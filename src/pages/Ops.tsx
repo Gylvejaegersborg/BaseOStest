@@ -18,7 +18,7 @@ const DEVICE_ICON: Record<string, typeof Cpu> = {
 export function Ops() {
   const [logs, setLogs] = useState(() => Array.from({ length: 12 }, (_, i) => makeLogLine(i)))
   const seed = useRef(12)
-  const logEndRef = useRef<HTMLDivElement>(null)
+  const logScrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const id = window.setInterval(() => {
@@ -29,7 +29,12 @@ export function Ops() {
   }, [])
 
   useEffect(() => {
-    logEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    const el = logScrollRef.current
+    if (!el) return
+    // Only the log box scrolls — and only if already at the bottom — so it never
+    // hijacks the page scroll on mobile.
+    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60
+    if (nearBottom) el.scrollTop = el.scrollHeight
   }, [logs])
 
   return (
@@ -72,7 +77,7 @@ export function Ops() {
           <div className="flex items-center gap-1.5 border-b border-line px-3 py-1.5 text-[10px] text-dim">
             <Terminal size={11} /> tail -f /var/log/personal-os
           </div>
-          <div className="h-[320px] overflow-y-auto p-2 text-[11px] leading-relaxed lg:h-[calc(100%-30px)]">
+          <div ref={logScrollRef} className="h-[320px] overflow-y-auto p-2 text-[11px] leading-relaxed lg:h-[calc(100%-30px)]">
             {logs.map((l, i) => (
               <div key={i} className="flex gap-2 whitespace-nowrap">
                 <span className="text-dim tabular-nums">{l.time}</span>
@@ -80,7 +85,6 @@ export function Ops() {
                 <span className="text-text/80">{l.text}</span>
               </div>
             ))}
-            <div ref={logEndRef} />
           </div>
         </Panel>
       </div>
