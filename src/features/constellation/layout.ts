@@ -1,0 +1,85 @@
+import { NAV_SECTIONS, type SectionId } from '@/data/sections'
+import { projectsForSection } from '@/data/projects'
+
+export interface Body {
+  key: string
+  kind: 'sun' | 'planet'
+  x: number
+  y: number
+  r: number
+  label: string
+  accent: string
+  sectionId: SectionId
+  projectId?: string
+}
+
+export const VIEW_W = 1200
+export const VIEW_H = 700
+
+// Hand-placed sun positions for a balanced constellation. Projects (hub) sits
+// near the centre so the others read as orbiting it.
+const SUN_POS: Record<string, { x: number; y: number }> = {
+  notes: { x: 250, y: 175 },
+  chat: { x: 540, y: 110 },
+  calendar: { x: 850, y: 180 },
+  projects: { x: 600, y: 365 },
+  lab: { x: 300, y: 500 },
+  room: { x: 910, y: 470 },
+  ops: { x: 1060, y: 300 },
+}
+
+// Constellation outline: which suns are linked by faint lines.
+export const SUN_LINKS: [SectionId, SectionId][] = [
+  ['notes', 'chat'],
+  ['chat', 'calendar'],
+  ['calendar', 'ops'],
+  ['ops', 'room'],
+  ['room', 'lab'],
+  ['lab', 'notes'],
+  ['projects', 'notes'],
+  ['projects', 'calendar'],
+  ['projects', 'room'],
+  ['projects', 'lab'],
+]
+
+export function buildBodies(): { suns: Body[]; planets: Body[] } {
+  const suns: Body[] = []
+  const planets: Body[] = []
+
+  for (const s of NAV_SECTIONS) {
+    const pos = SUN_POS[s.id]
+    suns.push({
+      key: `sun-${s.id}`,
+      kind: 'sun',
+      x: pos.x,
+      y: pos.y,
+      r: 16,
+      label: s.label,
+      accent: s.accent,
+      sectionId: s.id,
+    })
+
+    const projs = projectsForSection(s.id)
+    projs.forEach((p, i) => {
+      const angle = (Math.PI * 2 * i) / projs.length + s.id.length // varied start
+      const radius = 78 + (i % 2) * 22
+      planets.push({
+        key: `planet-${p.id}`,
+        kind: 'planet',
+        x: pos.x + Math.cos(angle) * radius,
+        y: pos.y + Math.sin(angle) * radius * 0.8,
+        r: 6,
+        label: p.name,
+        accent: s.accent,
+        sectionId: s.id,
+        projectId: p.id,
+      })
+    })
+  }
+
+  return { suns, planets }
+}
+
+export function sunPos(id: SectionId) {
+  return SUN_POS[id]
+}

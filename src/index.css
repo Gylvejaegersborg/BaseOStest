@@ -1,0 +1,135 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-bg text-text font-mono antialiased;
+    margin: 0;
+    background-image:
+      radial-gradient(circle at 20% -10%, rgba(54, 224, 200, 0.05), transparent 45%),
+      radial-gradient(circle at 90% 110%, rgba(224, 64, 138, 0.05), transparent 45%);
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    @apply bg-accent/30 text-text;
+  }
+
+  /* Thin terminal scrollbars */
+  ::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-line-2 rounded;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-dim;
+  }
+}
+
+@layer components {
+  /* Faint dotted grid used as a section backdrop */
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(31, 39, 51, 0.4) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(31, 39, 51, 0.4) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .hud-corners::before,
+  .hud-corners::after {
+    content: '';
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border-color: currentColor;
+    opacity: 0.55;
+  }
+  .hud-corners::before {
+    top: -1px;
+    left: -1px;
+    border-top: 1px solid;
+    border-left: 1px solid;
+  }
+  .hud-corners::after {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 1px solid;
+    border-right: 1px solid;
+  }
+
+  .label {
+    @apply text-[11px] uppercase tracking-[0.18em] text-dim;
+  }
+}
+
+/* Markdown preview (terminal prose) */
+.prose-term {
+  @apply text-text/90 text-sm leading-relaxed;
+}
+.prose-term h1,
+.prose-term h2,
+.prose-term h3 {
+  @apply font-display text-accent tracking-wide mt-6 mb-2;
+}
+.prose-term h1 {
+  @apply text-2xl border-b border-line pb-2;
+}
+.prose-term h2 {
+  @apply text-xl;
+}
+.prose-term h3 {
+  @apply text-base text-amber;
+}
+.prose-term p {
+  @apply my-3;
+}
+.prose-term a {
+  @apply text-accent underline decoration-accent/40 hover:decoration-accent;
+}
+.prose-term ul {
+  @apply list-disc pl-5 my-3 space-y-1 marker:text-dim;
+}
+.prose-term ol {
+  @apply list-decimal pl-5 my-3 space-y-1 marker:text-dim;
+}
+.prose-term blockquote {
+  @apply border-l-2 border-magenta/60 pl-3 my-3 text-dim italic;
+}
+.prose-term code {
+  @apply bg-panel-2 text-amber px-1.5 py-0.5 rounded text-[0.85em];
+}
+.prose-term pre {
+  @apply bg-panel-2 border border-line rounded-md p-3 my-4 overflow-x-auto;
+}
+.prose-term pre code {
+  @apply bg-transparent text-text/90 p-0;
+}
+.prose-term table {
+  @apply w-full my-4 text-xs border border-line;
+}
+.prose-term th,
+.prose-term td {
+  @apply border border-line px-2 py-1 text-left;
+}
+.prose-term th {
+  @apply bg-panel-2 text-accent uppercase tracking-wider;
+}
+.prose-term hr {
+  @apply border-line my-6;
+}
