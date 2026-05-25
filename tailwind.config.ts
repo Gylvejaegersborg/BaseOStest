@@ -17,10 +17,21 @@ export default {
         magenta: '#e0408a',
         'neon-green': '#46d369',
         danger: '#ff5566',
+        // Claude-themed palette, scoped to the Sudoku app (warm cream + terracotta).
+        'claude-bg': '#F0EEE6',
+        'claude-surface': '#FAF9F5',
+        'claude-ink': '#1F1E1C',
+        'claude-ink-2': '#6B6862',
+        'claude-clay': '#CC785C',
+        'claude-clay-soft': '#E8C4B8',
+        'claude-line': '#E3DFD3',
+        'claude-sage': '#7A9471',
+        'claude-sky': '#6B8AA6',
       },
       fontFamily: {
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
         display: ['"Share Tech Mono"', 'monospace'],
+        claude: ['"Lora"', 'Georgia', 'ui-serif', 'serif'],
       },
       boxShadow: {
         glow: '0 0 0 1px rgba(54,224,200,0.25), 0 0 14px -2px rgba(54,224,200,0.35)',

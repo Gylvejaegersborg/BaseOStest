@@ -7,6 +7,7 @@ import {
   FlaskConical,
   Users,
   Activity,
+  Grid3x3,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -19,6 +20,7 @@ export type SectionId =
   | 'lab'
   | 'room'
   | 'ops'
+  | 'sudoku'
 
 export interface Section {
   id: SectionId
@@ -102,6 +104,15 @@ export const SECTIONS: Section[] = [
     icon: Activity,
     blurb: 'Errors, uptime, agent health and every device connection.',
     accent: '#ff5566',
+  },
+  {
+    id: 'sudoku',
+    label: 'Sudoku',
+    code: 'SDK.08',
+    route: '/sudoku',
+    icon: Grid3x3,
+    blurb: 'Learn to read the board. Guided hints, mid-game nudges and a coaching report each round.',
+    accent: '#CC785C',
   },
 ]
 

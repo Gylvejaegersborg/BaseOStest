@@ -1,3 +1,4 @@
+import { Suspense, lazy } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { AppShell } from './components/layout/AppShell'
 import { Home } from './pages/Home'
@@ -8,6 +9,8 @@ import { Projects } from './pages/Projects'
 import { Lab } from './pages/Lab'
 import { MeetingRoom } from './pages/MeetingRoom'
 import { Ops } from './pages/Ops'
+
+const Sudoku = lazy(() => import('./pages/Sudoku').then((m) => ({ default: m.Sudoku })))
 
 const router = createBrowserRouter([
   {
@@ -22,6 +25,14 @@ const router = createBrowserRouter([
       { path: 'lab', element: <Lab /> },
       { path: 'room', element: <MeetingRoom /> },
       { path: 'ops', element: <Ops /> },
+      {
+        path: 'sudoku',
+        element: (
+          <Suspense fallback={<div className="h-full w-full bg-claude-bg" />}>
+            <Sudoku />
+          </Suspense>
+        ),
+      },
     ],
   },
 ])
