@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Mic, Paperclip, Send, Square, X, Bot, Plus } from 'lucide-react'
+import { Mic, Paperclip, Send, Square, X, Bot, Plus, MessagesSquare, ChevronDown } from 'lucide-react'
 import { AGENTS } from '@/data/agents'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { cn } from '@/lib/cn'
@@ -46,10 +46,12 @@ export function Chat() {
   const [draft, setDraft] = useState('')
   const [pending, setPending] = useState<Attachment[]>([])
   const [dragging, setDragging] = useState(false)
+  const [threadsOpen, setThreadsOpen] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
 
   const agent = CHAT_AGENTS.find((a) => a.id === agentId)!
+  const convo = CONVERSATIONS.find((c) => c.id === convoId) ?? CONVERSATIONS[0]
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
@@ -108,34 +110,50 @@ export function Chat() {
         addFiles(e.dataTransfer.files)
       }}
     >
-      {/* Conversations */}
+      {/* Conversations (desktop rail) */}
       <aside className="hidden w-[240px] shrink-0 flex-col border-r border-line bg-panel/40 lg:flex">
         <div className="flex items-center justify-between border-b border-line p-3">
           <span className="label">Threads</span>
           <Plus size={14} className="text-dim hover:text-accent" />
         </div>
         <div className="flex-1 overflow-y-auto">
-          {CONVERSATIONS.map((c) => (
-            <button
-              key={c.id}
-              onClick={() => setConvoId(c.id)}
-              className={cn(
-                'flex w-full flex-col gap-0.5 border-l-2 px-3 py-2.5 text-left transition-colors',
-                c.id === convoId ? 'border-accent bg-accent/5' : 'border-transparent hover:bg-panel-2/50',
-              )}
-            >
-              <span className="flex items-center justify-between text-xs text-text">
-                {c.title}
-                <span className="text-[9px] text-dim">{c.agent}</span>
-              </span>
-              <span className="truncate text-[10px] text-dim">{c.preview}</span>
-            </button>
-          ))}
+          <ThreadList convoId={convoId} onSelect={setConvoId} />
         </div>
       </aside>
 
       {/* Thread */}
       <section className="relative flex min-w-0 flex-1 flex-col">
+        {/* Mobile thread switcher */}
+        <div className="relative border-b border-line lg:hidden">
+          <button
+            onClick={() => setThreadsOpen((o) => !o)}
+            className="flex w-full items-center gap-2 px-3 py-2 text-left"
+          >
+            <MessagesSquare size={15} className="shrink-0 text-dim" />
+            <span className="min-w-0 flex-1 truncate text-sm text-text">{convo.title}</span>
+            <span className="text-[10px] text-dim">{convo.agent}</span>
+            <ChevronDown size={15} className={cn('shrink-0 text-dim transition-transform', threadsOpen && 'rotate-180')} />
+          </button>
+          {threadsOpen && (
+            <>
+              <div className="fixed inset-0 z-30" onClick={() => setThreadsOpen(false)} />
+              <div className="absolute inset-x-0 top-full z-40 max-h-[60vh] overflow-y-auto border-b border-line-2 bg-panel shadow-glow animate-fade-in">
+                <div className="flex items-center justify-between border-b border-line px-3 py-2">
+                  <span className="label">Threads</span>
+                  <Plus size={14} className="text-dim hover:text-accent" />
+                </div>
+                <ThreadList
+                  convoId={convoId}
+                  onSelect={(id) => {
+                    setConvoId(id)
+                    setThreadsOpen(false)
+                  }}
+                />
+              </div>
+            </>
+          )}
+        </div>
+
         {/* Agent selector */}
         <div className="flex flex-wrap items-center gap-2 border-b border-line px-3 py-2 sm:px-4">
           {CHAT_AGENTS.map((a) => (
@@ -208,6 +226,29 @@ export function Chat() {
         )}
       </section>
     </div>
+  )
+}
+
+function ThreadList({ convoId, onSelect }: { convoId: string; onSelect: (id: string) => void }) {
+  return (
+    <>
+      {CONVERSATIONS.map((c) => (
+        <button
+          key={c.id}
+          onClick={() => onSelect(c.id)}
+          className={cn(
+            'flex w-full flex-col gap-0.5 border-l-2 px-3 py-2.5 text-left transition-colors',
+            c.id === convoId ? 'border-accent bg-accent/5' : 'border-transparent hover:bg-panel-2/50',
+          )}
+        >
+          <span className="flex items-center justify-between text-xs text-text">
+            {c.title}
+            <span className="text-[9px] text-dim">{c.agent}</span>
+          </span>
+          <span className="truncate text-[10px] text-dim">{c.preview}</span>
+        </button>
+      ))}
+    </>
   )
 }
 
