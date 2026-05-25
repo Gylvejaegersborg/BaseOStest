@@ -68,11 +68,11 @@ export function Ops() {
 
       {/* Log stream */}
       <div className="lg:col-span-1">
-        <Panel title="Live Log" code="STREAM" accent="#f0a020" className="h-full" bodyClassName="p-0">
+        <Panel title="Live Log" code="STREAM" accent="#f0a020" className="lg:h-full" bodyClassName="p-0">
           <div className="flex items-center gap-1.5 border-b border-line px-3 py-1.5 text-[10px] text-dim">
             <Terminal size={11} /> tail -f /var/log/personal-os
           </div>
-          <div className="h-[calc(100%-30px)] overflow-y-auto p-2 text-[11px] leading-relaxed">
+          <div className="h-[320px] overflow-y-auto p-2 text-[11px] leading-relaxed lg:h-[calc(100%-30px)]">
             {logs.map((l, i) => (
               <div key={i} className="flex gap-2 whitespace-nowrap">
                 <span className="text-dim tabular-nums">{l.time}</span>

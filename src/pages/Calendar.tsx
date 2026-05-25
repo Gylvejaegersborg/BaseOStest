@@ -47,9 +47,9 @@ export function Calendar() {
   }
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
       {/* Calendar grid */}
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex h-[72vh] min-w-0 flex-col lg:h-auto lg:flex-1">
         <div className="flex items-center justify-between border-b border-line px-4 py-2">
           <div className="flex items-center gap-3">
             <h1 className="font-display text-lg tracking-wider text-text">CALENDAR</h1>
@@ -70,22 +70,25 @@ export function Calendar() {
           </div>
         </div>
 
-        {/* Day headers */}
-        <div className="flex border-b border-line pr-3" style={{ paddingLeft: 52 }}>
-          {days.map((d) => {
-            const today = isSameDay(d, TODAY)
-            return (
-              <div key={d.toISOString()} className="flex-1 py-2 text-center">
-                <div className="text-[10px] uppercase tracking-wider text-dim">{format(d, 'EEE')}</div>
-                <div className={`font-display text-lg ${today ? 'text-accent' : 'text-text'}`}>{format(d, 'd')}</div>
-              </div>
-            )
-          })}
-        </div>
+        {/* Headers + grid share one scroll area so columns stay aligned; min-width forces
+            horizontal scroll on narrow phones instead of crushing the 7 columns. */}
+        <div className="min-h-0 flex-1 overflow-auto">
+          <div className="min-w-[720px] lg:min-w-0">
+            {/* Day headers */}
+            <div className="sticky top-0 z-20 flex border-b border-line bg-bg pr-3" style={{ paddingLeft: 52 }}>
+              {days.map((d) => {
+                const today = isSameDay(d, TODAY)
+                return (
+                  <div key={d.toISOString()} className="flex-1 py-2 text-center">
+                    <div className="text-[10px] uppercase tracking-wider text-dim">{format(d, 'EEE')}</div>
+                    <div className={`font-display text-lg ${today ? 'text-accent' : 'text-text'}`}>{format(d, 'd')}</div>
+                  </div>
+                )
+              })}
+            </div>
 
-        {/* Time grid */}
-        <div className="min-h-0 flex-1 overflow-y-auto">
-          <div className="relative flex" style={{ height: (DAY_END - DAY_START) * HOUR_PX }}>
+            {/* Time grid */}
+            <div className="relative flex" style={{ height: (DAY_END - DAY_START) * HOUR_PX }}>
             {/* hour labels */}
             <div className="w-[52px] shrink-0">
               {Array.from({ length: DAY_END - DAY_START }, (_, i) => (
@@ -110,12 +113,13 @@ export function Calendar() {
                 </div>
               )
             })}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Side panels */}
-      <aside className="flex w-[300px] shrink-0 flex-col gap-3 overflow-y-auto border-l border-line bg-panel/30 p-3">
+      <aside className="flex w-full shrink-0 flex-col gap-3 overflow-y-auto border-t border-line bg-panel/30 p-3 lg:w-[300px] lg:border-l lg:border-t-0">
         <Panel title="Up Next" code="TOP 3" accent="#f0a020" bodyClassName="p-2">
           <div className="space-y-2">
             {upNext.length ? (

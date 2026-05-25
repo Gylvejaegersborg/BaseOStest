@@ -2,56 +2,88 @@ import { useState } from 'react'
 import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity } from 'lucide-react'
 import { LAB_MODULES, type LabModule } from '@/data/labs'
 import { Panel } from '@/components/ui/Panel'
+import { Modal } from '@/components/ui/Modal'
 import { Badge } from '@/components/ui/Badge'
 import { StatusDot } from '@/components/ui/StatusDot'
+import { useIsDesktop } from '@/lib/useMediaQuery'
 import { cn } from '@/lib/cn'
 
 const STATUS_COLOR = { live: '#46d369', staging: '#f0a020', local: '#36e0c8' } as const
 
 export function Lab() {
   const [selectedId, setSelectedId] = useState(LAB_MODULES[0].id)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const isDesktop = useIsDesktop()
   const selected = LAB_MODULES.find((m) => m.id === selectedId)!
+
+  const openModule = (id: string) => {
+    setSelectedId(id)
+    if (!isDesktop) setMobileOpen(true)
+  }
 
   return (
     <div className="flex h-full">
-      <div className="min-w-0 flex-1 overflow-y-auto p-6">
+      <div className="min-w-0 flex-1 overflow-y-auto p-4 sm:p-6">
         <div className="mb-5">
           <h1 className="font-display text-2xl tracking-wider text-text">LAB</h1>
           <p className="text-xs text-dim">Pages and apps you have built. Preview, launch and poke them.</p>
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {LAB_MODULES.map((m) => (
-            <ModuleCard key={m.id} mod={m} active={m.id === selectedId} onClick={() => setSelectedId(m.id)} />
+            <ModuleCard key={m.id} mod={m} active={m.id === selectedId} onClick={() => openModule(m.id)} />
           ))}
         </div>
       </div>
 
+      {/* Desktop: persistent detail rail */}
       <aside className="hidden w-[380px] shrink-0 flex-col gap-3 overflow-y-auto border-l border-line bg-panel/30 p-3 lg:flex">
-        <Panel title={selected.name} code={selected.kind} accent={STATUS_COLOR[selected.status]}>
-          <PreviewFrame mod={selected} />
-          <p className="mt-3 text-xs text-text/85">{selected.description}</p>
-          <div className="mt-2 flex flex-wrap gap-1">
-            {selected.stack.map((s) => (
-              <Badge key={s} color="#6b7785">
-                {s}
-              </Badge>
-            ))}
-          </div>
-          {selected.url && (
-            <a
-              href={selected.url}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-3 flex items-center justify-center gap-2 border border-line py-2 text-xs uppercase tracking-wider text-accent hover:border-accent/60"
-            >
-              Launch <ExternalLink size={13} />
-            </a>
-          )}
-        </Panel>
-
-        <TestConsole key={selected.id} mod={selected} />
+        <ModuleDetail mod={selected} />
       </aside>
+
+      {/* Mobile: detail opens in a modal */}
+      <Modal
+        open={mobileOpen && !isDesktop}
+        onClose={() => setMobileOpen(false)}
+        title={selected.name}
+        code={selected.kind}
+        accent={STATUS_COLOR[selected.status]}
+        width={520}
+      >
+        <div className="flex flex-col gap-3">
+          <ModuleDetail mod={selected} embedded />
+        </div>
+      </Modal>
     </div>
+  )
+}
+
+function ModuleDetail({ mod, embedded }: { mod: LabModule; embedded?: boolean }) {
+  return (
+    <>
+      <Panel title={embedded ? undefined : mod.name} code={embedded ? undefined : mod.kind} accent={STATUS_COLOR[mod.status]}>
+        <PreviewFrame mod={mod} />
+        <p className="mt-3 text-xs text-text/85">{mod.description}</p>
+        <div className="mt-2 flex flex-wrap gap-1">
+          {mod.stack.map((s) => (
+            <Badge key={s} color="#6b7785">
+              {s}
+            </Badge>
+          ))}
+        </div>
+        {mod.url && (
+          <a
+            href={mod.url}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-3 flex items-center justify-center gap-2 border border-line py-2 text-xs uppercase tracking-wider text-accent hover:border-accent/60"
+          >
+            Launch <ExternalLink size={13} />
+          </a>
+        )}
+      </Panel>
+
+      <TestConsole key={mod.id} mod={mod} />
+    </>
   )
 }
 

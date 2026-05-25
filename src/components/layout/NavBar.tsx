@@ -2,14 +2,14 @@ import { NavLink } from 'react-router-dom'
 import { SECTIONS } from '@/data/sections'
 import { cn } from '@/lib/cn'
 
-export function NavBar() {
+export function NavBar({ className }: { className?: string }) {
   return (
-    <nav className="flex h-full w-[68px] flex-col items-stretch border-r border-line bg-panel/60 py-3">
-      <div className="mb-3 flex flex-col items-center">
+    <nav className={cn('flex h-full w-[68px] flex-col items-stretch border-r border-line bg-panel/60 py-3', className)}>
+      <div className="mb-3 flex shrink-0 flex-col items-center">
         <div className="font-display text-lg leading-none text-accent">OS</div>
         <div className="text-[8px] tracking-[0.3em] text-dim">v0.1</div>
       </div>
-      <div className="flex flex-1 flex-col gap-0.5">
+      <div className="flex flex-1 flex-col gap-0.5 overflow-y-auto">
         {SECTIONS.map((s) => {
           const Icon = s.icon
           return (
@@ -20,7 +20,7 @@ export function NavBar() {
               title={s.label}
               className={({ isActive }) =>
                 cn(
-                  'group relative flex flex-col items-center gap-1 py-2.5 text-dim transition-colors hover:text-text',
+                  'group relative flex shrink-0 flex-col items-center gap-1 py-2.5 text-dim transition-colors hover:text-text',
                   isActive && 'text-text',
                 )
               }

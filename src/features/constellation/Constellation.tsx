@@ -4,7 +4,7 @@ import { buildBodies, sunPos, SUN_LINKS, VIEW_H, VIEW_W, type Body } from './lay
 interface Props {
   activeKey: string | null
   onHover: (b: Body | null) => void
-  onSelect: (b: Body) => void
+  onSelect: (b: Body, pointerType: string) => void
 }
 
 export function Constellation({ activeKey, onHover, onSelect }: Props) {
@@ -13,8 +13,8 @@ export function Constellation({ activeKey, onHover, onSelect }: Props) {
   return (
     <svg
       viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
-      preserveAspectRatio="xMidYMid slice"
-      className="absolute inset-0 h-full w-full"
+      preserveAspectRatio="xMidYMid meet"
+      className="absolute inset-0 h-full w-full touch-manipulation"
     >
       {/* constellation outline between suns */}
       <g opacity={0.25}>
@@ -77,16 +77,16 @@ function BodyNode({
   body: Body
   active: boolean
   onHover: (b: Body | null) => void
-  onSelect: (b: Body) => void
+  onSelect: (b: Body, pointerType: string) => void
 }) {
   const isSun = body.kind === 'sun'
   return (
     <g
       transform={`translate(${body.x} ${body.y})`}
       className="cursor-pointer"
-      onMouseEnter={() => onHover(body)}
-      onMouseLeave={() => onHover(null)}
-      onClick={() => onSelect(body)}
+      onPointerEnter={(e) => e.pointerType !== 'touch' && onHover(body)}
+      onPointerLeave={(e) => e.pointerType !== 'touch' && onHover(null)}
+      onPointerUp={(e) => onSelect(body, e.pointerType)}
     >
       {/* hit area */}
       <circle r={isSun ? 34 : 18} fill="transparent" />

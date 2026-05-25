@@ -16,9 +16,14 @@ export function Home() {
   const shown = hover ?? pinned
   const activeKey = hover?.key ?? pinned?.key ?? null
 
-  const onSelect = (b: Body) => {
-    if (b.kind === 'sun') navigate(sectionById(b.sectionId).route)
-    else setPinned(b)
+  // On a mouse, clicking a sun jumps straight in. On touch there is no hover,
+  // so a tap selects the body and shows its panel; the panel's button navigates.
+  const onSelect = (b: Body, pointerType: string) => {
+    if (b.kind === 'sun' && pointerType !== 'touch') {
+      navigate(sectionById(b.sectionId).route)
+    } else {
+      setPinned((cur) => (cur?.key === b.key ? null : b))
+    }
   }
 
   return (
@@ -27,20 +32,20 @@ export function Home() {
       <div className="pointer-events-none absolute inset-0 grid-bg opacity-30" />
 
       {/* Title overlay */}
-      <div className="pointer-events-none absolute left-6 top-6 z-10">
-        <div className="text-[11px] tracking-[0.4em] text-dim">PERSONAL OPERATING SYSTEM</div>
-        <h1 className="font-display text-4xl tracking-wider text-text sm:text-5xl">
+      <div className="pointer-events-none absolute left-4 top-4 z-10 sm:left-6 sm:top-6">
+        <div className="text-[10px] tracking-[0.4em] text-dim sm:text-[11px]">PERSONAL OPERATING SYSTEM</div>
+        <h1 className="font-display text-2xl tracking-wider text-text sm:text-4xl lg:text-5xl">
           THE <span className="text-accent">CONSTELLATION</span>
         </h1>
-        <div className="mt-1 max-w-md text-xs text-dim">
+        <div className="mt-1 hidden max-w-md text-xs text-dim sm:block">
           Eight sections, ten projects — one map. Hover a body to read it, click a sun to enter.
         </div>
       </div>
 
       <Constellation activeKey={activeKey} onHover={setHover} onSelect={onSelect} />
 
-      {/* Hint */}
-      <div className="pointer-events-none absolute bottom-6 left-6 z-10 flex items-center gap-2 text-[11px] text-dim">
+      {/* Hint (desktop only — touch users get the tap-to-select panel) */}
+      <div className="pointer-events-none absolute bottom-6 left-6 z-10 hidden items-center gap-2 text-[11px] text-dim lg:flex">
         <MousePointerClick size={13} /> hover = preview · click sun = open · click planet = pin
       </div>
 
@@ -55,7 +60,7 @@ function InfoPanel({ body, onOpen }: { body: Body | null; onOpen: () => void }) 
   const project = body?.projectId ? projectById(body.projectId) : undefined
 
   return (
-    <div className="absolute bottom-6 right-6 z-10 w-[320px]">
+    <div className="absolute bottom-4 left-4 right-4 z-10 sm:bottom-6 sm:left-auto sm:right-6 sm:w-[320px]">
       <div
         className="hud-corners relative border bg-panel/85 p-4 backdrop-blur-md transition-all"
         style={{ borderColor: body ? `${body.accent}55` : '#1f2733', color: body?.accent ?? '#1f2733' }}

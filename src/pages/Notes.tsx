@@ -1,20 +1,20 @@
 import { useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { Eye, FileText, Hash, PanelsTopLeft, Pencil } from 'lucide-react'
+import { Check, ChevronLeft, FileText, Hash, Pencil } from 'lucide-react'
 import { NOTES, NOTE_TAGS, type Note } from '@/data/notes'
 import { SearchInput } from '@/components/ui/SearchInput'
 import { relTime } from '@/lib/time'
 import { cn } from '@/lib/cn'
 
-type ViewMode = 'edit' | 'preview' | 'split'
-
 export function Notes() {
   const [query, setQuery] = useState('')
   const [tag, setTag] = useState<string | null>(null)
   const [selectedId, setSelectedId] = useState<string>(NOTES[0].id)
-  const [view, setView] = useState<ViewMode>('split')
+  const [editing, setEditing] = useState(false)
   const [drafts, setDrafts] = useState<Record<string, string>>({})
+  // mobile master-detail: 'list' shows the browser, 'note' shows the editor
+  const [mobileView, setMobileView] = useState<'list' | 'note'>('list')
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -41,7 +41,12 @@ export function Notes() {
   return (
     <div className="flex h-full">
       {/* Browser */}
-      <aside className="flex w-[300px] shrink-0 flex-col border-r border-line bg-panel/40">
+      <aside
+        className={cn(
+          'w-full shrink-0 flex-col border-r border-line bg-panel/40 lg:flex lg:w-[300px]',
+          mobileView === 'note' ? 'hidden' : 'flex',
+        )}
+      >
         <div className="border-b border-line p-3">
           <SearchInput value={query} onChange={setQuery} placeholder="search 320 notes…" />
           <div className="mt-2 flex flex-wrap gap-1">
@@ -74,7 +79,11 @@ export function Notes() {
               {items.map((n) => (
                 <button
                   key={n.id}
-                  onClick={() => setSelectedId(n.id)}
+                  onClick={() => {
+                    setSelectedId(n.id)
+                    setMobileView('note')
+                    setEditing(false)
+                  }}
                   className={cn(
                     'flex w-full flex-col gap-0.5 border-l-2 px-3 py-2 text-left transition-colors',
                     n.id === selectedId
@@ -98,35 +107,63 @@ export function Notes() {
       </aside>
 
       {/* Editor / preview */}
-      <section className="flex min-w-0 flex-1 flex-col">
+      <section
+        className={cn(
+          'min-w-0 flex-1 flex-col lg:flex',
+          mobileView === 'list' ? 'hidden' : 'flex',
+        )}
+      >
         <div className="flex items-center justify-between border-b border-line px-4 py-2">
           <div className="flex min-w-0 items-center gap-2">
+            <button
+              onClick={() => setMobileView('list')}
+              className="text-dim hover:text-text lg:hidden"
+              aria-label="Back to list"
+            >
+              <ChevronLeft size={16} />
+            </button>
             <Hash size={13} className="text-dim" />
             <span className="truncate font-display text-text">{selected.title}</span>
-            <span className="text-[10px] text-dim">· {selected.folder}</span>
+            <span className="hidden text-[10px] text-dim sm:inline">· {selected.folder}</span>
           </div>
-          <div className="flex border border-line">
-            <ModeBtn icon={Pencil} label="Edit" active={view === 'edit'} onClick={() => setView('edit')} />
-            <ModeBtn icon={PanelsTopLeft} label="Split" active={view === 'split'} onClick={() => setView('split')} />
-            <ModeBtn icon={Eye} label="Read" active={view === 'preview'} onClick={() => setView('preview')} />
-          </div>
+          <button
+            onClick={() => setEditing((e) => !e)}
+            className={cn(
+              'flex items-center gap-1 border px-2.5 py-1 text-[11px] uppercase tracking-wider transition-colors',
+              editing ? 'border-accent/60 bg-accent/10 text-accent' : 'border-line text-dim hover:text-text',
+            )}
+          >
+            {editing ? (
+              <>
+                <Check size={12} /> Done
+              </>
+            ) : (
+              <>
+                <Pencil size={12} /> Edit
+              </>
+            )}
+          </button>
         </div>
 
-        <div className="flex min-h-0 flex-1">
-          {view !== 'preview' && (
+        {/* Single rendered view. Click the page (or Edit) to drop into the raw
+            markdown; blurring or hitting Done returns to the rendered note. */}
+        <div className="min-h-0 flex-1">
+          {editing ? (
             <textarea
+              autoFocus
               value={body}
               onChange={(e) => setDrafts((d) => ({ ...d, [selectedId]: e.target.value }))}
+              onBlur={() => setEditing(false)}
               spellCheck={false}
-              className={cn(
-                'min-h-0 resize-none bg-bg/40 p-4 text-sm leading-relaxed text-text/90 outline-none',
-                view === 'split' ? 'w-1/2 border-r border-line' : 'w-full',
-              )}
+              className="h-full w-full resize-none bg-bg/40 p-5 text-sm leading-relaxed text-text/90 outline-none"
             />
-          )}
-          {view !== 'edit' && (
-            <div className={cn('min-h-0 overflow-y-auto p-5', view === 'split' ? 'w-1/2' : 'mx-auto w-full max-w-3xl')}>
-              <article className="prose-term">
+          ) : (
+            <div
+              onClick={() => setEditing(true)}
+              title="Click to edit"
+              className="h-full cursor-text overflow-y-auto p-5"
+            >
+              <article className="prose-term mx-auto w-full max-w-3xl">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{body}</ReactMarkdown>
               </article>
             </div>
@@ -134,30 +171,6 @@ export function Notes() {
         </div>
       </section>
     </div>
-  )
-}
-
-function ModeBtn({
-  icon: Icon,
-  label,
-  active,
-  onClick,
-}: {
-  icon: typeof Eye
-  label: string
-  active: boolean
-  onClick: () => void
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={cn(
-        'flex items-center gap-1 px-2.5 py-1 text-[11px] uppercase tracking-wider transition-colors',
-        active ? 'bg-accent/10 text-accent' : 'text-dim hover:text-text',
-      )}
-    >
-      <Icon size={12} /> {label}
-    </button>
   )
 }
 

@@ -109,7 +109,7 @@ export function Chat() {
       }}
     >
       {/* Conversations */}
-      <aside className="flex w-[240px] shrink-0 flex-col border-r border-line bg-panel/40">
+      <aside className="hidden w-[240px] shrink-0 flex-col border-r border-line bg-panel/40 lg:flex">
         <div className="flex items-center justify-between border-b border-line p-3">
           <span className="label">Threads</span>
           <Plus size={14} className="text-dim hover:text-accent" />
@@ -137,7 +137,7 @@ export function Chat() {
       {/* Thread */}
       <section className="relative flex min-w-0 flex-1 flex-col">
         {/* Agent selector */}
-        <div className="flex items-center gap-2 border-b border-line px-4 py-2">
+        <div className="flex flex-wrap items-center gap-2 border-b border-line px-3 py-2 sm:px-4">
           {CHAT_AGENTS.map((a) => (
             <button
               key={a.id}
@@ -151,7 +151,7 @@ export function Chat() {
               <StatusDot color={a.color} size={6} /> {a.name}
             </button>
           ))}
-          <span className="ml-auto text-[10px] text-dim">{agent.model}</span>
+          <span className="ml-auto hidden text-[10px] text-dim sm:inline">{agent.model}</span>
         </div>
 
         <div ref={scrollRef} className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
