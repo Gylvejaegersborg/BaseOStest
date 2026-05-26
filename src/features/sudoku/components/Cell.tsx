@@ -23,7 +23,7 @@ export function Cell(props: CellProps) {
       type="button"
       onClick={onClick}
       className={cn(
-        'relative flex select-none items-center justify-center transition-colors',
+        'relative flex min-h-0 min-w-0 select-none items-center justify-center overflow-hidden transition-colors',
         // Grid lines: draw top + left only so adjacent cells never double up.
         // Box dividers (every third line) match the outer frame's 2px weight.
         col !== 0 && (col % 3 === 0 ? 'border-l-2 border-l-claude-ink/40' : 'border-l border-l-claude-line'),
