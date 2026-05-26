@@ -84,7 +84,7 @@ export function Sudoku() {
 
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
           {/* Board column */}
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex w-full flex-col items-center gap-4 lg:w-[clamp(17rem,38vw,30rem)] lg:shrink-0">
             <Controls
               difficulty={game.difficulty}
               elapsed={game.elapsed}
@@ -98,7 +98,7 @@ export function Sudoku() {
               onAutoPencil={game.autoPencil}
             />
 
-            <div className="relative">
+            <div className="relative w-full">
               <Board game={game} highlights={highlights} />
               {(game.paused || game.generating) && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-claude-surface/90 backdrop-blur-sm">
