@@ -23,9 +23,11 @@ export function Cell(props: CellProps) {
       type="button"
       onClick={onClick}
       className={cn(
-        'relative flex aspect-square select-none items-center justify-center border border-claude-line transition-colors',
-        col % 3 === 2 && col !== 8 && 'border-r-2 border-r-claude-ink/40',
-        row % 3 === 2 && row !== 8 && 'border-b-2 border-b-claude-ink/40',
+        'relative flex min-h-0 min-w-0 select-none items-center justify-center overflow-hidden transition-colors',
+        // Grid lines: draw top + left only so adjacent cells never double up.
+        // Box dividers (every third line) match the outer frame's 2px weight.
+        col !== 0 && (col % 3 === 0 ? 'border-l-2 border-l-claude-ink/40' : 'border-l border-l-claude-line'),
+        row !== 0 && (row % 3 === 0 ? 'border-t-2 border-t-claude-ink/40' : 'border-t border-t-claude-line'),
         peer && !selected && 'bg-claude-bg',
         sameValue && !selected && 'bg-claude-sage/20',
         hintEvidence && !selected && 'bg-claude-clay-soft/60',

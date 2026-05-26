@@ -26,6 +26,7 @@ const SUN_POS: Record<string, { x: number; y: number }> = {
   lab: { x: 300, y: 500 },
   room: { x: 910, y: 470 },
   ops: { x: 1060, y: 300 },
+  sudoku: { x: 150, y: 370 },
 }
 
 // Constellation outline: which suns are linked by faint lines.
