@@ -27,6 +27,15 @@ export default {
         'claude-line': '#E3DFD3',
         'claude-sage': '#7A9471',
         'claude-sky': '#6B8AA6',
+        // isark beat-store brand palette (dark, electric — distinct from the OS terminal theme).
+        'isark-bg': '#0B0B0E',
+        'isark-surface': '#141419',
+        'isark-elevated': '#1C1C24',
+        'isark-line': '#2A2A33',
+        'isark-text': '#F4F3EE',
+        'isark-dim': '#8C8C97',
+        'isark-accent': '#CCFF00',
+        'isark-accent-2': '#A78BFA',
       },
       fontFamily: {
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],

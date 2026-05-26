@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity } from 'lucide-react'
+import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store } from 'lucide-react'
 import { LAB_MODULES, type LabModule } from '@/data/labs'
 import { Panel } from '@/components/ui/Panel'
 import { Modal } from '@/components/ui/Modal'
@@ -7,12 +7,14 @@ import { Badge } from '@/components/ui/Badge'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { useIsDesktop } from '@/lib/useMediaQuery'
 import { cn } from '@/lib/cn'
+import { BeatStoreModal } from '@/features/beatstore/BeatStoreModal'
 
 const STATUS_COLOR = { live: '#46d369', staging: '#f0a020', local: '#36e0c8' } as const
 
 export function Lab() {
   const [selectedId, setSelectedId] = useState(LAB_MODULES[0].id)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [storeOpen, setStoreOpen] = useState(false)
   const isDesktop = useIsDesktop()
   const selected = LAB_MODULES.find((m) => m.id === selectedId)!
 
@@ -37,7 +39,7 @@ export function Lab() {
 
       {/* Desktop: persistent detail rail */}
       <aside className="hidden w-[380px] shrink-0 flex-col gap-3 overflow-y-auto border-l border-line bg-panel/30 p-3 lg:flex">
-        <ModuleDetail mod={selected} />
+        <ModuleDetail mod={selected} onOpenStore={() => setStoreOpen(true)} />
       </aside>
 
       {/* Mobile: detail opens in a modal */}
@@ -50,14 +52,16 @@ export function Lab() {
         width={520}
       >
         <div className="flex flex-col gap-3">
-          <ModuleDetail mod={selected} embedded />
+          <ModuleDetail mod={selected} embedded onOpenStore={() => setStoreOpen(true)} />
         </div>
       </Modal>
+
+      <BeatStoreModal open={storeOpen} onClose={() => setStoreOpen(false)} />
     </div>
   )
 }
 
-function ModuleDetail({ mod, embedded }: { mod: LabModule; embedded?: boolean }) {
+function ModuleDetail({ mod, embedded, onOpenStore }: { mod: LabModule; embedded?: boolean; onOpenStore?: () => void }) {
   return (
     <>
       <Panel title={embedded ? undefined : mod.name} code={embedded ? undefined : mod.kind} accent={STATUS_COLOR[mod.status]}>
@@ -70,6 +74,14 @@ function ModuleDetail({ mod, embedded }: { mod: LabModule; embedded?: boolean })
             </Badge>
           ))}
         </div>
+        {mod.id === 'beat-store' && onOpenStore && (
+          <button
+            onClick={onOpenStore}
+            className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
+          >
+            Open Beat Store <Store size={13} />
+          </button>
+        )}
         {mod.url && (
           <a
             href={mod.url}
