@@ -10,6 +10,14 @@ export interface LabModule {
 
 export const LAB_MODULES: LabModule[] = [
   {
+    id: 'beat-store',
+    name: 'isark Beat Store',
+    kind: 'Storefront',
+    status: 'live',
+    description: 'Public beat store — preview, pick a license tier and check out. The sales counterpart to the private Beat DB.',
+    stack: ['React', 'Web Audio', 'Tailwind'],
+  },
+  {
     id: 'artist-web',
     name: 'Artist Webpage',
     kind: 'Public site',
