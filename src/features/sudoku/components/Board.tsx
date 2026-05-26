@@ -10,7 +10,7 @@ export function Board({ game, highlights }: { game: SudokuGame; highlights: Set<
   const selBox = selected !== null ? boxOf(selected) : -1
 
   return (
-    <div className="grid aspect-square w-full max-w-[min(92vw,30rem)] grid-cols-9 border-2 border-claude-ink/60 bg-claude-surface shadow-[0_2px_24px_rgba(31,30,28,0.10)]">
+    <div className="grid aspect-square w-full max-w-[min(92vw,30rem)] grid-cols-[repeat(9,minmax(0,1fr))] grid-rows-[repeat(9,minmax(0,1fr))] border-2 border-claude-ink/40 bg-claude-surface shadow-[0_2px_24px_rgba(31,30,28,0.10)]">
       {board.map((v, i) => {
         const peer =
           selected !== null &&
