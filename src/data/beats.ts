@@ -41,7 +41,7 @@ function licenses(exclusive: number): License[] {
   ]
 }
 
-const ARTIST = 'isark'
+const ARTIST = 'ISΛRK'
 
 export const BEATS: Beat[] = [
   // ─── Real tracks ────────────────────────────────────────────────────────
@@ -74,7 +74,7 @@ export const BEATS: Beat[] = [
   {
     id: 'switch',
     title: 'Switch',
-    artist: 'isark × 10k.emraan',
+    artist: 'ISΛRK × 10k.emraan',
     bpm: 186,
     musicalKey: 'C min',
     mood: ['Drill', 'Hard'],

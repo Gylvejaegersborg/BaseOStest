@@ -11,7 +11,7 @@ export interface LabModule {
 export const LAB_MODULES: LabModule[] = [
   {
     id: 'beat-store',
-    name: 'isark Beat Store',
+    name: 'ISΛRK Beat Store',
     kind: 'Storefront',
     status: 'live',
     description: 'Public beat store — preview, pick a license tier and check out. The sales counterpart to the private Beat DB.',
@@ -22,7 +22,7 @@ export const LAB_MODULES: LabModule[] = [
     name: 'Artist Webpage',
     kind: 'Public site',
     status: 'live',
-    description: 'The public isark site — releases grid, link hub and bio.',
+    description: 'The public ISΛRK site — releases grid, link hub and bio.',
     stack: ['React', 'Vite', 'Tailwind'],
     url: 'https://soundcloud.com/itsisark',
   },

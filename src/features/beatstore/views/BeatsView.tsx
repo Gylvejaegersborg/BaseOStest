@@ -21,15 +21,11 @@ export function BeatsView({ player, cartTiersFor, onAddToCart }: BeatsViewProps)
 
   const current = player.current
 
-  const onPickFromMenu = (beat: Beat) => {
-    player.play(beat)
-  }
-
   return (
     <div className="relative h-full w-full overflow-hidden">
-      {/* Background colour-wash */}
+      {/* Background colour wash — driven by the current beat's gradient */}
       <div
-        className="pointer-events-none absolute inset-0 -z-0"
+        className="pointer-events-none absolute inset-0 z-0"
         style={{
           background: current
             ? `radial-gradient(ellipse at 50% 30%, ${current.gradient[0]}22, transparent 70%), radial-gradient(ellipse at 50% 90%, ${current.gradient[1]}33, transparent 80%)`
@@ -37,7 +33,40 @@ export function BeatsView({ player, cartTiersFor, onAddToCart }: BeatsViewProps)
         }}
       />
 
-      {/* Search bar / menu toggle */}
+      {/* Perspective gridflow floor (#15 from the mockup) */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-[55%] overflow-hidden [perspective:1200px]">
+        <div
+          className="absolute inset-0 origin-bottom animate-grid-flow"
+          style={{
+            transform: 'rotateX(72deg)',
+            backgroundImage:
+              'linear-gradient(rgba(204,255,0,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(204,255,0,0.07) 1px, transparent 1px)',
+            backgroundSize: '64px 64px',
+            maskImage: 'linear-gradient(to top, black 30%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to top, black 30%, transparent 100%)',
+          }}
+        />
+      </div>
+
+      {/* Floating sonic dust (#16/#21 from the mockup) */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        <div
+          className="absolute -inset-[50%] animate-dust-drift opacity-[0.06]"
+          style={{
+            backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.85) 1px, transparent 1px)',
+            backgroundSize: '70px 70px',
+          }}
+        />
+        <div
+          className="absolute -inset-[50%] animate-dust-drift-reverse opacity-[0.03]"
+          style={{
+            backgroundImage: 'radial-gradient(circle, rgba(166,139,255,0.9) 1px, transparent 1px)',
+            backgroundSize: '110px 110px',
+          }}
+        />
+      </div>
+
+      {/* Search / menu toggle */}
       <div className="pointer-events-auto absolute left-4 top-4 z-20 flex items-center gap-2">
         <button
           type="button"
@@ -49,7 +78,6 @@ export function BeatsView({ player, cartTiersFor, onAddToCart }: BeatsViewProps)
         </button>
       </div>
 
-      {/* Prev / Next arrows */}
       <ArrowButton side="left" onClick={player.prev} />
       <ArrowButton side="right" onClick={player.next} />
 
@@ -77,6 +105,7 @@ export function BeatsView({ player, cartTiersFor, onAddToCart }: BeatsViewProps)
           duration={player.duration}
           shuffle={player.shuffle}
           cartTiers={current ? cartTiersFor(current.id) : new Set()}
+          analyserRef={player.analyserRef}
           onTogglePlay={() => current && player.toggle(current)}
           onToggleShuffle={() => player.setShuffle(!player.shuffle)}
           onSeek={player.seek}
@@ -93,9 +122,7 @@ export function BeatsView({ player, cartTiersFor, onAddToCart }: BeatsViewProps)
         onQuery={setQuery}
         mood={mood}
         onMood={setMood}
-        onPick={(b) => {
-          onPickFromMenu(b)
-        }}
+        onPick={(b) => player.play(b)}
       />
     </div>
   )

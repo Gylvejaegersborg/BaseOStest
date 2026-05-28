@@ -20,7 +20,7 @@ export function BeatStoreNav({ view, cartCount, onView, onClose }: BeatStoreNavP
   return (
     <header className="relative z-40 flex h-14 items-center gap-2 border-b border-isark-line/70 bg-isark-bg/55 px-4 backdrop-blur-xl">
       <div className="flex items-baseline gap-2">
-        <span className="font-sans text-lg font-bold tracking-tight text-isark-text">isark</span>
+        <span className="font-sans text-lg font-bold tracking-[0.05em] text-isark-text">ISΛRK</span>
         <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-isark-accent">beat store</span>
       </div>
 
