@@ -36,6 +36,9 @@ export default {
         'isark-dim': '#8C8C97',
         'isark-accent': '#CCFF00',
         'isark-accent-2': '#A78BFA',
+        'isark-mint': '#A8E6D0',
+        'isark-lavender': '#B6A8FF',
+        'isark-coral': '#FFB48A',
       },
       fontFamily: {
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
