@@ -39,7 +39,7 @@ export function generateLabelTexture(gradient: [string, string], title: string):
   ctx.fillText(title.toUpperCase(), 0, -size * 0.18)
   ctx.fillStyle = 'rgba(255,255,255,0.55)'
   ctx.font = '14px ui-monospace, monospace'
-  ctx.fillText('isark', 0, -size * 0.18 + 28)
+  ctx.fillText('ISΛRK', 0, -size * 0.18 + 28)
   ctx.restore()
 
   const tex = new THREE.CanvasTexture(canvas)

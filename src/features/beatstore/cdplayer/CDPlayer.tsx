@@ -3,7 +3,7 @@ import { Canvas } from '@react-three/fiber'
 import type { Beat } from '@/data/beats'
 import { Disc } from './Disc'
 import { VisualiserRing } from './VisualiserRing'
-import { Hands } from './Hands'
+import { DustSwap } from './DustSwap'
 import { useCDSwap, swapEasings } from './useCDSwap'
 
 interface CDPlayerProps {
@@ -15,8 +15,8 @@ interface CDPlayerProps {
 
 /**
  * Top-down 3D CD player: a spinning disc with the beat's artwork, a colour
- * audio-reactive visualiser ring, and friendly robot/alien hands that swap
- * the CD on track change.
+ * audio-reactive visualiser ring, and a sonic-dust dissolve effect on track
+ * change.
  */
 export function CDPlayer({ current, playing, swapToken, analyserRef }: CDPlayerProps) {
   const swap = useCDSwap(current, swapToken)
@@ -57,7 +57,13 @@ export function CDPlayer({ current, playing, swapToken, analyserRef }: CDPlayerP
       </Suspense>
 
       <VisualiserRing analyserRef={analyserRef} playing={playing} />
-      <Hands progress={swap.progress} swapping={swap.swapping} />
+
+      <DustSwap
+        progress={swap.progress}
+        swapping={swap.swapping}
+        outgoingColor={swap.outgoing?.gradient[0] ?? '#A78BFA'}
+        incomingColor={swap.incoming?.gradient[0] ?? '#CCFF00'}
+      />
     </Canvas>
   )
 }

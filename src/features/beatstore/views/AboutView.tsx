@@ -3,9 +3,9 @@ import { ExternalLink } from 'lucide-react'
 export function AboutView() {
   return (
     <div className="mx-auto h-full max-w-2xl space-y-5 overflow-y-auto p-6">
-      <h1 className="font-sans text-3xl font-bold tracking-tight text-isark-text">About isark</h1>
+      <h1 className="font-sans text-3xl font-bold tracking-[0.05em] text-isark-text">About ISΛRK</h1>
       <p className="text-sm leading-relaxed text-isark-text">
-        isark is a small beat shop — a handful of records a month, made carefully and shared here as soon as they're
+        ISΛRK is a small beat shop — a handful of records a month, made carefully and shared here as soon as they're
         ready. Browse the catalog on the Beats page, preview anything, and grab a license if something fits.
       </p>
       <p className="text-sm leading-relaxed text-isark-dim">

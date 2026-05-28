@@ -4,8 +4,8 @@ const TIERS = [
   {
     tier: 'MP3',
     price: 'from $24.99',
-    desc: 'Tagless MP3 master. Stream up to 5,000 plays, monetise on YouTube and TikTok, credit "Prod. isark".',
-    bullets: ['Tagless MP3 master', 'Up to 5k streams', 'Music videos OK', 'Credit Prod. isark'],
+    desc: 'Tagless MP3 master. Stream up to 5,000 plays, monetise on YouTube and TikTok, credit "Prod. ISΛRK".',
+    bullets: ['Tagless MP3 master', 'Up to 5k streams', 'Music videos OK', 'Credit Prod. ISΛRK'],
   },
   {
     tier: 'WAV',

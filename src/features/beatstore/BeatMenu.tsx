@@ -107,16 +107,7 @@ function BeatLine({
         active ? 'border-isark-accent/60' : 'border-transparent hover:border-isark-line',
       )}
     >
-      <div
-        className="relative h-12 w-12 shrink-0 overflow-hidden rounded-md"
-        style={{ background: `linear-gradient(135deg, ${beat.gradient[0]}, ${beat.gradient[1]})` }}
-      >
-        {playing && (
-          <span className="absolute inset-0 flex items-center justify-center bg-black/40">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-isark-accent" />
-          </span>
-        )}
-      </div>
+      <WaveSwatch beat={beat} playing={playing} />
       <div className="min-w-0 flex-1">
         <div className={cn('truncate text-sm font-semibold', active ? 'text-isark-accent' : 'text-isark-text')}>
           {beat.title}
@@ -126,6 +117,33 @@ function BeatLine({
         </div>
       </div>
     </button>
+  )
+}
+
+/**
+ * The mini wave-bar mockup #21 — gradient base with a horizontal cyan→magenta
+ * wave that breathes when its beat is playing.
+ */
+function WaveSwatch({ beat, playing }: { beat: Beat; playing: boolean }) {
+  return (
+    <div
+      className="relative h-12 w-12 shrink-0 overflow-hidden rounded-md"
+      style={{ background: `linear-gradient(135deg, ${beat.gradient[0]}, ${beat.gradient[1]})` }}
+    >
+      <div
+        className={cn(
+          'absolute inset-x-1 bottom-1 h-3 rounded',
+          playing ? 'animate-wave-pulse' : 'opacity-70',
+        )}
+        style={{
+          background: 'linear-gradient(90deg, #06B6D4, #A78BFA, #EC4899)',
+          filter: playing ? undefined : 'blur(1.5px)',
+        }}
+      />
+      {playing && (
+        <span className="absolute right-1 top-1 h-1.5 w-1.5 animate-pulse rounded-full bg-isark-accent shadow-[0_0_6px_rgba(204,255,0,0.8)]" />
+      )}
+    </div>
   )
 }
 
