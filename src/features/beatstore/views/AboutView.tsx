@@ -14,7 +14,7 @@ export function AboutView() {
       </p>
       <div className="flex flex-wrap gap-2 pt-2">
         <a
-          href="https://soundcloud.com/"
+          href="https://soundcloud.com/itsisark"
           target="_blank"
           rel="noreferrer"
           className="inline-flex items-center gap-1.5 rounded-md border border-isark-line bg-isark-surface/70 px-3 py-1.5 text-sm text-isark-text transition-colors hover:border-isark-accent hover:text-isark-accent"
