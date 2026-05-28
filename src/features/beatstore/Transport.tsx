@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { ExternalLink, Pause, Play, Shuffle } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { type Beat, type LicenseTier, formatDuration, formatPrice } from '@/data/beats'
@@ -10,6 +11,7 @@ interface TransportProps {
   duration: number
   shuffle: boolean
   cartTiers: Set<LicenseTier>
+  analyserRef: React.MutableRefObject<AnalyserNode | null>
   onTogglePlay: () => void
   onToggleShuffle: () => void
   onSeek: (t01: number) => void
@@ -24,6 +26,7 @@ export function Transport({
   duration,
   shuffle,
   cartTiers,
+  analyserRef,
   onTogglePlay,
   onToggleShuffle,
   onSeek,
@@ -35,7 +38,7 @@ export function Transport({
       <div className="flex items-end justify-between gap-4">
         <div className="min-w-0">
           <div className="flex items-baseline gap-2">
-            <h2 className="truncate font-sans text-2xl font-bold tracking-tight text-isark-text">{beat.title}</h2>
+            <PulseTitle analyserRef={analyserRef}>{beat.title}</PulseTitle>
             <span className="text-sm text-isark-dim">— {beat.artist}</span>
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11px] uppercase tracking-wider text-isark-dim">
@@ -52,16 +55,19 @@ export function Transport({
             )}
           </div>
         </div>
-        {beat.soundcloudUrl && (
-          <a
-            href={beat.soundcloudUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="flex shrink-0 items-center gap-1.5 rounded-md border border-isark-line px-2.5 py-1 text-[11px] text-isark-dim transition-colors hover:border-isark-accent hover:text-isark-text"
-          >
-            SoundCloud <ExternalLink size={11} />
-          </a>
-        )}
+        <div className="flex shrink-0 flex-col items-end gap-2">
+          <ColorModules beat={beat} />
+          {beat.soundcloudUrl && (
+            <a
+              href={beat.soundcloudUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1.5 rounded-md border border-isark-line px-2.5 py-1 text-[11px] text-isark-dim transition-colors hover:border-isark-accent hover:text-isark-text"
+            >
+              SoundCloud <ExternalLink size={11} />
+            </a>
+          )}
+        </div>
       </div>
 
       {/* Play + progress row */}
@@ -124,6 +130,84 @@ export function Transport({
           )
         })}
       </div>
+    </div>
+  )
+}
+
+/**
+ * Track title that subtly scales and letter-spaces with the audio's overall
+ * loudness (RMS of analyser data). Calm when paused; breathes on loud peaks.
+ */
+function PulseTitle({
+  analyserRef,
+  children,
+}: {
+  analyserRef: React.MutableRefObject<AnalyserNode | null>
+  children: React.ReactNode
+}) {
+  const elRef = useRef<HTMLHeadingElement>(null)
+  const bufRef = useRef<Uint8Array<ArrayBuffer> | null>(null)
+
+  useEffect(() => {
+    let raf = 0
+    let smoothed = 0
+    const tick = () => {
+      const an = analyserRef.current
+      const el = elRef.current
+      if (an && el) {
+        if (!bufRef.current || bufRef.current.length !== an.frequencyBinCount) {
+          bufRef.current = new Uint8Array(new ArrayBuffer(an.frequencyBinCount))
+        }
+        an.getByteFrequencyData(bufRef.current)
+        const arr = bufRef.current
+        let sum = 0
+        for (let i = 0; i < arr.length; i++) sum += arr[i]
+        const avg = arr.length > 0 ? sum / arr.length / 255 : 0
+        // Light smoothing so the title breathes rather than jitters.
+        smoothed = smoothed * 0.78 + avg * 0.22
+        const pulse = Math.min(1, smoothed * 1.8)
+        el.style.setProperty('--pulse', String(pulse))
+      }
+      raf = requestAnimationFrame(tick)
+    }
+    tick()
+    return () => cancelAnimationFrame(raf)
+  }, [analyserRef])
+
+  return (
+    <h2
+      ref={elRef}
+      className="truncate font-sans text-2xl font-bold tracking-tight text-isark-text"
+      style={
+        {
+          '--pulse': 0,
+          letterSpacing: 'calc(-0.005em + var(--pulse) * 0.04em)',
+          transform: 'scale(calc(1 + var(--pulse) * 0.04))',
+          transformOrigin: 'left center',
+          willChange: 'transform, letter-spacing',
+        } as React.CSSProperties
+      }
+    >
+      {children}
+    </h2>
+  )
+}
+
+/**
+ * Compact row of color tiles derived from the beat (gradient stops + a couple
+ * of brand accents). Gently pulses to give the transport some life when paused.
+ */
+function ColorModules({ beat }: { beat: Beat }) {
+  const colors = [beat.gradient[0], beat.gradient[1], '#A78BFA', '#CCFF00']
+  return (
+    <div className="flex gap-1.5">
+      {colors.map((c, i) => (
+        <div
+          key={i}
+          className="h-4 w-4 rounded-md shadow-[0_0_8px_rgba(255,255,255,0.08)] animate-module-pulse"
+          style={{ background: c, animationDelay: `${i * 0.35}s` }}
+        />
+      ))}
     </div>
   )
 }
