@@ -9,14 +9,21 @@ export interface License {
 export interface Beat {
   id: string
   title: string
+  artist: string
   bpm: number
   musicalKey: string
   mood: string[]
   durationSec: number
-  /** Two-stop gradient used for the cover art. */
+  /** Two-stop gradient used as fallback cover art when no image is provided. */
   gradient: [string, string]
   plays: number
   licenses: License[]
+  /** Same-origin audio file under /public/beats/audio/. Falls back to a synth preview if missing. */
+  audioFile?: string
+  /** Same-origin cover image under /public/beats/covers/. Falls back to generated art if missing. */
+  coverImage?: string
+  /** Optional public SoundCloud track URL. */
+  soundcloudUrl?: string
 }
 
 export interface CartItem {
@@ -34,10 +41,54 @@ function licenses(exclusive: number): License[] {
   ]
 }
 
+const ARTIST = 'isark'
+
 export const BEATS: Beat[] = [
+  // ─── Real tracks ────────────────────────────────────────────────────────
+  {
+    id: 'homerun',
+    title: 'Homerun',
+    artist: ARTIST,
+    bpm: 140,
+    musicalKey: 'A min',
+    mood: ['Hard', 'Trap'],
+    durationSec: 113,
+    gradient: ['#FF7A55', '#3A0F18'],
+    plays: 412,
+    licenses: licenses(329),
+    audioFile: '/beats/audio/homerun.mp3',
+  },
+  {
+    id: 'virtual-love',
+    title: 'Virtual Love',
+    artist: ARTIST,
+    bpm: 110,
+    musicalKey: 'C maj',
+    mood: ['Lo-fi', 'Warm', 'Smooth'],
+    durationSec: 55,
+    gradient: ['#F4A8E8', '#3A1B33'],
+    plays: 287,
+    licenses: licenses(279),
+    audioFile: '/beats/audio/virtual-love.mp3',
+  },
+  {
+    id: 'switch',
+    title: 'Switch',
+    artist: 'isark × 10k.emraan',
+    bpm: 186,
+    musicalKey: 'C min',
+    mood: ['Drill', 'Hard'],
+    durationSec: 100,
+    gradient: ['#A78BFA', '#150A33'],
+    plays: 1024,
+    licenses: licenses(449),
+    audioFile: '/beats/audio/switch.mp3',
+  },
+  // ─── Placeholders (synth preview until real audio lands) ────────────────
   {
     id: 'nightshade',
     title: 'Nightshade',
+    artist: ARTIST,
     bpm: 142,
     musicalKey: 'F# min',
     mood: ['Dark', 'Trap'],
@@ -49,6 +100,7 @@ export const BEATS: Beat[] = [
   {
     id: 'cold-storage',
     title: 'Cold Storage',
+    artist: ARTIST,
     bpm: 138,
     musicalKey: 'C min',
     mood: ['Ambient', 'Drill'],
@@ -58,19 +110,9 @@ export const BEATS: Beat[] = [
     licenses: licenses(349),
   },
   {
-    id: 'velvet-static',
-    title: 'Velvet Static',
-    bpm: 150,
-    musicalKey: 'A min',
-    mood: ['Lo-fi', 'Soul'],
-    durationSec: 201,
-    gradient: ['#CC785C', '#3A1B12'],
-    plays: 24087,
-    licenses: licenses(399),
-  },
-  {
     id: 'lowlight',
     title: 'Lowlight',
+    artist: ARTIST,
     bpm: 124,
     musicalKey: 'D min',
     mood: ['R&B', 'Smooth'],
@@ -80,19 +122,9 @@ export const BEATS: Beat[] = [
     licenses: licenses(279),
   },
   {
-    id: 'concrete-bloom',
-    title: 'Concrete Bloom',
-    bpm: 160,
-    musicalKey: 'G min',
-    mood: ['Hard', 'Drill'],
-    durationSec: 158,
-    gradient: ['#E0408A', '#3A0E22'],
-    plays: 30219,
-    licenses: licenses(449),
-  },
-  {
     id: 'signal-lost',
     title: 'Signal Lost',
+    artist: ARTIST,
     bpm: 145,
     musicalKey: 'E min',
     mood: ['Experimental', 'Trap'],
@@ -104,6 +136,7 @@ export const BEATS: Beat[] = [
   {
     id: 'afterglow',
     title: 'Afterglow',
+    artist: ARTIST,
     bpm: 130,
     musicalKey: 'Bb maj',
     mood: ['Warm', 'Pop'],
@@ -112,24 +145,13 @@ export const BEATS: Beat[] = [
     plays: 16604,
     licenses: licenses(329),
   },
-  {
-    id: 'patient-zero',
-    title: 'Patient Zero',
-    bpm: 155,
-    musicalKey: 'F min',
-    mood: ['Aggressive', 'Trap'],
-    durationSec: 171,
-    gradient: ['#FF5566', '#3A0E14'],
-    plays: 21188,
-    licenses: licenses(379),
-  },
 ]
 
 export const MOODS: string[] = [...new Set(BEATS.flatMap((b) => b.mood))].sort()
 
 export function formatDuration(sec: number): string {
   const m = Math.floor(sec / 60)
-  const s = sec % 60
+  const s = Math.max(0, Math.floor(sec % 60))
   return `${m}:${String(s).padStart(2, '0')}`
 }
 

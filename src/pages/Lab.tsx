@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store } from 'lucide-react'
 import { LAB_MODULES, type LabModule } from '@/data/labs'
 import { Panel } from '@/components/ui/Panel'
@@ -7,7 +7,10 @@ import { Badge } from '@/components/ui/Badge'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { useIsDesktop } from '@/lib/useMediaQuery'
 import { cn } from '@/lib/cn'
-import { BeatStoreModal } from '@/features/beatstore/BeatStoreModal'
+
+const BeatStorePage = lazy(() =>
+  import('@/features/beatstore/BeatStorePage').then((m) => ({ default: m.BeatStorePage })),
+)
 
 const STATUS_COLOR = { live: '#46d369', staging: '#f0a020', local: '#36e0c8' } as const
 
@@ -56,7 +59,11 @@ export function Lab() {
         </div>
       </Modal>
 
-      <BeatStoreModal open={storeOpen} onClose={() => setStoreOpen(false)} />
+      {storeOpen && (
+        <Suspense fallback={null}>
+          <BeatStorePage open onClose={() => setStoreOpen(false)} />
+        </Suspense>
+      )}
     </div>
   )
 }
