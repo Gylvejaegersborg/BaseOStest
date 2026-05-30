@@ -48,7 +48,7 @@ export function BeatsView({ player, cartTiersFor, onAddToCart }: BeatsViewProps)
       }
 
   return (
-    <div className="relative h-full w-full overflow-hidden p-3 sm:p-4">
+    <div className="relative h-full w-full overflow-hidden p-0 sm:p-4">
       {/* Search / menu toggle — outside the card so it stays available everywhere */}
       <div className="pointer-events-auto absolute left-3 top-3 z-30 sm:left-4 sm:top-4">
         <button

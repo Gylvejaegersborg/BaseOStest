@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import type { Beat, LicenseTier } from '@/data/beats'
+import { ExternalLink } from 'lucide-react'
+import { type Beat, type LicenseTier, formatDuration } from '@/data/beats'
 import { Transport } from './Transport'
 import { generateLabelDataURL } from './textures'
 import type { BeatPlayer } from './useBeatPlayer'
@@ -11,11 +12,10 @@ interface NowPlayingCardProps {
 }
 
 /**
- * The "Now Playing" card — a big square showing the current beat's artwork
- * with all the transport controls overlaid in a glass info panel at the
- * bottom. Real `coverImage` files are used when available; otherwise the
- * procedural artwork generator paints a unique cover from the beat's gradient
- * and id. Artwork crossfades on track change.
+ * The Now Playing card — a big square (or portrait on phones) showing the
+ * current beat's artwork edge-to-edge. The song's text (title, artist, meta)
+ * floats over the artwork as a glassy pill at the top; the transport controls
+ * sit in a separate glass panel at the bottom.
  */
 export function NowPlayingCard({ player, cartTiersFor, onAddToCart }: NowPlayingCardProps) {
   const beat = player.current
@@ -25,17 +25,21 @@ export function NowPlayingCard({ player, cartTiersFor, onAddToCart }: NowPlaying
       {/* Artwork layer (crossfades when beat changes) */}
       {beat && <ArtworkLayer beat={beat} />}
 
-      {/* Legibility veil — keeps the artwork visible up top, darkens the bottom for the glass panel */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-isark-bg/95 via-isark-bg/55 to-transparent" />
+      {/* Soft top + bottom veils so the glassy text and the transport panel stay legible
+          regardless of cover */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-isark-bg/85 via-transparent to-isark-bg/40" />
 
-      {/* Top eyebrow */}
-      <div className="pointer-events-none absolute right-5 top-5 z-10 font-mono text-[10px] uppercase tracking-[0.35em] text-isark-text/70">
+      {/* "NOW PLAYING" eyebrow */}
+      <div className="pointer-events-none absolute right-4 top-3 z-10 font-mono text-[10px] uppercase tracking-[0.32em] text-white/70 sm:right-5 sm:top-4">
         Now Playing
       </div>
 
-      {/* Glass info panel at the bottom — Transport sits inside */}
-      <div className="absolute inset-x-4 bottom-4 z-10 sm:inset-x-6 sm:bottom-6">
-        <div className="rounded-2xl border border-isark-line/60 bg-isark-bg/45 p-4 backdrop-blur-2xl sm:p-5">
+      {/* Glassy title pill hovering over the artwork */}
+      {beat && <TitleOverlay beat={beat} />}
+
+      {/* Glass info panel at the bottom — transport + licenses only */}
+      <div className="absolute inset-x-3 bottom-3 z-10 sm:inset-x-5 sm:bottom-5">
+        <div className="rounded-2xl border border-white/10 bg-black/35 p-3 backdrop-blur-2xl sm:p-4">
           <Transport
             beat={beat}
             playing={player.playing}
@@ -44,7 +48,6 @@ export function NowPlayingCard({ player, cartTiersFor, onAddToCart }: NowPlaying
             duration={player.duration}
             shuffle={player.shuffle}
             cartTiers={beat ? cartTiersFor(beat.id) : new Set()}
-            analyserRef={player.analyserRef}
             onTogglePlay={() => beat && player.toggle(beat)}
             onToggleShuffle={() => player.setShuffle(!player.shuffle)}
             onSeek={player.seek}
@@ -59,9 +62,52 @@ export function NowPlayingCard({ player, cartTiersFor, onAddToCart }: NowPlaying
 }
 
 /**
- * Resolves the artwork source for a beat (real file → procedural fallback)
- * and renders it as a smoothly-crossfading background layer keyed on the
- * beat id so React mounts a fresh `animate-fade-in` for each track change.
+ * Floating glassy text pill over the artwork — title + artist + a tiny mono
+ * metadata line. Sits at the top of the card. Translucent fill + backdrop blur
+ * so the cover shows through.
+ */
+function TitleOverlay({ beat }: { beat: Beat }) {
+  return (
+    <div className="pointer-events-none absolute inset-x-3 top-10 z-10 sm:inset-x-5 sm:top-12">
+      <div className="inline-block max-w-full rounded-2xl border border-white/15 bg-black/20 px-4 py-3 backdrop-blur-md">
+        <h2 className="truncate font-sans text-2xl font-bold tracking-tight text-white/95 [text-shadow:0_2px_18px_rgba(0,0,0,0.5)] sm:text-3xl">
+          {beat.title}
+        </h2>
+        <p className="mt-0.5 truncate text-sm text-white/75 [text-shadow:0_1px_10px_rgba(0,0,0,0.6)]">
+          {beat.artist}
+        </p>
+        <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-white/65 sm:text-[11px]">
+          <span>{beat.bpm} BPM</span>
+          <span>·</span>
+          <span>{beat.musicalKey}</span>
+          <span>·</span>
+          <span>{formatDuration(beat.durationSec)}</span>
+          {beat.mood.length > 0 && (
+            <>
+              <span>·</span>
+              <span className="text-isark-accent-2">{beat.mood.join(' / ')}</span>
+            </>
+          )}
+        </p>
+        {beat.soundcloudUrl && (
+          <a
+            href={beat.soundcloudUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="pointer-events-auto mt-2 inline-flex items-center gap-1 text-[11px] text-white/70 hover:text-white"
+          >
+            SoundCloud <ExternalLink size={11} />
+          </a>
+        )}
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Resolves the artwork source (real coverImage → procedural fallback) and
+ * renders it as a smoothly crossfading background layer keyed on the beat
+ * id so React mounts a fresh `animate-fade-in` on every track change.
  */
 function ArtworkLayer({ beat }: { beat: Beat }) {
   const [src, setSrc] = useState<string | null>(null)
@@ -89,7 +135,6 @@ function ArtworkLayer({ beat }: { beat: Beat }) {
   }, [beat])
 
   if (!src) {
-    // First-paint placeholder — soft gradient so the card doesn't flash empty.
     return (
       <div
         className="absolute inset-0"

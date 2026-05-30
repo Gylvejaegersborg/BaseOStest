@@ -34,6 +34,7 @@ export function PerimeterVisualiser({ analyserRef, playing, pad, cornerRadius, m
   useEffect(() => {
     let raf = 0
     let t = 0
+    let activation = 0
 
     const tick = () => {
       const canvas = canvasRef.current
@@ -66,6 +67,9 @@ export function PerimeterVisualiser({ analyserRef, playing, pad, cornerRadius, m
       }
 
       t += 1 / 60
+      // Ease activation toward 1 while playing, back toward 0 while paused.
+      // Bars are gray at activation=0 and rainbow at activation=1.
+      activation += ((playing ? 1 : 0) - activation) * 0.06
       const hueRot = (t * 0.08) % 1
 
       // Card box inside the canvas (centred, inset by `pad`).
@@ -74,7 +78,7 @@ export function PerimeterVisualiser({ analyserRef, playing, pad, cornerRadius, m
       const cardW = rect.width - pad * 2
       const cardH = rect.height - pad * 2
 
-      drawBars(ctx, cardX, cardY, cardW, cardH, cornerRadius, data, playing, t, hueRot, effectiveMin, effectiveMax)
+      drawBars(ctx, cardX, cardY, cardW, cardH, cornerRadius, data, playing, t, hueRot, activation, effectiveMin, effectiveMax)
 
       raf = requestAnimationFrame(tick)
     }
@@ -102,6 +106,7 @@ function drawBars(
   playing: boolean,
   t: number,
   hueRot: number,
+  activation: number,
   barMin: number,
   barMax: number,
 ) {
@@ -128,8 +133,8 @@ function drawBars(
     )
 
     const hue = (i / BAR_COUNT + hueRot) % 1
-    const sat = 0.85
-    const light = 0.55 + target * 0.18
+    const sat = activation * 0.85
+    const light = 0.42 + target * 0.18 + activation * 0.1
     ctx.fillStyle = `hsl(${hue * 360}, ${sat * 100}%, ${light * 100}%)`
 
     // Draw bar from edge outward along the outward normal.
