@@ -141,7 +141,7 @@ function WaveSwatch({ beat, playing }: { beat: Beat; playing: boolean }) {
         }}
       />
       {playing && (
-        <span className="absolute right-1 top-1 h-1.5 w-1.5 animate-pulse rounded-full bg-isark-accent shadow-[0_0_6px_rgba(204,255,0,0.8)]" />
+        <span className="absolute right-1 top-1 h-1.5 w-1.5 animate-pulse rounded-full bg-isark-accent shadow-[0_0_6px_rgba(167,139,250,0.9)]" />
       )}
     </div>
   )

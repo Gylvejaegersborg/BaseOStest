@@ -19,9 +19,10 @@ const ITEMS: Array<{ id: StoreView; label: string; icon: typeof Disc3 }> = [
 export function BeatStoreNav({ view, cartCount, onView, onClose }: BeatStoreNavProps) {
   return (
     <header className="relative z-40 flex h-14 items-center gap-2 border-b border-isark-line/70 bg-isark-bg/55 px-4 backdrop-blur-xl">
-      <div className="flex items-baseline gap-2">
-        <span className="font-sans text-lg font-bold tracking-[0.05em] text-isark-text">ISΛRK</span>
-        <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-isark-accent">beat store</span>
+      <div className="flex items-baseline gap-2.5 leading-none">
+        <span className="font-sans text-base font-bold tracking-[0.14em] text-isark-text">ISΛRK</span>
+        <span className="text-isark-line/70">/</span>
+        <span className="font-sans text-[11px] font-semibold uppercase tracking-[0.32em] text-isark-accent">Beat Store</span>
       </div>
 
       <nav className="ml-6 flex items-center gap-1">
@@ -42,7 +43,7 @@ export function BeatStoreNav({ view, cartCount, onView, onClose }: BeatStoreNavP
               <span>{it.label}</span>
               {active && (
                 <span
-                  className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-isark-accent shadow-[0_0_10px_rgba(204,255,0,0.6)]"
+                  className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-isark-accent shadow-[0_0_10px_rgba(167,139,250,0.7)]"
                   aria-hidden
                 />
               )}

@@ -27,15 +27,15 @@ export default {
         'claude-line': '#E3DFD3',
         'claude-sage': '#7A9471',
         'claude-sky': '#6B8AA6',
-        // isark beat-store brand palette (dark, electric — distinct from the OS terminal theme).
+        // ISΛRK beat-store brand palette (dark, electric — distinct from the OS terminal theme).
         'isark-bg': '#0B0B0E',
         'isark-surface': '#141419',
         'isark-elevated': '#1C1C24',
         'isark-line': '#2A2A33',
         'isark-text': '#F4F3EE',
         'isark-dim': '#8C8C97',
-        'isark-accent': '#CCFF00',
-        'isark-accent-2': '#A78BFA',
+        'isark-accent': '#A78BFA',
+        'isark-accent-2': '#F4A8E8',
         'isark-mint': '#A8E6D0',
         'isark-lavender': '#B6A8FF',
         'isark-coral': '#FFB48A',

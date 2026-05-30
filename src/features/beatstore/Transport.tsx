@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { ExternalLink, Pause, Play, Shuffle } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ExternalLink, Pause, Play, Shuffle } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { type Beat, type LicenseTier, formatDuration, formatPrice } from '@/data/beats'
 
@@ -16,6 +16,8 @@ interface TransportProps {
   onToggleShuffle: () => void
   onSeek: (t01: number) => void
   onAddToCart: (tier: LicenseTier, price: number) => void
+  onPrev: () => void
+  onNext: () => void
 }
 
 export function Transport({
@@ -31,6 +33,8 @@ export function Transport({
   onToggleShuffle,
   onSeek,
   onAddToCart,
+  onPrev,
+  onNext,
 }: TransportProps) {
   if (!beat) return null
   return (
@@ -70,30 +74,31 @@ export function Transport({
         </div>
       </div>
 
-      {/* Play + progress row */}
-      <div className="flex items-center gap-3">
+      {/* Transport row: prev · play · next · shuffle · seek */}
+      <div className="flex items-center gap-2">
+        <TransportButton onClick={onPrev} label="Previous beat">
+          <ChevronLeft size={18} />
+        </TransportButton>
         <button
           type="button"
           onClick={onTogglePlay}
           aria-label={playing ? 'Pause' : 'Play'}
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-isark-accent text-isark-bg shadow-[0_0_30px_rgba(204,255,0,0.35)] transition-transform hover:scale-105 active:scale-95"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-isark-accent text-isark-bg shadow-[0_0_30px_rgba(167,139,250,0.45)] transition-transform hover:scale-105 active:scale-95"
         >
           {playing ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" className="ml-0.5" />}
         </button>
-        <button
-          type="button"
+        <TransportButton onClick={onNext} label="Next beat">
+          <ChevronRight size={18} />
+        </TransportButton>
+        <TransportButton
           onClick={onToggleShuffle}
-          aria-label="Shuffle"
-          className={cn(
-            'flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition-colors',
-            shuffle
-              ? 'border-isark-accent bg-isark-accent/15 text-isark-accent'
-              : 'border-isark-line text-isark-dim hover:border-isark-accent/60 hover:text-isark-text',
-          )}
+          label="Shuffle"
+          active={shuffle}
+          className="ml-1"
         >
-          <Shuffle size={16} />
-        </button>
-        <div className="flex flex-1 items-center gap-2">
+          <Shuffle size={15} />
+        </TransportButton>
+        <div className="ml-2 flex flex-1 items-center gap-2">
           <span className="w-10 text-right font-mono text-[11px] text-isark-dim">{formatDuration(currentTime)}</span>
           <SeekBar progress={progress} onSeek={onSeek} />
           <span className="w-10 font-mono text-[11px] text-isark-dim">{formatDuration(duration || beat.durationSec)}</span>
@@ -198,7 +203,7 @@ function PulseTitle({
  * of brand accents). Gently pulses to give the transport some life when paused.
  */
 function ColorModules({ beat }: { beat: Beat }) {
-  const colors = [beat.gradient[0], beat.gradient[1], '#A78BFA', '#CCFF00']
+  const colors = [beat.gradient[0], beat.gradient[1], '#A78BFA', '#F4A8E8']
   return (
     <div className="flex gap-1.5">
       {colors.map((c, i) => (
@@ -209,6 +214,37 @@ function ColorModules({ beat }: { beat: Beat }) {
         />
       ))}
     </div>
+  )
+}
+
+function TransportButton({
+  onClick,
+  label,
+  active = false,
+  className,
+  children,
+}: {
+  onClick: () => void
+  label: string
+  active?: boolean
+  className?: string
+  children: React.ReactNode
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      className={cn(
+        'flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-colors',
+        active
+          ? 'border-isark-accent bg-isark-accent/15 text-isark-accent'
+          : 'border-isark-line text-isark-dim hover:border-isark-accent/60 hover:text-isark-text',
+        className,
+      )}
+    >
+      {children}
+    </button>
   )
 }
 
@@ -231,7 +267,7 @@ function SeekBar({ progress, onSeek }: { progress: number; onSeek: (t: number) =
         style={{ width: `${Math.max(0, Math.min(1, progress)) * 100}%` }}
       />
       <div
-        className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-isark-accent opacity-0 shadow-[0_0_8px_rgba(204,255,0,0.6)] transition-opacity group-hover:opacity-100"
+        className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-isark-accent opacity-0 shadow-[0_0_8px_rgba(167,139,250,0.7)] transition-opacity group-hover:opacity-100"
         style={{ left: `${Math.max(0, Math.min(1, progress)) * 100}%` }}
       />
     </div>

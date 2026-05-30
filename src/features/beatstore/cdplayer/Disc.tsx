@@ -38,7 +38,7 @@ export function Disc({ beat, playing, lift = 0, opacity = 1, scale = 1 }: DiscPr
       {/* Edge rim shimmer — colourful chromatic */}
       <mesh position={[0, 0.022, 0]}>
         <ringGeometry args={[1.55, 1.6, 96]} />
-        <meshBasicMaterial color="#CCFF00" transparent opacity={0.5 * opacity} side={THREE.DoubleSide} />
+        <meshBasicMaterial color="#A78BFA" transparent opacity={0.6 * opacity} side={THREE.DoubleSide} />
       </mesh>
 
       {/* Cover art / generated label on top */}
@@ -109,7 +109,10 @@ function ImageFace({ url, opacity }: { url: string; opacity: number }) {
 }
 
 function GeneratedFace({ beat, opacity }: { beat: Beat; opacity: number }) {
-  const texture = useMemo(() => generateLabelTexture(beat.gradient, beat.title), [beat.gradient, beat.title])
+  const texture = useMemo(
+    () => generateLabelTexture(beat.gradient, beat.title, beat.id),
+    [beat.gradient, beat.title, beat.id],
+  )
   useEffect(() => () => texture.dispose(), [texture])
   return (
     <mesh position={[0, 0.025, 0]}>

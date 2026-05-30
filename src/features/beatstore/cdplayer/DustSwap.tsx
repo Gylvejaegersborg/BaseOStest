@@ -3,9 +3,9 @@ import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { swapEasings } from './useCDSwap'
 
-const COUNT = 220
-const DISC_EDGE = 1.55
-const OUTER_R = 3.2
+const COUNT = 260
+const DISC_EDGE = 2.0
+const OUTER_R = 4.2
 
 interface DustSwapProps {
   progress: number

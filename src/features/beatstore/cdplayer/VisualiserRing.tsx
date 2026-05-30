@@ -2,11 +2,11 @@ import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
-const BAR_COUNT = 96
-const INNER_RADIUS = 1.72
-const BAR_HEIGHT_MAX = 0.9
-const BAR_WIDTH = 0.04
-const BAR_THICKNESS = 0.02
+const BAR_COUNT = 128
+const INNER_RADIUS = 3.2
+const BAR_HEIGHT_MAX = 0.6
+const BAR_WIDTH = 0.06
+const BAR_THICKNESS = 0.025
 
 interface VisualiserRingProps {
   analyserRef: React.MutableRefObject<AnalyserNode | null>
@@ -21,7 +21,7 @@ interface VisualiserRingProps {
  * it from a rotating HSL palette. When no audio is playing the bars rest in a
  * gentle idle wave so the ring stays alive.
  */
-export function VisualiserRing({ analyserRef, playing, baseHue = 0.18 }: VisualiserRingProps) {
+export function VisualiserRing({ analyserRef, playing, baseHue = 0.72 }: VisualiserRingProps) {
   const meshRef = useRef<THREE.InstancedMesh>(null)
   const dataRef = useRef<Uint8Array<ArrayBuffer> | null>(null)
   const dummy = useMemo(() => new THREE.Object3D(), [])
