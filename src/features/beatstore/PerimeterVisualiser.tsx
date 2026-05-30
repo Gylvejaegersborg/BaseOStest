@@ -7,12 +7,12 @@ interface PerimeterVisualiserProps {
   pad: number
   /** Card border radius (px) — used so bars trace the rounded corners cleanly. */
   cornerRadius: number
+  /** Maximum bar length (px). Defaults to `pad - 4` so bars never overflow. */
+  maxBarLen?: number
 }
 
 const BAR_COUNT = 360
 const BAR_WIDTH = 3
-const BAR_MIN_LEN = 6
-const BAR_MAX_LEN = 64
 
 /**
  * Rainbow audio-reactive bars around the perimeter of the Now Playing card.
@@ -24,9 +24,12 @@ const BAR_MAX_LEN = 64
  * every frame. Bins are mirrored across the perimeter so the visualiser looks
  * symmetric around the card.
  */
-export function PerimeterVisualiser({ analyserRef, playing, pad, cornerRadius }: PerimeterVisualiserProps) {
+export function PerimeterVisualiser({ analyserRef, playing, pad, cornerRadius, maxBarLen }: PerimeterVisualiserProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const dataRef = useRef<Uint8Array<ArrayBuffer> | null>(null)
+
+  const effectiveMax = Math.max(8, maxBarLen ?? pad - 4)
+  const effectiveMin = Math.max(2, Math.round(effectiveMax * 0.12))
 
   useEffect(() => {
     let raf = 0
@@ -71,13 +74,13 @@ export function PerimeterVisualiser({ analyserRef, playing, pad, cornerRadius }:
       const cardW = rect.width - pad * 2
       const cardH = rect.height - pad * 2
 
-      drawBars(ctx, cardX, cardY, cardW, cardH, cornerRadius, data, playing, t, hueRot)
+      drawBars(ctx, cardX, cardY, cardW, cardH, cornerRadius, data, playing, t, hueRot, effectiveMin, effectiveMax)
 
       raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
-  }, [analyserRef, playing, pad, cornerRadius])
+  }, [analyserRef, playing, pad, cornerRadius, effectiveMin, effectiveMax])
 
   return (
     <canvas
@@ -99,6 +102,8 @@ function drawBars(
   playing: boolean,
   t: number,
   hueRot: number,
+  barMin: number,
+  barMax: number,
 ) {
   // Effective straight-edge lengths after corner radii are removed.
   const sH = Math.max(0, cw - 2 * radius)
@@ -115,7 +120,7 @@ function drawBars(
     }
     const idle = (Math.sin(t * 1.8 + i * 0.21) * 0.5 + 0.5) * 0.16
     const target = playing ? Math.max(amp * 0.95, idle * 0.25) : idle
-    const len = BAR_MIN_LEN + target * (BAR_MAX_LEN - BAR_MIN_LEN)
+    const len = barMin + target * (barMax - barMin)
 
     const { x, y, nx, ny } = positionOnRoundedRect(
       (i / BAR_COUNT) * perim,
