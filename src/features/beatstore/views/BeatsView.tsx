@@ -13,12 +13,10 @@ interface BeatsViewProps {
 }
 
 /**
- * Beats view — a single big artwork-as-card with all controls overlaid, and
- * a rainbow audio-reactive bar visualiser around its perimeter.
- *
- * Sizing is responsive: on phones the card fills the available area as a
- * portrait rectangle (background-cover handles the artwork crop). On wider
- * viewports it locks back to a square so the cover reads as a cover.
+ * Beats view — a single artwork-as-card with all controls overlaid, and a
+ * rainbow audio-reactive bar visualiser around its perimeter. The card fills
+ * the available area on every viewport so the visualiser bars sit right up
+ * against the screen edge.
  */
 export function BeatsView({ player, cartTiersFor, onAddToCart }: BeatsViewProps) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -35,20 +33,13 @@ export function BeatsView({ player, cartTiersFor, onAddToCart }: BeatsViewProps)
   const current = player.current
 
   // Pad / corner radius / bar length scale with the viewport so the visualiser
-  // doesn't eat the card on phones.
-  const pad = vp.isSmall ? 22 : 60
+  // doesn't eat the card on phones but still has room to breathe on desktop.
+  const pad = vp.isSmall ? 22 : 56
   const cornerRadius = vp.isSmall ? 18 : 24
   const maxBarLen = pad - 4
 
-  const containerStyle: React.CSSProperties = vp.isSmall
-    ? { width: '100%', height: '100%' }
-    : {
-        width: 'min(88vmin, calc(100vh - 96px))',
-        height: 'min(88vmin, calc(100vh - 96px))',
-      }
-
   return (
-    <div className="relative h-full w-full overflow-hidden p-0 sm:p-4">
+    <div className="relative h-full w-full overflow-hidden">
       {/* Search / menu toggle — outside the card so it stays available everywhere */}
       <div className="pointer-events-auto absolute left-3 top-3 z-30 sm:left-4 sm:top-4">
         <button
@@ -62,36 +53,36 @@ export function BeatsView({ player, cartTiersFor, onAddToCart }: BeatsViewProps)
         </button>
       </div>
 
-      {/* Card + perimeter visualiser composition */}
-      <div className="flex h-full w-full items-center justify-center">
-        <div className="relative" style={containerStyle}>
-          {/* Rainbow bars around the card edge */}
-          <PerimeterVisualiser
-            analyserRef={player.analyserRef}
-            playing={player.playing}
-            pad={pad}
-            cornerRadius={cornerRadius}
-            maxBarLen={maxBarLen}
-          />
-          {/* The artwork-as-card, inset by `pad` to leave room for the visualiser */}
-          <div
-            className="absolute"
-            style={{
-              left: pad,
-              top: pad,
-              right: pad,
-              bottom: pad,
-              borderRadius: cornerRadius,
-            }}
-          >
-            {current ? (
-              <NowPlayingCard
-                player={player}
-                cartTiersFor={cartTiersFor}
-                onAddToCart={onAddToCart}
-              />
-            ) : null}
-          </div>
+      {/* Card + perimeter visualiser composition — fills the whole content area
+          so the rainbow bars touch the wall on every side. */}
+      <div className="relative h-full w-full">
+        {/* Rainbow bars around the card edge */}
+        <PerimeterVisualiser
+          analyserRef={player.analyserRef}
+          playing={player.playing}
+          pad={pad}
+          cornerRadius={cornerRadius}
+          maxBarLen={maxBarLen}
+        />
+        {/* The artwork-as-card, inset by `pad` so the visualiser sits between
+            the card and the viewport wall. */}
+        <div
+          className="absolute"
+          style={{
+            left: pad,
+            top: pad,
+            right: pad,
+            bottom: pad,
+            borderRadius: cornerRadius,
+          }}
+        >
+          {current ? (
+            <NowPlayingCard
+              player={player}
+              cartTiersFor={cartTiersFor}
+              onAddToCart={onAddToCart}
+            />
+          ) : null}
         </div>
       </div>
 
