@@ -41,7 +41,9 @@ export function generateLabelCanvas(
       drawGrid(ctx, size, gradient, rand)
       break
   }
-  drawTitle(ctx, size, title)
+  // Note: the title is *not* painted into the artwork — the floating glassy
+  // TitleOverlay handles it. Painting it here gets covered by the bottom
+  // transport panel and reads as half-hidden text behind the player.
   return canvas
 }
 
@@ -63,21 +65,6 @@ function drawRadialBase(ctx: CanvasRenderingContext2D, size: number, gradient: [
   g.addColorStop(1, gradient[1])
   ctx.fillStyle = g
   ctx.fillRect(0, 0, size, size)
-}
-
-function drawTitle(ctx: CanvasRenderingContext2D, size: number, title: string) {
-  ctx.save()
-  ctx.fillStyle = 'rgba(0,0,0,0.45)'
-  ctx.fillRect(0, size - 110, size, 110)
-  ctx.fillStyle = 'rgba(255,255,255,0.96)'
-  ctx.font = 'bold 44px system-ui, sans-serif'
-  ctx.textAlign = 'left'
-  ctx.textBaseline = 'alphabetic'
-  ctx.fillText(title.toUpperCase(), 32, size - 50)
-  ctx.fillStyle = 'rgba(255,255,255,0.55)'
-  ctx.font = '18px ui-monospace, monospace'
-  ctx.fillText('ISΛRK', 32, size - 22)
-  ctx.restore()
 }
 
 // ── Procedural styles ─────────────────────────────────────────────────────────

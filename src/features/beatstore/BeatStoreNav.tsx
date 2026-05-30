@@ -1,7 +1,7 @@
-import { Disc3, FileText, Info, ShoppingBag, X } from 'lucide-react'
+import { Disc3, FileText, Info, Package, ShoppingBag, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
 
-export type StoreView = 'beats' | 'licensing' | 'about' | 'cart' | 'checkout' | 'done'
+export type StoreView = 'beats' | 'packs' | 'licensing' | 'about' | 'cart' | 'checkout' | 'done'
 
 interface BeatStoreNavProps {
   view: StoreView
@@ -12,6 +12,7 @@ interface BeatStoreNavProps {
 
 const ITEMS: Array<{ id: StoreView; label: string; icon: typeof Disc3 }> = [
   { id: 'beats', label: 'Beats', icon: Disc3 },
+  { id: 'packs', label: 'Packs', icon: Package },
   { id: 'licensing', label: 'Licensing', icon: FileText },
   { id: 'about', label: 'About', icon: Info },
 ]

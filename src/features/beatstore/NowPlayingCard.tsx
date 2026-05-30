@@ -29,11 +29,6 @@ export function NowPlayingCard({ player, cartTiersFor, onAddToCart }: NowPlaying
           regardless of cover */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-isark-bg/85 via-transparent to-isark-bg/40" />
 
-      {/* "NOW PLAYING" eyebrow */}
-      <div className="pointer-events-none absolute right-4 top-3 z-10 font-mono text-[10px] uppercase tracking-[0.32em] text-white/70 sm:right-5 sm:top-4">
-        Now Playing
-      </div>
-
       {/* Glassy title pill hovering over the artwork */}
       {beat && <TitleOverlay beat={beat} />}
 
@@ -68,7 +63,7 @@ export function NowPlayingCard({ player, cartTiersFor, onAddToCart }: NowPlaying
  */
 function TitleOverlay({ beat }: { beat: Beat }) {
   return (
-    <div className="pointer-events-none absolute inset-x-3 top-10 z-10 sm:inset-x-5 sm:top-12">
+    <div className="pointer-events-none absolute inset-x-3 top-4 z-10 sm:inset-x-5 sm:top-5">
       <div className="inline-block max-w-full rounded-2xl border border-white/15 bg-black/20 px-4 py-3 backdrop-blur-md">
         <h2 className="truncate font-sans text-2xl font-bold tracking-tight text-white/95 [text-shadow:0_2px_18px_rgba(0,0,0,0.5)] sm:text-3xl">
           {beat.title}
@@ -76,19 +71,20 @@ function TitleOverlay({ beat }: { beat: Beat }) {
         <p className="mt-0.5 truncate text-sm text-white/75 [text-shadow:0_1px_10px_rgba(0,0,0,0.6)]">
           {beat.artist}
         </p>
-        <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-white/65 sm:text-[11px]">
+        {/* BPM · key · duration on one row */}
+        <p className="mt-1.5 truncate font-mono text-[10px] uppercase tracking-[0.18em] text-white/65 sm:text-[11px]">
           <span>{beat.bpm} BPM</span>
-          <span>·</span>
+          <span className="mx-2">·</span>
           <span>{beat.musicalKey}</span>
-          <span>·</span>
+          <span className="mx-2">·</span>
           <span>{formatDuration(beat.durationSec)}</span>
-          {beat.mood.length > 0 && (
-            <>
-              <span>·</span>
-              <span className="text-isark-accent-2">{beat.mood.join(' / ')}</span>
-            </>
-          )}
         </p>
+        {/* Mood / genre on its own row so it doesn't reflow into the metadata */}
+        {beat.mood.length > 0 && (
+          <p className="mt-1 truncate font-mono text-[10px] uppercase tracking-[0.22em] text-isark-accent-2 sm:text-[11px]">
+            {beat.mood.join(' · ')}
+          </p>
+        )}
         {beat.soundcloudUrl && (
           <a
             href={beat.soundcloudUrl}

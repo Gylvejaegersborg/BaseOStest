@@ -3,6 +3,7 @@ import { BEATS, type Beat, type CartItem, type LicenseTier } from '@/data/beats'
 import { useBeatPlayer } from './useBeatPlayer'
 import { BeatStoreNav, type StoreView } from './BeatStoreNav'
 import { BeatsView } from './views/BeatsView'
+import { PacksView } from './views/PacksView'
 import { LicensingView } from './views/LicensingView'
 import { AboutView } from './views/AboutView'
 import { Cart } from './Cart'
@@ -84,6 +85,7 @@ export function BeatStorePage({ open, onClose }: BeatStorePageProps) {
         {view === 'beats' && (
           <BeatsView player={player} cartTiersFor={cartTiersFor} onAddToCart={addToCart} />
         )}
+        {view === 'packs' && <PacksView />}
         {view === 'licensing' && <LicensingView />}
         {view === 'about' && <AboutView />}
         {view === 'cart' && (
