@@ -1,20 +1,19 @@
-import * as THREE from 'three'
-
 const STYLES = ['bands', 'waves', 'blobs', 'burst', 'grid'] as const
 type Style = (typeof STYLES)[number]
 
 /**
- * Generates a CD-label canvas texture from the beat's gradient + title. Picks
- * one of five procedural artwork styles based on a hash of the beat's id so
- * every mock track has a distinct, repeatable visual identity — no external
- * cover image required.
+ * Generates a procedural cover-art canvas from the beat's gradient + title.
+ * Picks one of five styles based on a hash of the beat's id so every mock
+ * track gets a distinct, deterministic visual identity — no external image
+ * required. Returns the raw HTMLCanvasElement so callers can render it
+ * however they like (background-image data URL, OffscreenCanvas, etc).
  */
-export function generateLabelTexture(
+export function generateLabelCanvas(
   gradient: [string, string],
   title: string,
   id: string = title,
-): THREE.CanvasTexture {
-  const size = 512
+): HTMLCanvasElement {
+  const size = 768
   const canvas = document.createElement('canvas')
   canvas.width = size
   canvas.height = size
@@ -42,115 +41,95 @@ export function generateLabelTexture(
       drawGrid(ctx, size, gradient, rand)
       break
   }
-  drawGrooves(ctx, size)
   drawTitle(ctx, size, title)
+  return canvas
+}
 
-  const tex = new THREE.CanvasTexture(canvas)
-  tex.colorSpace = THREE.SRGBColorSpace
-  tex.anisotropy = 4
-  return tex
+/** Convenience: convert the procedural artwork to a data URL ready for CSS. */
+export function generateLabelDataURL(
+  gradient: [string, string],
+  title: string,
+  id: string = title,
+): string {
+  return generateLabelCanvas(gradient, title, id).toDataURL('image/jpeg', 0.9)
 }
 
 // ── Shared layers ─────────────────────────────────────────────────────────────
 
 function drawRadialBase(ctx: CanvasRenderingContext2D, size: number, gradient: [string, string]) {
-  const g = ctx.createRadialGradient(size / 2, size / 2, size * 0.08, size / 2, size / 2, size * 0.55)
+  // Diagonal base — feels less "label", more "cover".
+  const g = ctx.createLinearGradient(0, 0, size, size)
   g.addColorStop(0, gradient[0])
   g.addColorStop(1, gradient[1])
   ctx.fillStyle = g
   ctx.fillRect(0, 0, size, size)
 }
 
-function drawGrooves(ctx: CanvasRenderingContext2D, size: number) {
-  ctx.globalCompositeOperation = 'overlay'
-  for (let r = 80; r < size / 2; r += 6) {
-    ctx.beginPath()
-    ctx.arc(size / 2, size / 2, r, 0, Math.PI * 2)
-    ctx.strokeStyle = `rgba(255,255,255,${0.03 + (r % 18 === 0 ? 0.05 : 0)})`
-    ctx.lineWidth = 1
-    ctx.stroke()
-  }
-  ctx.globalCompositeOperation = 'source-over'
-}
-
 function drawTitle(ctx: CanvasRenderingContext2D, size: number, title: string) {
   ctx.save()
-  ctx.translate(size / 2, size / 2)
-  ctx.fillStyle = 'rgba(255,255,255,0.92)'
-  ctx.font = 'bold 26px system-ui, sans-serif'
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  ctx.fillText(title.toUpperCase(), 0, -size * 0.18)
+  ctx.fillStyle = 'rgba(0,0,0,0.45)'
+  ctx.fillRect(0, size - 110, size, 110)
+  ctx.fillStyle = 'rgba(255,255,255,0.96)'
+  ctx.font = 'bold 44px system-ui, sans-serif'
+  ctx.textAlign = 'left'
+  ctx.textBaseline = 'alphabetic'
+  ctx.fillText(title.toUpperCase(), 32, size - 50)
   ctx.fillStyle = 'rgba(255,255,255,0.55)'
-  ctx.font = '14px ui-monospace, monospace'
-  ctx.fillText('ISΛRK', 0, -size * 0.18 + 28)
+  ctx.font = '18px ui-monospace, monospace'
+  ctx.fillText('ISΛRK', 32, size - 22)
   ctx.restore()
 }
 
 // ── Procedural styles ─────────────────────────────────────────────────────────
 
-/** Concentric ring bands of alternating opacity — geometric/minimalist. */
 function drawBands(ctx: CanvasRenderingContext2D, size: number, gradient: [string, string], rand: () => number) {
   ctx.save()
   ctx.translate(size / 2, size / 2)
-  const bandCount = 6 + Math.floor(rand() * 4)
-  const maxR = size * 0.46
+  const bandCount = 7 + Math.floor(rand() * 5)
+  const maxR = size * 0.7
   for (let i = bandCount; i > 0; i--) {
     const r = (i / bandCount) * maxR
-    const alpha = 0.06 + rand() * 0.12
     ctx.beginPath()
     ctx.arc(0, 0, r, 0, Math.PI * 2)
     ctx.fillStyle = i % 2 === 0 ? gradient[0] : gradient[1]
-    ctx.globalAlpha = alpha
+    ctx.globalAlpha = 0.08 + rand() * 0.14
     ctx.fill()
   }
   ctx.globalAlpha = 1
   ctx.restore()
 }
 
-/** Stacked sinusoidal wave bands — flowing horizontal motion. */
 function drawWaves(ctx: CanvasRenderingContext2D, size: number, gradient: [string, string], rand: () => number) {
   ctx.save()
-  ctx.translate(size / 2, size / 2)
-  ctx.beginPath()
-  ctx.arc(0, 0, size * 0.46, 0, Math.PI * 2)
-  ctx.clip()
-
-  const waves = 5 + Math.floor(rand() * 3)
+  const waves = 6 + Math.floor(rand() * 4)
   for (let i = 0; i < waves; i++) {
-    const amp = 18 + rand() * 38
-    const freq = 0.012 + rand() * 0.02
+    const amp = 24 + rand() * 60
+    const freq = 0.008 + rand() * 0.018
     const phase = rand() * Math.PI * 2
-    const y = -size * 0.4 + (i / waves) * size * 0.8
+    const y = (i / waves) * size + size * 0.05
     ctx.beginPath()
-    ctx.moveTo(-size / 2, y)
-    for (let x = -size / 2; x <= size / 2; x += 6) {
+    ctx.moveTo(0, y)
+    for (let x = 0; x <= size; x += 6) {
       ctx.lineTo(x, y + Math.sin(x * freq + phase) * amp)
     }
-    ctx.lineTo(size / 2, size / 2)
-    ctx.lineTo(-size / 2, size / 2)
+    ctx.lineTo(size, size)
+    ctx.lineTo(0, size)
     ctx.closePath()
     ctx.fillStyle = i % 2 === 0 ? gradient[0] : gradient[1]
-    ctx.globalAlpha = 0.18 + rand() * 0.12
+    ctx.globalAlpha = 0.16 + rand() * 0.14
     ctx.fill()
   }
   ctx.globalAlpha = 1
   ctx.restore()
 }
 
-/** Soft overlapping blobs — fluid/organic. */
 function drawBlobs(ctx: CanvasRenderingContext2D, size: number, gradient: [string, string], rand: () => number) {
   ctx.save()
-  ctx.translate(size / 2, size / 2)
-  ctx.beginPath()
-  ctx.arc(0, 0, size * 0.46, 0, Math.PI * 2)
-  ctx.clip()
-
-  const blobs = 5 + Math.floor(rand() * 4)
+  const blobs = 6 + Math.floor(rand() * 5)
   for (let i = 0; i < blobs; i++) {
-    const cx = (rand() - 0.5) * size * 0.7
-    const cy = (rand() - 0.5) * size * 0.7
-    const radius = size * (0.12 + rand() * 0.18)
+    const cx = rand() * size
+    const cy = rand() * size
+    const radius = size * (0.18 + rand() * 0.28)
     const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius)
     g.addColorStop(0, hexWithAlpha(i % 2 === 0 ? gradient[0] : gradient[1], 0.55))
     g.addColorStop(1, hexWithAlpha(i % 2 === 0 ? gradient[0] : gradient[1], 0))
@@ -162,21 +141,16 @@ function drawBlobs(ctx: CanvasRenderingContext2D, size: number, gradient: [strin
   ctx.restore()
 }
 
-/** Radial starburst lines — energy/explosion. */
 function drawBurst(ctx: CanvasRenderingContext2D, size: number, gradient: [string, string], rand: () => number) {
   ctx.save()
   ctx.translate(size / 2, size / 2)
-  ctx.beginPath()
-  ctx.arc(0, 0, size * 0.46, 0, Math.PI * 2)
-  ctx.clip()
-
-  const rays = 26 + Math.floor(rand() * 22)
+  const rays = 36 + Math.floor(rand() * 30)
   for (let i = 0; i < rays; i++) {
     const angle = (i / rays) * Math.PI * 2 + rand() * 0.08
-    const len = size * (0.18 + rand() * 0.32)
-    const width = 1 + rand() * 4
+    const len = size * (0.25 + rand() * 0.5)
+    const width = 1 + rand() * 5
     const grad = ctx.createLinearGradient(0, 0, Math.cos(angle) * len, Math.sin(angle) * len)
-    grad.addColorStop(0, hexWithAlpha(gradient[0], 0.45))
+    grad.addColorStop(0, hexWithAlpha(gradient[0], 0.5))
     grad.addColorStop(1, hexWithAlpha(gradient[1], 0))
     ctx.strokeStyle = grad
     ctx.lineWidth = width
@@ -188,36 +162,30 @@ function drawBurst(ctx: CanvasRenderingContext2D, size: number, gradient: [strin
   ctx.restore()
 }
 
-/** Geometric grid + offset accent dots — structured/tech. */
 function drawGrid(ctx: CanvasRenderingContext2D, size: number, gradient: [string, string], rand: () => number) {
   ctx.save()
-  ctx.translate(size / 2, size / 2)
-  ctx.beginPath()
-  ctx.arc(0, 0, size * 0.46, 0, Math.PI * 2)
-  ctx.clip()
-
-  const step = 28 + Math.floor(rand() * 12)
-  ctx.strokeStyle = hexWithAlpha(gradient[0], 0.18)
+  const step = 38 + Math.floor(rand() * 16)
+  ctx.strokeStyle = hexWithAlpha(gradient[0], 0.22)
   ctx.lineWidth = 1
-  for (let x = -size / 2; x <= size / 2; x += step) {
+  for (let x = 0; x <= size; x += step) {
     ctx.beginPath()
-    ctx.moveTo(x, -size / 2)
-    ctx.lineTo(x, size / 2)
+    ctx.moveTo(x, 0)
+    ctx.lineTo(x, size)
     ctx.stroke()
   }
-  for (let y = -size / 2; y <= size / 2; y += step) {
+  for (let y = 0; y <= size; y += step) {
     ctx.beginPath()
-    ctx.moveTo(-size / 2, y)
-    ctx.lineTo(size / 2, y)
+    ctx.moveTo(0, y)
+    ctx.lineTo(size, y)
     ctx.stroke()
   }
-  const dots = 8 + Math.floor(rand() * 8)
+  const dots = 14 + Math.floor(rand() * 12)
   ctx.fillStyle = hexWithAlpha(gradient[0], 0.65)
   for (let i = 0; i < dots; i++) {
-    const x = Math.round((rand() - 0.5) * size * 0.7 / step) * step
-    const y = Math.round((rand() - 0.5) * size * 0.7 / step) * step
+    const x = Math.round((rand() * size) / step) * step
+    const y = Math.round((rand() * size) / step) * step
     ctx.beginPath()
-    ctx.arc(x, y, 3 + rand() * 3, 0, Math.PI * 2)
+    ctx.arc(x, y, 3 + rand() * 4, 0, Math.PI * 2)
     ctx.fill()
   }
   ctx.restore()
