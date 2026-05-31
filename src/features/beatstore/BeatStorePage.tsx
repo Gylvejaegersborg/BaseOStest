@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { BEATS, type Beat, type CartItem, type LicenseTier } from '@/data/beats'
+import { BEATS, CONTACT_EMAIL, formatPrice, type Beat, type CartItem, type LicenseTier } from '@/data/beats'
 import { useBeatPlayer } from './useBeatPlayer'
 import { BeatStoreNav, type StoreView } from './BeatStoreNav'
 import { BeatsView } from './views/BeatsView'
@@ -8,7 +8,7 @@ import { LicensingView } from './views/LicensingView'
 import { AboutView } from './views/AboutView'
 import { Cart } from './Cart'
 import { Checkout } from './Checkout'
-import { Check, Download } from 'lucide-react'
+import { Check, Download, Mail } from 'lucide-react'
 
 interface BeatStorePageProps {
   open: boolean
@@ -17,8 +17,9 @@ interface BeatStorePageProps {
 
 /**
  * Immersive full-screen beat-store experience. Mounted on top of the OS shell
- * when `open` is true. Holds its own internal view router (Beats / Licensing /
- * About / Cart / Checkout / Done) and a real-audio player driving the 3D CD.
+ * when `open` is true. Holds its own internal view router (Beats / Packs /
+ * Licensing / About / Cart / Checkout / Done) and a real-audio player driving
+ * the Now Playing card.
  */
 export function BeatStorePage({ open, onClose }: BeatStorePageProps) {
   const [view, setView] = useState<StoreView>('beats')
@@ -87,7 +88,7 @@ export function BeatStorePage({ open, onClose }: BeatStorePageProps) {
         )}
         {view === 'packs' && <PacksView />}
         {view === 'licensing' && <LicensingView />}
-        {view === 'about' && <AboutView />}
+        {view === 'about' && <AboutView onBrowseBeats={() => setView('beats')} />}
         {view === 'cart' && (
           <Cart
             items={cart}
@@ -123,42 +124,97 @@ function DoneView({
   orderEmail: string
   onBack: () => void
 }) {
+  const total = purchased.reduce((s, i) => s + i.price, 0)
+
+  // Build a mailto: link that drafts an order receipt in the customer's mail
+  // client. There's no backend on this static site, so this is the most
+  // honest way to "send a receipt" — the user actually opens their own mail
+  // app with a draft prefilled.
+  const receiptBody =
+    `ISARK Order ${orderNo}\n\n` +
+    `Thanks for your purchase — here are your files:\n\n` +
+    purchased
+      .map((p) => {
+        const beat = BEATS.find((b) => b.id === p.beatId)
+        const link = beat?.audioFile ? `${window.location.origin}${beat.audioFile}` : '(demo — no file)'
+        return `• ${p.title} · ${p.tier} license · ${formatPrice(p.price)}\n  ${link}`
+      })
+      .join('\n\n') +
+    `\n\nTotal: ${formatPrice(total)}\n\n— ISARK`
+
+  const receiptMailto = `mailto:${encodeURIComponent(orderEmail)}?subject=${encodeURIComponent(
+    `ISARK Order ${orderNo}`,
+  )}&body=${encodeURIComponent(receiptBody)}`
+
   return (
     <div className="flex h-full flex-col items-center overflow-y-auto p-6 text-center">
       <div className="mt-6 flex h-14 w-14 items-center justify-center rounded-full bg-isark-accent/15 text-isark-accent">
         <Check size={28} />
       </div>
       <h2 className="mt-4 font-sans text-2xl font-bold tracking-tight">Order confirmed</h2>
-      <p className="mt-1 text-sm text-isark-dim">
-        Order <span className="font-mono text-isark-text">{orderNo}</span> · files sent to{' '}
-        <span className="text-isark-text">{orderEmail}</span>
+      <p className="mt-1 max-w-md text-sm text-isark-dim">
+        Order <span className="font-mono text-isark-text">{orderNo}</span> — your files are below. Hit
+        <span className="mx-1 font-semibold text-isark-text">Email me a receipt</span> to draft a copy in your mail
+        client.
       </p>
-      <div className="mt-5 w-full max-w-sm space-y-2">
-        {purchased.map((item) => (
-          <div
-            key={`${item.beatId}-${item.tier}`}
-            className="flex items-center justify-between rounded-lg border border-isark-line bg-isark-surface px-3 py-2.5 text-left"
-          >
-            <div className="min-w-0">
-              <div className="truncate text-sm font-semibold">{item.title}</div>
-              <div className="font-mono text-[11px] text-isark-dim">{item.tier} license</div>
-            </div>
-            <button
-              type="button"
-              className="flex items-center gap-1.5 rounded-md border border-isark-accent/40 bg-isark-accent/10 px-2.5 py-1 text-xs text-isark-accent"
+
+      <div className="mt-5 w-full max-w-md space-y-2">
+        {purchased.map((item) => {
+          const beat = BEATS.find((b) => b.id === item.beatId)
+          const audioUrl = beat?.audioFile
+          const downloadName = `${item.title} — ISARK [${item.tier}].mp3`
+          return (
+            <div
+              key={`${item.beatId}-${item.tier}`}
+              className="flex items-center justify-between gap-3 rounded-lg border border-isark-line bg-isark-surface px-3 py-2.5 text-left"
             >
-              <Download size={13} /> Download
-            </button>
-          </div>
-        ))}
+              <div className="min-w-0">
+                <div className="truncate text-sm font-semibold">{item.title}</div>
+                <div className="font-mono text-[11px] text-isark-dim">
+                  {item.tier} license · {formatPrice(item.price)}
+                </div>
+              </div>
+              {audioUrl ? (
+                <a
+                  href={audioUrl}
+                  download={downloadName}
+                  className="flex shrink-0 items-center gap-1.5 rounded-md border border-isark-accent/50 bg-isark-accent/10 px-2.5 py-1 text-xs text-isark-accent transition-colors hover:bg-isark-accent/20"
+                >
+                  <Download size={13} /> Download
+                </a>
+              ) : (
+                <span
+                  className="shrink-0 rounded-md border border-isark-line px-2.5 py-1 text-[11px] text-isark-dim"
+                  title="No file uploaded for this demo beat"
+                >
+                  Demo · no file
+                </span>
+              )}
+            </div>
+          )
+        })}
       </div>
-      <button
-        type="button"
-        onClick={onBack}
-        className="mt-6 rounded-lg border border-isark-line px-4 py-2 text-sm text-isark-text transition-colors hover:border-isark-accent"
-      >
-        Back to store
-      </button>
+
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+        <a
+          href={receiptMailto}
+          className="flex items-center gap-2 rounded-lg bg-isark-accent px-4 py-2.5 text-sm font-semibold text-isark-bg shadow-[0_0_24px_rgba(167,139,250,0.45)] transition-transform hover:scale-[1.02] active:scale-95"
+        >
+          <Mail size={15} /> Email me a receipt
+        </a>
+        <button
+          type="button"
+          onClick={onBack}
+          className="rounded-lg border border-isark-line px-4 py-2.5 text-sm text-isark-text transition-colors hover:border-isark-accent"
+        >
+          Back to store
+        </button>
+      </div>
+
+      <p className="mt-3 text-[11px] text-isark-dim">
+        Need a different format or stems? Email <span className="text-isark-text">{CONTACT_EMAIL}</span> with your order
+        number.
+      </p>
     </div>
   )
 }

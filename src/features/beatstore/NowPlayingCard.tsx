@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ExternalLink } from 'lucide-react'
-import { type Beat, type LicenseTier, formatDuration } from '@/data/beats'
+import { type Beat, type License, type LicenseTier, formatDuration } from '@/data/beats'
+import { LicenseDetailModal } from './LicenseDetailModal'
 import { Transport } from './Transport'
 import { generateLabelDataURL } from './textures'
 import type { BeatPlayer } from './useBeatPlayer'
@@ -19,6 +20,7 @@ interface NowPlayingCardProps {
  */
 export function NowPlayingCard({ player, cartTiersFor, onAddToCart }: NowPlayingCardProps) {
   const beat = player.current
+  const [openLicense, setOpenLicense] = useState<License | null>(null)
 
   return (
     <div className="relative h-full w-full overflow-hidden rounded-3xl border border-isark-line/60 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.65)]">
@@ -46,12 +48,24 @@ export function NowPlayingCard({ player, cartTiersFor, onAddToCart }: NowPlaying
             onTogglePlay={() => beat && player.toggle(beat)}
             onToggleShuffle={() => player.setShuffle(!player.shuffle)}
             onSeek={player.seek}
-            onAddToCart={(tier, price) => beat && onAddToCart(beat, tier, price)}
+            onOpenLicense={(lic) => setOpenLicense(lic)}
             onPrev={player.prev}
             onNext={player.next}
           />
         </div>
       </div>
+
+      {beat && openLicense && (
+        <LicenseDetailModal
+          beat={beat}
+          license={openLicense}
+          inCart={cartTiersFor(beat.id).has(openLicense.tier)}
+          onAddToCart={(b, lic) => {
+            if (typeof lic.price === 'number') onAddToCart(b, lic.tier, lic.price)
+          }}
+          onClose={() => setOpenLicense(null)}
+        />
+      )}
     </div>
   )
 }

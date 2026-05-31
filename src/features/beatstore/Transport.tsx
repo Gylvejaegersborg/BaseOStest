@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight, Pause, Play, Shuffle } from 'lucide-react'
 import { cn } from '@/lib/cn'
-import { type Beat, type LicenseTier, formatDuration, formatPrice } from '@/data/beats'
+import { type Beat, type License, type LicenseTier, formatDuration, formatPrice } from '@/data/beats'
 
 interface TransportProps {
   beat: Beat | null
@@ -13,7 +13,8 @@ interface TransportProps {
   onTogglePlay: () => void
   onToggleShuffle: () => void
   onSeek: (t01: number) => void
-  onAddToCart: (tier: LicenseTier, price: number) => void
+  /** Open the license detail modal — clicking a license button no longer adds directly. */
+  onOpenLicense: (license: License) => void
   onPrev: () => void
   onNext: () => void
 }
@@ -34,7 +35,7 @@ export function Transport({
   onTogglePlay,
   onToggleShuffle,
   onSeek,
-  onAddToCart,
+  onOpenLicense,
   onPrev,
   onNext,
 }: TransportProps) {
@@ -71,16 +72,17 @@ export function Transport({
         </div>
       </div>
 
-      {/* Licenses */}
-      <div className="grid grid-cols-3 gap-2">
+      {/* Licenses — click opens the detail modal for that tier */}
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {beat.licenses.map((lic) => {
           const inCart = cartTiers.has(lic.tier)
+          const negotiable = lic.price === 'negotiable'
           return (
             <button
               key={lic.tier}
               type="button"
-              onClick={() => !inCart && onAddToCart(lic.tier, lic.price)}
-              disabled={inCart}
+              onClick={() => onOpenLicense(lic)}
+              aria-label={`View ${lic.tier} license`}
               className={cn(
                 'group flex flex-col items-start rounded-lg border p-2.5 text-left transition-all sm:p-3',
                 inCart
@@ -92,7 +94,12 @@ export function Transport({
                 <span className="truncate font-mono text-[10px] uppercase tracking-wider text-isark-text/70 group-hover:text-isark-text">
                   {lic.tier}
                 </span>
-                <span className="shrink-0 font-sans text-[13px] font-semibold text-isark-text sm:text-sm">
+                <span
+                  className={cn(
+                    'shrink-0 font-sans text-[13px] font-semibold text-isark-text sm:text-sm',
+                    negotiable && 'text-isark-accent',
+                  )}
+                >
                   {inCart ? 'Added' : formatPrice(lic.price)}
                 </span>
               </div>
