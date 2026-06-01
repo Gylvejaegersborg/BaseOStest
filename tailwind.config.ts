@@ -86,6 +86,14 @@ export default {
           '0%': { backgroundPosition: '0 0' },
           '100%': { backgroundPosition: '0 128px' },
         },
+        'gradient-pan': {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+        },
+        'float-slow': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
       },
       animation: {
         twinkle: 'twinkle 3s ease-in-out infinite',
@@ -97,6 +105,8 @@ export default {
         'dust-drift': 'dust-drift 30s linear infinite',
         'dust-drift-reverse': 'dust-drift-reverse 40s linear infinite',
         'grid-flow': 'grid-flow 8s linear infinite',
+        'gradient-pan': 'gradient-pan 14s ease-in-out infinite',
+        'float-slow': 'float-slow 6s ease-in-out infinite',
       },
     },
   },

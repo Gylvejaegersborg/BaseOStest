@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from 'react'
-import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone } from 'lucide-react'
+import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe } from 'lucide-react'
 import { LAB_MODULES, type LabModule } from '@/data/labs'
 import { Panel } from '@/components/ui/Panel'
 import { Modal } from '@/components/ui/Modal'
@@ -17,6 +17,9 @@ const BeatDBPage = lazy(() =>
 const DiscordDashPage = lazy(() =>
   import('@/features/discorddash/DiscordDashPage').then((m) => ({ default: m.DiscordDashPage })),
 )
+const ArtistWebPage = lazy(() =>
+  import('@/features/artistweb/ArtistWebPage').then((m) => ({ default: m.ArtistWebPage })),
+)
 const SudokuPage = lazy(() =>
   import('@/pages/Sudoku').then((m) => ({ default: m.Sudoku })),
 )
@@ -33,6 +36,7 @@ export function Lab() {
   const [dbOpen, setDbOpen] = useState(false)
   const [discordOpen, setDiscordOpen] = useState(false)
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
+  const [artistOpen, setArtistOpen] = useState(false)
   const isDesktop = useIsDesktop()
   const selected = LAB_MODULES.find((m) => m.id === selectedId)!
 
@@ -76,6 +80,7 @@ export function Lab() {
             onOpenDB={() => setDbOpen(true)}
             onOpenDiscord={() => setDiscordOpen(true)}
             onOpenShortcuts={() => setShortcutsOpen(true)}
+            onOpenArtist={() => setArtistOpen(true)}
           />
         </aside>
       )}
@@ -104,6 +109,7 @@ export function Lab() {
               onOpenDB={() => setDbOpen(true)}
               onOpenDiscord={() => setDiscordOpen(true)}
               onOpenShortcuts={() => setShortcutsOpen(true)}
+              onOpenArtist={() => setArtistOpen(true)}
             />
           </div>
         )}
@@ -132,6 +138,19 @@ export function Lab() {
           <ShortcutsLabPage open onClose={() => setShortcutsOpen(false)} />
         </Suspense>
       )}
+
+      {artistOpen && (
+        <Suspense fallback={null}>
+          <ArtistWebPage
+            open
+            onClose={() => setArtistOpen(false)}
+            onGetBeats={() => {
+              setArtistOpen(false)
+              setStoreOpen(true)
+            }}
+          />
+        </Suspense>
+      )}
     </div>
   )
 }
@@ -143,6 +162,7 @@ function ModuleDetail({
   onOpenDB,
   onOpenDiscord,
   onOpenShortcuts,
+  onOpenArtist,
 }: {
   mod: LabModule
   embedded?: boolean
@@ -150,6 +170,7 @@ function ModuleDetail({
   onOpenDB?: () => void
   onOpenDiscord?: () => void
   onOpenShortcuts?: () => void
+  onOpenArtist?: () => void
 }) {
   return (
     <>
@@ -169,6 +190,14 @@ function ModuleDetail({
             className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
           >
             Open Beat Store <Store size={13} />
+          </button>
+        )}
+        {mod.id === 'artist-web' && onOpenArtist && (
+          <button
+            onClick={onOpenArtist}
+            className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
+          >
+            Open Artist Page <Globe size={13} />
           </button>
         )}
         {mod.id === 'beat-db' && onOpenDB && (
