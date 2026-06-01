@@ -1,9 +1,15 @@
-export type LicenseTier = 'MP3' | 'WAV' | 'Exclusive'
+export type LicenseTier = 'MP3' | 'WAV' | 'Stems' | 'Exclusive'
 
 export interface License {
   tier: LicenseTier
-  price: number
+  /** Fixed price in USD, or 'negotiable' for tiers that require a quote. */
+  price: number | 'negotiable'
+  /** Short blurb shown on the license button. */
   note: string
+  /** Longer description shown in the license detail modal. */
+  details: string
+  /** Bullet-point inclusions shown in the license detail modal. */
+  highlights: string[]
 }
 
 export interface Beat {
@@ -33,11 +39,56 @@ export interface CartItem {
   price: number
 }
 
-function licenses(exclusive: number): License[] {
+function licenses(): License[] {
   return [
-    { tier: 'MP3', price: 24.99, note: 'Tagless MP3 · 5k streams' },
-    { tier: 'WAV', price: 49.99, note: 'MP3 + WAV · 10k streams' },
-    { tier: 'Exclusive', price: exclusive, note: 'Full rights · trackouts' },
+    {
+      tier: 'MP3',
+      price: 24.99,
+      note: 'Tagless MP3 · 5k streams',
+      details:
+        'Tagless 320 kbps MP3 master. Stream up to 5,000 plays across all platforms, monetise on YouTube and TikTok. Credit "Prod. ISARK" in the title or description.',
+      highlights: [
+        'Tagless 320 kbps MP3',
+        'Up to 5,000 streams',
+        'Music videos + social posts OK',
+        'Credit Prod. ISARK',
+      ],
+    },
+    {
+      tier: 'WAV',
+      price: 49.99,
+      note: 'MP3 + WAV · 10k streams',
+      details:
+        'Includes everything in the MP3 license plus the uncompressed WAV master. Stream cap is raised to 10,000.',
+      highlights: ['Everything in MP3', 'Uncompressed WAV master', 'Up to 10,000 streams', 'Mixing-ready file'],
+    },
+    {
+      tier: 'Stems',
+      price: 99,
+      note: 'WAV + trackouts · 25k streams',
+      details:
+        'Adds the individual trackout stems (drums, bass, melodies, FX) for full mixing flexibility. Stream cap raised to 25,000. Ideal for serious productions and releases.',
+      highlights: [
+        'Everything in WAV',
+        'Individual trackout stems',
+        'Drums · bass · melodies · FX',
+        'Up to 25,000 streams',
+      ],
+    },
+    {
+      tier: 'Exclusive',
+      price: 'negotiable',
+      note: 'Full rights · contact ISARK',
+      details:
+        'Full transfer of rights — the beat is permanently retired from the store after purchase. Includes the stems, WAV, signed exclusive contract and no streaming caps. Pricing depends on the beat; reach out to negotiate.',
+      highlights: [
+        'Full rights transfer',
+        'Beat retired from the store',
+        'Stems + WAV + MP3 included',
+        'No streaming caps',
+        'Signed exclusive contract',
+      ],
+    },
   ]
 }
 
@@ -55,7 +106,7 @@ export const BEATS: Beat[] = [
     durationSec: 113,
     gradient: ['#FF7A55', '#3A0F18'],
     plays: 412,
-    licenses: licenses(329),
+    licenses: licenses(),
     audioFile: '/beats/audio/homerun.mp3',
   },
   {
@@ -68,7 +119,7 @@ export const BEATS: Beat[] = [
     durationSec: 55,
     gradient: ['#F4A8E8', '#3A1B33'],
     plays: 287,
-    licenses: licenses(279),
+    licenses: licenses(),
     audioFile: '/beats/audio/virtual-love.mp3',
   },
   {
@@ -81,7 +132,7 @@ export const BEATS: Beat[] = [
     durationSec: 100,
     gradient: ['#A78BFA', '#150A33'],
     plays: 1024,
-    licenses: licenses(449),
+    licenses: licenses(),
     audioFile: '/beats/audio/switch.mp3',
   },
   // ─── Placeholders (synth preview until real audio lands) ────────────────
@@ -95,7 +146,7 @@ export const BEATS: Beat[] = [
     durationSec: 184,
     gradient: ['#FF3D9F', '#14082E'],
     plays: 18420,
-    licenses: licenses(299),
+    licenses: licenses(),
   },
   {
     id: 'cold-storage',
@@ -107,7 +158,7 @@ export const BEATS: Beat[] = [
     durationSec: 167,
     gradient: ['#5EE6F0', '#14222B'],
     plays: 9310,
-    licenses: licenses(349),
+    licenses: licenses(),
   },
   {
     id: 'lowlight',
@@ -119,7 +170,7 @@ export const BEATS: Beat[] = [
     durationSec: 192,
     gradient: ['#FF8A65', '#2A0B33'],
     plays: 13755,
-    licenses: licenses(279),
+    licenses: licenses(),
   },
   {
     id: 'signal-lost',
@@ -131,7 +182,7 @@ export const BEATS: Beat[] = [
     durationSec: 176,
     gradient: ['#E63956', '#0A2540'],
     plays: 7841,
-    licenses: licenses(299),
+    licenses: licenses(),
   },
   {
     id: 'afterglow',
@@ -143,11 +194,14 @@ export const BEATS: Beat[] = [
     durationSec: 199,
     gradient: ['#FFA559', '#5D3B7A'],
     plays: 16604,
-    licenses: licenses(329),
+    licenses: licenses(),
   },
 ]
 
 export const MOODS: string[] = [...new Set(BEATS.flatMap((b) => b.mood))].sort()
+
+/** Where exclusive-license enquiries are sent. Update to your real address. */
+export const CONTACT_EMAIL = 'hello@isark.beats'
 
 export function formatDuration(sec: number): string {
   const m = Math.floor(sec / 60)
@@ -155,7 +209,8 @@ export function formatDuration(sec: number): string {
   return `${m}:${String(s).padStart(2, '0')}`
 }
 
-export function formatPrice(n: number): string {
+export function formatPrice(n: number | 'negotiable'): string {
+  if (n === 'negotiable') return 'Contact'
   return `$${n.toFixed(2)}`
 }
 
