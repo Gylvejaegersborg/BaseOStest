@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from 'react'
-import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database } from 'lucide-react'
+import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Gauge } from 'lucide-react'
 import { LAB_MODULES, type LabModule } from '@/data/labs'
 import { Panel } from '@/components/ui/Panel'
 import { Modal } from '@/components/ui/Modal'
@@ -17,6 +17,9 @@ const BeatDBPage = lazy(() =>
 const SudokuPage = lazy(() =>
   import('@/pages/Sudoku').then((m) => ({ default: m.Sudoku })),
 )
+const RenderQueuePage = lazy(() =>
+  import('@/features/renderqueue/RenderQueuePage').then((m) => ({ default: m.RenderQueuePage })),
+)
 
 const STATUS_COLOR = { live: '#46d369', staging: '#f0a020', local: '#36e0c8' } as const
 
@@ -25,6 +28,7 @@ export function Lab() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [storeOpen, setStoreOpen] = useState(false)
   const [dbOpen, setDbOpen] = useState(false)
+  const [renderOpen, setRenderOpen] = useState(false)
   const isDesktop = useIsDesktop()
   const selected = LAB_MODULES.find((m) => m.id === selectedId)!
 
@@ -62,7 +66,7 @@ export function Lab() {
       {/* Desktop: persistent detail rail (non-Sudoku) */}
       {!isSudoku && (
         <aside className="hidden w-[380px] shrink-0 flex-col gap-3 overflow-y-auto border-l border-line bg-panel/30 p-3 lg:flex">
-          <ModuleDetail mod={selected} onOpenStore={() => setStoreOpen(true)} onOpenDB={() => setDbOpen(true)} />
+          <ModuleDetail mod={selected} onOpenStore={() => setStoreOpen(true)} onOpenDB={() => setDbOpen(true)} onOpenRender={() => setRenderOpen(true)} />
         </aside>
       )}
 
@@ -83,7 +87,7 @@ export function Lab() {
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            <ModuleDetail mod={selected} embedded onOpenStore={() => setStoreOpen(true)} onOpenDB={() => setDbOpen(true)} />
+            <ModuleDetail mod={selected} embedded onOpenStore={() => setStoreOpen(true)} onOpenDB={() => setDbOpen(true)} onOpenRender={() => setRenderOpen(true)} />
           </div>
         )}
       </Modal>
@@ -99,6 +103,12 @@ export function Lab() {
           <BeatDBPage open onClose={() => setDbOpen(false)} />
         </Suspense>
       )}
+
+      {renderOpen && (
+        <Suspense fallback={null}>
+          <RenderQueuePage open onClose={() => setRenderOpen(false)} />
+        </Suspense>
+      )}
     </div>
   )
 }
@@ -108,11 +118,13 @@ function ModuleDetail({
   embedded,
   onOpenStore,
   onOpenDB,
+  onOpenRender,
 }: {
   mod: LabModule
   embedded?: boolean
   onOpenStore?: () => void
   onOpenDB?: () => void
+  onOpenRender?: () => void
 }) {
   return (
     <>
@@ -140,6 +152,14 @@ function ModuleDetail({
             className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
           >
             Open Beat DB <Database size={13} />
+          </button>
+        )}
+        {mod.id === 'render-queue' && onOpenRender && (
+          <button
+            onClick={onOpenRender}
+            className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
+          >
+            Open Render Queue <Gauge size={13} />
           </button>
         )}
         {mod.url && (
