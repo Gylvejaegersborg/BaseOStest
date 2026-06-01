@@ -32,12 +32,25 @@ const AGENT_SYSTEM: Record<string, string> = {
 }
 
 const CHAT_AGENTS = AGENTS.slice(0, 3)
-const CONVERSATIONS = [
+const SEED_CONVERSATIONS = [
   { id: 'c1', title: 'Release plan Q3', agent: 'Hemera' },
   { id: 'c2', title: 'Beat DB schema', agent: 'Claude' },
   { id: 'c3', title: 'Content batch', agent: 'Nyx' },
   { id: 'c4', title: 'Homeserver tunnel', agent: 'Claude' },
 ]
+
+type Convo = { id: string; title: string; agent: string }
+
+function loadConvos(): Convo[] {
+  try {
+    const s = localStorage.getItem('os:chat:convos')
+    return s ? JSON.parse(s) : SEED_CONVERSATIONS
+  } catch { return SEED_CONVERSATIONS }
+}
+
+function saveConvos(convos: Convo[]) {
+  localStorage.setItem('os:chat:convos', JSON.stringify(convos))
+}
 
 function fmtSize(bytes: number) {
   if (bytes < 1024) return `${bytes} B`
@@ -59,11 +72,12 @@ function saveHistory(convoId: string, messages: Message[]) {
 
 export function Chat() {
   const [agentId, setAgentId] = useState(CHAT_AGENTS[0].id)
-  const [convoId, setConvoId] = useState('c1')
+  const [convos, setConvos] = useState<Convo[]>(loadConvos)
+  const [convoId, setConvoId] = useState(loadConvos()[0]?.id ?? 'c1')
   const [messages, setMessages] = useState<Message[]>(() => {
-    const stored = loadHistory('c1')
-    if (stored.length) return stored
-    return [{ id: 'm0', role: 'assistant', text: 'Channel open. Type a message to start.', time: fmtTime() }]
+    const id = loadConvos()[0]?.id ?? 'c1'
+    const stored = loadHistory(id)
+    return stored.length ? stored : [{ id: 'm0', role: 'assistant', text: 'Channel open. Type a message to start.', time: fmtTime() }]
   })
   const [draft, setDraft] = useState('')
   const [pending, setPending] = useState<Attachment[]>([])
@@ -77,7 +91,19 @@ export function Chat() {
   const abortRef = useRef<AbortController | null>(null)
 
   const agent = CHAT_AGENTS.find((a) => a.id === agentId)!
-  const convo = CONVERSATIONS.find((c) => c.id === convoId) ?? CONVERSATIONS[0]
+  const convo = convos.find((c) => c.id === convoId) ?? convos[0]
+
+  const createThread = () => {
+    const id = `t-${Date.now()}`
+    const title = `New thread ${convos.length + 1}`
+    const newConvo: Convo = { id, title, agent: agent.name }
+    const next = [newConvo, ...convos]
+    setConvos(next)
+    saveConvos(next)
+    setConvoId(id)
+    setMessages([{ id: 'm0', role: 'assistant', text: 'New thread. What are we working on?', time: fmtTime() }])
+    setThreadsOpen(false)
+  }
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
@@ -199,10 +225,10 @@ export function Chat() {
       <aside className="hidden w-[240px] shrink-0 flex-col border-r border-line bg-panel/40 lg:flex">
         <div className="flex items-center justify-between border-b border-line p-3">
           <span className="label">Threads</span>
-          <Plus size={14} className="text-dim hover:text-accent" />
+          <button onClick={createThread} className="text-dim hover:text-accent" title="New thread"><Plus size={14} /></button>
         </div>
         <div className="flex-1 overflow-y-auto">
-          <ThreadList convoId={convoId} onSelect={switchConvo} />
+          <ThreadList convos={convos} convoId={convoId} onSelect={switchConvo} />
         </div>
         <button
           onClick={() => setShowKeyPanel((v) => !v)}
@@ -235,9 +261,9 @@ export function Chat() {
               <div className="absolute inset-x-0 top-full z-40 max-h-[60vh] overflow-y-auto border-b border-line-2 bg-panel shadow-glow animate-fade-in">
                 <div className="flex items-center justify-between border-b border-line px-3 py-2">
                   <span className="label">Threads</span>
-                  <Plus size={14} className="text-dim hover:text-accent" />
+                  <button onClick={createThread} className="text-dim hover:text-accent" title="New thread"><Plus size={14} /></button>
                 </div>
-                <ThreadList convoId={convoId} onSelect={switchConvo} />
+                <ThreadList convos={convos} convoId={convoId} onSelect={switchConvo} />
               </div>
             </>
           )}
@@ -401,10 +427,10 @@ function ApiKeyPanel({ value, onChange, onClose }: { value: string; onChange: (k
   )
 }
 
-function ThreadList({ convoId, onSelect }: { convoId: string; onSelect: (id: string) => void }) {
+function ThreadList({ convos, convoId, onSelect }: { convos: Convo[]; convoId: string; onSelect: (id: string) => void }) {
   return (
     <>
-      {CONVERSATIONS.map((c) => (
+      {convos.map((c) => (
         <button
           key={c.id}
           onClick={() => onSelect(c.id)}
