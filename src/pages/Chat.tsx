@@ -130,7 +130,9 @@ export function Chat() {
         method: 'POST',
         signal: controller.signal,
         headers: {
-          'x-api-key': apiKey,
+          ...(apiKey.startsWith('sk-ant-')
+            ? { 'x-api-key': apiKey }
+            : { 'Authorization': `Bearer ${apiKey}` }),
           'anthropic-version': '2023-06-01',
           'content-type': 'application/json',
           'anthropic-dangerous-direct-browser-access': 'true',
@@ -364,7 +366,7 @@ function ApiKeyPanel({ value, onChange, onClose }: { value: string; onChange: (k
     <div className="border-b border-line bg-panel/80 p-3">
       <div className="mb-2 flex items-center justify-between">
         <span className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-dim">
-          <Key size={12} /> Anthropic API Key
+          <Key size={12} /> API Key or OAuth Token
         </span>
         <button onClick={onClose} className="text-dim hover:text-text"><X size={13} /></button>
       </div>
@@ -374,7 +376,7 @@ function ApiKeyPanel({ value, onChange, onClose }: { value: string; onChange: (k
             type={show ? 'text' : 'password'}
             value={local}
             onChange={(e) => setLocal(e.target.value)}
-            placeholder="sk-ant-…"
+            placeholder="sk-ant-… or OAuth token"
             className="w-full border border-line bg-bg/60 px-2 py-1.5 pr-8 text-sm text-text focus:border-accent/60 focus:outline-none"
           />
           <button
@@ -391,7 +393,10 @@ function ApiKeyPanel({ value, onChange, onClose }: { value: string; onChange: (k
           Save
         </button>
       </div>
-      <p className="mt-1.5 text-[10px] text-dim">Stored in localStorage only. Never sent anywhere except api.anthropic.com.</p>
+      <p className="mt-1.5 text-[10px] text-dim">
+        Paste an API key (<span className="text-text/60">sk-ant-…</span>) or an OAuth access token.
+        Stored in localStorage only — only sent to api.anthropic.com.
+      </p>
     </div>
   )
 }
