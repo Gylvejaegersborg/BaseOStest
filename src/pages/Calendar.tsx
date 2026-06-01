@@ -21,7 +21,12 @@ function hhmm(h: number) {
 }
 
 export function Calendar() {
-  const [appts, setAppts] = useState<Appt[]>(APPOINTMENTS)
+  const [appts, setAppts] = useState<Appt[]>(() => {
+    try {
+      const stored = localStorage.getItem('os:calendar:appts')
+      return stored ? JSON.parse(stored) : APPOINTMENTS
+    } catch { return APPOINTMENTS }
+  })
   const [weekOffset, setWeekOffset] = useState(0)
   const [editing, setEditing] = useState<Appt | null>(null)
 
@@ -42,7 +47,11 @@ export function Calendar() {
   }, [appts])
 
   const save = (updated: Appt) => {
-    setAppts((list) => list.map((a) => (a.id === updated.id ? updated : a)))
+    setAppts((list) => {
+      const next = list.map((a) => (a.id === updated.id ? updated : a))
+      localStorage.setItem('os:calendar:appts', JSON.stringify(next))
+      return next
+    })
     setEditing(null)
   }
 

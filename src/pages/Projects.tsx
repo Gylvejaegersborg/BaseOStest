@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowUpRight, GitCommitHorizontal } from 'lucide-react'
+import { ArrowUpRight, GitCommitHorizontal, Pencil, Check, X } from 'lucide-react'
 import { PROJECTS, STATUS_META, type Project, type ProjectStatus } from '@/data/projects'
 import { sectionById } from '@/data/sections'
 import { Badge } from '@/components/ui/Badge'
@@ -8,18 +8,48 @@ import { StatusDot } from '@/components/ui/StatusDot'
 
 const ORDER: ProjectStatus[] = ['active', 'paused', 'idea', 'shipped']
 
+type ProjectOverrides = Record<string, { lastMove?: string; nextMove?: string; progress?: number }>
+
+function loadOverrides(): ProjectOverrides {
+  try { return JSON.parse(localStorage.getItem('os:projects:overrides') ?? '{}') }
+  catch { return {} }
+}
+
+function saveOverrides(o: ProjectOverrides) {
+  localStorage.setItem('os:projects:overrides', JSON.stringify(o))
+}
+
+function applyOverrides(projects: Project[], overrides: ProjectOverrides): Project[] {
+  return projects.map((p) => {
+    const o = overrides[p.id]
+    return o ? { ...p, ...o } : p
+  })
+}
+
 export function Projects() {
+  const [overrides, setOverrides] = useState<ProjectOverrides>(loadOverrides)
   const [open, setOpen] = useState<Project | null>(null)
+
+  const projects = applyOverrides(PROJECTS, overrides)
+  const openProject = open ? applyOverrides([open], overrides)[0] : null
+
+  const updateProject = (id: string, patch: { lastMove?: string; nextMove?: string; progress?: number }) => {
+    setOverrides((prev) => {
+      const next = { ...prev, [id]: { ...prev[id], ...patch } }
+      saveOverrides(next)
+      return next
+    })
+  }
 
   return (
     <div className="h-full overflow-y-auto p-6">
       <div className="mb-6">
         <h1 className="font-display text-2xl tracking-wider text-text">PROJECT OVERVIEW</h1>
-        <p className="text-xs text-dim">{PROJECTS.length} projects · status, last move, next move.</p>
+        <p className="text-xs text-dim">{projects.length} projects · status, last move, next move.</p>
       </div>
 
       {ORDER.map((status) => {
-        const items = PROJECTS.filter((p) => p.status === status)
+        const items = projects.filter((p) => p.status === status)
         if (!items.length) return null
         return (
           <section key={status} className="mb-8">
@@ -40,7 +70,13 @@ export function Projects() {
         )
       })}
 
-      <ProjectModal project={open} onClose={() => setOpen(null)} />
+      {openProject && (
+        <ProjectModal
+          project={openProject}
+          onClose={() => setOpen(null)}
+          onUpdate={(patch) => updateProject(openProject.id, patch)}
+        />
+      )}
     </div>
   )
 }
@@ -84,10 +120,18 @@ function ProjectCard({ project, onClick }: { project: Project; onClick: () => vo
   )
 }
 
-function ProjectModal({ project, onClose }: { project: Project | null; onClose: () => void }) {
-  if (!project) return null
+function ProjectModal({
+  project,
+  onClose,
+  onUpdate,
+}: {
+  project: Project
+  onClose: () => void
+  onUpdate: (patch: { lastMove?: string; nextMove?: string; progress?: number }) => void
+}) {
   const section = sectionById(project.sectionId)
   const meta = STATUS_META[project.status]
+
   return (
     <Modal open={!!project} onClose={onClose} title={project.name} code={section.code} accent={section.accent} width={620}>
       <div className="flex items-center gap-3 text-xs">
@@ -101,8 +145,36 @@ function ProjectModal({ project, onClose }: { project: Project | null; onClose: 
       <p className="mt-4 text-sm text-text/90">{project.what}</p>
 
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <Field label="LAST MOVE" value={project.lastMove} color="#6b7785" />
-        <Field label="NEXT MOVE" value={project.nextMove} color={section.accent} />
+        <EditableField
+          label="LAST MOVE"
+          value={project.lastMove}
+          color="#6b7785"
+          onSave={(v) => onUpdate({ lastMove: v })}
+        />
+        <EditableField
+          label="NEXT MOVE"
+          value={project.nextMove}
+          color={section.accent}
+          onSave={(v) => onUpdate({ nextMove: v })}
+        />
+      </div>
+
+      <div className="mt-4">
+        <label className="label mb-1 block">PROGRESS</label>
+        <div className="flex items-center gap-3">
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={project.progress}
+            onChange={(e) => onUpdate({ progress: Number(e.target.value) })}
+            className="flex-1 accent-accent"
+          />
+          <span className="w-10 text-right text-xs tabular-nums text-text">{project.progress}%</span>
+        </div>
+        <div className="mt-1.5 h-1 w-full bg-bg">
+          <div className="h-full transition-all" style={{ width: `${project.progress}%`, backgroundColor: section.accent }} />
+        </div>
       </div>
 
       <div className="mt-5">
@@ -139,13 +211,50 @@ function ProjectModal({ project, onClose }: { project: Project | null; onClose: 
   )
 }
 
-function Field({ label, value, color }: { label: string; value: string; color: string }) {
+function EditableField({
+  label,
+  value,
+  color,
+  onSave,
+}: {
+  label: string
+  value: string
+  color: string
+  onSave: (v: string) => void
+}) {
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(value)
+
+  const commit = () => { onSave(draft); setEditing(false) }
+  const cancel = () => { setDraft(value); setEditing(false) }
+
   return (
     <div className="border border-line bg-bg/40 p-3">
-      <div className="label mb-1" style={{ color }}>
-        {label}
+      <div className="mb-1 flex items-center justify-between">
+        <span className="label" style={{ color }}>{label}</span>
+        {editing ? (
+          <div className="flex gap-1">
+            <button onClick={commit} className="text-neon-green/80 hover:text-neon-green"><Check size={12} /></button>
+            <button onClick={cancel} className="text-dim hover:text-danger"><X size={12} /></button>
+          </div>
+        ) : (
+          <button onClick={() => { setDraft(value); setEditing(true) }} className="text-dim hover:text-text">
+            <Pencil size={12} />
+          </button>
+        )}
       </div>
-      <div className="text-xs text-text/85">{value}</div>
+      {editing ? (
+        <textarea
+          autoFocus
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commit() } if (e.key === 'Escape') cancel() }}
+          rows={2}
+          className="w-full resize-none bg-transparent text-xs text-text/85 outline-none"
+        />
+      ) : (
+        <div className="text-xs text-text/85">{value}</div>
+      )}
     </div>
   )
 }

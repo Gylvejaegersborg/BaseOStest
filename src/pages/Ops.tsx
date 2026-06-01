@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { AlertTriangle, Cpu, HardDrive, Smartphone, Server, Radio, Terminal } from 'lucide-react'
+import { AlertTriangle, Cpu, HardDrive, Smartphone, Server, Radio, Terminal, Wifi, WifiOff } from 'lucide-react'
 import { DEVICES, OPS_ERRORS, SERVICES, makeLogLine, type OpsError, type ServiceStatus } from '@/data/ops'
 import { AGENTS } from '@/data/agents'
 import { Panel } from '@/components/ui/Panel'
@@ -15,8 +15,18 @@ const DEVICE_ICON: Record<string, typeof Cpu> = {
   sensor: Radio,
 }
 
+async function ping(url: string): Promise<number> {
+  const t0 = performance.now()
+  try {
+    await fetch(url, { method: 'HEAD', cache: 'no-store', mode: 'no-cors', signal: AbortSignal.timeout(4000) })
+    return Math.round(performance.now() - t0)
+  } catch { return -1 }
+}
+
 export function Ops() {
   const [logs, setLogs] = useState(() => Array.from({ length: 12 }, (_, i) => makeLogLine(i)))
+  const [online, setOnline] = useState(navigator.onLine)
+  const [selfLatency, setSelfLatency] = useState<number | null>(null)
   const seed = useRef(12)
   const logScrollRef = useRef<HTMLDivElement>(null)
 
@@ -25,6 +35,21 @@ export function Ops() {
       seed.current += 1
       setLogs((l) => [...l.slice(-60), makeLogLine(seed.current)])
     }, 1400)
+    return () => window.clearInterval(id)
+  }, [])
+
+  useEffect(() => {
+    const on = () => setOnline(true)
+    const off = () => setOnline(false)
+    window.addEventListener('online', on)
+    window.addEventListener('offline', off)
+    return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off) }
+  }, [])
+
+  useEffect(() => {
+    const measure = async () => setSelfLatency(await ping(window.location.origin + '/'))
+    measure()
+    const id = window.setInterval(measure, 15000)
     return () => window.clearInterval(id)
   }, [])
 
@@ -40,7 +65,18 @@ export function Ops() {
   return (
     <div className="grid h-full grid-cols-1 gap-3 overflow-y-auto p-4 lg:grid-cols-3">
       <div className="lg:col-span-1">
-        <h1 className="mb-3 font-display text-2xl tracking-wider text-text">OPS CONSOLE</h1>
+        <div className="mb-3 flex items-center gap-3">
+          <h1 className="font-display text-2xl tracking-wider text-text">OPS CONSOLE</h1>
+          <span className={`flex items-center gap-1 text-[10px] uppercase tracking-wider ${online ? 'text-neon-green' : 'text-danger'}`}>
+            {online ? <Wifi size={12} /> : <WifiOff size={12} />}
+            {online ? 'online' : 'offline'}
+          </span>
+          {selfLatency !== null && online && (
+            <span className="text-[10px] text-dim tabular-nums">
+              self {selfLatency >= 0 ? `${selfLatency}ms` : '—'}
+            </span>
+          )}
+        </div>
 
         <Panel title="Services" code="HEALTH" accent="#36e0c8" className="mb-3" bodyClassName="p-2">
           <div className="space-y-1.5">

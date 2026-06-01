@@ -12,7 +12,10 @@ export function Notes() {
   const [tag, setTag] = useState<string | null>(null)
   const [selectedId, setSelectedId] = useState<string>(NOTES[0].id)
   const [editing, setEditing] = useState(false)
-  const [drafts, setDrafts] = useState<Record<string, string>>({})
+  const [drafts, setDrafts] = useState<Record<string, string>>(() => {
+    try { return JSON.parse(localStorage.getItem('os:notes:drafts') ?? '{}') }
+    catch { return {} }
+  })
   // mobile master-detail: 'list' shows the browser, 'note' shows the editor
   const [mobileView, setMobileView] = useState<'list' | 'note'>('list')
 
@@ -152,7 +155,11 @@ export function Notes() {
             <textarea
               autoFocus
               value={body}
-              onChange={(e) => setDrafts((d) => ({ ...d, [selectedId]: e.target.value }))}
+              onChange={(e) => {
+                const next = { ...drafts, [selectedId]: e.target.value }
+                setDrafts(next)
+                localStorage.setItem('os:notes:drafts', JSON.stringify(next))
+              }}
               onBlur={() => setEditing(false)}
               spellCheck={false}
               className="h-full w-full resize-none bg-bg/40 p-5 text-sm leading-relaxed text-text/90 outline-none"
