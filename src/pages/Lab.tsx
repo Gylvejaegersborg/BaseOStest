@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from 'react'
-import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe } from 'lucide-react'
+import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe, Gauge } from 'lucide-react'
 import { LAB_MODULES, type LabModule } from '@/data/labs'
 import { Panel } from '@/components/ui/Panel'
 import { Modal } from '@/components/ui/Modal'
@@ -26,6 +26,9 @@ const SudokuPage = lazy(() =>
 const ShortcutsLabPage = lazy(() =>
   import('@/features/shortcutslab/ShortcutsLabPage').then((m) => ({ default: m.ShortcutsLabPage })),
 )
+const RenderQueuePage = lazy(() =>
+  import('@/features/renderqueue/RenderQueuePage').then((m) => ({ default: m.RenderQueuePage })),
+)
 
 const STATUS_COLOR = { live: '#46d369', staging: '#f0a020', local: '#36e0c8' } as const
 
@@ -37,6 +40,7 @@ export function Lab() {
   const [discordOpen, setDiscordOpen] = useState(false)
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
   const [artistOpen, setArtistOpen] = useState(false)
+  const [renderOpen, setRenderOpen] = useState(false)
   const isDesktop = useIsDesktop()
   const selected = LAB_MODULES.find((m) => m.id === selectedId)!
 
@@ -81,6 +85,7 @@ export function Lab() {
             onOpenDiscord={() => setDiscordOpen(true)}
             onOpenShortcuts={() => setShortcutsOpen(true)}
             onOpenArtist={() => setArtistOpen(true)}
+            onOpenRender={() => setRenderOpen(true)}
           />
         </aside>
       )}
@@ -110,6 +115,7 @@ export function Lab() {
               onOpenDiscord={() => setDiscordOpen(true)}
               onOpenShortcuts={() => setShortcutsOpen(true)}
               onOpenArtist={() => setArtistOpen(true)}
+              onOpenRender={() => setRenderOpen(true)}
             />
           </div>
         )}
@@ -151,6 +157,12 @@ export function Lab() {
           />
         </Suspense>
       )}
+
+      {renderOpen && (
+        <Suspense fallback={null}>
+          <RenderQueuePage open onClose={() => setRenderOpen(false)} />
+        </Suspense>
+      )}
     </div>
   )
 }
@@ -163,6 +175,7 @@ function ModuleDetail({
   onOpenDiscord,
   onOpenShortcuts,
   onOpenArtist,
+  onOpenRender,
 }: {
   mod: LabModule
   embedded?: boolean
@@ -171,6 +184,7 @@ function ModuleDetail({
   onOpenDiscord?: () => void
   onOpenShortcuts?: () => void
   onOpenArtist?: () => void
+  onOpenRender?: () => void
 }) {
   return (
     <>
@@ -222,6 +236,14 @@ function ModuleDetail({
             className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
           >
             Open Shortcuts Lab <Smartphone size={13} />
+          </button>
+        )}
+        {mod.id === 'render-queue' && onOpenRender && (
+          <button
+            onClick={onOpenRender}
+            className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
+          >
+            Open Render Queue <Gauge size={13} />
           </button>
         )}
         {mod.url && (
