@@ -25,7 +25,6 @@ export const LAB_MODULES: LabModule[] = [
     status: 'live',
     description: 'The public ISΛRK site — releases grid, link hub and bio.',
     stack: ['React', 'Vite', 'Tailwind'],
-    url: 'https://soundcloud.com/itsisark',
   },
   {
     id: 'beat-db',
