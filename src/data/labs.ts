@@ -6,6 +6,7 @@ export interface LabModule {
   description: string
   stack: string[]
   url?: string
+  embedded?: boolean
 }
 
 export const LAB_MODULES: LabModule[] = [
@@ -66,5 +67,14 @@ export const LAB_MODULES: LabModule[] = [
     status: 'staging',
     description: 'Visualises the master → upload pipeline in real time.',
     stack: ['React', 'WebSocket'],
+  },
+  {
+    id: 'sudoku',
+    name: 'Sudoku',
+    kind: 'Mini-game',
+    status: 'live',
+    description: 'Learn to read the board. Guided hints, mid-game nudges and a coaching report each round.',
+    stack: ['React', 'TypeScript'],
+    embedded: true,
   },
 ]
