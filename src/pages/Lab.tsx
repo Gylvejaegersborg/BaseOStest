@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from 'react'
-import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database } from 'lucide-react'
+import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot } from 'lucide-react'
 import { LAB_MODULES, type LabModule } from '@/data/labs'
 import { Panel } from '@/components/ui/Panel'
 import { Modal } from '@/components/ui/Modal'
@@ -14,6 +14,9 @@ const BeatStorePage = lazy(() =>
 const BeatDBPage = lazy(() =>
   import('@/features/beatdb/BeatDBPage').then((m) => ({ default: m.BeatDBPage })),
 )
+const DiscordDashPage = lazy(() =>
+  import('@/features/discorddash/DiscordDashPage').then((m) => ({ default: m.DiscordDashPage })),
+)
 const SudokuPage = lazy(() =>
   import('@/pages/Sudoku').then((m) => ({ default: m.Sudoku })),
 )
@@ -25,6 +28,7 @@ export function Lab() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [storeOpen, setStoreOpen] = useState(false)
   const [dbOpen, setDbOpen] = useState(false)
+  const [discordOpen, setDiscordOpen] = useState(false)
   const isDesktop = useIsDesktop()
   const selected = LAB_MODULES.find((m) => m.id === selectedId)!
 
@@ -62,7 +66,12 @@ export function Lab() {
       {/* Desktop: persistent detail rail (non-Sudoku) */}
       {!isSudoku && (
         <aside className="hidden w-[380px] shrink-0 flex-col gap-3 overflow-y-auto border-l border-line bg-panel/30 p-3 lg:flex">
-          <ModuleDetail mod={selected} onOpenStore={() => setStoreOpen(true)} onOpenDB={() => setDbOpen(true)} />
+          <ModuleDetail
+            mod={selected}
+            onOpenStore={() => setStoreOpen(true)}
+            onOpenDB={() => setDbOpen(true)}
+            onOpenDiscord={() => setDiscordOpen(true)}
+          />
         </aside>
       )}
 
@@ -83,7 +92,13 @@ export function Lab() {
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            <ModuleDetail mod={selected} embedded onOpenStore={() => setStoreOpen(true)} onOpenDB={() => setDbOpen(true)} />
+            <ModuleDetail
+              mod={selected}
+              embedded
+              onOpenStore={() => setStoreOpen(true)}
+              onOpenDB={() => setDbOpen(true)}
+              onOpenDiscord={() => setDiscordOpen(true)}
+            />
           </div>
         )}
       </Modal>
@@ -99,6 +114,12 @@ export function Lab() {
           <BeatDBPage open onClose={() => setDbOpen(false)} />
         </Suspense>
       )}
+
+      {discordOpen && (
+        <Suspense fallback={null}>
+          <DiscordDashPage open onClose={() => setDiscordOpen(false)} />
+        </Suspense>
+      )}
     </div>
   )
 }
@@ -108,11 +129,13 @@ function ModuleDetail({
   embedded,
   onOpenStore,
   onOpenDB,
+  onOpenDiscord,
 }: {
   mod: LabModule
   embedded?: boolean
   onOpenStore?: () => void
   onOpenDB?: () => void
+  onOpenDiscord?: () => void
 }) {
   return (
     <>
@@ -140,6 +163,14 @@ function ModuleDetail({
             className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
           >
             Open Beat DB <Database size={13} />
+          </button>
+        )}
+        {mod.id === 'discord-dash' && onOpenDiscord && (
+          <button
+            onClick={onOpenDiscord}
+            className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
+          >
+            Open Dashboard <Bot size={13} />
           </button>
         )}
         {mod.url && (
