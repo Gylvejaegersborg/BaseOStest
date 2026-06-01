@@ -28,11 +28,12 @@ export const LAB_MODULES: LabModule[] = [
   },
   {
     id: 'beat-db',
-    name: 'Beat Database UI',
+    name: 'Beat DB',
     kind: 'Internal tool',
     status: 'staging',
-    description: 'Searchable private beat library with waveform previews.',
-    stack: ['React', 'SQLite', 'WaveSurfer'],
+    description:
+      'The private artist library — beats, lyrics, songs, artwork, videos, stems and notes in one searchable database with file previews and an always-on player. A standalone app the OS just windows into.',
+    stack: ['React', 'Web Audio', 'Tailwind'],
   },
   {
     id: 'discord-dash',
