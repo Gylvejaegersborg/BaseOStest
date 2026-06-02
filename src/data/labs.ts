@@ -78,6 +78,15 @@ export const LAB_MODULES: LabModule[] = [
     stack: ['React', 'TypeScript'],
   },
   {
+    id: 'yt-dlp',
+    name: 'yt-dlp',
+    kind: 'Downloader UI',
+    status: 'local',
+    description:
+      'Frontend for yt-dlp — paste a URL, pick format and quality, and queue downloads. Mockup for now; wire to a local yt-dlp API when the homeserver is up.',
+    stack: ['React', 'TypeScript', 'yt-dlp'],
+  },
+  {
     id: 'sudoku',
     name: 'Sudoku',
     kind: 'Mini-game',

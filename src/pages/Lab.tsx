@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from 'react'
-import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe, Gauge, Music2 } from 'lucide-react'
+import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe, Gauge, Music2, Download } from 'lucide-react'
 import { LAB_MODULES, type LabModule } from '@/data/labs'
 import { Panel } from '@/components/ui/Panel'
 import { Modal } from '@/components/ui/Modal'
@@ -32,6 +32,9 @@ const SongTrackerPage = lazy(() =>
 const PipelineMonitorPage = lazy(() =>
   import('@/features/pipelinemonitor/PipelineMonitorPage').then((m) => ({ default: m.PipelineMonitorPage })),
 )
+const YtDlpPage = lazy(() =>
+  import('@/features/ytdlp/YtDlpPage').then((m) => ({ default: m.YtDlpPage })),
+)
 
 const STATUS_COLOR = { live: '#46d369', staging: '#f0a020', local: '#36e0c8' } as const
 
@@ -45,6 +48,7 @@ export function Lab() {
   const [artistOpen, setArtistOpen] = useState(false)
   const [trackerOpen, setTrackerOpen] = useState(false)
   const [pipelineOpen, setPipelineOpen] = useState(false)
+  const [ytdlpOpen, setYtdlpOpen] = useState(false)
   const isDesktop = useIsDesktop()
   const selected = LAB_MODULES.find((m) => m.id === selectedId)!
 
@@ -91,6 +95,7 @@ export function Lab() {
             onOpenArtist={() => setArtistOpen(true)}
             onOpenTracker={() => setTrackerOpen(true)}
             onOpenPipeline={() => setPipelineOpen(true)}
+            onOpenYtDlp={() => setYtdlpOpen(true)}
           />
         </aside>
       )}
@@ -122,6 +127,7 @@ export function Lab() {
               onOpenArtist={() => setArtistOpen(true)}
               onOpenTracker={() => setTrackerOpen(true)}
               onOpenPipeline={() => setPipelineOpen(true)}
+              onOpenYtDlp={() => setYtdlpOpen(true)}
             />
           </div>
         )}
@@ -175,6 +181,12 @@ export function Lab() {
           <PipelineMonitorPage open onClose={() => setPipelineOpen(false)} />
         </Suspense>
       )}
+
+      {ytdlpOpen && (
+        <Suspense fallback={null}>
+          <YtDlpPage open onClose={() => setYtdlpOpen(false)} />
+        </Suspense>
+      )}
     </div>
   )
 }
@@ -189,6 +201,7 @@ function ModuleDetail({
   onOpenArtist,
   onOpenTracker,
   onOpenPipeline,
+  onOpenYtDlp,
 }: {
   mod: LabModule
   embedded?: boolean
@@ -199,6 +212,7 @@ function ModuleDetail({
   onOpenArtist?: () => void
   onOpenTracker?: () => void
   onOpenPipeline?: () => void
+  onOpenYtDlp?: () => void
 }) {
   return (
     <>
@@ -266,6 +280,14 @@ function ModuleDetail({
             className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
           >
             Open Pipeline Monitor <Gauge size={13} />
+          </button>
+        )}
+        {mod.id === 'yt-dlp' && onOpenYtDlp && (
+          <button
+            onClick={onOpenYtDlp}
+            className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
+          >
+            Open Downloader <Download size={13} />
           </button>
         )}
         {mod.url && (
