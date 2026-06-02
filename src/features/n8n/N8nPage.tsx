@@ -212,7 +212,7 @@ export function N8nPage({ open, onClose }: N8nPageProps) {
       id: runId,
       workflowId: wf.id,
       workflowName: wf.name,
-      status: 'running',
+      status: 'running' as ExecStatus,
       startedAt,
       durationMs: 0,
     }, ...prev].slice(0, 30))
