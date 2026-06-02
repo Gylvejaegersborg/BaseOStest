@@ -1,0 +1,13 @@
+{
+  "name": "shortcuts-bridge",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local bridge between the iOS Shortcuts app and the Personal OS Shortcuts Lab dashboard.",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
