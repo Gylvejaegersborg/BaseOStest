@@ -78,6 +78,15 @@ export const LAB_MODULES: LabModule[] = [
     stack: ['React', 'TypeScript'],
   },
   {
+    id: 'n8n',
+    name: 'n8n',
+    kind: 'Automation hub',
+    status: 'local',
+    description:
+      'Dashboard for the homeserver n8n instance — browse workflows, see execution history, trigger runs manually, and toggle active state. Wire to the n8n REST API when the server is up.',
+    stack: ['n8n', 'REST API', 'React'],
+  },
+  {
     id: 'yt-dlp',
     name: 'yt-dlp',
     kind: 'Downloader UI',
