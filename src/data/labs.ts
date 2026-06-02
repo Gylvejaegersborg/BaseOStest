@@ -60,12 +60,22 @@ export const LAB_MODULES: LabModule[] = [
     stack: ['Shortcuts', 'Webhook'],
   },
   {
-    id: 'render-queue',
-    name: 'Render Queue Monitor',
-    kind: 'Experiment',
-    status: 'staging',
-    description: 'Visualises the master → upload pipeline in real time.',
-    stack: ['React', 'WebSocket'],
+    id: 'song-tracker',
+    name: 'ISΛRK Song Tracker',
+    kind: 'Studio tool',
+    status: 'live',
+    description:
+      'Daily task tracker for ISΛRK’s ongoing song projects — each song’s stage in the record → distribute lifecycle, its own checklist and a Today panel of the day’s focus.',
+    stack: ['React', 'TypeScript'],
+  },
+  {
+    id: 'pipeline-monitor',
+    name: 'Pipeline Monitor',
+    kind: 'Archive',
+    status: 'local',
+    description:
+      'Archived factory-style pipeline visualiser — live stage diagram, animated job queue, stats and an event log. Kept as a reusable design.',
+    stack: ['React', 'TypeScript'],
   },
   {
     id: 'sudoku',

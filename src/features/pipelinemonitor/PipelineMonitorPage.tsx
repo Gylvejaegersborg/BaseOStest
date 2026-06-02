@@ -6,7 +6,7 @@ import { StatusDot } from '@/components/ui/StatusDot'
 import { clock } from '@/lib/time'
 import { cn } from '@/lib/cn'
 
-interface RenderQueuePageProps {
+interface PipelineMonitorPageProps {
   open: boolean
   onClose: () => void
 }
@@ -138,12 +138,15 @@ function makeLogLine(): LogLine {
 }
 
 /**
- * Render Queue Monitor — a live view of the record → mix → master → tag →
- * upload → distribute pipeline. Jobs advance through stages on a timer, a
- * scoped tail-f log streams render events, and any job that errors raises a
- * banner that opens a full error log.
+ * Pipeline Monitor (archived) — a factory-style live view of the
+ * record → mix → master → tag → upload → distribute pipeline. Jobs advance
+ * through stages on a timer, a scoped tail-f log streams render events, and
+ * any job that errors raises a banner that opens a full error log.
+ *
+ * Archived design: kept in the Lab as a reusable visualiser. The active
+ * ISΛRK-focused tool is the Song Tracker (src/features/songtracker).
  */
-export function RenderQueuePage({ open, onClose }: RenderQueuePageProps) {
+export function PipelineMonitorPage({ open, onClose }: PipelineMonitorPageProps) {
   const [jobs, setJobs] = useState<Job[]>(() => [
     makeJob(0),
     makeJob(1),
