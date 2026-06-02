@@ -23,10 +23,9 @@ const SUN_POS: Record<string, { x: number; y: number }> = {
   chat: { x: 540, y: 110 },
   calendar: { x: 850, y: 180 },
   projects: { x: 600, y: 365 },
-  lab: { x: 300, y: 500 },
+  lab: { x: 200, y: 440 },
   room: { x: 910, y: 470 },
   ops: { x: 1060, y: 300 },
-  sudoku: { x: 150, y: 370 },
 }
 
 // Constellation outline: which suns are linked by faint lines.

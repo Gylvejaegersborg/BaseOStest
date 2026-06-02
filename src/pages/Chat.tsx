@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Mic, Paperclip, Send, Square, X, Bot, Plus, MessagesSquare, ChevronDown } from 'lucide-react'
+import { Mic, Paperclip, Send, Square, X, Bot, Plus, MessagesSquare, ChevronDown, Key, Eye, EyeOff } from 'lucide-react'
 import { AGENTS } from '@/data/agents'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { cn } from '@/lib/cn'
@@ -18,12 +18,25 @@ interface Message {
   time: string
 }
 
+// Map agent IDs to real Anthropic model IDs
+const AGENT_MODEL: Record<string, string> = {
+  claude: 'claude-sonnet-4-6',
+  hemera: 'claude-haiku-4-5-20251001',
+  nyx: 'claude-haiku-4-5-20251001',
+}
+
+const AGENT_SYSTEM: Record<string, string> = {
+  claude: 'You are Claude, a builder and code assistant embedded in a personal OS dashboard. Be concise and technical.',
+  hemera: 'You are Hemera, a strategic planner and creative director for the ISΛRK artist project. You focus on releases, content strategy and scheduling.',
+  nyx: 'You are Nyx, an execution-focused agent that runs tasks and coordinates sub-agents. You are direct, fast and action-oriented.',
+}
+
 const CHAT_AGENTS = AGENTS.slice(0, 3)
 const CONVERSATIONS = [
-  { id: 'c1', title: 'Release plan Q3', agent: 'Hemera', preview: 'Three windows, here is the draft…' },
-  { id: 'c2', title: 'Beat DB schema', agent: 'Claude', preview: 'Added waveform previews to…' },
-  { id: 'c3', title: 'Content batch', agent: 'Nyx', preview: 'Spun up 4 workers for…' },
-  { id: 'c4', title: 'Homeserver tunnel', agent: 'Claude', preview: 'watchtower auto-updates next' },
+  { id: 'c1', title: 'Release plan Q3', agent: 'Hemera' },
+  { id: 'c2', title: 'Beat DB schema', agent: 'Claude' },
+  { id: 'c3', title: 'Content batch', agent: 'Nyx' },
+  { id: 'c4', title: 'Homeserver tunnel', agent: 'Claude' },
 ]
 
 function fmtSize(bytes: number) {
@@ -32,23 +45,36 @@ function fmtSize(bytes: number) {
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`
 }
 
+function loadHistory(convoId: string): Message[] {
+  try {
+    const stored = localStorage.getItem(`os:chat:${convoId}`)
+    return stored ? JSON.parse(stored) : []
+  } catch { return [] }
+}
+
+function saveHistory(convoId: string, messages: Message[]) {
+  try { localStorage.setItem(`os:chat:${convoId}`, JSON.stringify(messages.slice(-100))) }
+  catch { /* quota */ }
+}
+
 export function Chat() {
   const [agentId, setAgentId] = useState(CHAT_AGENTS[0].id)
   const [convoId, setConvoId] = useState('c1')
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 'm0',
-      role: 'assistant',
-      text: 'Channel open. I am a UI stub for now — no model is wired in yet. Try attaching a file or recording a voice note; the affordances are real.',
-      time: '09:12',
-    },
-  ])
+  const [messages, setMessages] = useState<Message[]>(() => {
+    const stored = loadHistory('c1')
+    if (stored.length) return stored
+    return [{ id: 'm0', role: 'assistant', text: 'Channel open. Type a message to start.', time: fmtTime() }]
+  })
   const [draft, setDraft] = useState('')
   const [pending, setPending] = useState<Attachment[]>([])
   const [dragging, setDragging] = useState(false)
   const [threadsOpen, setThreadsOpen] = useState(false)
+  const [streaming, setStreaming] = useState(false)
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem('os:chat:apiKey') ?? '')
+  const [showKeyPanel, setShowKeyPanel] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const abortRef = useRef<AbortController | null>(null)
 
   const agent = CHAT_AGENTS.find((a) => a.id === agentId)!
   const convo = CONVERSATIONS.find((c) => c.id === convoId) ?? CONVERSATIONS[0]
@@ -57,58 +83,117 @@ export function Chat() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
   }, [messages])
 
-  const addFiles = (files: FileList | null) => {
-    if (!files) return
-    const next = Array.from(files).map((f) => ({
-      id: crypto.randomUUID(),
-      name: f.name,
-      size: f.size,
-      kind: 'file' as const,
-    }))
-    setPending((p) => [...p, ...next])
+  const switchConvo = (id: string) => {
+    setConvoId(id)
+    const stored = loadHistory(id)
+    setMessages(stored.length ? stored : [{ id: 'm0', role: 'assistant', text: 'Channel open.', time: fmtTime() }])
+    setThreadsOpen(false)
   }
 
-  const send = () => {
+  const addFiles = (files: FileList | null) => {
+    if (!files) return
+    setPending((p) => [...p, ...Array.from(files).map((f) => ({
+      id: crypto.randomUUID(), name: f.name, size: f.size, kind: 'file' as const,
+    }))])
+  }
+
+  const send = async () => {
+    if (streaming) { abortRef.current?.abort(); return }
     if (!draft.trim() && !pending.length) return
-    const now = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+    if (!apiKey) { setShowKeyPanel(true); return }
+
+    const now = fmtTime()
     const userMsg: Message = {
-      id: crypto.randomUUID(),
-      role: 'user',
-      text: draft.trim(),
-      attachments: pending,
-      time: now,
+      id: crypto.randomUUID(), role: 'user',
+      text: draft.trim(), attachments: pending, time: now,
     }
-    setMessages((m) => [...m, userMsg])
+    const nextMsgs = [...messages, userMsg]
+    setMessages(nextMsgs)
+    saveHistory(convoId, nextMsgs)
     setDraft('')
     setPending([])
-    setTimeout(() => {
-      setMessages((m) => [
-        ...m,
-        {
-          id: crypto.randomUUID(),
-          role: 'assistant',
-          text: `[${agent.name} backend not connected] — received your message${
-            userMsg.attachments?.length ? ` and ${userMsg.attachments.length} attachment(s)` : ''
-          }. Once the local agent is online this is where the reply streams in.`,
-          time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
+
+    const assistantId = crypto.randomUUID()
+    const assistantMsg: Message = { id: assistantId, role: 'assistant', text: '', time: fmtTime() }
+    setMessages((m) => [...m, assistantMsg])
+    setStreaming(true)
+
+    const controller = new AbortController()
+    abortRef.current = controller
+
+    try {
+      const history = nextMsgs
+        .filter((m) => m.text.trim())
+        .map((m) => ({ role: m.role as 'user' | 'assistant', content: m.text }))
+
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        signal: controller.signal,
+        headers: {
+          ...(apiKey.startsWith('sk-ant-')
+            ? { 'x-api-key': apiKey }
+            : { 'Authorization': `Bearer ${apiKey}` }),
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json',
+          'anthropic-dangerous-direct-browser-access': 'true',
         },
-      ])
-    }, 650)
+        body: JSON.stringify({
+          model: AGENT_MODEL[agentId] ?? 'claude-haiku-4-5-20251001',
+          max_tokens: 1024,
+          system: AGENT_SYSTEM[agentId] ?? '',
+          stream: true,
+          messages: history,
+        }),
+      })
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: { message: `HTTP ${res.status}` } }))
+        throw new Error(err?.error?.message ?? `HTTP ${res.status}`)
+      }
+
+      const reader = res.body!.getReader()
+      const decoder = new TextDecoder()
+      let accumulated = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        const chunk = decoder.decode(value, { stream: true })
+        for (const line of chunk.split('\n')) {
+          if (!line.startsWith('data: ')) continue
+          const data = line.slice(6).trim()
+          if (data === '[DONE]') break
+          try {
+            const parsed = JSON.parse(data)
+            if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
+              accumulated += parsed.delta.text
+              setMessages((m) => m.map((msg) =>
+                msg.id === assistantId ? { ...msg, text: accumulated } : msg,
+              ))
+            }
+          } catch { /* skip malformed */ }
+        }
+      }
+
+      const final = [...nextMsgs, { ...assistantMsg, text: accumulated }]
+      saveHistory(convoId, final)
+    } catch (err: unknown) {
+      if ((err as Error)?.name === 'AbortError') return
+      const errText = (err as Error)?.message ?? 'Unknown error'
+      setMessages((m) => m.map((msg) =>
+        msg.id === assistantId ? { ...msg, text: `⚠ ${errText}` } : msg,
+      ))
+    } finally {
+      setStreaming(false)
+    }
   }
 
   return (
     <div
       className="flex h-full"
-      onDragOver={(e) => {
-        e.preventDefault()
-        setDragging(true)
-      }}
+      onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
       onDragLeave={() => setDragging(false)}
-      onDrop={(e) => {
-        e.preventDefault()
-        setDragging(false)
-        addFiles(e.dataTransfer.files)
-      }}
+      onDrop={(e) => { e.preventDefault(); setDragging(false); addFiles(e.dataTransfer.files) }}
     >
       {/* Conversations (desktop rail) */}
       <aside className="hidden w-[240px] shrink-0 flex-col border-r border-line bg-panel/40 lg:flex">
@@ -117,8 +202,18 @@ export function Chat() {
           <Plus size={14} className="text-dim hover:text-accent" />
         </div>
         <div className="flex-1 overflow-y-auto">
-          <ThreadList convoId={convoId} onSelect={setConvoId} />
+          <ThreadList convoId={convoId} onSelect={switchConvo} />
         </div>
+        <button
+          onClick={() => setShowKeyPanel((v) => !v)}
+          className={cn(
+            'flex items-center gap-2 border-t border-line px-3 py-2 text-[11px] transition-colors',
+            apiKey ? 'text-dim hover:text-text' : 'text-amber/80 hover:text-amber',
+          )}
+        >
+          <Key size={12} />
+          {apiKey ? 'API key set' : 'Set API key'}
+        </button>
       </aside>
 
       {/* Thread */}
@@ -142,13 +237,7 @@ export function Chat() {
                   <span className="label">Threads</span>
                   <Plus size={14} className="text-dim hover:text-accent" />
                 </div>
-                <ThreadList
-                  convoId={convoId}
-                  onSelect={(id) => {
-                    setConvoId(id)
-                    setThreadsOpen(false)
-                  }}
-                />
+                <ThreadList convoId={convoId} onSelect={switchConvo} />
               </div>
             </>
           )}
@@ -169,13 +258,44 @@ export function Chat() {
               <StatusDot color={a.color} size={6} /> {a.name}
             </button>
           ))}
-          <span className="ml-auto hidden text-[10px] text-dim sm:inline">{agent.model}</span>
+          <span className="ml-auto hidden text-[10px] text-dim sm:inline">
+            {AGENT_MODEL[agentId] ?? agent.model}
+          </span>
+          {!apiKey && (
+            <button
+              onClick={() => setShowKeyPanel(true)}
+              className="flex items-center gap-1 border border-amber/40 bg-amber/10 px-2 py-1 text-[10px] text-amber/80 hover:bg-amber/20 lg:hidden"
+            >
+              <Key size={11} /> Set key
+            </button>
+          )}
         </div>
+
+        {/* API Key panel */}
+        {showKeyPanel && (
+          <ApiKeyPanel
+            value={apiKey}
+            onChange={(k) => { setApiKey(k); localStorage.setItem('os:chat:apiKey', k) }}
+            onClose={() => setShowKeyPanel(false)}
+          />
+        )}
 
         <div ref={scrollRef} className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
           {messages.map((m) => (
             <MessageRow key={m.id} msg={m} agentColor={agent.color} agentName={agent.name} />
           ))}
+          {streaming && messages[messages.length - 1]?.role === 'assistant' && messages[messages.length - 1]?.text === '' && (
+            <div className="flex gap-3">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center border text-[10px]" style={{ borderColor: `${agent.color}66`, color: agent.color }}>
+                <Bot size={14} />
+              </div>
+              <div className="flex items-center gap-1 pt-2">
+                {[0, 1, 2].map((i) => (
+                  <span key={i} className="h-1.5 w-1.5 rounded-full bg-accent/60" style={{ animation: `pulse 1.2s ease-in-out ${i * 0.2}s infinite` }} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Composer */}
@@ -204,17 +324,23 @@ export function Chat() {
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault()
-                  send()
-                }
+                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() }
               }}
               rows={1}
-              placeholder={`Message ${agent.name}…`}
+              placeholder={streaming ? 'Receiving…' : `Message ${agent.name}…`}
               className="max-h-32 min-h-[40px] flex-1 resize-none border border-line bg-bg/60 px-3 py-2 text-sm text-text placeholder:text-dim focus:border-accent/60 focus:outline-none"
             />
-            <button onClick={send} className="border border-accent/40 bg-accent/10 p-2 text-accent transition-colors hover:bg-accent/20" title="Send">
-              <Send size={16} />
+            <button
+              onClick={send}
+              className={cn(
+                'border p-2 transition-colors',
+                streaming
+                  ? 'border-danger/40 bg-danger/10 text-danger hover:bg-danger/20'
+                  : 'border-accent/40 bg-accent/10 text-accent hover:bg-accent/20',
+              )}
+              title={streaming ? 'Stop' : 'Send'}
+            >
+              {streaming ? <Square size={16} /> : <Send size={16} />}
             </button>
           </div>
         </div>
@@ -225,6 +351,52 @@ export function Chat() {
           </div>
         )}
       </section>
+    </div>
+  )
+}
+
+function fmtTime() {
+  return new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+}
+
+function ApiKeyPanel({ value, onChange, onClose }: { value: string; onChange: (k: string) => void; onClose: () => void }) {
+  const [show, setShow] = useState(false)
+  const [local, setLocal] = useState(value)
+  return (
+    <div className="border-b border-line bg-panel/80 p-3">
+      <div className="mb-2 flex items-center justify-between">
+        <span className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-dim">
+          <Key size={12} /> API Key or OAuth Token
+        </span>
+        <button onClick={onClose} className="text-dim hover:text-text"><X size={13} /></button>
+      </div>
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <input
+            type={show ? 'text' : 'password'}
+            value={local}
+            onChange={(e) => setLocal(e.target.value)}
+            placeholder="sk-ant-… or OAuth token"
+            className="w-full border border-line bg-bg/60 px-2 py-1.5 pr-8 text-sm text-text focus:border-accent/60 focus:outline-none"
+          />
+          <button
+            onClick={() => setShow((s) => !s)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-dim hover:text-text"
+          >
+            {show ? <EyeOff size={13} /> : <Eye size={13} />}
+          </button>
+        </div>
+        <button
+          onClick={() => { onChange(local); onClose() }}
+          className="border border-accent/40 bg-accent/10 px-3 py-1.5 text-xs uppercase tracking-wider text-accent hover:bg-accent/20"
+        >
+          Save
+        </button>
+      </div>
+      <p className="mt-1.5 text-[10px] text-dim">
+        Paste an API key (<span className="text-text/60">sk-ant-…</span>) or an OAuth access token.
+        Stored in localStorage only — only sent to api.anthropic.com.
+      </p>
     </div>
   )
 }
@@ -245,7 +417,6 @@ function ThreadList({ convoId, onSelect }: { convoId: string; onSelect: (id: str
             {c.title}
             <span className="text-[9px] text-dim">{c.agent}</span>
           </span>
-          <span className="truncate text-[10px] text-dim">{c.preview}</span>
         </button>
       ))}
     </>
@@ -283,7 +454,7 @@ function MessageRow({ msg, agentColor, agentName }: { msg: Message; agentColor: 
   )
 }
 
-function MicButton({ onClip }: { onClip: (att: Attachment) => void }) {
+function MicButton({ onClip }: { onClip: (att: { id: string; name: string; size: number; kind: 'audio' }) => void }) {
   const [recording, setRecording] = useState(false)
   const [secs, setSecs] = useState(0)
   const recorderRef = useRef<MediaRecorder | null>(null)
@@ -306,12 +477,11 @@ function MicButton({ onClip }: { onClip: (att: Attachment) => void }) {
       rec.ondataavailable = (e) => chunks.push(e.data)
       rec.onstop = () => {
         const blob = new Blob(chunks, { type: 'audio/webm' })
-        onClip({ id: crypto.randomUUID(), name: `voice-note-${Date.now()}.webm`, size: blob.size, kind: 'audio' })
+        onClip({ id: crypto.randomUUID(), name: `voice-${Date.now()}.webm`, size: blob.size, kind: 'audio' })
         stream.getTracks().forEach((t) => t.stop())
       }
       rec.start()
     } catch {
-      // permission denied / unsupported — keep the timer running as a mock
       recorderRef.current = null
     }
   }
@@ -319,11 +489,8 @@ function MicButton({ onClip }: { onClip: (att: Attachment) => void }) {
   const stop = () => {
     setRecording(false)
     stopTimer()
-    if (recorderRef.current) {
-      recorderRef.current.stop()
-    } else {
-      onClip({ id: crypto.randomUUID(), name: `voice-note-${Date.now()}.webm`, size: secs * 16000, kind: 'audio' })
-    }
+    if (recorderRef.current) recorderRef.current.stop()
+    else onClip({ id: crypto.randomUUID(), name: `voice-${Date.now()}.webm`, size: secs * 16000, kind: 'audio' })
   }
 
   useEffect(() => () => stopTimer(), [])

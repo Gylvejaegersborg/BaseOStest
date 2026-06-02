@@ -6,6 +6,7 @@ export interface LabModule {
   description: string
   stack: string[]
   url?: string
+  embedded?: boolean
 }
 
 export const LAB_MODULES: LabModule[] = [
@@ -24,7 +25,6 @@ export const LAB_MODULES: LabModule[] = [
     status: 'live',
     description: 'The public ISΛRK site — releases grid, link hub and bio.',
     stack: ['React', 'Vite', 'Tailwind'],
-    url: 'https://soundcloud.com/itsisark',
   },
   {
     id: 'beat-db',
@@ -60,11 +60,48 @@ export const LAB_MODULES: LabModule[] = [
     stack: ['Shortcuts', 'Webhook'],
   },
   {
-    id: 'render-queue',
-    name: 'Render Queue Monitor',
-    kind: 'Experiment',
-    status: 'staging',
-    description: 'Visualises the master → upload pipeline in real time.',
-    stack: ['React', 'WebSocket'],
+    id: 'song-tracker',
+    name: 'ISΛRK Song Tracker',
+    kind: 'Studio tool',
+    status: 'live',
+    description:
+      'Daily task tracker for ISΛRK’s ongoing song projects — each song’s stage in the record → distribute lifecycle, its own checklist and a Today panel of the day’s focus.',
+    stack: ['React', 'TypeScript'],
+  },
+  {
+    id: 'pipeline-monitor',
+    name: 'Pipeline Monitor',
+    kind: 'Archive',
+    status: 'local',
+    description:
+      'Archived factory-style pipeline visualiser — live stage diagram, animated job queue, stats and an event log. Kept as a reusable design.',
+    stack: ['React', 'TypeScript'],
+  },
+  {
+    id: 'n8n',
+    name: 'n8n',
+    kind: 'Automation hub',
+    status: 'local',
+    description:
+      'Dashboard for the homeserver n8n instance — browse workflows, see execution history, trigger runs manually, and toggle active state. Wire to the n8n REST API when the server is up.',
+    stack: ['n8n', 'REST API', 'React'],
+  },
+  {
+    id: 'yt-dlp',
+    name: 'yt-dlp',
+    kind: 'Downloader UI',
+    status: 'local',
+    description:
+      'Frontend for yt-dlp — paste a URL, pick format and quality, and queue downloads. Mockup for now; wire to a local yt-dlp API when the homeserver is up.',
+    stack: ['React', 'TypeScript', 'yt-dlp'],
+  },
+  {
+    id: 'sudoku',
+    name: 'Sudoku',
+    kind: 'Mini-game',
+    status: 'live',
+    description: 'Learn to read the board. Guided hints, mid-game nudges and a coaching report each round.',
+    stack: ['React', 'TypeScript'],
+    embedded: true,
   },
 ]

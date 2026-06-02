@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from 'react'
-import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database } from 'lucide-react'
+import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe, Gauge, Music2, Download, Workflow } from 'lucide-react'
 import { LAB_MODULES, type LabModule } from '@/data/labs'
 import { Panel } from '@/components/ui/Panel'
 import { Modal } from '@/components/ui/Modal'
@@ -14,6 +14,30 @@ const BeatStorePage = lazy(() =>
 const BeatDBPage = lazy(() =>
   import('@/features/beatdb/BeatDBPage').then((m) => ({ default: m.BeatDBPage })),
 )
+const DiscordDashPage = lazy(() =>
+  import('@/features/discorddash/DiscordDashPage').then((m) => ({ default: m.DiscordDashPage })),
+)
+const ArtistWebPage = lazy(() =>
+  import('@/features/artistweb/ArtistWebPage').then((m) => ({ default: m.ArtistWebPage })),
+)
+const SudokuPage = lazy(() =>
+  import('@/pages/Sudoku').then((m) => ({ default: m.Sudoku })),
+)
+const ShortcutsLabPage = lazy(() =>
+  import('@/features/shortcutslab/ShortcutsLabPage').then((m) => ({ default: m.ShortcutsLabPage })),
+)
+const SongTrackerPage = lazy(() =>
+  import('@/features/songtracker/SongTrackerPage').then((m) => ({ default: m.SongTrackerPage })),
+)
+const PipelineMonitorPage = lazy(() =>
+  import('@/features/pipelinemonitor/PipelineMonitorPage').then((m) => ({ default: m.PipelineMonitorPage })),
+)
+const YtDlpPage = lazy(() =>
+  import('@/features/ytdlp/YtDlpPage').then((m) => ({ default: m.YtDlpPage })),
+)
+const N8nPage = lazy(() =>
+  import('@/features/n8n/N8nPage').then((m) => ({ default: m.N8nPage })),
+)
 
 const STATUS_COLOR = { live: '#46d369', staging: '#f0a020', local: '#36e0c8' } as const
 
@@ -22,6 +46,13 @@ export function Lab() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [storeOpen, setStoreOpen] = useState(false)
   const [dbOpen, setDbOpen] = useState(false)
+  const [discordOpen, setDiscordOpen] = useState(false)
+  const [shortcutsOpen, setShortcutsOpen] = useState(false)
+  const [artistOpen, setArtistOpen] = useState(false)
+  const [trackerOpen, setTrackerOpen] = useState(false)
+  const [pipelineOpen, setPipelineOpen] = useState(false)
+  const [ytdlpOpen, setYtdlpOpen] = useState(false)
+  const [n8nOpen, setN8nOpen] = useState(false)
   const isDesktop = useIsDesktop()
   const selected = LAB_MODULES.find((m) => m.id === selectedId)!
 
@@ -30,24 +61,49 @@ export function Lab() {
     if (!isDesktop) setMobileOpen(true)
   }
 
+  const isSudoku = selected.id === 'sudoku'
+
   return (
     <div className="flex h-full">
-      <div className="min-w-0 flex-1 overflow-y-auto p-4 sm:p-6">
+      {/* When Sudoku is open on desktop, shrink the grid to a sidebar */}
+      <div className={cn('min-w-0 overflow-y-auto p-4 sm:p-6', isSudoku && isDesktop ? 'w-[260px] shrink-0 border-r border-line' : 'flex-1')}>
         <div className="mb-5">
           <h1 className="font-display text-2xl tracking-wider text-text">LAB</h1>
           <p className="text-xs text-dim">Pages and apps you have built. Preview, launch and poke them.</p>
         </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <div className={cn('grid gap-3', isSudoku && isDesktop ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3')}>
           {LAB_MODULES.map((m) => (
             <ModuleCard key={m.id} mod={m} active={m.id === selectedId} onClick={() => openModule(m.id)} />
           ))}
         </div>
       </div>
 
-      {/* Desktop: persistent detail rail */}
-      <aside className="hidden w-[380px] shrink-0 flex-col gap-3 overflow-y-auto border-l border-line bg-panel/30 p-3 lg:flex">
-        <ModuleDetail mod={selected} onOpenStore={() => setStoreOpen(true)} onOpenDB={() => setDbOpen(true)} />
-      </aside>
+      {/* Desktop: Sudoku fills remaining space */}
+      {isSudoku && isDesktop && (
+        <div className="flex min-w-0 flex-1 overflow-hidden">
+          <Suspense fallback={<div className="flex h-full w-full items-center justify-center text-xs text-dim">Loading…</div>}>
+            <SudokuPage />
+          </Suspense>
+        </div>
+      )}
+
+      {/* Desktop: persistent detail rail (non-Sudoku) */}
+      {!isSudoku && (
+        <aside className="hidden w-[380px] shrink-0 flex-col gap-3 overflow-y-auto border-l border-line bg-panel/30 p-3 lg:flex">
+          <ModuleDetail
+            mod={selected}
+            onOpenStore={() => setStoreOpen(true)}
+            onOpenDB={() => setDbOpen(true)}
+            onOpenDiscord={() => setDiscordOpen(true)}
+            onOpenShortcuts={() => setShortcutsOpen(true)}
+            onOpenArtist={() => setArtistOpen(true)}
+            onOpenTracker={() => setTrackerOpen(true)}
+            onOpenPipeline={() => setPipelineOpen(true)}
+            onOpenYtDlp={() => setYtdlpOpen(true)}
+            onOpenN8n={() => setN8nOpen(true)}
+          />
+        </aside>
+      )}
 
       {/* Mobile: detail opens in a modal */}
       <Modal
@@ -56,11 +112,31 @@ export function Lab() {
         title={selected.name}
         code={selected.kind}
         accent={STATUS_COLOR[selected.status]}
-        width={520}
+        width={isSudoku ? 800 : 520}
       >
-        <div className="flex flex-col gap-3">
-          <ModuleDetail mod={selected} embedded onOpenStore={() => setStoreOpen(true)} onOpenDB={() => setDbOpen(true)} />
-        </div>
+        {isSudoku ? (
+          <div className="h-[70vh] overflow-auto">
+            <Suspense fallback={<div className="flex h-full items-center justify-center text-xs text-dim">Loading…</div>}>
+              <SudokuPage />
+            </Suspense>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3">
+            <ModuleDetail
+              mod={selected}
+              embedded
+              onOpenStore={() => setStoreOpen(true)}
+              onOpenDB={() => setDbOpen(true)}
+              onOpenDiscord={() => setDiscordOpen(true)}
+              onOpenShortcuts={() => setShortcutsOpen(true)}
+              onOpenArtist={() => setArtistOpen(true)}
+              onOpenTracker={() => setTrackerOpen(true)}
+              onOpenPipeline={() => setPipelineOpen(true)}
+              onOpenYtDlp={() => setYtdlpOpen(true)}
+            onOpenN8n={() => setN8nOpen(true)}
+            />
+          </div>
+        )}
       </Modal>
 
       {storeOpen && (
@@ -74,6 +150,55 @@ export function Lab() {
           <BeatDBPage open onClose={() => setDbOpen(false)} />
         </Suspense>
       )}
+
+      {discordOpen && (
+        <Suspense fallback={null}>
+          <DiscordDashPage open onClose={() => setDiscordOpen(false)} />
+        </Suspense>
+      )}
+
+      {shortcutsOpen && (
+        <Suspense fallback={null}>
+          <ShortcutsLabPage open onClose={() => setShortcutsOpen(false)} />
+        </Suspense>
+      )}
+
+      {artistOpen && (
+        <Suspense fallback={null}>
+          <ArtistWebPage
+            open
+            onClose={() => setArtistOpen(false)}
+            onGetBeats={() => {
+              setArtistOpen(false)
+              setStoreOpen(true)
+            }}
+          />
+        </Suspense>
+      )}
+
+      {trackerOpen && (
+        <Suspense fallback={null}>
+          <SongTrackerPage open onClose={() => setTrackerOpen(false)} />
+        </Suspense>
+      )}
+
+      {pipelineOpen && (
+        <Suspense fallback={null}>
+          <PipelineMonitorPage open onClose={() => setPipelineOpen(false)} />
+        </Suspense>
+      )}
+
+      {ytdlpOpen && (
+        <Suspense fallback={null}>
+          <YtDlpPage open onClose={() => setYtdlpOpen(false)} />
+        </Suspense>
+      )}
+
+      {n8nOpen && (
+        <Suspense fallback={null}>
+          <N8nPage open onClose={() => setN8nOpen(false)} />
+        </Suspense>
+      )}
     </div>
   )
 }
@@ -83,11 +208,25 @@ function ModuleDetail({
   embedded,
   onOpenStore,
   onOpenDB,
+  onOpenDiscord,
+  onOpenShortcuts,
+  onOpenArtist,
+  onOpenTracker,
+  onOpenPipeline,
+  onOpenYtDlp,
+  onOpenN8n,
 }: {
   mod: LabModule
   embedded?: boolean
   onOpenStore?: () => void
   onOpenDB?: () => void
+  onOpenDiscord?: () => void
+  onOpenShortcuts?: () => void
+  onOpenArtist?: () => void
+  onOpenTracker?: () => void
+  onOpenPipeline?: () => void
+  onOpenYtDlp?: () => void
+  onOpenN8n?: () => void
 }) {
   return (
     <>
@@ -109,12 +248,68 @@ function ModuleDetail({
             Open Beat Store <Store size={13} />
           </button>
         )}
+        {mod.id === 'artist-web' && onOpenArtist && (
+          <button
+            onClick={onOpenArtist}
+            className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
+          >
+            Open Artist Page <Globe size={13} />
+          </button>
+        )}
         {mod.id === 'beat-db' && onOpenDB && (
           <button
             onClick={onOpenDB}
             className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
           >
             Open Beat DB <Database size={13} />
+          </button>
+        )}
+        {mod.id === 'discord-dash' && onOpenDiscord && (
+          <button
+            onClick={onOpenDiscord}
+            className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
+          >
+            Open Dashboard <Bot size={13} />
+          </button>
+        )}
+        {mod.id === 'shortcuts-lab' && onOpenShortcuts && (
+          <button
+            onClick={onOpenShortcuts}
+            className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
+          >
+            Open Shortcuts Lab <Smartphone size={13} />
+          </button>
+        )}
+        {mod.id === 'song-tracker' && onOpenTracker && (
+          <button
+            onClick={onOpenTracker}
+            className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
+          >
+            Open Song Tracker <Music2 size={13} />
+          </button>
+        )}
+        {mod.id === 'pipeline-monitor' && onOpenPipeline && (
+          <button
+            onClick={onOpenPipeline}
+            className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
+          >
+            Open Pipeline Monitor <Gauge size={13} />
+          </button>
+        )}
+        {mod.id === 'yt-dlp' && onOpenYtDlp && (
+          <button
+            onClick={onOpenYtDlp}
+            className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
+          >
+            Open Downloader <Download size={13} />
+          </button>
+        )}
+        {mod.id === 'n8n' && onOpenN8n && (
+          <button
+            onClick={onOpenN8n}
+            className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
+          >
+            Open Dashboard <Workflow size={13} />
           </button>
         )}
         {mod.url && (
@@ -161,7 +356,6 @@ function ModuleCard({ mod, active, onClick }: { mod: LabModule; active: boolean;
   )
 }
 
-// Stylised fake preview (no real iframe target exists yet)
 function MiniPreview({ mod }: { mod: LabModule }) {
   return (
     <div className="grid-bg absolute inset-0 flex items-center justify-center opacity-70">
@@ -179,9 +373,19 @@ function PreviewFrame({ mod }: { mod: LabModule }) {
         <span className="h-2 w-2 rounded-full bg-neon-green/70" />
         <span className="ml-2 truncate text-[10px] text-dim">{mod.url ?? `local://${mod.id}`}</span>
       </div>
-      <div className="grid-bg flex aspect-video items-center justify-center">
-        <span className="font-display text-xs tracking-widest text-dim">PREVIEW · {mod.kind.toUpperCase()}</span>
-      </div>
+      {mod.url ? (
+        <iframe
+          src={mod.url}
+          title={mod.name}
+          sandbox="allow-scripts allow-same-origin allow-forms"
+          className="aspect-video w-full border-0 bg-white"
+          loading="lazy"
+        />
+      ) : (
+        <div className="grid-bg flex aspect-video items-center justify-center">
+          <span className="font-display text-xs tracking-widest text-dim">PREVIEW · {mod.kind.toUpperCase()}</span>
+        </div>
+      )}
     </div>
   )
 }

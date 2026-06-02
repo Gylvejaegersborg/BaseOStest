@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { buildBodies, sunPos, SUN_LINKS, VIEW_H, VIEW_W, type Body } from './layout'
+import { cn } from '@/lib/cn'
 
 interface Props {
   activeKey: string | null
@@ -17,7 +18,7 @@ export function Constellation({ activeKey, onHover, onSelect }: Props) {
       className="absolute inset-0 h-full w-full touch-manipulation"
     >
       {/* constellation outline between suns */}
-      <g opacity={0.25}>
+      <g className="animate-glow-soft">
         {SUN_LINKS.map(([a, b], i) => {
           const pa = sunPos(a)
           const pb = sunPos(b)
@@ -90,19 +91,29 @@ function BodyNode({
     >
       {/* hit area */}
       <circle r={isSun ? 34 : 18} fill="transparent" />
-      {/* glow halo */}
+
+      {/* Outer aura — slow breath. Stagger via animation-delay so the suns
+          don't pulse in unison. */}
+      <circle
+        r={isSun ? 42 : 16}
+        fill={body.accent}
+        className={active ? 'animate-breathe-strong' : 'animate-breathe'}
+        style={{ animationDelay: `${-((body.x * 0.013 + body.y * 0.009) % 5)}s` }}
+      />
+      {/* Mid halo — faster pulse over the static halo for liveliness */}
       <circle
         r={isSun ? (active ? 30 : 24) : active ? 16 : 11}
         fill={body.accent}
         opacity={active ? 0.18 : 0.1}
-        className="transition-all"
+        className={cn('transition-all', active ? 'animate-glow' : 'animate-glow-soft')}
+        style={{ animationDelay: `${-((body.x * 0.007) % 3)}s` }}
       />
       <circle
         r={body.r}
         fill={isSun ? body.accent : '#0a0c10'}
         stroke={body.accent}
         strokeWidth={isSun ? 0 : 1.5}
-        style={{ filter: `drop-shadow(0 0 ${active ? 8 : 4}px ${body.accent})` }}
+        style={{ filter: `drop-shadow(0 0 ${active ? 10 : 5}px ${body.accent})` }}
       />
       {isSun && <circle r={body.r - 6} fill="#0a0c10" opacity={0.35} />}
       <text
