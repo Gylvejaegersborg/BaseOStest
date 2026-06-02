@@ -48,6 +48,8 @@ export function Notes() {
   const [query, setQuery] = useState('')
   const [tag, setTag] = useState<string | null>(null)
   const [editing, setEditing] = useState(false)
+  const [editingTitle, setEditingTitle] = useState(false)
+  const [titleDraft, setTitleDraft] = useState('')
   const [mobileView, setMobileView] = useState<'list' | 'note'>('list')
 
   const [drafts, setDrafts] = useState<Record<string, string>>(() => loadJSON(STORAGE.drafts, {}))
@@ -160,6 +162,24 @@ export function Notes() {
     setEditing(false)
   }
 
+  // Renaming via the title input rewrites the body's first H1 (or prepends one
+  // if missing) so titleFromBody stays in sync with the markdown.
+  const saveTitle = (next: string) => {
+    if (!selected) return
+    const trimmed = next.trim() || 'Untitled'
+    const lines = body.split('\n')
+    const idx = lines.findIndex((l) => /^#\s+.+$/.test(l))
+    if (idx >= 0) lines[idx] = `# ${trimmed}`
+    else lines.unshift(`# ${trimmed}`, '')
+    updateBody(selected.id, lines.join('\n'))
+    setEditingTitle(false)
+  }
+
+  const beginTitleEdit = () => {
+    setTitleDraft(displayTitle)
+    setEditingTitle(true)
+  }
+
   const addTag = (t: string) => {
     if (!selected) return
     const clean = t.trim().toLowerCase().replace(/^#/, '')
@@ -230,6 +250,7 @@ export function Notes() {
                     setSelectedId(n.id)
                     setMobileView('note')
                     setEditing(false)
+                    setEditingTitle(false)
                   }}
                   className={cn(
                     'flex w-full flex-col gap-0.5 border-l-2 px-3 py-2 text-left transition-colors',
@@ -267,14 +288,41 @@ export function Notes() {
             <div className="flex items-center justify-between border-b border-line px-4 py-2">
               <div className="flex min-w-0 items-center gap-2">
                 <button
-                  onClick={() => setMobileView('list')}
+                  onClick={() => {
+                    setMobileView('list')
+                    setEditingTitle(false)
+                  }}
                   className="text-dim hover:text-text lg:hidden"
                   aria-label="Back to list"
                 >
                   <ChevronLeft size={16} />
                 </button>
                 <Hash size={13} className="text-dim" />
-                <span className="truncate font-display text-text">{displayTitle}</span>
+                {editingTitle ? (
+                  <input
+                    autoFocus
+                    value={titleDraft}
+                    onChange={(e) => setTitleDraft(e.target.value)}
+                    onBlur={() => saveTitle(titleDraft)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        saveTitle(titleDraft)
+                      } else if (e.key === 'Escape') {
+                        setEditingTitle(false)
+                      }
+                    }}
+                    className="min-w-0 flex-1 border-b border-accent/60 bg-transparent pb-0.5 font-display text-text outline-none"
+                  />
+                ) : (
+                  <button
+                    onClick={beginTitleEdit}
+                    title="Click to rename"
+                    className="min-w-0 truncate font-display text-text transition-colors hover:text-accent"
+                  >
+                    {displayTitle}
+                  </button>
+                )}
                 <span className="hidden text-[10px] text-dim sm:inline">· {selected.folder}</span>
               </div>
               <div className="flex items-center gap-2">
