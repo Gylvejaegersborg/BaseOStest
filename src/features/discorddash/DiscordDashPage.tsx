@@ -3,6 +3,9 @@ import { Hash, Send, Check, X, Bot, ShieldQuestion } from 'lucide-react'
 import { AGENTS } from '@/data/agents'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { cn } from '@/lib/cn'
+import { useDiscordBridge } from './useDiscordBridge'
+import { GUILDS, MOCK_APPROVALS } from './mockData'
+import type { Approval, BridgeMessage, ConnectionState } from './types'
 
 interface DiscordDashPageProps {
   open: boolean
@@ -11,110 +14,69 @@ interface DiscordDashPageProps {
 
 const ACCENT = '#e0408a'
 
-interface Channel {
-  id: string
-  name: string
-  unread: number
+// Header status dot — colour + label reflect the live bridge connection.
+const CONNECTION_META: Record<ConnectionState, { color: string; label: string; pulse: boolean }> = {
+  connecting: { color: '#f0a020', label: 'Connecting…', pulse: true },
+  live: { color: '#46d369', label: 'Connected', pulse: true },
+  mock: { color: '#36e0c8', label: 'Demo · mock data', pulse: false },
+  error: { color: '#ff5566', label: 'Bridge offline', pulse: false },
 }
 
-const CHANNELS: Channel[] = [
-  { id: 'general', name: 'general', unread: 0 },
-  { id: 'agent-log', name: 'agent-log', unread: 12 },
-  { id: 'approvals', name: 'approvals', unread: 3 },
-  { id: 'music-drops', name: 'music-drops', unread: 5 },
-  { id: 'ops-alerts', name: 'ops-alerts', unread: 1 },
-]
-
-interface Message {
-  id: string
-  channel: string
-  /** agent id, or 'you' for the operator */
-  author: string
-  time: string
-  text: string
+// Resolve an author id to name + colour for the approvals panel (which keys by
+// agent id). Messages already carry their own display fields.
+function approvalAuthor(authorId: string): { name: string; color: string } {
+  const a = AGENTS.find((x) => x.id === authorId)
+  return { name: a?.name ?? authorId, color: a?.color ?? '#6b7785' }
 }
 
-const byId = (id: string) => AGENTS.find((a) => a.id === id)
-
-// Visual identity for an author — covers agents plus the human operator.
-function authorMeta(author: string): { name: string; color: string; initials: string } {
-  if (author === 'you') return { name: 'You', color: '#c8d2dc', initials: 'YO' }
-  const agent = byId(author)
-  if (!agent) return { name: author, color: '#6b7785', initials: author.slice(0, 2).toUpperCase() }
-  const initials = agent.name
+function initialsOf(name: string): string {
+  return name
     .replace(/[·]/g, ' ')
     .split(/\s+/)
     .map((p) => p[0])
     .join('')
     .slice(0, 2)
     .toUpperCase()
-  return { name: agent.name, color: agent.color, initials }
 }
-
-const INITIAL_MESSAGES: Message[] = [
-  { id: 'm1', channel: 'general', author: 'hemera', time: '08:02', text: 'Morning brief is up. Three release windows queued for Q3 — sharing the draft in #music-drops.' },
-  { id: 'm2', channel: 'general', author: 'you', time: '08:05', text: 'Nice. Push the week-2 promo earlier, it looked thin.' },
-  { id: 'm3', channel: 'general', author: 'hemera', time: '08:06', text: 'On it. Re-spacing the cadence and flagging Nyx for the assets.' },
-  { id: 'm4', channel: 'general', author: 'claude', time: '08:14', text: 'Calendar grid refactor landed. Week view is stable now, tests green.' },
-
-  { id: 'm5', channel: 'agent-log', author: 'nyx', time: '08:20', text: 'Spun up 4 workers for the content batch.' },
-  { id: 'm6', channel: 'agent-log', author: 'nyx-w1', time: '08:21', text: 'Caption set drafted — tightening the hooks.' },
-  { id: 'm7', channel: 'agent-log', author: 'nyx-w2', time: '08:23', text: 'Cover-art prompts done. Idling until the next request.' },
-  { id: 'm8', channel: 'agent-log', author: 'claude', time: '08:31', text: 'Found a null deref in the upload routine, patched it. Pushing the branch.' },
-  { id: 'm9', channel: 'agent-log', author: 'nyx', time: '08:40', text: 'Worker 2 stalled on a rate limit, retrying with backoff.' },
-
-  { id: 'm10', channel: 'music-drops', author: 'hemera', time: '08:45', text: 'Q3 plan draft attached. Window 1 opens July 7.' },
-  { id: 'm11', channel: 'music-drops', author: 'nyx-w1', time: '08:52', text: 'Release captions ready for review — 6 variants per track.' },
-  { id: 'm12', channel: 'music-drops', author: 'you', time: '09:01', text: 'Love variant 3. Lock it for the lead single.' },
-
-  { id: 'm13', channel: 'approvals', author: 'nyx', time: '09:10', text: 'Requesting approval to publish the lead-single captions to the scheduler.' },
-  { id: 'm14', channel: 'approvals', author: 'claude', time: '09:12', text: 'Requesting approval to merge branch `fix/upload-null-deref` into main.' },
-
-  { id: 'm15', channel: 'ops-alerts', author: 'nyx', time: '09:18', text: '⚠ Upload queue backed up — master from song routines still pending.' },
-]
-
-interface Approval {
-  id: string
-  author: string
-  action: string
-}
-
-const INITIAL_APPROVALS: Approval[] = [
-  { id: 'a1', author: 'nyx', action: 'Publish lead-single captions to the post scheduler' },
-  { id: 'a2', author: 'claude', action: 'Merge branch fix/upload-null-deref → main' },
-  { id: 'a3', author: 'hemera', action: 'Send Q3 release calendar to the team channel' },
-  { id: 'a4', author: 'nyx-w2', action: 'Spend 4 image credits on cover-art upscale' },
-]
 
 export function DiscordDashPage({ open, onClose }: DiscordDashPageProps) {
-  const [activeChannel, setActiveChannel] = useState('general')
-  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES)
-  const [approvals, setApprovals] = useState<Approval[]>(INITIAL_APPROVALS)
-  // ids of approvals currently animating out, so we can fade before removing.
+  const [guildId, setGuildId] = useState(GUILDS[0].id)
+  const [activeChannel, setActiveChannel] = useState('')
+  const { channels, messages, connection, markRead, send } = useDiscordBridge(guildId, activeChannel)
+
+  const [approvals, setApprovals] = useState<Approval[]>(MOCK_APPROVALS)
   const [leaving, setLeaving] = useState<Set<string>>(new Set())
   const [draft, setDraft] = useState('')
   const [toast, setToast] = useState<{ text: string; color: string } | null>(null)
-  const [channels, setChannels] = useState<Channel[]>(CHANNELS)
 
   const feedRef = useRef<HTMLDivElement>(null)
   const toastTimer = useRef<ReturnType<typeof setTimeout>>()
 
+  const guild = GUILDS.find((g) => g.id === guildId)!
+  const conn = CONNECTION_META[connection]
+
+  // Keep a valid active channel as the channel list (re)loads.
+  useEffect(() => {
+    if (channels.length === 0) return
+    if (!channels.some((c) => c.id === activeChannel)) {
+      setActiveChannel(channels[0].id)
+    }
+  }, [channels, activeChannel])
+
   const visibleMessages = useMemo(
-    () => messages.filter((m) => m.channel === activeChannel),
+    () => messages.filter((m) => m.channelId === activeChannel),
     [messages, activeChannel],
   )
 
-  // Auto-scroll the feed to the bottom on mount and whenever the channel
-  // changes or a new message arrives.
+  // Auto-scroll the feed to the bottom on mount and on channel/message change.
   useEffect(() => {
     const el = feedRef.current
     if (el) el.scrollTop = el.scrollHeight
   }, [activeChannel, visibleMessages.length, open])
 
-  // Clear unread badge when a channel is opened.
   const selectChannel = (id: string) => {
     setActiveChannel(id)
-    setChannels((prev) => prev.map((c) => (c.id === id ? { ...c, unread: 0 } : c)))
+    markRead(id)
   }
 
   // Esc closes the overlay (same pattern as BeatStorePage).
@@ -136,8 +98,7 @@ export function DiscordDashPage({ open, onClose }: DiscordDashPageProps) {
   const resolveApproval = (id: string, decision: 'approve' | 'deny') => {
     const item = approvals.find((a) => a.id === id)
     if (!item) return
-    const meta = authorMeta(item.author)
-    // fade out, then drop from the list.
+    const { name } = approvalAuthor(item.authorId)
     setLeaving((prev) => new Set(prev).add(id))
     setTimeout(() => {
       setApprovals((prev) => prev.filter((a) => a.id !== id))
@@ -148,22 +109,15 @@ export function DiscordDashPage({ open, onClose }: DiscordDashPageProps) {
       })
     }, 280)
     showToast(
-      decision === 'approve'
-        ? `Approved · ${meta.name}'s action`
-        : `Denied · ${meta.name}'s action`,
+      decision === 'approve' ? `Approved · ${name}'s action` : `Denied · ${name}'s action`,
       decision === 'approve' ? '#46d369' : '#ff5566',
     )
   }
 
-  const send = () => {
+  const submit = () => {
     const text = draft.trim()
-    if (!text) return
-    const now = new Date()
-    const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
-    setMessages((prev) => [
-      ...prev,
-      { id: `u-${Date.now()}`, channel: activeChannel, author: 'you', time, text },
-    ])
+    if (!text || !activeChannel) return
+    void send(activeChannel, text)
     setDraft('')
   }
 
@@ -175,12 +129,35 @@ export function DiscordDashPage({ open, onClose }: DiscordDashPageProps) {
       <header className="flex items-center gap-3 border-b border-line bg-panel/60 px-4 py-2.5">
         <Bot size={18} style={{ color: ACCENT }} />
         <h1 className="font-display text-lg tracking-wider text-text">DISCORD BRIDGE</h1>
-        <span className="flex items-center gap-1.5 border border-line bg-bg/60 px-2 py-1 text-[11px] text-dim">
-          <StatusDot color="#46d369" size={7} pulse /> Connected
+        <span
+          className="flex items-center gap-1.5 border bg-bg/60 px-2 py-1 text-[11px]"
+          style={{ borderColor: `${conn.color}55`, color: conn.color }}
+        >
+          <StatusDot color={conn.color} size={7} pulse={conn.pulse} /> {conn.label}
         </span>
-        <span className="text-xs text-dim">
-          server <span className="text-text">ISΛRK HQ</span>
-        </span>
+
+        {/* Server switcher */}
+        <div className="flex items-center gap-1">
+          {GUILDS.map((g) => {
+            const active = g.id === guildId
+            return (
+              <button
+                key={g.id}
+                onClick={() => setGuildId(g.id)}
+                title={`${g.name} · ${g.id}`}
+                className={cn(
+                  'border px-2 py-1 text-[11px] uppercase tracking-wider transition-colors',
+                  active
+                    ? 'border-magenta/60 bg-magenta/15 text-text'
+                    : 'border-line text-dim hover:border-magenta/40 hover:text-text',
+                )}
+              >
+                {g.name}
+              </button>
+            )
+          })}
+        </div>
+
         <button
           onClick={onClose}
           className="ml-auto flex items-center gap-1 border border-line px-2.5 py-1 text-[11px] uppercase tracking-wider text-dim transition-colors hover:border-magenta/60 hover:text-magenta"
@@ -193,7 +170,9 @@ export function DiscordDashPage({ open, onClose }: DiscordDashPageProps) {
       <div className="flex min-h-0 flex-1">
         {/* Channel list */}
         <nav className="hidden w-[200px] shrink-0 flex-col border-r border-line bg-panel/30 sm:flex">
-          <div className="px-3 py-2 text-[10px] uppercase tracking-widest text-dim">Channels</div>
+          <div className="px-3 py-2 text-[10px] uppercase tracking-widest text-dim">
+            {guild.name} · Channels
+          </div>
           <div className="flex-1 overflow-y-auto px-2 pb-2">
             {channels.map((c) => {
               const active = c.id === activeChannel
@@ -226,13 +205,13 @@ export function DiscordDashPage({ open, onClose }: DiscordDashPageProps) {
         <main className="flex min-w-0 flex-1 flex-col">
           <div className="flex items-center gap-1.5 border-b border-line px-4 py-2 text-sm">
             <Hash size={15} style={{ color: ACCENT }} />
-            <span className="text-text">{activeChannel}</span>
+            <span className="text-text">{activeChannel || '—'}</span>
           </div>
 
           <div ref={feedRef} className="flex-1 overflow-y-auto px-4 py-3">
             {visibleMessages.length === 0 ? (
               <div className="flex h-full items-center justify-center text-xs text-dim">
-                No messages in #{activeChannel} yet.
+                No messages in #{activeChannel || 'this channel'} yet.
               </div>
             ) : (
               visibleMessages.map((m) => <MessageRow key={m.id} message={m} />)
@@ -245,13 +224,13 @@ export function DiscordDashPage({ open, onClose }: DiscordDashPageProps) {
               <input
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && send()}
-                placeholder={`Message #${activeChannel}`}
+                onKeyDown={(e) => e.key === 'Enter' && submit()}
+                placeholder={activeChannel ? `Message #${activeChannel}` : 'Select a channel'}
                 className="flex-1 bg-transparent text-sm text-text placeholder:text-dim focus:outline-none"
               />
               <button
-                onClick={send}
-                disabled={!draft.trim()}
+                onClick={submit}
+                disabled={!draft.trim() || !activeChannel}
                 className="flex items-center gap-1 text-dim transition-colors hover:text-magenta disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Send size={15} />
@@ -265,9 +244,7 @@ export function DiscordDashPage({ open, onClose }: DiscordDashPageProps) {
           <div className="flex items-center gap-1.5 px-3 py-2 text-[10px] uppercase tracking-widest text-dim">
             <ShieldQuestion size={13} style={{ color: ACCENT }} />
             Pending Approvals
-            {approvals.length > 0 && (
-              <span className="ml-auto text-dim">{approvals.length}</span>
-            )}
+            {approvals.length > 0 && <span className="ml-auto text-dim">{approvals.length}</span>}
           </div>
           <div className="flex-1 overflow-y-auto px-2 pb-2">
             {approvals.length === 0 ? (
@@ -302,20 +279,22 @@ export function DiscordDashPage({ open, onClose }: DiscordDashPageProps) {
   )
 }
 
-function MessageRow({ message }: { message: Message }) {
-  const meta = authorMeta(message.author)
+function MessageRow({ message }: { message: BridgeMessage }) {
+  const name = message.isSelf ? 'You' : message.authorName
+  const color = message.authorColor ?? '#6b7785'
+  const initials = initialsOf(name)
   return (
     <div className="group flex gap-3 py-1.5 animate-fade-in">
       <div
         className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[11px] font-bold"
-        style={{ backgroundColor: `${meta.color}22`, color: meta.color, border: `1px solid ${meta.color}55` }}
+        style={{ backgroundColor: `${color}22`, color, border: `1px solid ${color}55` }}
       >
-        {meta.initials}
+        {initials}
       </div>
       <div className="min-w-0">
         <div className="flex items-baseline gap-2">
-          <span className="text-sm font-semibold" style={{ color: meta.color }}>
-            {meta.name}
+          <span className="text-sm font-semibold" style={{ color }}>
+            {name}
           </span>
           <span className="text-[10px] text-dim">{message.time}</span>
         </div>
@@ -336,7 +315,7 @@ function ApprovalCard({
   onApprove: () => void
   onDeny: () => void
 }) {
-  const meta = authorMeta(approval.author)
+  const { name, color } = approvalAuthor(approval.authorId)
   return (
     <div
       className={cn(
@@ -345,9 +324,9 @@ function ApprovalCard({
       )}
     >
       <div className="flex items-center gap-1.5">
-        <StatusDot color={meta.color} size={7} />
-        <span className="text-xs font-semibold" style={{ color: meta.color }}>
-          {meta.name}
+        <StatusDot color={color} size={7} />
+        <span className="text-xs font-semibold" style={{ color }}>
+          {name}
         </span>
       </div>
       <p className="mt-1.5 text-xs leading-relaxed text-text/85">{approval.action}</p>
