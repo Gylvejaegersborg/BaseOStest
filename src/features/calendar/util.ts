@@ -26,6 +26,17 @@ export function hhmm(h: number): string {
   return `${String(hr).padStart(2, '0')}:${String(mn).padStart(2, '0')}`
 }
 
+/** Parse an "HH:MM" string (as produced by <input type="time">) into a
+ *  fractional hour (14:30 → 14.5, 14:37 → 14.616…). Returns null if invalid. */
+export function parseHM(v: string): number | null {
+  const m = /^(\d{1,2}):(\d{2})$/.exec(v.trim())
+  if (!m) return null
+  const hr = Number(m[1])
+  const mn = Number(m[2])
+  if (hr > 23 || mn > 59) return null
+  return hr + mn / 60
+}
+
 export function apptStartMs(a: Appt): number {
   return atHour(offsetDate(a.dayOffset), a.start).getTime()
 }

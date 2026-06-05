@@ -11,7 +11,7 @@ import {
 import { Panel } from '@/components/ui/Panel'
 import { Modal } from '@/components/ui/Modal'
 import { cn } from '@/lib/cn'
-import { offsetDate, hhmm } from './util'
+import { offsetDate, hhmm, parseHM } from './util'
 import { format } from 'date-fns'
 
 const STATUS_LABEL: Record<TaskStatus, string> = { todo: 'To do', doing: 'Doing', done: 'Done' }
@@ -193,12 +193,10 @@ export function TaskModal({
         <div>
           <label className="label mb-1 block">Time</label>
           <input
-            type="number"
-            step="0.5"
-            value={draft.dueTime ?? ''}
-            placeholder="—"
-            onChange={(e) => set({ dueTime: e.target.value === '' ? undefined : Number(e.target.value) })}
-            className="w-full border border-line bg-bg/60 px-2 py-1.5 text-sm text-text focus:border-accent/60 focus:outline-none"
+            type="time"
+            value={draft.dueTime != null ? hhmm(draft.dueTime) : ''}
+            onChange={(e) => set({ dueTime: e.target.value === '' ? undefined : (parseHM(e.target.value) ?? undefined) })}
+            className="w-full border border-line bg-bg/60 px-2 py-1.5 text-sm text-text focus:border-accent/60 focus:outline-none [color-scheme:dark]"
           />
         </div>
         <div>

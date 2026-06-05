@@ -7,6 +7,7 @@ import type { Body } from '@/features/constellation/layout'
 import { sectionById } from '@/data/sections'
 import { projectById, STATUS_META } from '@/data/projects'
 import { StatusDot } from '@/components/ui/StatusDot'
+import { HomeAgenda } from '@/features/calendar/HomeAgenda'
 
 export function Home() {
   const navigate = useNavigate()
@@ -43,6 +44,9 @@ export function Home() {
       </div>
 
       <Constellation activeKey={activeKey} onHover={setHover} onSelect={onSelect} />
+
+      {/* Up Next agenda — appointments + timed tasks, shared with the Calendar */}
+      <HomeAgenda />
 
       {/* Hint (desktop only — touch users get the tap-to-select panel) */}
       <div className="pointer-events-none absolute bottom-6 left-6 z-10 hidden items-center gap-2 text-[11px] text-dim lg:flex">

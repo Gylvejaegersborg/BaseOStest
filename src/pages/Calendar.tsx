@@ -14,7 +14,9 @@ import { Panel } from '@/components/ui/Panel'
 import { Modal } from '@/components/ui/Modal'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { cn } from '@/lib/cn'
-import { TODAY, apptDate, apptStartMs, hhmm } from '@/features/calendar/util'
+import { TODAY, apptDate, hhmm, parseHM } from '@/features/calendar/util'
+import { APPTS_KEY, TASKS_KEY, buildAgenda, loadJSON, type AgendaItem } from '@/features/calendar/agenda'
+import { AgendaList } from '@/features/calendar/AgendaList'
 import { MonthView } from '@/features/calendar/MonthView'
 import { DayDetailModal } from '@/features/calendar/DayDetailModal'
 import { CronDetailModal } from '@/features/calendar/CronDetailModal'
@@ -26,18 +28,6 @@ import { useReminders } from '@/features/calendar/useReminders'
 const DAY_START = 7
 const DAY_END = 22
 const HOUR_PX = 46
-
-const APPTS_KEY = 'os:calendar:appts'
-const TASKS_KEY = 'os:calendar:tasks'
-
-function loadJSON<T>(key: string, fallback: T): T {
-  try {
-    const raw = localStorage.getItem(key)
-    return raw ? (JSON.parse(raw) as T) : fallback
-  } catch {
-    return fallback
-  }
-}
 
 export function Calendar() {
   const [appts, setAppts] = useState<Appt[]>(() => loadJSON(APPTS_KEY, APPOINTMENTS))
@@ -58,15 +48,12 @@ export function Calendar() {
   const days = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)), [weekStart])
   const month = useMemo(() => addMonths(TODAY, monthOffset), [monthOffset])
 
-  const upNext = useMemo(() => {
-    const now = Date.now()
-    return appts
-      .map((a) => ({ a, t: apptStartMs(a) }))
-      .filter((x) => x.t >= now)
-      .sort((x, y) => x.t - y.t)
-      .slice(0, 3)
-      .map((x) => x.a)
-  }, [appts])
+  const upNext = useMemo(() => buildAgenda(appts, tasks, 4), [appts, tasks])
+
+  const openAgendaItem = (item: AgendaItem) => {
+    if (item.source === 'appt') setEditing(item.raw as Appt)
+    else setEditingTask(item.raw as Task)
+  }
 
   // ─── Persistence helpers ───────────────────────────────────────────────────
   const saveAppt = (updated: Appt) => {
@@ -212,29 +199,8 @@ export function Calendar() {
           onTest={reminders.testNudge}
         />
 
-        <Panel title="Up Next" code="TOP 3" accent="#f0a020" bodyClassName="p-2">
-          <div className="space-y-2">
-            {upNext.length ? (
-              upNext.map((a) => (
-                <button
-                  key={a.id}
-                  onClick={() => setEditing(a)}
-                  className="flex w-full items-center gap-2 border-l-2 bg-bg/40 px-2 py-2 text-left hover:bg-panel-2/60"
-                  style={{ borderColor: KIND_COLOR[a.kind] }}
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-xs text-text">{a.title}</div>
-                    <div className="text-[10px] text-dim">
-                      {format(apptDate(a), 'EEE')} · {hhmm(a.start)}–{hhmm(a.end)}
-                    </div>
-                  </div>
-                  <StatusDot color={KIND_COLOR[a.kind]} size={6} />
-                </button>
-              ))
-            ) : (
-              <div className="px-2 py-3 text-xs text-dim">Nothing upcoming this view.</div>
-            )}
-          </div>
+        <Panel title="Up Next" code="AGENDA" accent="#f0a020" bodyClassName="p-2">
+          <AgendaList items={upNext} onSelect={openAgendaItem} emptyText="Nothing upcoming." />
         </Panel>
 
         <TaskPanel tasks={tasks} onToggle={toggleTask} onEdit={setEditingTask} onAdd={addTask} />
@@ -385,27 +351,34 @@ function EditModal({ appt, onClose, onSave }: { appt: Appt | null; onClose: () =
         className="mb-3 w-full border border-line bg-bg/60 px-2 py-1.5 text-sm text-text focus:border-accent/60 focus:outline-none"
       />
 
-      <div className="mb-3 grid grid-cols-4 gap-2">
+      <div className="mb-3 grid grid-cols-2 gap-2">
         <div>
           <label className="label mb-1 block">Start</label>
           <input
-            type="number"
-            step="0.5"
-            value={draft.start}
-            onChange={(e) => setDraft({ ...draft, start: Number(e.target.value) })}
-            className="w-full border border-line bg-bg/60 px-2 py-1.5 text-sm text-text focus:border-accent/60 focus:outline-none"
+            type="time"
+            value={hhmm(draft.start)}
+            onChange={(e) => {
+              const h = parseHM(e.target.value)
+              if (h != null) setDraft({ ...draft, start: h })
+            }}
+            className="w-full border border-line bg-bg/60 px-2 py-1.5 text-sm text-text focus:border-accent/60 focus:outline-none [color-scheme:dark]"
           />
         </div>
         <div>
           <label className="label mb-1 block">End</label>
           <input
-            type="number"
-            step="0.5"
-            value={draft.end}
-            onChange={(e) => setDraft({ ...draft, end: Number(e.target.value) })}
-            className="w-full border border-line bg-bg/60 px-2 py-1.5 text-sm text-text focus:border-accent/60 focus:outline-none"
+            type="time"
+            value={hhmm(draft.end)}
+            onChange={(e) => {
+              const h = parseHM(e.target.value)
+              if (h != null) setDraft({ ...draft, end: h })
+            }}
+            className="w-full border border-line bg-bg/60 px-2 py-1.5 text-sm text-text focus:border-accent/60 focus:outline-none [color-scheme:dark]"
           />
         </div>
+      </div>
+
+      <div className="mb-3 grid grid-cols-2 gap-2">
         <div>
           <label className="label mb-1 block">Kind</label>
           <select
@@ -429,7 +402,7 @@ function EditModal({ appt, onClose, onSave }: { appt: Appt | null; onClose: () =
           >
             {[5, 10, 15, 30, 60].map((m) => (
               <option key={m} value={m}>
-                {m}m
+                {m}m before
               </option>
             ))}
           </select>
