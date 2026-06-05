@@ -2,15 +2,17 @@ import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CalendarDays } from 'lucide-react'
 import { AgendaList } from './AgendaList'
-import { buildAgenda, loadAppts, loadTasks } from './agenda'
+import { buildAgenda } from './agenda'
+import { useCalendar } from './CalendarContext'
 
 /**
- * Compact "Up Next" readout for the Home constellation — same agenda data as
- * the Calendar's Up Next panel (appointments + timed tasks), read from storage.
+ * Compact "Up Next" readout for the Home constellation — same live agenda data
+ * as the Calendar's Up Next panel (appointments + timed tasks).
  */
 export function HomeAgenda() {
   const navigate = useNavigate()
-  const items = useMemo(() => buildAgenda(loadAppts(), loadTasks(), 4), [])
+  const { appts, tasks } = useCalendar()
+  const items = useMemo(() => buildAgenda(appts, tasks, 4), [appts, tasks])
 
   return (
     <div className="absolute right-4 top-4 z-10 hidden w-[260px] sm:block">

@@ -1,37 +1,30 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { addDays, addMonths, format, isSameDay, startOfWeek } from 'date-fns'
 import { Bell, BellOff, ChevronLeft, ChevronRight, Clock, MapPin } from 'lucide-react'
-import {
-  APPOINTMENTS,
-  CRON_JOBS,
-  KIND_COLOR,
-  TASKS,
-  type Appt,
-  type CronJob,
-  type Task,
-} from '@/data/calendar'
+import { CRON_JOBS, KIND_COLOR, type Appt, type CronJob, type Task } from '@/data/calendar'
 import { Panel } from '@/components/ui/Panel'
 import { Modal } from '@/components/ui/Modal'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { cn } from '@/lib/cn'
 import { TODAY, apptDate, hhmm, parseHM } from '@/features/calendar/util'
-import { APPTS_KEY, TASKS_KEY, buildAgenda, loadJSON, type AgendaItem } from '@/features/calendar/agenda'
+import { buildAgenda, type AgendaItem } from '@/features/calendar/agenda'
 import { AgendaList } from '@/features/calendar/AgendaList'
 import { MonthView } from '@/features/calendar/MonthView'
 import { DayDetailModal } from '@/features/calendar/DayDetailModal'
 import { CronDetailModal } from '@/features/calendar/CronDetailModal'
 import { TaskPanel, TaskModal } from '@/features/calendar/TaskPanel'
 import { RemindersPanel } from '@/features/calendar/RemindersPanel'
-import { NudgeStack } from '@/features/calendar/NudgeStack'
-import { useReminders } from '@/features/calendar/useReminders'
+import { useCalendar } from '@/features/calendar/CalendarContext'
 
 const DAY_START = 7
 const DAY_END = 22
 const HOUR_PX = 46
 
 export function Calendar() {
-  const [appts, setAppts] = useState<Appt[]>(() => loadJSON(APPTS_KEY, APPOINTMENTS))
-  const [tasks, setTasks] = useState<Task[]>(() => loadJSON(TASKS_KEY, TASKS))
+  // Calendar data + reminder engine live in the app-wide CalendarProvider so
+  // reminders keep firing regardless of which page is open.
+  const { appts, tasks, saveAppt, toggleTask, saveTask, deleteTask, reminders } = useCalendar()
+
   const [view, setView] = useState<'week' | 'month'>('week')
   const [weekOffset, setWeekOffset] = useState(0)
   const [monthOffset, setMonthOffset] = useState(0)
@@ -55,49 +48,17 @@ export function Calendar() {
     else setEditingTask(item.raw as Task)
   }
 
-  // ─── Persistence helpers ───────────────────────────────────────────────────
-  const saveAppt = (updated: Appt) => {
-    setAppts((list) => {
-      const next = list.map((a) => (a.id === updated.id ? updated : a))
-      localStorage.setItem(APPTS_KEY, JSON.stringify(next))
-      return next
-    })
+  // Wrap the context mutators so the editor modals close on save/delete.
+  const handleSaveAppt = (a: Appt) => {
+    saveAppt(a)
     setEditing(null)
   }
-
-  const persistTasks = useCallback((next: Task[]) => {
-    localStorage.setItem(TASKS_KEY, JSON.stringify(next))
-    return next
-  }, [])
-
-  const toggleTask = useCallback(
-    (task: Task) => {
-      setTasks((list) =>
-        persistTasks(
-          list.map((t) => (t.id === task.id ? { ...t, status: t.status === 'done' ? 'todo' : 'done' } : t)),
-        ),
-      )
-    },
-    [persistTasks],
-  )
-
-  const completeTask = useCallback(
-    (id: string) => {
-      setTasks((list) => persistTasks(list.map((t) => (t.id === id ? { ...t, status: 'done' } : t))))
-    },
-    [persistTasks],
-  )
-
-  const saveTask = (updated: Task) => {
-    setTasks((list) => {
-      const exists = list.some((t) => t.id === updated.id)
-      return persistTasks(exists ? list.map((t) => (t.id === updated.id ? updated : t)) : [...list, updated])
-    })
+  const handleSaveTask = (t: Task) => {
+    saveTask(t)
     setEditingTask(null)
   }
-
-  const deleteTask = (id: string) => {
-    setTasks((list) => persistTasks(list.filter((t) => t.id !== id)))
+  const handleDeleteTask = (id: string) => {
+    deleteTask(id)
     setEditingTask(null)
   }
 
@@ -110,9 +71,6 @@ export function Calendar() {
       dayOffset: 0,
       reminderMinutes: 15,
     })
-
-  // ─── Reminders engine ───────────────────────────────────────────────────────
-  const reminders = useReminders(appts, tasks, { onCompleteTask: completeTask })
 
   return (
     <div className="flex h-full flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
@@ -231,8 +189,8 @@ export function Calendar() {
         </Panel>
       </aside>
 
-      <EditModal appt={editing} onClose={() => setEditing(null)} onSave={saveAppt} />
-      <TaskModal task={editingTask} onClose={() => setEditingTask(null)} onSave={saveTask} onDelete={deleteTask} />
+      <EditModal appt={editing} onClose={() => setEditing(null)} onSave={handleSaveAppt} />
+      <TaskModal task={editingTask} onClose={() => setEditingTask(null)} onSave={handleSaveTask} onDelete={handleDeleteTask} />
       <CronDetailModal job={cronJob} onClose={() => setCronJob(null)} />
       <DayDetailModal
         day={dayDetail}
@@ -251,13 +209,6 @@ export function Calendar() {
           setView('week')
           setDayDetail(null)
         }}
-      />
-
-      <NudgeStack
-        nudges={reminders.nudges}
-        onDismiss={reminders.dismiss}
-        onSnooze={reminders.snooze}
-        onComplete={reminders.complete}
       />
     </div>
   )
