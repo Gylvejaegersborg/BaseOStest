@@ -11,8 +11,11 @@ import { useCalendar } from './CalendarContext'
  */
 export function HomeAgenda() {
   const navigate = useNavigate()
-  const { appts, tasks } = useCalendar()
-  const items = useMemo(() => buildAgenda(appts, tasks, 4), [appts, tasks])
+  const { appts, tasks, reminders, crons } = useCalendar()
+  const items = useMemo(
+    () => buildAgenda({ appts, tasks, reminders, crons }, 5),
+    [appts, tasks, reminders, crons],
+  )
 
   return (
     <div className="absolute right-4 top-4 z-10 hidden w-[260px] sm:block">

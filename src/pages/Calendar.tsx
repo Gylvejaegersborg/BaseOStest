@@ -1,17 +1,20 @@
 import { useMemo, useState } from 'react'
 import { addDays, addMonths, format, isSameDay, startOfWeek } from 'date-fns'
 import { Bell, BellOff, ChevronLeft, ChevronRight, Clock, MapPin } from 'lucide-react'
-import { CRON_JOBS, KIND_COLOR, type Appt, type CronJob, type Task } from '@/data/calendar'
+import { KIND_COLOR, REMINDER_COLOR, type Appt, type CronJob, type Reminder, type Task } from '@/data/calendar'
 import { Panel } from '@/components/ui/Panel'
 import { Modal } from '@/components/ui/Modal'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { cn } from '@/lib/cn'
-import { TODAY, apptDate, hhmm, parseHM } from '@/features/calendar/util'
+import { TODAY, apptDate, dayOffsetOf, hhmm, offsetDate, parseHM } from '@/features/calendar/util'
 import { buildAgenda, type AgendaItem } from '@/features/calendar/agenda'
+import { cronScheduleLabel } from '@/features/calendar/cron'
 import { AgendaList } from '@/features/calendar/AgendaList'
 import { MonthView } from '@/features/calendar/MonthView'
 import { DayDetailModal } from '@/features/calendar/DayDetailModal'
 import { CronDetailModal } from '@/features/calendar/CronDetailModal'
+import { CronEditModal } from '@/features/calendar/CronEditModal'
+import { ReminderModal } from '@/features/calendar/ReminderModal'
 import { TaskPanel, TaskModal } from '@/features/calendar/TaskPanel'
 import { RemindersPanel } from '@/features/calendar/RemindersPanel'
 import { useCalendar } from '@/features/calendar/CalendarContext'
@@ -23,7 +26,20 @@ const HOUR_PX = 46
 export function Calendar() {
   // Calendar data + reminder engine live in the app-wide CalendarProvider so
   // reminders keep firing regardless of which page is open.
-  const { appts, tasks, saveAppt, toggleTask, saveTask, deleteTask, reminders } = useCalendar()
+  const {
+    appts,
+    tasks,
+    reminders,
+    crons,
+    saveAppt,
+    toggleTask,
+    saveTask,
+    deleteTask,
+    saveReminder,
+    deleteReminder,
+    saveCron,
+    remindersEngine,
+  } = useCalendar()
 
   const [view, setView] = useState<'week' | 'month'>('week')
   const [weekOffset, setWeekOffset] = useState(0)
@@ -31,7 +47,9 @@ export function Calendar() {
 
   const [editing, setEditing] = useState<Appt | null>(null)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
+  const [editingReminder, setEditingReminder] = useState<Reminder | null>(null)
   const [cronJob, setCronJob] = useState<CronJob | null>(null)
+  const [editingCron, setEditingCron] = useState<CronJob | null>(null)
   const [dayDetail, setDayDetail] = useState<Date | null>(null)
 
   const weekStart = useMemo(
@@ -41,11 +59,16 @@ export function Calendar() {
   const days = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)), [weekStart])
   const month = useMemo(() => addMonths(TODAY, monthOffset), [monthOffset])
 
-  const upNext = useMemo(() => buildAgenda(appts, tasks, 4), [appts, tasks])
+  const upNext = useMemo(
+    () => buildAgenda({ appts, tasks, reminders, crons }, 6),
+    [appts, tasks, reminders, crons],
+  )
 
   const openAgendaItem = (item: AgendaItem) => {
     if (item.source === 'appt') setEditing(item.raw as Appt)
-    else setEditingTask(item.raw as Task)
+    else if (item.source === 'task') setEditingTask(item.raw as Task)
+    else if (item.source === 'reminder') setEditingReminder(item.raw as Reminder)
+    else setCronJob(item.raw as CronJob)
   }
 
   // Wrap the context mutators so the editor modals close on save/delete.
@@ -61,6 +84,18 @@ export function Calendar() {
     deleteTask(id)
     setEditingTask(null)
   }
+  const handleSaveReminder = (r: Reminder) => {
+    saveReminder(r)
+    setEditingReminder(null)
+  }
+  const handleDeleteReminder = (id: string) => {
+    deleteReminder(id)
+    setEditingReminder(null)
+  }
+  const handleSaveCron = (c: CronJob) => {
+    saveCron(c)
+    setEditingCron(null)
+  }
 
   const addTask = () =>
     setEditingTask({
@@ -71,6 +106,14 @@ export function Calendar() {
       dayOffset: 0,
       reminderMinutes: 15,
     })
+
+  // Quick-add a reminder from the panel (no modal — straight to the list).
+  const addReminderQuick = (title: string, dayOffset: number, time: number) =>
+    saveReminder({ id: `r-${Date.now()}`, title, dayOffset, time })
+
+  // Double-click empty grid space → new reminder prefilled to that day + time.
+  const createReminderAt = (dayOffset: number, time: number) =>
+    setEditingReminder({ id: `new-${Date.now()}`, title: '', dayOffset, time })
 
   return (
     <div className="flex h-full flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
@@ -103,11 +146,14 @@ export function Calendar() {
             </div>
             {/* Reminder bell */}
             <button
-              onClick={reminders.toggleEnabled}
-              title={reminders.enabled ? 'Mute reminders' : 'Enable reminders'}
-              className={cn('border border-line p-1.5', reminders.enabled ? 'text-accent' : 'text-dim hover:text-text')}
+              onClick={remindersEngine.toggleEnabled}
+              title={remindersEngine.enabled ? 'Mute reminders' : 'Enable reminders'}
+              className={cn(
+                'border border-line p-1.5',
+                remindersEngine.enabled ? 'text-accent' : 'text-dim hover:text-text',
+              )}
             >
-              {reminders.enabled ? <Bell size={14} /> : <BellOff size={14} />}
+              {remindersEngine.enabled ? <Bell size={14} /> : <BellOff size={14} />}
             </button>
             {/* Period nav */}
             <div className="flex items-center gap-1">
@@ -134,7 +180,14 @@ export function Calendar() {
         </div>
 
         {view === 'week' ? (
-          <WeekGrid days={days} appts={appts} onSelectAppt={setEditing} />
+          <WeekGrid
+            days={days}
+            appts={appts}
+            reminders={reminders}
+            onSelectAppt={setEditing}
+            onSelectReminder={setEditingReminder}
+            onCreateAt={createReminderAt}
+          />
         ) : (
           <MonthView
             month={month}
@@ -149,12 +202,13 @@ export function Calendar() {
       {/* Side panels */}
       <aside className="flex w-full shrink-0 flex-col gap-3 overflow-y-auto border-t border-line bg-panel/30 p-3 lg:w-[320px] lg:border-l lg:border-t-0">
         <RemindersPanel
-          enabled={reminders.enabled}
-          permission={reminders.permission}
-          scheduled={reminders.scheduled}
-          onToggle={reminders.toggleEnabled}
-          onEnableNotifications={reminders.enableNotifications}
-          onTest={reminders.testNudge}
+          enabled={remindersEngine.enabled}
+          permission={remindersEngine.permission}
+          scheduled={remindersEngine.scheduled}
+          onToggle={remindersEngine.toggleEnabled}
+          onEnableNotifications={remindersEngine.enableNotifications}
+          onTest={remindersEngine.testNudge}
+          onAddReminder={addReminderQuick}
         />
 
         <Panel title="Up Next" code="AGENDA" accent="#f0a020" bodyClassName="p-2">
@@ -165,7 +219,7 @@ export function Calendar() {
 
         <Panel title="AI Cron Jobs" code="AGT" accent="#36e0c8" bodyClassName="p-2">
           <div className="space-y-1.5">
-            {CRON_JOBS.map((c) => (
+            {crons.map((c) => (
               <button
                 key={c.id}
                 onClick={() => setCronJob(c)}
@@ -179,7 +233,7 @@ export function Calendar() {
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-xs text-text">{c.name}</div>
                   <div className="text-[10px] text-dim">
-                    {c.owner} · {c.schedule}
+                    {c.owner} · {cronScheduleLabel(c.schedule)}
                   </div>
                 </div>
                 <span className="text-[9px] text-dim">{c.lastRun}</span>
@@ -191,15 +245,34 @@ export function Calendar() {
 
       <EditModal appt={editing} onClose={() => setEditing(null)} onSave={handleSaveAppt} />
       <TaskModal task={editingTask} onClose={() => setEditingTask(null)} onSave={handleSaveTask} onDelete={handleDeleteTask} />
-      <CronDetailModal job={cronJob} onClose={() => setCronJob(null)} />
+      <ReminderModal
+        reminder={editingReminder}
+        onClose={() => setEditingReminder(null)}
+        onSave={handleSaveReminder}
+        onDelete={handleDeleteReminder}
+      />
+      <CronDetailModal
+        job={cronJob}
+        onClose={() => setCronJob(null)}
+        onEdit={(c) => {
+          setCronJob(null)
+          setEditingCron(c)
+        }}
+      />
+      <CronEditModal job={editingCron} onClose={() => setEditingCron(null)} onSave={handleSaveCron} />
       <DayDetailModal
         day={dayDetail}
         appts={appts}
         tasks={tasks}
+        reminders={reminders}
         onClose={() => setDayDetail(null)}
         onSelectAppt={(a) => {
           setDayDetail(null)
           setEditing(a)
+        }}
+        onSelectReminder={(r) => {
+          setDayDetail(null)
+          setEditingReminder(r)
         }}
         onToggleTask={toggleTask}
         onOpenWeek={(d) => {
@@ -217,12 +290,28 @@ export function Calendar() {
 function WeekGrid({
   days,
   appts,
+  reminders,
   onSelectAppt,
+  onSelectReminder,
+  onCreateAt,
 }: {
   days: Date[]
   appts: Appt[]
+  reminders: Reminder[]
   onSelectAppt: (a: Appt) => void
+  onSelectReminder: (r: Reminder) => void
+  onCreateAt: (dayOffset: number, hour: number) => void
 }) {
+  // Translate a vertical click position in a day column into a fractional hour,
+  // snapped to the nearest 15 minutes.
+  const hourFromClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const y = e.clientY - rect.top
+    const raw = DAY_START + y / HOUR_PX
+    const snapped = Math.round(raw * 4) / 4
+    return Math.min(DAY_END - 0.25, Math.max(DAY_START, snapped))
+  }
+
   return (
     <div className="min-h-0 flex-1 overflow-auto">
       <div className="min-w-[720px] lg:min-w-0">
@@ -251,16 +340,25 @@ function WeekGrid({
               </div>
             ))}
           </div>
-          {/* day columns */}
+          {/* day columns — double-click empty space to add a reminder at that time */}
           {days.map((d) => {
             const dayAppts = appts.filter((a) => isSameDay(apptDate(a), d))
+            const dayReminders = reminders.filter((r) => !r.done && isSameDay(offsetDate(r.dayOffset), d))
             return (
-              <div key={d.toISOString()} className="relative flex-1 border-l border-line/60">
+              <div
+                key={d.toISOString()}
+                className="relative flex-1 cursor-cell border-l border-line/60"
+                onDoubleClick={(e) => onCreateAt(dayOffsetOf(d), hourFromClick(e))}
+                title="Double-click to add a reminder"
+              >
                 {Array.from({ length: DAY_END - DAY_START }, (_, i) => (
                   <div key={i} className="border-t border-line/40" style={{ height: HOUR_PX }} />
                 ))}
                 {dayAppts.map((a) => (
                   <ApptBlock key={a.id} appt={a} onClick={() => onSelectAppt(a)} />
+                ))}
+                {dayReminders.map((r) => (
+                  <ReminderMarker key={r.id} reminder={r} onClick={() => onSelectReminder(r)} />
                 ))}
               </div>
             )
@@ -271,6 +369,27 @@ function WeekGrid({
   )
 }
 
+function ReminderMarker({ reminder, onClick }: { reminder: Reminder; onClick: () => void }) {
+  const top = (reminder.time - DAY_START) * HOUR_PX
+  return (
+    <button
+      onClick={onClick}
+      onDoubleClick={(e) => e.stopPropagation()}
+      title={`${reminder.title} · ${hhmm(reminder.time)}`}
+      className="absolute right-0.5 z-10 flex items-center gap-1 border px-1 py-0.5 text-[9px] leading-none hover:brightness-125"
+      style={{
+        top: top - 7,
+        color: REMINDER_COLOR,
+        borderColor: `${REMINDER_COLOR}66`,
+        backgroundColor: '#11141b',
+      }}
+    >
+      <Bell size={9} />
+      <span className="max-w-[80px] truncate">{reminder.title}</span>
+    </button>
+  )
+}
+
 function ApptBlock({ appt, onClick }: { appt: Appt; onClick: () => void }) {
   const top = (appt.start - DAY_START) * HOUR_PX
   const height = Math.max(22, (appt.end - appt.start) * HOUR_PX - 2)
@@ -278,6 +397,7 @@ function ApptBlock({ appt, onClick }: { appt: Appt; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
+      onDoubleClick={(e) => e.stopPropagation()}
       className="absolute left-0.5 right-0.5 overflow-hidden border-l-2 px-1.5 py-1 text-left transition-all hover:z-10 hover:brightness-125"
       style={{ top, height, backgroundColor: `${color}22`, borderColor: color }}
     >

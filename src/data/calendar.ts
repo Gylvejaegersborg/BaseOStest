@@ -108,15 +108,19 @@ export interface CronRun {
   duration: string
 }
 
+export type CronSchedule =
+  | { type: 'daily'; hour: number } // hour as fractional 24h (8.5 = 08:30)
+  | { type: 'everyHours'; n: number }
+  | { type: 'everyMinutes'; n: number }
+
 export interface CronJob {
   id: string
   name: string
   owner: 'Claude' | 'Hemera' | 'Nyx'
-  schedule: string
+  schedule: CronSchedule
   lastRun: string
   status: 'ok' | 'running' | 'warn'
   description?: string
-  nextRun?: string
   avgRuntime?: string
   successRate?: number // 0–100
   recentRuns?: CronRun[]
@@ -128,11 +132,10 @@ export const CRON_JOBS: CronJob[] = [
     id: 'c1',
     name: 'Daily content plan',
     owner: 'Hemera',
-    schedule: '08:00 daily',
+    schedule: { type: 'daily', hour: 8 },
     lastRun: 'today 08:00',
     status: 'ok',
     description: 'Drafts the day’s posting plan across YouTube, TikTok and IG from the release calendar and engagement data.',
-    nextRun: 'tomorrow 08:00',
     avgRuntime: '42s',
     successRate: 98,
     recentRuns: [
@@ -146,11 +149,10 @@ export const CRON_JOBS: CronJob[] = [
     id: 'c2',
     name: 'Upload queue flush',
     owner: 'Nyx',
-    schedule: 'every 2h',
+    schedule: { type: 'everyHours', n: 2 },
     lastRun: '14m ago',
     status: 'running',
     description: 'Pushes rendered exports from the vault to the distributor and verifies checksums + metadata.',
-    nextRun: 'in 1h 46m',
     avgRuntime: '3m12s',
     successRate: 91,
     recentRuns: [
@@ -164,11 +166,10 @@ export const CRON_JOBS: CronJob[] = [
     id: 'c3',
     name: 'Vault backup',
     owner: 'Claude',
-    schedule: '03:00 daily',
+    schedule: { type: 'daily', hour: 3 },
     lastRun: 'today 03:00',
     status: 'ok',
     description: 'Encrypted snapshot of the project vault to cold storage with rolling 30-day retention.',
-    nextRun: 'tomorrow 03:00',
     avgRuntime: '6m40s',
     successRate: 100,
     recentRuns: [
@@ -182,11 +183,10 @@ export const CRON_JOBS: CronJob[] = [
     id: 'c4',
     name: 'Beat import scan',
     owner: 'Claude',
-    schedule: 'every 6h',
+    schedule: { type: 'everyHours', n: 6 },
     lastRun: '3h ago',
     status: 'ok',
     description: 'Scans the inbox for new stems/loops, tags BPM + key, and files them into the Beat DB.',
-    nextRun: 'in 3h',
     avgRuntime: '54s',
     successRate: 96,
     recentRuns: [
@@ -200,11 +200,10 @@ export const CRON_JOBS: CronJob[] = [
     id: 'c5',
     name: 'Engagement digest',
     owner: 'Hemera',
-    schedule: '20:00 daily',
+    schedule: { type: 'daily', hour: 20 },
     lastRun: 'yesterday 20:00',
     status: 'warn',
     description: 'Summarises comments, DMs and stats across platforms; flags anything that needs a human reply.',
-    nextRun: 'today 20:00',
     avgRuntime: '1m30s',
     successRate: 84,
     recentRuns: [
@@ -218,11 +217,10 @@ export const CRON_JOBS: CronJob[] = [
     id: 'c6',
     name: 'Sub-agent health check',
     owner: 'Nyx',
-    schedule: 'every 15m',
+    schedule: { type: 'everyMinutes', n: 15 },
     lastRun: '6m ago',
     status: 'ok',
     description: 'Pings every running sub-agent, restarts stalled workers and reports latency to Ops.',
-    nextRun: 'in 9m',
     avgRuntime: '8s',
     successRate: 99,
     recentRuns: [
@@ -232,4 +230,22 @@ export const CRON_JOBS: CronJob[] = [
     ],
     outputs: ['4/4 agents healthy', 'Avg latency 120ms', '0 restarts'],
   },
+]
+
+// ─── Standalone reminders ─────────────────────────────────────────────────────
+// Lightweight "ping me at this time" entries, separate from appointments/tasks.
+
+export const REMINDER_COLOR = '#9b7bff'
+
+export interface Reminder {
+  id: string
+  title: string
+  dayOffset: number
+  time: number // fractional 24h hour — the moment to ping
+  done?: boolean
+}
+
+export const REMINDERS: Reminder[] = [
+  { id: 'r1', title: 'Stand up & stretch', dayOffset: 0, time: 15 },
+  { id: 'r2', title: 'Wind down — screens off', dayOffset: 0, time: 22 },
 ]
