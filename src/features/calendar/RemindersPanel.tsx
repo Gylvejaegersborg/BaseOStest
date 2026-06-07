@@ -4,6 +4,7 @@ import { Bell, BellOff, BellRing, Plus, Send } from 'lucide-react'
 import { Panel } from '@/components/ui/Panel'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { hhmm, parseHM } from './util'
+import { DateField } from './DateField'
 import type { NotifyPermission } from './notifications'
 import type { ScheduledReminder } from './useReminders'
 
@@ -15,6 +16,7 @@ interface RemindersPanelProps {
   onEnableNotifications: () => void
   onTest: () => void
   onAddReminder: (title: string, dayOffset: number, time: number) => void
+  onSelect: (item: ScheduledReminder) => void
 }
 
 function nextHour(): number {
@@ -29,6 +31,7 @@ export function RemindersPanel({
   onEnableNotifications,
   onTest,
   onAddReminder,
+  onSelect,
 }: RemindersPanelProps) {
   const [adding, setAdding] = useState(false)
   const [title, setTitle] = useState('')
@@ -98,16 +101,7 @@ export function RemindersPanel({
             className="w-full border border-line bg-bg/60 px-2 py-1 text-xs text-text focus:border-accent/60 focus:outline-none"
           />
           <div className="flex items-center gap-1.5">
-            <select
-              value={day}
-              onChange={(e) => setDay(Number(e.target.value))}
-              className="flex-1 border border-line bg-bg/60 px-1.5 py-1 text-xs text-text focus:border-accent/60 focus:outline-none"
-            >
-              <option value={0}>Today</option>
-              <option value={1}>Tomorrow</option>
-              <option value={2}>In 2 days</option>
-              <option value={7}>In a week</option>
-            </select>
+            <DateField value={day} onChange={(d) => setDay(d ?? 0)} className="flex-1 px-1.5 py-1 text-xs" />
             <input
               type="time"
               value={hhmm(time)}
@@ -143,17 +137,23 @@ export function RemindersPanel({
         </button>
       )}
 
-      {/* Next scheduled pings */}
+      {/* Next scheduled pings — click to edit */}
       {scheduled.length ? (
         <div className="space-y-1">
           {scheduled.map((r) => (
-            <div key={`${r.source}:${r.refId}`} className="flex items-center gap-2 px-1 py-1">
+            <button
+              key={`${r.source}:${r.refId}`}
+              onClick={() => onSelect(r)}
+              className="flex w-full items-center gap-2 px-1 py-1 text-left hover:bg-panel-2/60"
+            >
               <StatusDot color={r.color} size={5} />
               <div className="min-w-0 flex-1">
                 <div className="truncate text-[11px] text-text">{r.title}</div>
-                <div className="text-[9px] text-dim">{format(r.startAt, 'EEE HH:mm')}</div>
+                <div className="text-[9px] text-dim">
+                  {format(r.startAt, 'EEE dd MMM · HH:mm')} · {r.source}
+                </div>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       ) : (

@@ -1,7 +1,15 @@
 import { useMemo, useState } from 'react'
 import { addDays, addMonths, format, isSameDay, startOfWeek } from 'date-fns'
-import { Bell, BellOff, ChevronLeft, ChevronRight, Clock, MapPin } from 'lucide-react'
-import { KIND_COLOR, REMINDER_COLOR, type Appt, type CronJob, type Reminder, type Task } from '@/data/calendar'
+import { Bell, BellOff, CheckSquare, ChevronLeft, ChevronRight, Clock, MapPin } from 'lucide-react'
+import {
+  KIND_COLOR,
+  PRIORITY_COLOR,
+  REMINDER_COLOR,
+  type Appt,
+  type CronJob,
+  type Reminder,
+  type Task,
+} from '@/data/calendar'
 import { Panel } from '@/components/ui/Panel'
 import { Modal } from '@/components/ui/Modal'
 import { StatusDot } from '@/components/ui/StatusDot'
@@ -10,6 +18,7 @@ import { TODAY, apptDate, dayOffsetOf, hhmm, offsetDate, parseHM } from '@/featu
 import { buildAgenda, type AgendaItem } from '@/features/calendar/agenda'
 import { cronScheduleLabel } from '@/features/calendar/cron'
 import { AgendaList } from '@/features/calendar/AgendaList'
+import { DateField } from '@/features/calendar/DateField'
 import { MonthView } from '@/features/calendar/MonthView'
 import { DayDetailModal } from '@/features/calendar/DayDetailModal'
 import { CronDetailModal } from '@/features/calendar/CronDetailModal'
@@ -69,6 +78,20 @@ export function Calendar() {
     else if (item.source === 'task') setEditingTask(item.raw as Task)
     else if (item.source === 'reminder') setEditingReminder(item.raw as Reminder)
     else setCronJob(item.raw as CronJob)
+  }
+
+  // Resolve a scheduled ping back to its source entity and open its editor.
+  const openScheduled = (source: 'appt' | 'task' | 'reminder', refId: string) => {
+    if (source === 'appt') {
+      const a = appts.find((x) => x.id === refId)
+      if (a) setEditing(a)
+    } else if (source === 'task') {
+      const t = tasks.find((x) => x.id === refId)
+      if (t) setEditingTask(t)
+    } else {
+      const r = reminders.find((x) => x.id === refId)
+      if (r) setEditingReminder(r)
+    }
   }
 
   // Wrap the context mutators so the editor modals close on save/delete.
@@ -183,8 +206,10 @@ export function Calendar() {
           <WeekGrid
             days={days}
             appts={appts}
+            tasks={tasks}
             reminders={reminders}
             onSelectAppt={setEditing}
+            onSelectTask={setEditingTask}
             onSelectReminder={setEditingReminder}
             onCreateAt={createReminderAt}
           />
@@ -209,6 +234,7 @@ export function Calendar() {
           onEnableNotifications={remindersEngine.enableNotifications}
           onTest={remindersEngine.testNudge}
           onAddReminder={addReminderQuick}
+          onSelect={(item) => openScheduled(item.source, item.refId)}
         />
 
         <Panel title="Up Next" code="AGENDA" accent="#f0a020" bodyClassName="p-2">
@@ -290,15 +316,19 @@ export function Calendar() {
 function WeekGrid({
   days,
   appts,
+  tasks,
   reminders,
   onSelectAppt,
+  onSelectTask,
   onSelectReminder,
   onCreateAt,
 }: {
   days: Date[]
   appts: Appt[]
+  tasks: Task[]
   reminders: Reminder[]
   onSelectAppt: (a: Appt) => void
+  onSelectTask: (t: Task) => void
   onSelectReminder: (r: Reminder) => void
   onCreateAt: (dayOffset: number, hour: number) => void
 }) {
@@ -344,6 +374,13 @@ function WeekGrid({
           {days.map((d) => {
             const dayAppts = appts.filter((a) => isSameDay(apptDate(a), d))
             const dayReminders = reminders.filter((r) => !r.done && isSameDay(offsetDate(r.dayOffset), d))
+            const dayTasks = tasks.filter(
+              (t) =>
+                t.status !== 'done' &&
+                t.dayOffset != null &&
+                t.dueTime != null &&
+                isSameDay(offsetDate(t.dayOffset), d),
+            )
             return (
               <div
                 key={d.toISOString()}
@@ -356,6 +393,9 @@ function WeekGrid({
                 ))}
                 {dayAppts.map((a) => (
                   <ApptBlock key={a.id} appt={a} onClick={() => onSelectAppt(a)} />
+                ))}
+                {dayTasks.map((t) => (
+                  <TaskMarker key={t.id} task={t} onClick={() => onSelectTask(t)} />
                 ))}
                 {dayReminders.map((r) => (
                   <ReminderMarker key={r.id} reminder={r} onClick={() => onSelectReminder(r)} />
@@ -390,6 +430,23 @@ function ReminderMarker({ reminder, onClick }: { reminder: Reminder; onClick: ()
   )
 }
 
+function TaskMarker({ task, onClick }: { task: Task; onClick: () => void }) {
+  const color = PRIORITY_COLOR[task.priority]
+  const top = (task.dueTime! - DAY_START) * HOUR_PX
+  return (
+    <button
+      onClick={onClick}
+      onDoubleClick={(e) => e.stopPropagation()}
+      title={`${task.title} · due ${hhmm(task.dueTime!)}`}
+      className="absolute right-0.5 z-10 flex items-center gap-1 border px-1 py-0.5 text-[9px] leading-none hover:brightness-125"
+      style={{ top: top - 7, color, borderColor: `${color}66`, backgroundColor: '#11141b' }}
+    >
+      <CheckSquare size={9} />
+      <span className="max-w-[80px] truncate">{task.title}</span>
+    </button>
+  )
+}
+
 function ApptBlock({ appt, onClick }: { appt: Appt; onClick: () => void }) {
   const top = (appt.start - DAY_START) * HOUR_PX
   const height = Math.max(22, (appt.end - appt.start) * HOUR_PX - 2)
@@ -414,13 +471,16 @@ function EditModal({ appt, onClose, onSave }: { appt: Appt | null; onClose: () =
   const color = KIND_COLOR[draft.kind]
 
   return (
-    <Modal open={!!appt} onClose={onClose} title="Appointment" code={format(apptDate(appt), 'EEE dd MMM')} accent={color} width={460}>
+    <Modal open={!!appt} onClose={onClose} title="Appointment" code={format(apptDate(draft), 'EEE dd MMM')} accent={color} width={460}>
       <label className="label mb-1 block">Title</label>
       <input
         value={draft.title}
         onChange={(e) => setDraft({ ...draft, title: e.target.value })}
         className="mb-3 w-full border border-line bg-bg/60 px-2 py-1.5 text-sm text-text focus:border-accent/60 focus:outline-none"
       />
+
+      <label className="label mb-1 block">Date</label>
+      <DateField value={draft.dayOffset} onChange={(d) => setDraft({ ...draft, dayOffset: d ?? 0 })} className="mb-3 w-full" />
 
       <div className="mb-3 grid grid-cols-2 gap-2">
         <div>

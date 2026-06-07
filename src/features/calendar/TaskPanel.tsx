@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Trash2 } from 'lucide-react'
+import { ChevronDown, ChevronUp, Plus, Trash2 } from 'lucide-react'
 import {
   PRIORITY_COLOR,
   PRIORITY_LABEL,
@@ -12,6 +12,7 @@ import { Panel } from '@/components/ui/Panel'
 import { Modal } from '@/components/ui/Modal'
 import { cn } from '@/lib/cn'
 import { offsetDate, hhmm, parseHM } from './util'
+import { DateField } from './DateField'
 import { format } from 'date-fns'
 
 const STATUS_LABEL: Record<TaskStatus, string> = { todo: 'To do', doing: 'Doing', done: 'Done' }
@@ -24,8 +25,10 @@ interface TaskPanelProps {
 }
 
 export function TaskPanel({ tasks, onToggle, onEdit, onAdd }: TaskPanelProps) {
+  const [showDone, setShowDone] = useState(false)
   const open = tasks.filter((t) => t.status !== 'done')
-  const doneCount = tasks.length - open.length
+  const done = tasks.filter((t) => t.status === 'done')
+  const doneCount = done.length
   const pct = tasks.length ? Math.round((doneCount / tasks.length) * 100) : 0
 
   // Sort: overdue/high priority first, then by due day.
@@ -66,6 +69,25 @@ export function TaskPanel({ tasks, onToggle, onEdit, onAdd }: TaskPanelProps) {
           <div className="px-2 py-3 text-xs text-dim">All clear. Nice.</div>
         )}
       </div>
+
+      {doneCount > 0 && (
+        <>
+          <button
+            onClick={() => setShowDone((v) => !v)}
+            className="mt-2 flex w-full items-center justify-center gap-1.5 border border-line px-2 py-1.5 text-[10px] uppercase tracking-wider text-dim hover:text-text"
+          >
+            {showDone ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+            {showDone ? 'Hide' : 'Show'} done ({doneCount})
+          </button>
+          {showDone && (
+            <div className="mt-1.5 space-y-1.5">
+              {done.map((t) => (
+                <TaskRow key={t.id} task={t} onToggle={() => onToggle(t)} onEdit={() => onEdit(t)} />
+              ))}
+            </div>
+          )}
+        </>
+      )}
     </Panel>
   )
 }
@@ -98,7 +120,9 @@ function TaskRow({ task, onToggle, onEdit }: { task: Task; onToggle: () => void;
         className="mt-0.5 size-3.5 shrink-0 accent-neon-green"
       />
       <button onClick={onEdit} className="min-w-0 flex-1 text-left">
-        <div className="truncate text-xs text-text">{task.title}</div>
+        <div className={cn('truncate text-xs', task.status === 'done' ? 'text-dim line-through' : 'text-text')}>
+          {task.title}
+        </div>
         <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px]">
           <span style={{ color }}>{PRIORITY_LABEL[task.priority]}</span>
           {label && <span className={overdue ? 'text-danger' : 'text-dim'}>{label}</span>}
@@ -179,17 +203,12 @@ export function TaskModal({
         </div>
       </div>
 
-      <div className="mb-3 grid grid-cols-3 gap-2">
-        <div>
-          <label className="label mb-1 block">Due (days)</label>
-          <input
-            type="number"
-            value={draft.dayOffset ?? ''}
-            placeholder="—"
-            onChange={(e) => set({ dayOffset: e.target.value === '' ? undefined : Number(e.target.value) })}
-            className="w-full border border-line bg-bg/60 px-2 py-1.5 text-sm text-text focus:border-accent/60 focus:outline-none"
-          />
-        </div>
+      <div className="mb-3">
+        <label className="label mb-1 block">Due date</label>
+        <DateField value={draft.dayOffset} onChange={(d) => set({ dayOffset: d })} allowEmpty className="w-full" />
+      </div>
+
+      <div className="mb-3 grid grid-cols-2 gap-2">
         <div>
           <label className="label mb-1 block">Time</label>
           <input
@@ -261,12 +280,16 @@ export function TaskModal({
       )}
 
       <div className="flex items-center justify-between text-xs text-dim">
-        <button
-          onClick={() => onDelete(draft.id)}
-          className="flex items-center gap-1 border border-line px-2 py-1.5 uppercase tracking-wider hover:text-danger"
-        >
-          <Trash2 size={12} /> Delete
-        </button>
+        {!draft.id.startsWith('new') ? (
+          <button
+            onClick={() => onDelete(draft.id)}
+            className="flex items-center gap-1 border border-line px-2 py-1.5 uppercase tracking-wider hover:text-danger"
+          >
+            <Trash2 size={12} /> Delete
+          </button>
+        ) : (
+          <span />
+        )}
         <div className="flex gap-2">
           <button onClick={onClose} className="border border-line px-3 py-1.5 uppercase tracking-wider hover:text-text">
             Cancel
