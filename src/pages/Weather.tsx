@@ -10,28 +10,50 @@ import { deriveRoads } from '@/features/weather/roads'
 import { camerasNear } from '@/features/weather/cameras'
 import { HEMS_BASE } from '@/features/weather/hems'
 import { WEATHER_ACCENT, windArrowDir } from '@/features/weather/format'
-import { CurrentHero } from '@/features/weather/CurrentHero'
+import { CurrentHero, type MetricKey } from '@/features/weather/CurrentHero'
 import { HourlyGraph } from '@/features/weather/HourlyGraph'
 import { WeekStrip } from '@/features/weather/WeekStrip'
 import { WeatherMonth } from '@/features/weather/WeatherMonth'
 import { WeatherSymbol, symbolInfo } from '@/features/weather/WeatherSymbol'
 import {
   AirQualityPanel,
+  AuroraPanel,
   CamerasPanel,
+  EventsPanel,
   HemsPanel,
   NowcastPanel,
   RoadPanel,
   SourcesPanel,
   SunMoonPanel,
+  UvPanel,
 } from '@/features/weather/WeatherPanels'
+import {
+  AirDetailModal,
+  AstroDetailModal,
+  AuroraDetailModal,
+  EventsDetailModal,
+  MetricDetailModal,
+  SourcesDetailModal,
+  UvDetailModal,
+} from '@/features/weather/WeatherDetailModals'
 
 type View = 'today' | 'week' | 'month'
+
+type Detail =
+  | { type: 'metric'; metric: MetricKey }
+  | { type: 'astro' }
+  | { type: 'air' }
+  | { type: 'uv' }
+  | { type: 'aurora' }
+  | { type: 'events' }
+  | { type: 'sources' }
 
 export function Weather() {
   const [locId, setLocId] = useState<LocationId>('oslo')
   const [view, setView] = useState<View>('today')
   const [monthOffset, setMonthOffset] = useState(0)
   const [dayDetail, setDayDetail] = useState<DayForecast | null>(null)
+  const [detail, setDetail] = useState<Detail | null>(null)
 
   const loc = locationById(locId)
   const { data: wx, sources, loading, refresh, updatedAgo } = useWeather(locId)
@@ -118,7 +140,7 @@ export function Weather() {
         <div className="min-h-0 flex-1 overflow-y-auto p-3 sm:p-4">
           {view === 'today' && (
             <div className="space-y-4">
-              <CurrentHero loc={loc} wx={wx} />
+              <CurrentHero loc={loc} wx={wx} onMetric={(m) => setDetail({ type: 'metric', metric: m })} />
               <div className="border border-line bg-panel/40">
                 <div className="flex items-center justify-between border-b border-line px-3 py-2">
                   <h2 className="font-display text-sm uppercase tracking-wider" style={{ color: WEATHER_ACCENT }}>
@@ -151,18 +173,34 @@ export function Weather() {
         </div>
       </div>
 
-      {/* Side panels — quick-read */}
+      {/* Side panels — quick-read, each drills into multi-day detail */}
       <aside className="flex w-full shrink-0 flex-col gap-3 overflow-y-auto border-t border-line bg-panel/30 p-3 lg:w-[330px] lg:border-l lg:border-t-0">
-        <SourcesPanel sources={sources} />
+        <SourcesPanel sources={sources} onClick={() => setDetail({ type: 'sources' })} />
+        <EventsPanel events={wx.events} onClick={() => setDetail({ type: 'events' })} />
         <NowcastPanel wx={wx} />
-        <SunMoonPanel day={wx.days[0]} />
-        <AirQualityPanel aq={wx.airQuality} />
+        <SunMoonPanel day={wx.days[0]} moon={wx.moon} onClick={() => setDetail({ type: 'astro' })} />
+        <UvPanel uvHours={wx.uvHours} todayMax={wx.days[0]?.uvMax} onClick={() => setDetail({ type: 'uv' })} />
+        <AuroraPanel aurora={wx.aurora} onClick={() => setDetail({ type: 'aurora' })} />
+        <AirQualityPanel aq={wx.airQuality} onClick={() => setDetail({ type: 'air' })} />
         <HemsPanel hems={wx.hems} base={HEMS_BASE[locId]} />
         <RoadPanel roads={roads} />
         <CamerasPanel cameras={cameras} />
       </aside>
 
       <DayDetailModal day={dayDetail} hours={wx.hours} onClose={() => setDayDetail(null)} />
+
+      {/* Drill-down detail modals */}
+      <MetricDetailModal
+        metric={detail?.type === 'metric' ? detail.metric : null}
+        wx={wx}
+        onClose={() => setDetail(null)}
+      />
+      <AstroDetailModal open={detail?.type === 'astro'} wx={wx} onClose={() => setDetail(null)} />
+      <AirDetailModal open={detail?.type === 'air'} wx={wx} onClose={() => setDetail(null)} />
+      <UvDetailModal open={detail?.type === 'uv'} wx={wx} onClose={() => setDetail(null)} />
+      <AuroraDetailModal open={detail?.type === 'aurora'} wx={wx} onClose={() => setDetail(null)} />
+      <EventsDetailModal open={detail?.type === 'events'} wx={wx} onClose={() => setDetail(null)} />
+      <SourcesDetailModal open={detail?.type === 'sources'} wx={wx} onClose={() => setDetail(null)} />
     </div>
   )
 }

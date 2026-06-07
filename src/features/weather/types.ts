@@ -41,6 +41,8 @@ export interface DayForecast {
   symbol: string // representative midday symbol
   sunrise?: string
   sunset?: string
+  uvMax?: number // peak UV index
+  aqiMax?: number // peak European AQI
   /** True when this day is real forecast vs. climatology/mock beyond horizon. */
   forecast: boolean
 }
@@ -100,5 +102,84 @@ export interface LocationWeather {
   hours: HourPoint[] // hourly, next ~48h
   days: DayForecast[] // daily outlook, ~9 days + climatology padding
   airQuality: AirQuality
+  airQualitySeries: AqiPoint[] // hourly AQI, multi-day
   hems: HemsConditions
+  uvHours: UvPoint[] // hourly UV index, multi-day
+  aurora: Aurora
+  moon: MoonInfo
+  modelSpread: ModelSpread
+  events: WeatherEvent[]
+}
+
+// ── UV ───────────────────────────────────────────────────────────────────────
+export interface UvPoint {
+  time: string
+  uv: number
+}
+
+export type UvBand = 'low' | 'moderate' | 'high' | 'very-high' | 'extreme'
+
+// ── Air-quality time series ──────────────────────────────────────────────────
+export interface AqiPoint {
+  time: string
+  aqi: number // European AQI (0–100+)
+  pm25?: number
+  pm10?: number
+  no2?: number
+  o3?: number
+}
+
+// ── Aurora / geomagnetic (NOAA SWPC) ─────────────────────────────────────────
+export interface KpPoint {
+  time: string
+  kp: number
+  observed: boolean
+}
+
+export type AuroraBand = 'none' | 'low' | 'moderate' | 'high'
+
+export interface Aurora {
+  kp: number // current planetary K-index
+  kpMax: number // peak over the forecast window
+  forecast: KpPoint[]
+  probability: number // % chance overhead/visible at this latitude
+  band: AuroraBand
+  darkNight: boolean // is there real darkness to see it (false in Nordic summer)
+  note: string
+}
+
+// ── Moon ─────────────────────────────────────────────────────────────────────
+export interface MoonInfo {
+  phase: number // 0–1 through the synodic cycle
+  illum: number // 0–1 illuminated fraction
+  name: string // "Waxing gibbous", …
+}
+
+// ── Multi-model agreement (Open-Meteo: ECMWF / DWD / GFS / …) ────────────────
+export interface ModelDatum {
+  id: string
+  label: string
+  temp: number | null // current temp from this model
+  precip24: number | null // next-24h precip
+}
+
+export type Agreement = 'high' | 'medium' | 'low'
+
+export interface ModelSpread {
+  models: ModelDatum[]
+  meanTemp: number
+  spread: number // °C between coldest and warmest model
+  agreement: Agreement
+}
+
+// ── Upcoming weather + cosmic events ─────────────────────────────────────────
+export type EventKind = 'weather' | 'cosmic' | 'aurora' | 'alert'
+
+export interface WeatherEvent {
+  id: string
+  kind: EventKind
+  date: string // ISO date or datetime
+  title: string
+  detail: string
+  tone: string
 }

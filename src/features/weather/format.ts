@@ -1,4 +1,4 @@
-import type { AqiBand, FlyBand } from './types'
+import type { AqiBand, AuroraBand, FlyBand, UvBand } from './types'
 
 /** Compass label for a "from" wind direction in degrees. */
 export function windArrowDir(deg: number): string {
@@ -38,3 +38,36 @@ export function feelsLike(temp: number, windMs: number): number {
 }
 
 export const WEATHER_ACCENT = '#58b6f0'
+
+// ── UV index ─────────────────────────────────────────────────────────────────
+export function uvBand(uv: number): UvBand {
+  if (uv < 3) return 'low'
+  if (uv < 6) return 'moderate'
+  if (uv < 8) return 'high'
+  if (uv < 11) return 'very-high'
+  return 'extreme'
+}
+
+export const UV_META: Record<UvBand, { label: string; color: string }> = {
+  low: { label: 'Low', color: '#46d369' },
+  moderate: { label: 'Moderate', color: '#f0c020' },
+  high: { label: 'High', color: '#f0a020' },
+  'very-high': { label: 'Very high', color: '#ff5566' },
+  extreme: { label: 'Extreme', color: '#b58bff' },
+}
+
+// ── European AQI (0–100+) ────────────────────────────────────────────────────
+export function euroAqiBand(v: number): AqiBand {
+  if (v < 25) return 'low'
+  if (v < 50) return 'moderate'
+  if (v < 75) return 'high'
+  return 'severe'
+}
+
+// ── Aurora ───────────────────────────────────────────────────────────────────
+export const AURORA_META: Record<AuroraBand, { label: string; color: string }> = {
+  none: { label: 'Quiet', color: '#6b7785' },
+  low: { label: 'Low', color: '#46d369' },
+  moderate: { label: 'Active', color: '#36e0c8' },
+  high: { label: 'Storm', color: '#b58bff' },
+}

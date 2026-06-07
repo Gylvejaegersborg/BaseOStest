@@ -4,9 +4,19 @@ import type { LocationMeta } from './locations'
 import { WeatherSymbol, symbolInfo } from './WeatherSymbol'
 import { WEATHER_ACCENT, windArrowDir, windLabel } from './format'
 
+export type MetricKey = 'wind' | 'precip' | 'humidity' | 'pressure'
+
 /** Big "right now" readout: symbol, temperature and the four numbers you
- *  actually glance at — wind, humidity, pressure, precipitation. */
-export function CurrentHero({ loc, wx }: { loc: LocationMeta; wx: LocationWeather }) {
+ *  actually glance at — each clickable to drill into the multi-day detail. */
+export function CurrentHero({
+  loc,
+  wx,
+  onMetric,
+}: {
+  loc: LocationMeta
+  wx: LocationWeather
+  onMetric?: (m: MetricKey) => void
+}) {
   const c = wx.current
   const info = symbolInfo(c.symbol)
 
@@ -37,33 +47,41 @@ export function CurrentHero({ loc, wx }: { loc: LocationMeta; wx: LocationWeathe
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <Stat icon={Wind} label="Wind" value={`${c.windSpeed.toFixed(1)} m/s`} sub={`${windArrowDir(c.windDir)} · ${windLabel(c.windSpeed)}`} />
-        <Stat icon={Umbrella} label="Precip" value={`${c.precip.toFixed(1)} mm`} sub={c.precipProb != null ? `${c.precipProb}% chance` : 'last hour'} />
-        <Stat icon={Droplets} label="Humidity" value={`${Math.round(c.humidity)}%`} sub={`cloud ${Math.round(c.cloud)}%`} />
-        <Stat icon={Gauge} label="Pressure" value={`${Math.round(c.pressure)}`} sub="hPa" />
+        <Stat metric="wind" icon={Wind} label="Wind" value={`${c.windSpeed.toFixed(1)} m/s`} sub={`${windArrowDir(c.windDir)} · ${windLabel(c.windSpeed)}`} onMetric={onMetric} />
+        <Stat metric="precip" icon={Umbrella} label="Precip" value={`${c.precip.toFixed(1)} mm`} sub={c.precipProb != null ? `${c.precipProb}% chance` : 'last hour'} onMetric={onMetric} />
+        <Stat metric="humidity" icon={Droplets} label="Humidity" value={`${Math.round(c.humidity)}%`} sub={`cloud ${Math.round(c.cloud)}%`} onMetric={onMetric} />
+        <Stat metric="pressure" icon={Gauge} label="Pressure" value={`${Math.round(c.pressure)}`} sub="hPa" onMetric={onMetric} />
       </div>
     </div>
   )
 }
 
 function Stat({
+  metric,
   icon: Icon,
   label,
   value,
   sub,
+  onMetric,
 }: {
+  metric: MetricKey
   icon: typeof Wind
   label: string
   value: string
   sub: string
+  onMetric?: (m: MetricKey) => void
 }) {
   return (
-    <div className="border border-line/70 bg-bg/40 px-3 py-2">
+    <button
+      type="button"
+      onClick={() => onMetric?.(metric)}
+      className="border border-line/70 bg-bg/40 px-3 py-2 text-left transition-colors hover:border-accent/50 hover:bg-panel-2/50"
+    >
       <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-dim">
         <Icon size={12} /> {label}
       </div>
       <div className="mt-0.5 font-display text-lg text-text">{value}</div>
       <div className="text-[10px] text-dim">{sub}</div>
-    </div>
+    </button>
   )
 }
