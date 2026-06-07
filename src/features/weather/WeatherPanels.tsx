@@ -2,26 +2,34 @@ import { useState } from 'react'
 import {
   AlertTriangle,
   ArrowUpRight,
+  CalendarClock,
   CameraOff,
+  ChevronRight,
   Plane,
-  Moon as MoonIcon,
+  Sparkles,
+  Sun as SunIcon,
   Sunrise,
   Sunset,
   Wind,
 } from 'lucide-react'
-import { format, parseISO } from 'date-fns'
+import { format, isToday, parseISO } from 'date-fns'
 import { Panel } from '@/components/ui/Panel'
 import { StatusDot } from '@/components/ui/StatusDot'
+import { cn } from '@/lib/cn'
 import type {
   AirQuality,
+  Aurora,
   CameraFeed,
   DayForecast,
   HemsConditions,
   LocationWeather,
+  MoonInfo,
   RoadCondition,
   SourceStatus,
+  UvPoint,
+  WeatherEvent,
 } from './types'
-import { AQI_META, FLY_META, WEATHER_ACCENT } from './format'
+import { AQI_META, AURORA_META, FLY_META, UV_META, uvBand, WEATHER_ACCENT } from './format'
 
 const STATE_COLOR: Record<SourceStatus['state'], string> = {
   live: '#46d369',
@@ -31,9 +39,9 @@ const STATE_COLOR: Record<SourceStatus['state'], string> = {
 }
 
 // ── Data sources ─────────────────────────────────────────────────────────────
-export function SourcesPanel({ sources }: { sources: SourceStatus[] }) {
+export function SourcesPanel({ sources, onClick }: { sources: SourceStatus[]; onClick?: () => void }) {
   return (
-    <Panel title="Data Sources" code="FEEDS" accent={WEATHER_ACCENT} bodyClassName="p-2">
+    <Panel title="Data Sources" code="FEEDS" accent={WEATHER_ACCENT} right={onClick && <MoreChip />} bodyClassName="p-2">
       <div className="space-y-1.5">
         {sources.map((s) => (
           <a
@@ -63,32 +71,61 @@ export function SourcesPanel({ sources }: { sources: SourceStatus[] }) {
       <p className="mt-2 px-1 text-[9px] leading-relaxed text-dim">
         Multiple feeds, cross-read. Live = fetched now; mock = generated fallback; cached = derived/reference.
       </p>
+      {onClick && (
+        <button
+          onClick={onClick}
+          className="mt-1 flex w-full items-center justify-center gap-1 border border-line py-1 text-[10px] uppercase tracking-wider text-dim hover:text-text"
+        >
+          All sources & models <ChevronRight size={11} />
+        </button>
+      )}
     </Panel>
   )
 }
 
 // ── Air quality ──────────────────────────────────────────────────────────────
-export function AirQualityPanel({ aq }: { aq: AirQuality }) {
+export function AirQualityPanel({ aq, onClick }: { aq: AirQuality; onClick?: () => void }) {
   const meta = AQI_META[aq.band]
   return (
-    <Panel title="Air Quality" code="AQI" accent={meta.color} bodyClassName="p-3">
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="font-display text-2xl" style={{ color: meta.color }}>
-            {meta.label}
+    <Panel title="Air Quality" code="AQI" accent={meta.color} right={onClick && <MoreChip />} bodyClassName="p-3">
+      <DrillWrap onClick={onClick}>
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="font-display text-2xl" style={{ color: meta.color }}>
+              {meta.label}
+            </div>
+            <div className="text-[10px] text-dim">European AQI {aq.aqi} · dominant {aq.dominant}</div>
           </div>
-          <div className="text-[10px] text-dim">index {aq.aqi} · dominant {aq.dominant}</div>
+          <div className="text-right text-[10px] text-dim">
+            {aq.pm25 != null && <div>PM2.5 {aq.pm25}</div>}
+            {aq.pm10 != null && <div>PM10 {aq.pm10}</div>}
+            {aq.no2 != null && <div>NO₂ {aq.no2}</div>}
+          </div>
         </div>
-        <div className="text-right text-[10px] text-dim">
-          {aq.pm25 != null && <div>PM2.5 {aq.pm25}</div>}
-          {aq.pm10 != null && <div>PM10 {aq.pm10}</div>}
-          {aq.no2 != null && <div>NO₂ {aq.no2}</div>}
+        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-line">
+          <div className="h-full rounded-full" style={{ width: `${Math.min(100, aq.aqi)}%`, background: meta.color }} />
         </div>
-      </div>
-      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-line">
-        <div className="h-full rounded-full" style={{ width: `${Math.min(100, (aq.aqi / 4) * 100)}%`, background: meta.color }} />
-      </div>
+      </DrillWrap>
     </Panel>
+  )
+}
+
+/** Small "tap for multi-day detail" affordance shown in panel headers. */
+function MoreChip() {
+  return (
+    <span className="flex items-center gap-0.5 text-[9px] uppercase tracking-wider text-dim">
+      days <ChevronRight size={11} />
+    </span>
+  )
+}
+
+/** Wraps panel body content as a clickable drill-down when onClick is given. */
+function DrillWrap({ onClick, children }: { onClick?: () => void; children: React.ReactNode }) {
+  if (!onClick) return <>{children}</>
+  return (
+    <button type="button" onClick={onClick} className="block w-full text-left transition-opacity hover:opacity-90">
+      {children}
+    </button>
   )
 }
 
@@ -161,28 +198,59 @@ export function RoadPanel({ roads }: { roads: RoadCondition[] }) {
 }
 
 // ── Sun & moon ───────────────────────────────────────────────────────────────
-export function SunMoonPanel({ day }: { day?: DayForecast }) {
+export function SunMoonPanel({ day, moon, onClick }: { day?: DayForecast; moon?: MoonInfo; onClick?: () => void }) {
   const sr = day?.sunrise ? parseISO(day.sunrise) : null
   const ss = day?.sunset ? parseISO(day.sunset) : null
-  const daylight =
-    sr && ss ? Math.max(0, (ss.getTime() - sr.getTime()) / 3600000) : null
+  const daylight = sr && ss ? Math.max(0, (ss.getTime() - sr.getTime()) / 3600000) : null
   return (
-    <Panel title="Sun & Moon" code="ASTRO" accent="#f0c020" bodyClassName="p-3">
-      <div className="flex items-center justify-between text-sm">
-        <div className="flex items-center gap-2">
-          <Sunrise size={16} className="text-amber" />
-          <span className="text-text">{sr ? format(sr, 'HH:mm') : '—'}</span>
+    <Panel title="Sun & Moon" code="ASTRO" accent="#f0c020" right={onClick && <MoreChip />} bodyClassName="p-3">
+      <DrillWrap onClick={onClick}>
+        <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center gap-1.5">
+            <Sunrise size={16} className="text-amber" />
+            <span className="text-text">{sr ? format(sr, 'HH:mm') : '—'}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Sunset size={16} className="text-magenta" />
+            <span className="text-text">{ss ? format(ss, 'HH:mm') : '—'}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <SunIcon size={14} className="text-dim" />
+            <span className="text-dim">{daylight != null ? `${daylight.toFixed(1)}h` : '—'}</span>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Sunset size={16} className="text-magenta" />
-          <span className="text-text">{ss ? format(ss, 'HH:mm') : '—'}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <MoonIcon size={15} className="text-dim" />
-          <span className="text-dim">{daylight != null ? `${daylight.toFixed(1)}h` : '—'}</span>
-        </div>
-      </div>
+        {moon && (
+          <div className="mt-2 flex items-center gap-2 border-t border-line/60 pt-2 text-[11px]">
+            <MoonGlyph illum={moon.illum} phase={moon.phase} />
+            <span className="text-text">{moon.name}</span>
+            <span className="ml-auto text-dim">{Math.round(moon.illum * 100)}% lit</span>
+          </div>
+        )}
+      </DrillWrap>
     </Panel>
+  )
+}
+
+/** Tiny moon disc shaded by illuminated fraction + waxing/waning side. */
+export function MoonGlyph({ illum, phase, size = 16 }: { illum: number; phase: number; size?: number }) {
+  const waxing = phase < 0.5
+  return (
+    <span
+      className="relative inline-block shrink-0 rounded-full border border-line-2 bg-bg"
+      style={{ width: size, height: size }}
+      aria-hidden
+    >
+      <span
+        className="absolute inset-0 rounded-full"
+        style={{
+          background: '#cfe6ff',
+          // Reveal a fraction of the disc from the lit side.
+          clipPath: waxing
+            ? `inset(0 0 0 ${(1 - illum) * 100}%)`
+            : `inset(0 ${(1 - illum) * 100}% 0 0)`,
+        }}
+      />
+    </span>
   )
 }
 
@@ -263,5 +331,102 @@ function CameraTile({ cam }: { cam: CameraFeed }) {
         </span>
       </div>
     </a>
+  )
+}
+
+// ── UV index ─────────────────────────────────────────────────────────────────
+export function UvPanel({ uvHours, todayMax, onClick }: { uvHours: UvPoint[]; todayMax?: number; onClick?: () => void }) {
+  const nowUv = uvHours[0]?.uv ?? 0
+  const meta = UV_META[uvBand(nowUv)]
+  const peak = todayMax ?? Math.max(0, ...uvHours.slice(0, 24).map((u) => u.uv))
+  return (
+    <Panel title="UV Index" code="UV" accent={meta.color} right={onClick && <MoreChip />} bodyClassName="p-3">
+      <DrillWrap onClick={onClick}>
+        <div className="flex items-center gap-3">
+          <SunIcon size={20} style={{ color: meta.color }} />
+          <span className="font-display text-2xl" style={{ color: meta.color }}>
+            {nowUv.toFixed(0)}
+          </span>
+          <span className="text-sm" style={{ color: meta.color }}>
+            {meta.label}
+          </span>
+          <span className="ml-auto text-[10px] text-dim">peak today {peak.toFixed(0)}</span>
+        </div>
+        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-line">
+          <div className="h-full rounded-full" style={{ width: `${Math.min(100, (nowUv / 11) * 100)}%`, background: meta.color }} />
+        </div>
+      </DrillWrap>
+    </Panel>
+  )
+}
+
+// ── Aurora / northern lights ─────────────────────────────────────────────────
+export function AuroraPanel({ aurora, onClick }: { aurora: Aurora; onClick?: () => void }) {
+  const meta = AURORA_META[aurora.band]
+  return (
+    <Panel title="Northern Lights" code="AURORA" accent={meta.color} right={onClick && <MoreChip />} bodyClassName="p-3">
+      <DrillWrap onClick={onClick}>
+        <div className="flex items-center gap-2">
+          <Sparkles size={18} style={{ color: meta.color }} />
+          <span className="font-display text-lg" style={{ color: meta.color }}>
+            {meta.label}
+          </span>
+          <span className="ml-auto text-[11px] text-dim">Kp {aurora.kp} · peak {aurora.kpMax.toFixed(0)}</span>
+        </div>
+        <div className="mt-2 flex items-center justify-between text-[11px]">
+          <span className="text-dim">Visibility</span>
+          <span style={{ color: meta.color }}>{aurora.probability}%</span>
+        </div>
+        <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-line">
+          <div className="h-full rounded-full" style={{ width: `${aurora.probability}%`, background: meta.color }} />
+        </div>
+        <p className="mt-2 text-[10px] leading-relaxed text-dim">{aurora.note}</p>
+      </DrillWrap>
+    </Panel>
+  )
+}
+
+// ── Upcoming weather + cosmic events ─────────────────────────────────────────
+const EVENT_ICON = {
+  weather: AlertTriangle,
+  cosmic: SunIcon,
+  aurora: Sparkles,
+  alert: AlertTriangle,
+} as const
+
+export function EventsPanel({ events, onClick }: { events: WeatherEvent[]; onClick?: () => void }) {
+  return (
+    <Panel title="Upcoming" code="EVENTS" accent="#9b7bff" right={onClick && <MoreChip />} bodyClassName="p-2">
+      <div className="space-y-1">
+        {events.slice(0, 6).map((e) => (
+          <EventRow key={e.id} ev={e} />
+        ))}
+        {events.length === 0 && <div className="px-1 py-2 text-xs text-dim">Nothing notable on the horizon.</div>}
+      </div>
+      {events.length > 6 && onClick && (
+        <button onClick={onClick} className="mt-1 flex w-full items-center justify-center gap-1 border border-line py-1 text-[10px] uppercase tracking-wider text-dim hover:text-text">
+          <CalendarClock size={11} /> {events.length} events
+        </button>
+      )}
+    </Panel>
+  )
+}
+
+export function EventRow({ ev }: { ev: WeatherEvent }) {
+  const Icon = EVENT_ICON[ev.kind]
+  const d = parseISO(ev.date)
+  return (
+    <div className="flex items-start gap-2 border border-line bg-bg/30 px-2 py-1.5">
+      <Icon size={13} style={{ color: ev.tone }} className="mt-0.5 shrink-0" />
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center justify-between gap-2">
+          <span className="truncate text-xs text-text">{ev.title}</span>
+          <span className={cn('shrink-0 text-[9px]', isToday(d) ? 'text-accent' : 'text-dim')}>
+            {isToday(d) ? 'today' : format(d, 'EEE d')}
+          </span>
+        </div>
+        <div className="truncate text-[10px] text-dim">{ev.detail}</div>
+      </div>
+    </div>
   )
 }
