@@ -39,7 +39,7 @@ export function Home() {
           THE <span className="text-accent">CONSTELLATION</span>
         </h1>
         <div className="mt-1 hidden max-w-md text-xs text-dim sm:block">
-          Eight sections, ten projects — one map. Hover a body to read it, click a sun to enter.
+          Nine sections, ten projects — one map. Hover a body to read it, click a sun to enter.
         </div>
       </div>
 

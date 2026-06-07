@@ -11,6 +11,7 @@ import { MeetingRoom } from './pages/MeetingRoom'
 import { Ops } from './pages/Ops'
 
 const Sudoku = lazy(() => import('./pages/Sudoku').then((m) => ({ default: m.Sudoku })))
+const Weather = lazy(() => import('./pages/Weather').then((m) => ({ default: m.Weather })))
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,14 @@ const router = createBrowserRouter([
       { path: 'lab', element: <Lab /> },
       { path: 'room', element: <MeetingRoom /> },
       { path: 'ops', element: <Ops /> },
+      {
+        path: 'weather',
+        element: (
+          <Suspense fallback={<div className="h-full w-full bg-bg" />}>
+            <Weather />
+          </Suspense>
+        ),
+      },
       {
         path: 'sudoku',
         element: (

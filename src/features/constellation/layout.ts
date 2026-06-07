@@ -26,6 +26,7 @@ const SUN_POS: Record<string, { x: number; y: number }> = {
   lab: { x: 200, y: 440 },
   room: { x: 910, y: 470 },
   ops: { x: 1060, y: 300 },
+  weather: { x: 540, y: 585 },
 }
 
 // Constellation outline: which suns are linked by faint lines.
@@ -40,6 +41,9 @@ export const SUN_LINKS: [SectionId, SectionId][] = [
   ['projects', 'calendar'],
   ['projects', 'room'],
   ['projects', 'lab'],
+  ['projects', 'weather'],
+  ['weather', 'lab'],
+  ['weather', 'room'],
 ]
 
 export function buildBodies(): { suns: Body[]; planets: Body[] } {

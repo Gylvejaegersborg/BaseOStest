@@ -7,6 +7,7 @@ import {
   FlaskConical,
   Users,
   Activity,
+  CloudSun,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -19,6 +20,7 @@ export type SectionId =
   | 'lab'
   | 'room'
   | 'ops'
+  | 'weather'
 
 export interface Section {
   id: SectionId
@@ -102,6 +104,15 @@ export const SECTIONS: Section[] = [
     icon: Activity,
     blurb: 'Errors, uptime, agent health and every device connection.',
     accent: '#ff5566',
+  },
+  {
+    id: 'weather',
+    label: 'Weather',
+    code: 'MET.08',
+    route: '/weather',
+    icon: CloudSun,
+    blurb: 'Oslo, Hamar and Trysil — many feeds, one honest forecast.',
+    accent: '#58b6f0',
   },
 ]
 
