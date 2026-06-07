@@ -242,6 +242,7 @@ export interface Reminder {
   title: string
   dayOffset: number
   time: number // fractional 24h hour — the moment to ping
+  notes?: string
   done?: boolean
 }
 
