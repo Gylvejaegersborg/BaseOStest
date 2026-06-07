@@ -9,6 +9,19 @@ interface AgendaListProps {
   emptyText?: string
 }
 
+function metaLine(it: AgendaItem): string {
+  switch (it.source) {
+    case 'appt':
+      return `${hhmm(it.hour)}–${hhmm(it.endHour ?? it.hour)}`
+    case 'task':
+      return `due ${hhmm(it.hour)} · task`
+    case 'cron':
+      return `${hhmm(it.hour)} · cron`
+    case 'reminder':
+      return `${hhmm(it.hour)} · reminder`
+  }
+}
+
 export function AgendaList({ items, onSelect, emptyText = 'Nothing upcoming.' }: AgendaListProps) {
   if (!items.length) return <div className="px-2 py-3 text-xs text-dim">{emptyText}</div>
   return (
@@ -23,9 +36,7 @@ export function AgendaList({ items, onSelect, emptyText = 'Nothing upcoming.' }:
           <div className="min-w-0 flex-1">
             <div className="truncate text-xs text-text">{it.title}</div>
             <div className="text-[10px] text-dim">
-              {format(it.date, 'EEE')} ·{' '}
-              {it.endHour != null ? `${hhmm(it.hour)}–${hhmm(it.endHour)}` : `due ${hhmm(it.hour)}`}
-              {it.source === 'task' && ' · task'}
+              {format(it.date, 'EEE')} · {metaLine(it)}
             </div>
           </div>
           <StatusDot color={it.color} size={6} />

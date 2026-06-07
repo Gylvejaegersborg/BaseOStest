@@ -7,13 +7,13 @@ import { CalendarProvider, useCalendar } from '@/features/calendar/CalendarConte
 import { NudgeStack } from '@/features/calendar/NudgeStack'
 
 function GlobalNudges() {
-  const { reminders } = useCalendar()
+  const { remindersEngine } = useCalendar()
   return (
     <NudgeStack
-      nudges={reminders.nudges}
-      onDismiss={reminders.dismiss}
-      onSnooze={reminders.snooze}
-      onComplete={reminders.complete}
+      nudges={remindersEngine.nudges}
+      onDismiss={remindersEngine.dismiss}
+      onSnooze={remindersEngine.snooze}
+      onComplete={remindersEngine.complete}
     />
   )
 }

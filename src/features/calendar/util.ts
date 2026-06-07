@@ -1,5 +1,5 @@
-import { addDays, startOfDay } from 'date-fns'
-import type { Appt, Task } from '@/data/calendar'
+import { addDays, differenceInCalendarDays, startOfDay } from 'date-fns'
+import type { Appt, Reminder, Task } from '@/data/calendar'
 
 // Captured once at module load. Appt/Task dayOffsets are relative to this day.
 export const TODAY = new Date()
@@ -11,6 +11,11 @@ export function offsetDate(dayOffset: number): Date {
 
 export function apptDate(a: { dayOffset: number }): Date {
   return offsetDate(a.dayOffset)
+}
+
+/** Day offset (relative to today) for an arbitrary date — inverse of offsetDate. */
+export function dayOffsetOf(d: Date): number {
+  return differenceInCalendarDays(d, DAY_BASE)
 }
 
 /** Returns a new Date on `d` set to the given fractional hour (14.5 → 14:30). */
@@ -45,6 +50,11 @@ export function apptStartMs(a: Appt): number {
 export function taskDueMs(t: Task): number | null {
   if (t.dayOffset == null || t.dueTime == null) return null
   return atHour(offsetDate(t.dayOffset), t.dueTime).getTime()
+}
+
+/** Absolute ping time for a standalone reminder. */
+export function reminderMs(r: Reminder): number {
+  return atHour(offsetDate(r.dayOffset), r.time).getTime()
 }
 
 /** "in 12 min", "in 2h 5m", "now" — for a future timestamp relative to `from`. */

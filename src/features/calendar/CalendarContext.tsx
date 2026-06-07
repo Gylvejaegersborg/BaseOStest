@@ -1,28 +1,44 @@
 import { createContext, useCallback, useContext, useState, type ReactNode } from 'react'
-import type { Appt, Task } from '@/data/calendar'
-import { APPTS_KEY, TASKS_KEY, loadAppts, loadTasks } from './agenda'
+import type { Appt, CronJob, Reminder, Task } from '@/data/calendar'
+import {
+  APPTS_KEY,
+  CRONS_KEY,
+  REMINDERS_KEY,
+  TASKS_KEY,
+  loadAppts,
+  loadCrons,
+  loadReminders,
+  loadTasks,
+} from './agenda'
 import { useReminders } from './useReminders'
 
 interface CalendarContextValue {
   appts: Appt[]
   tasks: Task[]
+  reminders: Reminder[]
+  crons: CronJob[]
   saveAppt: (a: Appt) => void
   toggleTask: (t: Task) => void
   saveTask: (t: Task) => void
   deleteTask: (id: string) => void
-  reminders: ReturnType<typeof useReminders>
+  saveReminder: (r: Reminder) => void
+  deleteReminder: (id: string) => void
+  saveCron: (c: CronJob) => void
+  remindersEngine: ReturnType<typeof useReminders>
 }
 
 const CalendarContext = createContext<CalendarContextValue | null>(null)
 
 /**
- * Owns the persisted calendar data (appointments + tasks) and runs the reminder
- * engine. Mounted once high in the tree (AppShell) so reminders fire app-wide,
- * not just while the Calendar page is open.
+ * Owns the persisted calendar data (appointments, tasks, reminders, cron jobs)
+ * and runs the reminder engine. Mounted once high in the tree (AppShell) so
+ * reminders fire app-wide, not just while the Calendar page is open.
  */
 export function CalendarProvider({ children }: { children: ReactNode }) {
   const [appts, setAppts] = useState<Appt[]>(() => loadAppts())
   const [tasks, setTasks] = useState<Task[]>(() => loadTasks())
+  const [reminders, setReminders] = useState<Reminder[]>(() => loadReminders())
+  const [crons, setCrons] = useState<CronJob[]>(() => loadCrons())
 
   const saveAppt = useCallback((updated: Appt) => {
     setAppts((list) => {
@@ -72,10 +88,67 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
     [persistTasks],
   )
 
-  const reminders = useReminders(appts, tasks, { onCompleteTask: completeTask })
+  const persistReminders = useCallback((next: Reminder[]) => {
+    localStorage.setItem(REMINDERS_KEY, JSON.stringify(next))
+    return next
+  }, [])
+
+  const saveReminder = useCallback(
+    (updated: Reminder) => {
+      setReminders((list) => {
+        const exists = list.some((r) => r.id === updated.id)
+        return persistReminders(
+          exists ? list.map((r) => (r.id === updated.id ? updated : r)) : [...list, updated],
+        )
+      })
+    },
+    [persistReminders],
+  )
+
+  const deleteReminder = useCallback(
+    (id: string) => {
+      setReminders((list) => persistReminders(list.filter((r) => r.id !== id)))
+    },
+    [persistReminders],
+  )
+
+  const completeReminder = useCallback(
+    (id: string) => {
+      setReminders((list) => persistReminders(list.map((r) => (r.id === id ? { ...r, done: true } : r))))
+    },
+    [persistReminders],
+  )
+
+  const saveCron = useCallback((updated: CronJob) => {
+    setCrons((list) => {
+      const next = list.map((c) => (c.id === updated.id ? updated : c))
+      localStorage.setItem(CRONS_KEY, JSON.stringify(next))
+      return next
+    })
+  }, [])
+
+  const remindersEngine = useReminders(appts, tasks, reminders, {
+    onCompleteTask: completeTask,
+    onCompleteReminder: completeReminder,
+  })
 
   return (
-    <CalendarContext.Provider value={{ appts, tasks, saveAppt, toggleTask, saveTask, deleteTask, reminders }}>
+    <CalendarContext.Provider
+      value={{
+        appts,
+        tasks,
+        reminders,
+        crons,
+        saveAppt,
+        toggleTask,
+        saveTask,
+        deleteTask,
+        saveReminder,
+        deleteReminder,
+        saveCron,
+        remindersEngine,
+      }}
+    >
       {children}
     </CalendarContext.Provider>
   )

@@ -53,7 +53,7 @@ function NudgeCard({
           <div className="truncate text-sm text-text">{nudge.title}</div>
           <div className="mt-0.5 text-[11px] text-dim">{nudge.body}</div>
           <div className="mt-2 flex items-center gap-2">
-            {nudge.source === 'task' && (
+            {(nudge.source === 'task' || nudge.source === 'reminder') && (
               <button
                 onClick={onComplete}
                 className="flex items-center gap-1 border border-line px-2 py-1 text-[10px] uppercase tracking-wider text-neon-green hover:bg-panel-2/60"

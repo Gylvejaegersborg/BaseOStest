@@ -1,13 +1,10 @@
-import { Activity, ArrowRight, CheckCircle2, Clock, User } from 'lucide-react'
+import { Activity, ArrowRight, Clock, Pencil, CheckCircle2, User } from 'lucide-react'
+import { format } from 'date-fns'
 import type { CronJob } from '@/data/calendar'
 import { Modal } from '@/components/ui/Modal'
 import { StatusDot } from '@/components/ui/StatusDot'
-
-const STATUS_COLOR: Record<CronJob['status'], string> = {
-  ok: '#46d369',
-  running: '#36e0c8',
-  warn: '#f0a020',
-}
+import { untilLabel } from './util'
+import { CRON_STATUS_COLOR, cronNextRunMs, cronScheduleLabel } from './cron'
 
 const RUN_COLOR: Record<'ok' | 'warn' | 'fail', string> = {
   ok: '#46d369',
@@ -15,25 +12,42 @@ const RUN_COLOR: Record<'ok' | 'warn' | 'fail', string> = {
   fail: '#ff5566',
 }
 
-export function CronDetailModal({ job, onClose }: { job: CronJob | null; onClose: () => void }) {
+export function CronDetailModal({
+  job,
+  onClose,
+  onEdit,
+}: {
+  job: CronJob | null
+  onClose: () => void
+  onEdit: (job: CronJob) => void
+}) {
   if (!job) return null
-  const color = STATUS_COLOR[job.status]
+  const color = CRON_STATUS_COLOR[job.status]
+  const nextRun = cronNextRunMs(job.schedule)
 
   return (
     <Modal open={!!job} onClose={onClose} title={job.name} code={`CRON.${job.id.toUpperCase()}`} accent={color} width={480}>
-      <div className="mb-3 flex items-center gap-2">
-        <StatusDot color={color} pulse={job.status === 'running'} size={7} />
-        <span className="text-xs uppercase tracking-wider" style={{ color }}>
-          {job.status === 'running' ? 'Running now' : job.status === 'warn' ? 'Needs attention' : 'Healthy'}
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <span className="flex items-center gap-2">
+          <StatusDot color={color} pulse={job.status === 'running'} size={7} />
+          <span className="text-xs uppercase tracking-wider" style={{ color }}>
+            {job.status === 'running' ? 'Running now' : job.status === 'warn' ? 'Needs attention' : 'Healthy'}
+          </span>
         </span>
+        <button
+          onClick={() => onEdit(job)}
+          className="flex items-center gap-1 border border-line px-2 py-1 text-[10px] uppercase tracking-wider text-dim hover:text-text"
+        >
+          <Pencil size={11} /> Edit
+        </button>
       </div>
 
       {job.description && <p className="mb-4 text-sm leading-relaxed text-text/90">{job.description}</p>}
 
       <div className="mb-4 grid grid-cols-2 gap-2">
         <Stat icon={<User size={12} />} label="Owner" value={job.owner} />
-        <Stat icon={<Clock size={12} />} label="Schedule" value={job.schedule} />
-        <Stat icon={<ArrowRight size={12} />} label="Next run" value={job.nextRun ?? '—'} />
+        <Stat icon={<Clock size={12} />} label="Schedule" value={cronScheduleLabel(job.schedule)} />
+        <Stat icon={<ArrowRight size={12} />} label="Next run" value={`${format(nextRun, 'EEE HH:mm')} · ${untilLabel(nextRun)}`} />
         <Stat icon={<Activity size={12} />} label="Avg runtime" value={job.avgRuntime ?? '—'} />
       </div>
 
