@@ -280,5 +280,6 @@ export function mockLocationWeather(loc: LocationMeta, now = new Date()): Locati
     moon,
     modelSpread,
     events,
+    alerts: [],
   }
 }

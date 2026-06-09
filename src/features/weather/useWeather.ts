@@ -7,6 +7,7 @@ import { fetchForecast, fetchNowcast } from './metClient'
 import { fetchModelSpread, fetchUvAndSun } from './openMeteoClient'
 import { fetchAirSeries } from './openMeteoAir'
 import { fetchAurora } from './swpcClient'
+import { fetchAlerts, proxyConfigured } from './proxyClient'
 import { buildEvents } from './events'
 
 // Pulls every location's snapshot together from multiple feeds:
@@ -46,13 +47,14 @@ async function load(id: LocationId): Promise<Result> {
   const base = mockLocationWeather(meta)
   const now = new Date().toISOString()
 
-  const [forecast, nowcast, uvSun, models, air, aurora] = await Promise.allSettled([
+  const [forecast, nowcast, uvSun, models, air, aurora, alerts] = await Promise.allSettled([
     fetchForecast(meta),
     fetchNowcast(meta),
     fetchUvAndSun(meta),
     fetchModelSpread(meta),
     fetchAirSeries(meta),
     fetchAurora(meta),
+    fetchAlerts(meta),
   ])
 
   const sources: SourceStatus[] = []
@@ -125,10 +127,22 @@ async function load(id: LocationId): Promise<Result> {
     sources.push(src('swpc', 'NOAA SWPC', 'Planetary K-index', 'mock', 'unreachable — simulated', 'https://www.swpc.noaa.gov/'))
   }
 
-  // Rebuild the events feed from whatever data we ended up with.
-  data.events = buildEvents(data.days, data.aurora)
+  // 7 — MeteoAlarm severe-weather alerts (only when the proxy is configured)
+  if (alerts.status === 'fulfilled') {
+    data.alerts = alerts.value
+    sources.push(
+      src('meteoalarm', 'MeteoAlarm', 'EUMETNET alerts (proxy)', 'live', `${alerts.value.length} active`, 'https://meteoalarm.org/'),
+    )
+  } else if (proxyConfigured()) {
+    sources.push(src('meteoalarm', 'MeteoAlarm', 'EUMETNET alerts (proxy)', 'mock', 'proxy unreachable', 'https://meteoalarm.org/'))
+  } else {
+    sources.push(src('meteoalarm', 'MeteoAlarm', 'EUMETNET alerts (proxy)', 'cached', 'set VITE_WEATHER_PROXY_URL', 'https://meteoalarm.org/'))
+  }
 
-  // 7–9 — Derived / reference feeds (always available, transparently labelled)
+  // Rebuild the events feed from whatever data we ended up with.
+  data.events = buildEvents(data.days, data.aurora, new Date(), data.alerts)
+
+  // Derived / reference feeds (always available, transparently labelled)
   sources.push(src('vegvesen', 'Statens Vegvesen', 'Road surface & status', 'cached', 'modelled from forecast', 'https://www.vegvesen.no/trafikk/'))
   sources.push(src('cameras', 'Road cameras', 'Vegvesen · kamerakartet', 'cached', 'public webcam feeds', 'https://kamerakartet.no/'))
   sources.push(src('hems', 'Norsk Luftambulanse', 'HEMS flyability (derived)', 'cached', 'derived from MET wind/cloud', 'https://norskluftambulanse.no/'))

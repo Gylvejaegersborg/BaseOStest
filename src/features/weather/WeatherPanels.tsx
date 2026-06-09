@@ -164,15 +164,16 @@ function Metric({ label, value, unit }: { label: string; value: string; unit: st
 }
 
 // ── Road conditions (Statens Vegvesen, modelled) ─────────────────────────────
-const ROAD_COLOR: Record<RoadCondition['status'], string> = {
+export const ROAD_COLOR: Record<RoadCondition['status'], string> = {
   open: '#46d369',
   warning: '#f0a020',
   closed: '#ff5566',
 }
 
-export function RoadPanel({ roads }: { roads: RoadCondition[] }) {
+export function RoadPanel({ roads, onClick }: { roads: RoadCondition[]; onClick?: () => void }) {
   return (
-    <Panel title="Roads" code="VEGVESEN" accent="#f0a020" bodyClassName="p-2">
+    <Panel title="Roads" code="VEGVESEN" accent="#f0a020" right={onClick && <MoreChip />} bodyClassName="p-2">
+      <DrillWrap onClick={onClick}>
       <div className="space-y-1.5">
         {roads.map((r) => (
           <div key={r.id} className="border border-line bg-bg/30 px-2 py-1.5">
@@ -193,6 +194,7 @@ export function RoadPanel({ roads }: { roads: RoadCondition[] }) {
           </div>
         ))}
       </div>
+      </DrillWrap>
     </Panel>
   )
 }
@@ -397,12 +399,14 @@ const EVENT_ICON = {
 export function EventsPanel({ events, onClick }: { events: WeatherEvent[]; onClick?: () => void }) {
   return (
     <Panel title="Upcoming" code="EVENTS" accent="#9b7bff" right={onClick && <MoreChip />} bodyClassName="p-2">
-      <div className="space-y-1">
-        {events.slice(0, 6).map((e) => (
-          <EventRow key={e.id} ev={e} />
-        ))}
-        {events.length === 0 && <div className="px-1 py-2 text-xs text-dim">Nothing notable on the horizon.</div>}
-      </div>
+      <DrillWrap onClick={onClick}>
+        <div className="space-y-1">
+          {events.slice(0, 6).map((e) => (
+            <EventRow key={e.id} ev={e} />
+          ))}
+          {events.length === 0 && <div className="px-1 py-2 text-xs text-dim">Nothing notable on the horizon.</div>}
+        </div>
+      </DrillWrap>
       {events.length > 6 && onClick && (
         <button onClick={onClick} className="mt-1 flex w-full items-center justify-center gap-1 border border-line py-1 text-[10px] uppercase tracking-wider text-dim hover:text-text">
           <CalendarClock size={11} /> {events.length} events
