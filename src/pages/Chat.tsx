@@ -18,17 +18,77 @@ interface Message {
   time: string
 }
 
-// Map agent IDs to real Anthropic model IDs
+// Only Claude is wired to the Anthropic API. Nyx and Hemera are reserved for other models.
 const AGENT_MODEL: Record<string, string> = {
-  claude: 'claude-sonnet-4-6',
-  hemera: 'claude-haiku-4-5-20251001',
-  nyx: 'claude-haiku-4-5-20251001',
+  claude: 'claude-opus-4-8',
 }
 
 const AGENT_SYSTEM: Record<string, string> = {
   claude: 'You are Claude, a builder and code assistant embedded in a personal OS dashboard. Be concise and technical.',
-  hemera: 'You are Hemera, a strategic planner and creative director for the ISΛRK artist project. You focus on releases, content strategy and scheduling.',
-  nyx: 'You are Nyx, an execution-focused agent that runs tasks and coordinates sub-agents. You are direct, fast and action-oriented.',
+}
+
+// OAuth access tokens (sk-ant-oat01-…) must use Authorization: Bearer plus the
+// oauth beta header; only plain API keys (sk-ant-api…) go on x-api-key.
+function authHeaders(token: string): Record<string, string> {
+  if (!token.startsWith('sk-ant-') || token.startsWith('sk-ant-oat')) {
+    return {
+      'Authorization': `Bearer ${token}`,
+      'anthropic-beta': 'oauth-2025-04-20',
+    }
+  }
+  return { 'x-api-key': token }
+}
+
+// Claude OAuth (PKCE) — the same public client + flow Claude Code uses for
+// subscription sign-in. The callback page displays a code the user pastes back.
+const OAUTH_CLIENT_ID = '9d1c250a-e61b-44d9-88ed-5944d1962f5e'
+const OAUTH_REDIRECT = 'https://console.anthropic.com/oauth/code/callback'
+const OAUTH_VERIFIER_KEY = 'os:chat:oauthVerifier'
+
+function base64url(bytes: Uint8Array) {
+  let s = ''
+  bytes.forEach((b) => { s += String.fromCharCode(b) })
+  return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+
+async function buildOauthUrl(): Promise<string> {
+  const verifier = base64url(crypto.getRandomValues(new Uint8Array(32)))
+  localStorage.setItem(OAUTH_VERIFIER_KEY, verifier)
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier))
+  const challenge = base64url(new Uint8Array(digest))
+  const url = new URL('https://claude.ai/oauth/authorize')
+  url.searchParams.set('code', 'true')
+  url.searchParams.set('client_id', OAUTH_CLIENT_ID)
+  url.searchParams.set('response_type', 'code')
+  url.searchParams.set('redirect_uri', OAUTH_REDIRECT)
+  url.searchParams.set('scope', 'org:create_api_key user:profile user:inference')
+  url.searchParams.set('code_challenge', challenge)
+  url.searchParams.set('code_challenge_method', 'S256')
+  url.searchParams.set('state', verifier)
+  return url.toString()
+}
+
+async function exchangeOauthCode(pasted: string): Promise<string> {
+  const verifier = localStorage.getItem(OAUTH_VERIFIER_KEY)
+  if (!verifier) throw new Error('Sign-in session expired — click the sign-in link again.')
+  const [code, state] = pasted.trim().split('#')
+  const res = await fetch('https://console.anthropic.com/v1/oauth/token', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      grant_type: 'authorization_code',
+      code,
+      state: state ?? verifier,
+      client_id: OAUTH_CLIENT_ID,
+      redirect_uri: OAUTH_REDIRECT,
+      code_verifier: verifier,
+    }),
+  })
+  if (!res.ok) throw new Error(`Token exchange failed (HTTP ${res.status})`)
+  const data = await res.json()
+  if (!data?.access_token) throw new Error('No access token in response')
+  localStorage.removeItem(OAUTH_VERIFIER_KEY)
+  return data.access_token as string
 }
 
 const CHAT_AGENTS = AGENTS.slice(0, 3)
@@ -100,13 +160,31 @@ export function Chat() {
   const send = async () => {
     if (streaming) { abortRef.current?.abort(); return }
     if (!draft.trim() && !pending.length) return
-    if (!apiKey) { setShowKeyPanel(true); return }
 
+    const model = AGENT_MODEL[agentId]
     const now = fmtTime()
     const userMsg: Message = {
       id: crypto.randomUUID(), role: 'user',
       text: draft.trim(), attachments: pending, time: now,
     }
+
+    if (!model) {
+      // Nyx / Hemera — reserved for other models, not connected yet
+      const reply: Message = {
+        id: crypto.randomUUID(), role: 'assistant',
+        text: `${agent.name} is reserved for another model and isn't connected yet. Switch to Claude to chat.`,
+        time: fmtTime(),
+      }
+      const next = [...messages, userMsg, reply]
+      setMessages(next)
+      saveHistory(convoId, next)
+      setDraft('')
+      setPending([])
+      return
+    }
+
+    if (!apiKey) { setShowKeyPanel(true); return }
+
     const nextMsgs = [...messages, userMsg]
     setMessages(nextMsgs)
     saveHistory(convoId, nextMsgs)
@@ -125,21 +203,21 @@ export function Chat() {
       const history = nextMsgs
         .filter((m) => m.text.trim())
         .map((m) => ({ role: m.role as 'user' | 'assistant', content: m.text }))
+      // First message must be role "user" — drop leading assistant greetings
+      while (history.length && history[0].role !== 'user') history.shift()
 
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         signal: controller.signal,
         headers: {
-          ...(apiKey.startsWith('sk-ant-')
-            ? { 'x-api-key': apiKey }
-            : { 'Authorization': `Bearer ${apiKey}` }),
+          ...authHeaders(apiKey),
           'anthropic-version': '2023-06-01',
           'content-type': 'application/json',
           'anthropic-dangerous-direct-browser-access': 'true',
         },
         body: JSON.stringify({
-          model: AGENT_MODEL[agentId] ?? 'claude-haiku-4-5-20251001',
-          max_tokens: 1024,
+          model,
+          max_tokens: 16000,
           system: AGENT_SYSTEM[agentId] ?? '',
           stream: true,
           messages: history,
@@ -212,7 +290,7 @@ export function Chat() {
           )}
         >
           <Key size={12} />
-          {apiKey ? 'API key set' : 'Set API key'}
+          {apiKey ? 'Claude connected' : 'Connect Claude'}
         </button>
       </aside>
 
@@ -362,21 +440,82 @@ function fmtTime() {
 function ApiKeyPanel({ value, onChange, onClose }: { value: string; onChange: (k: string) => void; onClose: () => void }) {
   const [show, setShow] = useState(false)
   const [local, setLocal] = useState(value)
+  const [awaitingCode, setAwaitingCode] = useState(() => !!localStorage.getItem(OAUTH_VERIFIER_KEY))
+  const [oauthCode, setOauthCode] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+
+  const signIn = async () => {
+    setError('')
+    const url = await buildOauthUrl()
+    window.open(url, '_blank', 'noopener')
+    setAwaitingCode(true)
+  }
+
+  const connect = async () => {
+    if (!oauthCode.trim() || busy) return
+    setBusy(true)
+    setError('')
+    try {
+      const token = await exchangeOauthCode(oauthCode)
+      onChange(token)
+      onClose()
+    } catch (err) {
+      setError(`${(err as Error)?.message ?? 'Sign-in failed'} — you can paste a token manually below.`)
+    } finally {
+      setBusy(false)
+    }
+  }
+
   return (
     <div className="border-b border-line bg-panel/80 p-3">
       <div className="mb-2 flex items-center justify-between">
         <span className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-dim">
-          <Key size={12} /> API Key or OAuth Token
+          <Key size={12} /> Connect Claude
         </span>
         <button onClick={onClose} className="text-dim hover:text-text"><X size={13} /></button>
       </div>
+
+      {/* OAuth sign-in (no token needed) */}
+      <div className="mb-3 border border-line bg-bg/40 p-2">
+        <button
+          onClick={signIn}
+          className="w-full border border-accent/40 bg-accent/10 px-3 py-1.5 text-xs uppercase tracking-wider text-accent hover:bg-accent/20"
+        >
+          Sign in with Claude
+        </button>
+        {awaitingCode && (
+          <div className="mt-2 flex gap-2">
+            <input
+              value={oauthCode}
+              onChange={(e) => setOauthCode(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') connect() }}
+              placeholder="Paste the code from the sign-in page"
+              className="flex-1 border border-line bg-bg/60 px-2 py-1.5 text-sm text-text focus:border-accent/60 focus:outline-none"
+            />
+            <button
+              onClick={connect}
+              disabled={busy}
+              className="border border-accent/40 bg-accent/10 px-3 py-1.5 text-xs uppercase tracking-wider text-accent hover:bg-accent/20 disabled:opacity-50"
+            >
+              {busy ? '…' : 'Connect'}
+            </button>
+          </div>
+        )}
+        <p className="mt-1.5 text-[10px] text-dim">
+          Opens claude.ai sign-in. After approving, copy the code shown and paste it here.
+        </p>
+        {error && <p className="mt-1 text-[10px] text-danger">{error}</p>}
+      </div>
+
+      {/* Manual token / API key fallback */}
       <div className="flex gap-2">
         <div className="relative flex-1">
           <input
             type={show ? 'text' : 'password'}
             value={local}
             onChange={(e) => setLocal(e.target.value)}
-            placeholder="sk-ant-… or OAuth token"
+            placeholder="sk-ant-oat01-… (OAuth) or sk-ant-api…"
             className="w-full border border-line bg-bg/60 px-2 py-1.5 pr-8 text-sm text-text focus:border-accent/60 focus:outline-none"
           />
           <button
@@ -394,7 +533,8 @@ function ApiKeyPanel({ value, onChange, onClose }: { value: string; onChange: (k
         </button>
       </div>
       <p className="mt-1.5 text-[10px] text-dim">
-        Paste an API key (<span className="text-text/60">sk-ant-…</span>) or an OAuth access token.
+        Paste a Claude OAuth access token (<span className="text-text/60">sk-ant-oat01-…</span>) or an
+        API key (<span className="text-text/60">sk-ant-api…</span>).
         Stored in localStorage only — only sent to api.anthropic.com.
       </p>
     </div>
