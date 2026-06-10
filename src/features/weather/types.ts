@@ -109,6 +109,7 @@ export interface LocationWeather {
   moon: MoonInfo
   modelSpread: ModelSpread
   events: WeatherEvent[]
+  alerts: WeatherAlert[] // severe-weather alerts (empty unless the proxy is configured)
 }
 
 // ── UV ───────────────────────────────────────────────────────────────────────
@@ -182,4 +183,20 @@ export interface WeatherEvent {
   title: string
   detail: string
   tone: string
+}
+
+// ── Severe-weather alerts (EUMETNET MeteoAlarm, via weather-proxy) ────────────
+export type AlertSeverity = 'minor' | 'moderate' | 'severe' | 'extreme' | 'unknown'
+
+export interface WeatherAlert {
+  id: string
+  area: string
+  event: string
+  severity: AlertSeverity
+  awarenessLevel: number // 1 green · 2 yellow · 3 orange · 4 red
+  color: string
+  headline: string
+  onset?: string
+  expires?: string
+  url?: string
 }

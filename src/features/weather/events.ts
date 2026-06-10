@@ -1,6 +1,24 @@
 import { parseISO } from 'date-fns'
-import type { Aurora, DayForecast, WeatherEvent } from './types'
+import type { Aurora, DayForecast, WeatherAlert, WeatherEvent } from './types'
 import { cosmicEvents } from './astro'
+
+const ALERT_TONE: Record<string, string> = {
+  green: '#46d369',
+  yellow: '#f0c020',
+  orange: '#ff8a3d',
+  red: '#ff5566',
+}
+
+function alertEvents(alerts: WeatherAlert[]): WeatherEvent[] {
+  return alerts.map((a) => ({
+    id: `alert-${a.id}`,
+    kind: 'alert' as const,
+    date: a.onset ?? new Date().toISOString(),
+    title: `${a.event} · ${a.area}`,
+    detail: a.headline,
+    tone: ALERT_TONE[a.color] ?? '#f0a020',
+  }))
+}
 
 // Builds the "what's coming" feed: notable weather pulled out of the daily
 // forecast, an aurora alert when the geomagnetic forecast warrants it, and the
@@ -41,7 +59,13 @@ function auroraEvent(aurora: Aurora): WeatherEvent[] {
   ]
 }
 
-export function buildEvents(days: DayForecast[], aurora: Aurora, from = new Date()): WeatherEvent[] {
-  const all = [...weatherEvents(days), ...auroraEvent(aurora), ...cosmicEvents(from, 45)]
-  return all.sort((a, b) => a.date.localeCompare(b.date)).slice(0, 16)
+export function buildEvents(
+  days: DayForecast[],
+  aurora: Aurora,
+  from = new Date(),
+  alerts: WeatherAlert[] = [],
+): WeatherEvent[] {
+  // Official alerts first so they're never crowded out by the long-range calendar.
+  const all = [...alertEvents(alerts), ...weatherEvents(days), ...auroraEvent(aurora), ...cosmicEvents(from, 45)]
+  return all.sort((a, b) => a.date.localeCompare(b.date)).slice(0, 20)
 }

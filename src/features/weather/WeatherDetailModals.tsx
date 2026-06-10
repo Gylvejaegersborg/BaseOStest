@@ -1,9 +1,10 @@
+import { AlertTriangle } from 'lucide-react'
 import { format, parseISO } from 'date-fns'
 import { Modal } from '@/components/ui/Modal'
-import type { HourPoint, LocationWeather } from './types'
+import type { HourPoint, LocationWeather, RoadCondition } from './types'
 import type { MetricKey } from './CurrentHero'
 import { SeriesChart, type SeriesPoint } from './SeriesChart'
-import { EventRow, MoonGlyph } from './WeatherPanels'
+import { MoonGlyph, ROAD_COLOR } from './WeatherPanels'
 import { moonInfo } from './astro'
 import { PROVIDERS, STATUS_META } from './models'
 import {
@@ -202,17 +203,101 @@ export function AuroraDetailModal({ wx, onClose, open }: { wx: LocationWeather; 
 }
 
 // ── Events (weather + cosmic) ────────────────────────────────────────────────
+const EVENT_KIND_LABEL = { weather: 'Weather', cosmic: 'Cosmic', aurora: 'Aurora', alert: 'Alert' } as const
+
 export function EventsDetailModal({ wx, onClose, open }: { wx: LocationWeather; onClose: () => void; open: boolean }) {
   if (!open) return null
   return (
-    <Modal open onClose={onClose} title="Upcoming Events" code="EVENTS" accent="#9b7bff" width={520}>
-      <div className="space-y-1.5">
-        {wx.events.map((e) => (
-          <EventRow key={e.id} ev={e} />
-        ))}
-        {wx.events.length === 0 && <div className="text-xs text-dim">Nothing notable on the horizon.</div>}
+    <Modal open onClose={onClose} title="Upcoming Events" code="EVENTS" accent="#9b7bff" width={560}>
+      <div className="divide-y divide-line/50">
+        {wx.events.map((e) => {
+          const d = parseISO(e.date)
+          return (
+            <div key={e.id} className="flex items-start gap-3 py-2">
+              <div className="w-14 shrink-0 text-center">
+                <div className="font-display text-sm text-text">{format(d, 'd')}</div>
+                <div className="text-[10px] uppercase tracking-wider text-dim">{format(d, 'MMM')}</div>
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: e.tone }} />
+                  <span className="text-sm text-text">{e.title}</span>
+                  <span className="ml-auto shrink-0 text-[9px] uppercase tracking-wider" style={{ color: e.tone }}>
+                    {EVENT_KIND_LABEL[e.kind]}
+                  </span>
+                </div>
+                <p className="mt-0.5 text-xs text-dim">{e.detail}</p>
+                <div className="mt-0.5 text-[10px] text-dim">{format(d, 'EEEE d MMM, HH:mm')}</div>
+              </div>
+            </div>
+          )
+        })}
+        {wx.events.length === 0 && <div className="py-3 text-xs text-dim">Nothing notable on the horizon.</div>}
       </div>
-      <p className="mt-3 text-[10px] text-dim">Weather events from the forecast; cosmic events (moon, solstices, meteor showers) computed locally.</p>
+      <p className="mt-3 text-[10px] text-dim">
+        Weather events derived from the forecast; cosmic events (moon phases, solstices, meteor showers) computed locally;
+        aurora alerts from NOAA SWPC.
+      </p>
+    </Modal>
+  )
+}
+
+// ── Roads (Statens Vegvesen, modelled) ───────────────────────────────────────
+export function RoadsDetailModal({
+  roads,
+  wx,
+  onClose,
+  open,
+}: {
+  roads: RoadCondition[]
+  wx: LocationWeather
+  onClose: () => void
+  open: boolean
+}) {
+  if (!open) return null
+  // Approximate road-surface temperature: a touch below air temp (clear-night bias).
+  const points: SeriesPoint[] = wx.hours.map((h) => ({ time: h.time, value: Math.round((h.temp - 1.5) * 10) / 10 }))
+  const minSurface = Math.min(...points.map((p) => p.value))
+  return (
+    <Modal open onClose={onClose} title="Road Conditions" code="VEGVESEN" accent="#f0a020" width={620}>
+      <div className="mb-1 flex items-center justify-between">
+        <span className="label text-dim">Surface temperature · next 48h</span>
+        {minSurface <= 0 && (
+          <span className="flex items-center gap-1 text-[11px] text-amber">
+            <AlertTriangle size={11} /> dips below 0° — ice risk
+          </span>
+        )}
+      </div>
+      <SeriesChart points={points} color="#f0a020" kind="line" unit="°" />
+
+      <div className="mt-3 space-y-2">
+        {roads.map((r) => (
+          <div key={r.id} className="border border-line bg-bg/30 px-3 py-2">
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: ROAD_COLOR[r.status] }} />
+              <span className="text-sm text-text">
+                {r.road} · {r.stretch}
+              </span>
+              <span
+                className="ml-auto text-[10px] uppercase tracking-wider"
+                style={{ color: ROAD_COLOR[r.status] }}
+              >
+                {r.status}
+              </span>
+            </div>
+            <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-0.5 text-xs">
+              <span style={{ color: ROAD_COLOR[r.status] }}>{r.surface}</span>
+              {r.temp != null && <span className="text-dim">surface {r.temp}°</span>}
+            </div>
+            <p className="mt-1 text-[11px] text-dim">{r.message}</p>
+          </div>
+        ))}
+      </div>
+
+      <p className="mt-3 text-[10px] text-dim">
+        Surface state modelled from the MET forecast (temperature + precipitation type). Cross-reference the live
+        Statens Vegvesen feeds via the road cameras for real-time confirmation.
+      </p>
     </Modal>
   )
 }

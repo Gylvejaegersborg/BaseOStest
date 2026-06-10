@@ -33,6 +33,7 @@ import {
   AuroraDetailModal,
   EventsDetailModal,
   MetricDetailModal,
+  RoadsDetailModal,
   SourcesDetailModal,
   UvDetailModal,
 } from '@/features/weather/WeatherDetailModals'
@@ -46,6 +47,7 @@ type Detail =
   | { type: 'uv' }
   | { type: 'aurora' }
   | { type: 'events' }
+  | { type: 'roads' }
   | { type: 'sources' }
 
 export function Weather() {
@@ -183,7 +185,7 @@ export function Weather() {
         <AuroraPanel aurora={wx.aurora} onClick={() => setDetail({ type: 'aurora' })} />
         <AirQualityPanel aq={wx.airQuality} onClick={() => setDetail({ type: 'air' })} />
         <HemsPanel hems={wx.hems} base={HEMS_BASE[locId]} />
-        <RoadPanel roads={roads} />
+        <RoadPanel roads={roads} onClick={() => setDetail({ type: 'roads' })} />
         <CamerasPanel cameras={cameras} />
       </aside>
 
@@ -200,6 +202,7 @@ export function Weather() {
       <UvDetailModal open={detail?.type === 'uv'} wx={wx} onClose={() => setDetail(null)} />
       <AuroraDetailModal open={detail?.type === 'aurora'} wx={wx} onClose={() => setDetail(null)} />
       <EventsDetailModal open={detail?.type === 'events'} wx={wx} onClose={() => setDetail(null)} />
+      <RoadsDetailModal open={detail?.type === 'roads'} roads={roads} wx={wx} onClose={() => setDetail(null)} />
       <SourcesDetailModal open={detail?.type === 'sources'} wx={wx} onClose={() => setDetail(null)} />
     </div>
   )

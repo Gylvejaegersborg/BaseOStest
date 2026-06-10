@@ -42,8 +42,8 @@ export const PROVIDERS: ProviderInfo[] = [
   { id: 'bom', name: 'Bureau of Meteorology (AU)', role: 'Global model (ACCESS)', status: 'ensemble', detail: 'Australian ACCESS-G model.', href: 'http://www.bom.gov.au/' },
 
   // ── Registered, not connected (need keys / server proxy) ──
-  { id: 'metoffice', name: 'The Met Office (UK)', role: 'Forecast + warnings', status: 'key', detail: 'DataHub API requires a key.', href: 'https://www.metoffice.gov.uk/' },
-  { id: 'meteoalarm', name: 'EUMETNET MeteoAlarm', role: 'Severe-weather alerts', status: 'key', detail: 'Pan-European CAP alert feed (server-side).', href: 'https://meteoalarm.org/' },
+  { id: 'metoffice', name: 'The Met Office (UK)', role: 'Forecast + warnings', status: 'key', detail: 'DataHub API — keyed; scaffolded in weather-proxy.', href: 'https://www.metoffice.gov.uk/' },
+  { id: 'meteoalarm', name: 'EUMETNET MeteoAlarm', role: 'Severe-weather alerts', status: 'key', detail: 'CAP feed — connects via weather-proxy (VITE_WEATHER_PROXY_URL).', href: 'https://meteoalarm.org/' },
   { id: 'weatherchannel', name: 'The Weather Channel', role: 'Consumer forecast', status: 'key', detail: 'IBM/TWC API requires a key.', href: 'https://weather.com/' },
   { id: 'breezometer', name: 'BreezoMeter (Google)', role: 'Air quality + pollen', status: 'key', detail: 'Now Google Maps Platform Air Quality — keyed.', href: 'https://www.breezometer.com/' },
   { id: 'qweather', name: 'QWeather', role: 'Forecast (Asia focus)', status: 'key', detail: 'Requires an API key.', href: 'https://www.qweather.com/' },

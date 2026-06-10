@@ -1,0 +1,26 @@
+{
+  "name": "baseos-weather-proxy",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Server-side proxy for weather providers that need an API key or aren't browser-reachable (CORS). Currently: EUMETNET MeteoAlarm severe-weather alerts (key-less, CORS-blocked) and a keyed Met Office DataHub scaffold. The Weather section calls this when VITE_WEATHER_PROXY_URL is set.",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "fast-xml-parser": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.10.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
