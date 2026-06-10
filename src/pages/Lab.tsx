@@ -115,7 +115,7 @@ export function Lab() {
         width={isSudoku ? 800 : 520}
       >
         {isSudoku ? (
-          <div className="h-[70vh] overflow-auto">
+          <div className="h-[70dvh] overflow-hidden">
             <Suspense fallback={<div className="flex h-full items-center justify-center text-xs text-dim">Loading…</div>}>
               <SudokuPage />
             </Suspense>

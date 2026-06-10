@@ -28,7 +28,7 @@ export function Modal({ open, onClose, title, code, accent, children, width = 56
       onClick={onClose}
     >
       <div
-        className="relative w-full border border-line-2 bg-panel shadow-glow max-h-[85vh] flex flex-col"
+        className="relative w-full border border-line-2 bg-panel shadow-glow max-h-[85dvh] flex flex-col"
         style={{ maxWidth: width, borderColor: accent ? `${accent}55` : undefined }}
         onClick={(e) => e.stopPropagation()}
       >

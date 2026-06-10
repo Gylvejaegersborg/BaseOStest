@@ -204,9 +204,9 @@ export function YtDlpPage({ open, onClose }: YtDlpPageProps) {
         </button>
       </header>
 
-      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
         {/* Left: options panel */}
-        <aside className="shrink-0 overflow-y-auto border-b border-line bg-panel/30 lg:w-[300px] lg:border-b-0 lg:border-r">
+        <aside className="shrink-0 border-b border-line bg-panel/30 lg:w-[300px] lg:overflow-y-auto lg:border-b-0 lg:border-r">
           <div className="border-b border-line px-3 py-2 text-[10px] uppercase tracking-widest text-dim">
             Download Options
           </div>
@@ -323,7 +323,7 @@ export function YtDlpPage({ open, onClose }: YtDlpPageProps) {
         </aside>
 
         {/* Right: queue */}
-        <main className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <main className="flex min-w-0 flex-1 flex-col lg:min-h-0">
           <div className="flex items-center justify-between border-b border-line px-3 py-2">
             <span className="text-[10px] uppercase tracking-widest text-dim">
               Download Queue · {jobs.length} job{jobs.length !== 1 ? 's' : ''}
@@ -338,7 +338,7 @@ export function YtDlpPage({ open, onClose }: YtDlpPageProps) {
             )}
           </div>
 
-          <div className="min-h-0 flex-1 overflow-y-auto">
+          <div className="flex-1 lg:min-h-0 lg:overflow-y-auto">
             {jobs.length === 0 ? (
               <div className="flex h-full min-h-[200px] flex-col items-center justify-center gap-2 text-center text-dim">
                 <Download size={28} className="opacity-30" />

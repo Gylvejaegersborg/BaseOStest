@@ -100,9 +100,9 @@ export function SongTrackerPage({ open, onClose }: SongTrackerPageProps) {
       </header>
 
       {/* Body */}
-      <div className="flex min-h-0 flex-1 flex-col-reverse lg:flex-row">
+      <div className="flex min-h-0 flex-1 flex-col-reverse overflow-y-auto lg:flex-row lg:overflow-hidden">
         {/* Song projects */}
-        <div className="flex min-w-0 flex-1 flex-col gap-4 overflow-y-auto p-4">
+        <div className="flex min-w-0 flex-1 flex-col gap-4 p-4 lg:overflow-y-auto">
           <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-dim">
             <span className="font-display tracking-wider text-text">Song projects</span>
             <span className="text-dim">· {projects.length} active</span>
@@ -148,7 +148,7 @@ export function SongTrackerPage({ open, onClose }: SongTrackerPageProps) {
           </div>
 
           {/* Today's tasks */}
-          <div className="min-h-0 flex-1 overflow-y-auto p-2">
+          <div className="flex-1 p-2 lg:min-h-0 lg:overflow-y-auto">
             {today.length === 0 && (
               <p className="px-1 py-6 text-center text-xs text-dim">No tasks flagged for today.</p>
             )}

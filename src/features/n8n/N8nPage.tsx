@@ -293,13 +293,13 @@ export function N8nPage({ open, onClose }: N8nPageProps) {
         </div>
       </header>
 
-      <div className="flex min-h-0 flex-1 overflow-hidden">
-        {/* Workflow list */}
-        <aside className="flex w-[240px] shrink-0 flex-col border-r border-line bg-panel/30">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
+        {/* Workflow list — horizontal strip on mobile, sidebar on lg */}
+        <aside className="flex shrink-0 flex-col border-b border-line bg-panel/30 lg:w-[240px] lg:border-b-0 lg:border-r">
           <div className="border-b border-line px-3 py-2 text-[10px] uppercase tracking-widest text-dim">
             Workflows · {workflows.length}
           </div>
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex gap-1.5 overflow-x-auto p-2 lg:block lg:flex-1 lg:overflow-y-auto lg:overflow-x-visible lg:p-0">
             {workflows.map((wf) => {
               const TIcon = TRIGGER_ICON[wf.triggerType]
               const isActive = wf.status === 'active'
@@ -308,7 +308,7 @@ export function N8nPage({ open, onClose }: N8nPageProps) {
                   key={wf.id}
                   onClick={() => setSelectedId(wf.id)}
                   className={cn(
-                    'flex w-full flex-col gap-1 border-b border-line px-3 py-2.5 text-left transition-colors hover:bg-panel/50',
+                    'flex w-[200px] shrink-0 flex-col gap-1 border border-line px-3 py-2.5 text-left transition-colors hover:bg-panel/50 lg:w-full lg:border-x-0 lg:border-t-0 lg:border-b',
                     selectedId === wf.id && 'bg-panel/60',
                   )}
                 >
@@ -337,7 +337,7 @@ export function N8nPage({ open, onClose }: N8nPageProps) {
         </aside>
 
         {/* Detail + executions */}
-        <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <div className="flex min-w-0 flex-1 flex-col lg:overflow-hidden">
           {/* Workflow detail */}
           <div className="border-b border-line bg-panel/20 p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
@@ -424,10 +424,10 @@ export function N8nPage({ open, onClose }: N8nPageProps) {
             </div>
           </div>
 
-          {/* Execution log split */}
-          <div className="flex min-h-0 flex-1 overflow-hidden">
+          {/* Execution log split — stacked on mobile, side-by-side on lg */}
+          <div className="flex flex-col lg:min-h-0 lg:flex-1 lg:flex-row lg:overflow-hidden">
             {/* This workflow's runs */}
-            <div className="flex min-w-0 flex-1 flex-col overflow-hidden border-r border-line">
+            <div className="flex min-w-0 flex-1 flex-col border-b border-line lg:overflow-hidden lg:border-b-0 lg:border-r">
               <div className="border-b border-line px-3 py-2 text-[10px] uppercase tracking-widest text-dim">
                 This workflow · executions
               </div>
@@ -435,7 +435,7 @@ export function N8nPage({ open, onClose }: N8nPageProps) {
             </div>
 
             {/* All recent runs */}
-            <div className="flex w-[300px] shrink-0 flex-col overflow-hidden">
+            <div className="flex w-full shrink-0 flex-col lg:w-[300px] lg:overflow-hidden">
               <div className="border-b border-line px-3 py-2 text-[10px] uppercase tracking-widest text-dim">
                 All workflows · recent
               </div>
@@ -453,7 +453,7 @@ export function N8nPage({ open, onClose }: N8nPageProps) {
 function ExecList({ executions, compact }: { executions: Execution[]; compact?: boolean }) {
   if (executions.length === 0) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-2 text-center text-dim">
+      <div className="flex flex-1 flex-col items-center justify-center gap-2 py-8 text-center text-dim">
         <Activity size={22} className="opacity-30" />
         <p className="text-xs">No executions yet.</p>
       </div>
@@ -461,7 +461,7 @@ function ExecList({ executions, compact }: { executions: Execution[]; compact?: 
   }
 
   return (
-    <div className="flex-1 overflow-y-auto divide-y divide-line">
+    <div className="flex-1 divide-y divide-line lg:overflow-y-auto">
       {executions.map((e) => (
         <ExecRow key={e.id} exec={e} compact={compact} />
       ))}
