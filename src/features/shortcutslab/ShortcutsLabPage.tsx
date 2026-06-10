@@ -217,8 +217,8 @@ export function ShortcutsLabPage({ open, onClose }: ShortcutsLabPageProps) {
         </button>
       </div>
 
-      {/* Body: library · inspector · builder */}
-      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+      {/* Body: library · inspector · builder. One page scroll on mobile, per-column scroll on lg. */}
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
         <ShortcutLibrary lastTriggered={lastTriggered} onRun={runShortcut} />
         <PayloadInspector log={log} />
         <ActionBuilder onFire={(action, request) => fire(action, METHOD_FOR[action], request, 'builder')} />
@@ -237,7 +237,7 @@ function ShortcutLibrary({
   onRun: (s: ShortcutDef) => void
 }) {
   return (
-    <aside className="shrink-0 overflow-y-auto border-b border-line bg-panel/30 lg:w-[260px] lg:border-b-0 lg:border-r">
+    <aside className="shrink-0 border-b border-line bg-panel/30 lg:w-[260px] lg:overflow-y-auto lg:border-b-0 lg:border-r">
       <div className="border-b border-line px-3 py-2 text-[10px] uppercase tracking-widest text-dim">
         Shortcut Library
       </div>
@@ -276,12 +276,12 @@ function ShortcutLibrary({
 
 function PayloadInspector({ log }: { log: LogEntry[] }) {
   return (
-    <main className="flex min-h-0 min-w-0 flex-1 flex-col">
+    <main className="flex min-w-0 flex-1 flex-col lg:min-h-0">
       <div className="flex items-center justify-between border-b border-line px-3 py-2">
         <span className="text-[10px] uppercase tracking-widest text-dim">Payload Inspector</span>
         <span className="text-[10px] text-dim">{log.length}/8 requests</span>
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto p-3">
+      <div className="flex-1 p-3 lg:min-h-0 lg:overflow-y-auto">
         {log.length === 0 ? (
           <div className="flex h-full min-h-[200px] flex-col items-center justify-center gap-2 text-center text-dim">
             <Zap size={22} className="opacity-50" />
@@ -363,7 +363,7 @@ function ActionBuilder({
   const isGet = METHOD_FOR[action] === 'GET'
 
   return (
-    <aside className="shrink-0 overflow-y-auto border-t border-line bg-panel/30 lg:w-[240px] lg:border-l lg:border-t-0">
+    <aside className="shrink-0 border-t border-line bg-panel/30 lg:w-[240px] lg:overflow-y-auto lg:border-l lg:border-t-0">
       <div className="border-b border-line px-3 py-2 text-[10px] uppercase tracking-widest text-dim">
         Action Builder
       </div>

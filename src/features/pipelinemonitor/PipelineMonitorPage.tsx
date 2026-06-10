@@ -297,9 +297,9 @@ export function PipelineMonitorPage({ open, onClose }: PipelineMonitorPageProps)
       )}
 
       {/* Body */}
-      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
         {/* Main column */}
-        <div className="flex min-w-0 flex-1 flex-col gap-4 overflow-y-auto p-4">
+        <div className="flex min-w-0 flex-1 flex-col gap-4 p-4 lg:overflow-y-auto">
           <Pipeline status={stageStatus} />
           <ActiveJobs jobs={jobs} now={now} onErrorClick={setErrorDetail} />
           <Recent recent={recent} now={now} />
