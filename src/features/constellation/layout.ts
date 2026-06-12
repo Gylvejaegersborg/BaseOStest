@@ -25,6 +25,7 @@ const SUN_POS: Record<string, { x: number; y: number }> = {
   projects: { x: 600, y: 365 },
   lab: { x: 200, y: 440 },
   room: { x: 910, y: 470 },
+  team: { x: 760, y: 555 },
   ops: { x: 1060, y: 300 },
   weather: { x: 540, y: 585 },
 }
@@ -42,6 +43,9 @@ export const SUN_LINKS: [SectionId, SectionId][] = [
   ['projects', 'room'],
   ['projects', 'lab'],
   ['projects', 'weather'],
+  ['projects', 'team'],
+  ['team', 'room'],
+  ['team', 'weather'],
   ['weather', 'lab'],
   ['weather', 'room'],
 ]
@@ -51,7 +55,8 @@ export function buildBodies(): { suns: Body[]; planets: Body[] } {
   const planets: Body[] = []
 
   for (const s of NAV_SECTIONS) {
-    const pos = SUN_POS[s.id]
+    // Sections without a hand-placed spot fall back to centre instead of crashing.
+    const pos = SUN_POS[s.id] ?? { x: VIEW_W / 2, y: VIEW_H / 2 }
     suns.push({
       key: `sun-${s.id}`,
       kind: 'sun',
