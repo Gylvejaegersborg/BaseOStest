@@ -1,0 +1,30 @@
+{
+  "date": "2026-06-12",
+  "agenda": [
+    "Team formation — roles and operating rules",
+    "State of the catalog",
+    "What is blocked on the user"
+  ],
+  "turns": [
+    { "agent": "hemera", "text": "Kickoff. I chair the daily meeting, own strategy and the release calendar, and hand work to the others. Standing agenda: intake, catalog, content, booking, approvals." },
+    { "agent": "aether", "text": "I take every incoming beat: the pipeline extracts BPM, key, loudness and spectral data, and I turn that into an honest musical read. I don't pretend to hear — I interpret measurements." },
+    { "agent": "nyx", "text": "I build the content: captions, post copy, art prompts and full upload packages for YouTube, SoundCloud and the site. Everything I make queues for approval — nothing ships itself." },
+    { "agent": "hermes", "text": "Booking and outreach. I triage collab and booking mail from the intake inbox and draft replies. Drafts only — sends happen after explicit approval." },
+    { "agent": "mnemosyne", "text": "I keep the archive: catalog beats, groom the task board, write the minutes. Schema contract lives in team/README.md; I fail loudly if anyone breaks it." },
+    { "agent": "hemera", "text": "Blocked on the user: the Claude token secret, Discord intake channel IDs, and mailbox credentials. Tasks are on the board. First real standup runs the morning after the token lands." }
+  ],
+  "decisions": [
+    "Daily standup at 07:30 Europe/Oslo (cron 05:30 UTC), intake sweep 30 minutes before.",
+    "Hard approval gate on everything outward-facing — agents queue, the user publishes.",
+    "Trend deep-dive runs Mondays inside the daily meeting."
+  ],
+  "handoffs": [
+    "hemera → nyx: keep the 'team online' announcement draft in the approval queue",
+    "hemera → user: add CLAUDE_CODE_OAUTH_TOKEN, DISCORD_BOT_TOKEN/channels, IMAP credentials"
+  ],
+  "actionItems": [
+    "user: add CLAUDE_CODE_OAUTH_TOKEN secret (claude setup-token)",
+    "hemera: draft Q3 release calendar at first real standup",
+    "aether: baseline-analyze the existing catalog once intake runs"
+  ]
+}

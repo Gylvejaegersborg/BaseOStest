@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Activity, Cpu, MessageSquare, Timer, CheckCircle2 } from 'lucide-react'
 import { AGENTS, type Agent } from '@/data/agents'
 import { Panel } from '@/components/ui/Panel'
 import { StatusDot } from '@/components/ui/StatusDot'
+import { useTeamState } from '@/features/team/useTeamState'
 import { cn } from '@/lib/cn'
 
 interface Mover {
@@ -43,6 +44,34 @@ export function MeetingRoom() {
   const moversRef = useRef(movers)
   moversRef.current = movers
 
+  // Live team state committed by the workflows: real statuses/tasks override the
+  // mock roster, and the latest meeting transcript replaces the random chatter.
+  const team = useTeamState()
+  const live = team.connection === 'live'
+  const agents = useMemo<Agent[]>(
+    () =>
+      AGENTS.map((a) => {
+        const l = live ? team.agents.find((x) => x.id === a.id) : undefined
+        return l ? { ...a, role: l.role, status: l.status, task: l.task } : a
+      }),
+    [live, team.agents],
+  )
+  const agentsRef = useRef(agents)
+  agentsRef.current = agents
+  const turnsRef = useRef<{ agent: Agent; text: string }[] | null>(null)
+  const turnIdxRef = useRef(0)
+  useEffect(() => {
+    if (live && team.meeting?.turns.length) {
+      const mapped = team.meeting.turns
+        .map((t) => ({ agent: agents.find((a) => a.id === t.agent), text: t.text }))
+        .filter((t): t is { agent: Agent; text: string } => !!t.agent)
+      turnsRef.current = mapped.length ? mapped : null
+    } else {
+      turnsRef.current = null
+    }
+    turnIdxRef.current = 0
+  }, [live, team.meeting, agents])
+
   // wander loop
   useEffect(() => {
     const id = window.setInterval(() => {
@@ -68,13 +97,25 @@ export function MeetingRoom() {
     return () => window.clearInterval(id)
   }, [])
 
-  // chatter feed loop
+  // feed loop: replays the live meeting transcript when present, random mock
+  // chatter otherwise (refs keep the interval stable across state changes)
   useEffect(() => {
     const id = window.setInterval(() => {
-      const agent = AGENTS[Math.floor(Math.random() * AGENTS.length)]
-      if (agent.status === 'offline') return
-      const text = agent.chatter[Math.floor(Math.random() * agent.chatter.length)]
-      const idx = AGENTS.indexOf(agent)
+      const list = agentsRef.current
+      const turns = turnsRef.current
+      let agent: Agent
+      let text: string
+      if (turns) {
+        const t = turns[turnIdxRef.current % turns.length]
+        turnIdxRef.current += 1
+        agent = t.agent
+        text = t.text
+      } else {
+        agent = list[Math.floor(Math.random() * list.length)]
+        if (agent.status === 'offline') return
+        text = agent.chatter[Math.floor(Math.random() * agent.chatter.length)]
+      }
+      const idx = list.indexOf(agent)
       setFeed((f) => [
         { id: crypto.randomUUID(), agent, text, time: new Date().toLocaleTimeString('en-GB', { hour12: false }) },
         ...f,
@@ -87,7 +128,7 @@ export function MeetingRoom() {
     return () => window.clearInterval(id)
   }, [])
 
-  const agent = AGENTS.find((a) => a.id === selected)!
+  const agent = agents.find((a) => a.id === selected)!
 
   return (
     <div className="flex h-full flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
@@ -95,12 +136,15 @@ export function MeetingRoom() {
       <div className="flex h-[46vh] min-w-0 flex-col lg:h-auto lg:flex-1">
         <div className="flex items-center justify-between border-b border-line px-4 py-2">
           <h1 className="font-display text-lg tracking-wider text-text">MEETING ROOM</h1>
-          <span className="text-xs text-dim">{AGENTS.filter((a) => a.status !== 'offline').length} agents present</span>
+          <span className="text-xs text-dim">
+            {agents.filter((a) => a.status !== 'offline').length} agents present
+            {live && team.meeting && <span className="text-accent"> · replaying {team.meeting.date} standup</span>}
+          </span>
         </div>
         <div className="relative min-h-0 flex-1 overflow-hidden grid-bg">
           {/* room floor vignette */}
           <div className="pointer-events-none absolute inset-6 border border-line/40" />
-          {AGENTS.map((a, i) => (
+          {agents.map((a, i) => (
             <AgentAvatar
               key={a.id}
               agent={a}

@@ -1,0 +1,32 @@
+{
+  "updatedAt": "2026-06-12T00:00:00Z",
+  "tasks": [
+    {
+      "id": "t-secrets-setup",
+      "title": "Add CLAUDE_CODE_OAUTH_TOKEN secret so the team can run",
+      "owner": "user",
+      "status": "backlog",
+      "createdBy": "mnemosyne",
+      "createdAt": "2026-06-12T00:00:00Z",
+      "notes": "Run `claude setup-token` locally, paste the result as a repo Actions secret named CLAUDE_CODE_OAUTH_TOKEN. Required for every team workflow."
+    },
+    {
+      "id": "t-intake-channels",
+      "title": "Pick the Discord beat-drop channel(s) and set DISCORD_INTAKE_CHANNELS",
+      "owner": "user",
+      "status": "backlog",
+      "createdBy": "mnemosyne",
+      "createdAt": "2026-06-12T00:00:00Z",
+      "notes": "Repo variable, comma-separated channel IDs. Also add DISCORD_BOT_TOKEN secret (same bot as server/)."
+    },
+    {
+      "id": "t-release-calendar",
+      "title": "Draft the Q3 release calendar from the current catalog",
+      "owner": "hemera",
+      "status": "backlog",
+      "createdBy": "hemera",
+      "createdAt": "2026-06-12T00:00:00Z",
+      "notes": "Catalog: Homerun (art+master done, video pending), Switch (export done, upload scheduled), Virtual Love (demo, needs chorus), Nightshade (re-mix starting)."
+    }
+  ]
+}
