@@ -1,12 +1,20 @@
 {
-  "updatedAt": "2026-06-12T00:00:00Z",
+  "updatedAt": "2026-06-12T13:00:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "Waiting for the first daily meeting",
+      "task": "Standup closed. Next check-in June 20 — Switch approval gate.",
+      "lastActive": "2026-06-12T13:00:00Z"
+    },
+    {
+      "id": "aether",
+      "name": "Aether",
+      "role": "A&R · Sound",
+      "status": "idle",
+      "task": "No intake today. Dark until Discord intake channels are configured by user.",
       "lastActive": "2026-06-12T00:00:00Z"
     },
     {
@@ -14,23 +22,15 @@
       "name": "Nyx",
       "role": "Execution · Content",
       "status": "idle",
-      "task": "Waiting for the first content handoff",
-      "lastActive": "2026-06-12T00:00:00Z"
-    },
-    {
-      "id": "aether",
-      "name": "Aether",
-      "role": "A&R · Sound",
-      "status": "idle",
-      "task": "Waiting for the first beat intake",
-      "lastActive": "2026-06-12T00:00:00Z"
+      "task": "Switch upload package in review (ap-2026-06-19-switch-upload). Awaiting user approval.",
+      "lastActive": "2026-06-12T13:00:00Z"
     },
     {
       "id": "hermes",
       "name": "Hermes",
       "role": "Booking · Outreach",
       "status": "idle",
-      "task": "Waiting for inbox triage",
+      "task": "No booking messages today. Dark until IMAP credentials and Discord intake are live.",
       "lastActive": "2026-06-12T00:00:00Z"
     },
     {
@@ -38,8 +38,8 @@
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "idle",
-      "task": "Watching the schema",
-      "lastActive": "2026-06-12T00:00:00Z"
+      "task": "2026-06-12 meeting record closed. Board and agents.json current.",
+      "lastActive": "2026-06-12T13:00:00Z"
     }
   ]
 }

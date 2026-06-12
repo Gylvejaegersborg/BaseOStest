@@ -1,4 +1,21 @@
 {
-  "updatedAt": "2026-06-12T11:33:20.265Z",
-  "items": []
+  "updatedAt": "2026-06-12T12:30:00Z",
+  "items": [
+    {
+      "id": "ap-2026-06-19-switch-upload",
+      "type": "soundcloud_upload",
+      "title": "Switch — SoundCloud + YouTube upload package",
+      "summary": "Approving this queues the Switch instrumental (ISΛRK × 10k.emraan, 186 bpm, C min, drill) for manual upload to SoundCloud and YouTube, scheduled to go public on 2026-07-18. The package includes: metadata, upload description, pre-upload checklist, social captions for Instagram/X and YouTube community post, and an art direction prompt for cover/thumbnail production. No files are published automatically — all uploads and posts are manual steps listed in checklist.md.",
+      "draftPaths": [
+        "team/drafts/uploads/switch/metadata.json",
+        "team/drafts/uploads/switch/description.md",
+        "team/drafts/uploads/switch/checklist.md",
+        "team/drafts/uploads/switch/captions.md",
+        "team/drafts/uploads/switch/art-prompt.md"
+      ],
+      "draftedBy": "nyx",
+      "createdAt": "2026-06-12T12:30:00Z",
+      "status": "pending"
+    }
+  ]
 }

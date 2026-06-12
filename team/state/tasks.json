@@ -1,14 +1,14 @@
 {
-  "updatedAt": "2026-06-12T00:00:00Z",
+  "updatedAt": "2026-06-12T12:30:00Z",
   "tasks": [
     {
       "id": "t-secrets-setup",
       "title": "Add CLAUDE_CODE_OAUTH_TOKEN secret so the team can run",
       "owner": "user",
-      "status": "backlog",
+      "status": "done",
       "createdBy": "mnemosyne",
       "createdAt": "2026-06-12T00:00:00Z",
-      "notes": "Run `claude setup-token` locally, paste the result as a repo Actions secret named CLAUDE_CODE_OAUTH_TOKEN. Required for every team workflow."
+      "notes": "Confirmed done — workflow ran and first approval round-trip completed at 11:33 UTC 2026-06-12."
     },
     {
       "id": "t-intake-channels",
@@ -17,16 +17,36 @@
       "status": "backlog",
       "createdBy": "mnemosyne",
       "createdAt": "2026-06-12T00:00:00Z",
-      "notes": "Repo variable, comma-separated channel IDs. Also add DISCORD_BOT_TOKEN secret (same bot as server/)."
+      "notes": "Repo variable, comma-separated channel IDs. Also add DISCORD_BOT_TOKEN secret (same bot as server/). Blocked on user action — intake pipeline is dark until this lands."
     },
     {
       "id": "t-release-calendar",
       "title": "Draft the Q3 release calendar from the current catalog",
       "owner": "hemera",
-      "status": "backlog",
+      "status": "done",
       "createdBy": "hemera",
       "createdAt": "2026-06-12T00:00:00Z",
-      "notes": "Catalog: Homerun (art+master done, video pending), Switch (export done, upload scheduled), Virtual Love (demo, needs chorus), Nightshade (re-mix starting)."
+      "notes": "Calendar written at team/reports/q3-2026-release-calendar.md in the 2026-06-12 standup. Four tracks scheduled: Switch Jul 18, Homerun Aug 8, Virtual Love Sep 5 (conditional), Nightshade Sep 26 (tentative).",
+      "links": ["team/reports/q3-2026-release-calendar.md"]
+    },
+    {
+      "id": "t-switch-upload-package",
+      "title": "Build Switch upload package for SoundCloud/YouTube",
+      "owner": "nyx",
+      "status": "review",
+      "createdBy": "hemera",
+      "createdAt": "2026-06-12T12:00:00Z",
+      "handedFrom": "hemera",
+      "due": "2026-06-19",
+      "notes": "Draft complete. Package at team/drafts/uploads/switch/ — metadata, description, checklist, captions, art-prompt. Queued as ap-2026-06-19-switch-upload (pending). Awaiting user approval by June 20.",
+      "links": [
+        "team/reports/q3-2026-release-calendar.md",
+        "team/drafts/uploads/switch/metadata.json",
+        "team/drafts/uploads/switch/description.md",
+        "team/drafts/uploads/switch/checklist.md",
+        "team/drafts/uploads/switch/captions.md",
+        "team/drafts/uploads/switch/art-prompt.md"
+      ]
     }
   ]
 }
