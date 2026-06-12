@@ -1,0 +1,70 @@
+name: Team · Publish (user approval)
+
+# The ONLY workflow with publish credentials. It runs exclusively when ISΛRK
+# dispatches it — from the dashboard's Approvals tab or the GitHub UI/mobile app.
+on:
+  workflow_dispatch:
+    inputs:
+      action_id:
+        description: 'Approval queue item id (ap-…)'
+        required: true
+        type: string
+      decision:
+        description: 'approve or reject'
+        required: true
+        type: choice
+        options: [approve, reject]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: team-state
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install publisher dependencies
+        working-directory: scripts/team
+        run: npm install --no-audit --no-fund
+
+      - name: Resolve approval
+        env:
+          ACTION_ID: ${{ inputs.action_id }}
+          DECISION: ${{ inputs.decision }}
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        run: node scripts/team/resolve-approval.mjs
+
+      - name: Locate manual package
+        id: pkg
+        if: always()
+        run: |
+          path=$(node -e "try{console.log(JSON.parse(require('fs').readFileSync('/tmp/publish-output.json','utf8')).artifactPath??'')}catch{console.log('')}")
+          echo "path=$path" >> "$GITHUB_OUTPUT"
+
+      - name: Upload manual package artifact
+        if: steps.pkg.outputs.path != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.action_id }}-manual-package
+          path: ${{ steps.pkg.outputs.path }}
+
+      - name: Commit and push
+        if: always()
+        run: |
+          bash scripts/team/commit-state.sh "team(publish): ${{ inputs.action_id }} ${{ inputs.decision }}" team/ public/

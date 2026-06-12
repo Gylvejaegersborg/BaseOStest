@@ -1,0 +1,45 @@
+{
+  "updatedAt": "2026-06-12T00:00:00Z",
+  "agents": [
+    {
+      "id": "hemera",
+      "name": "Hemera",
+      "role": "Manager · Strategy",
+      "status": "idle",
+      "task": "Waiting for the first daily meeting",
+      "lastActive": "2026-06-12T00:00:00Z"
+    },
+    {
+      "id": "nyx",
+      "name": "Nyx",
+      "role": "Execution · Content",
+      "status": "idle",
+      "task": "Waiting for the first content handoff",
+      "lastActive": "2026-06-12T00:00:00Z"
+    },
+    {
+      "id": "aether",
+      "name": "Aether",
+      "role": "A&R · Sound",
+      "status": "idle",
+      "task": "Waiting for the first beat intake",
+      "lastActive": "2026-06-12T00:00:00Z"
+    },
+    {
+      "id": "hermes",
+      "name": "Hermes",
+      "role": "Booking · Outreach",
+      "status": "idle",
+      "task": "Waiting for inbox triage",
+      "lastActive": "2026-06-12T00:00:00Z"
+    },
+    {
+      "id": "mnemosyne",
+      "name": "Mnemosyne",
+      "role": "Archive · Ops",
+      "status": "idle",
+      "task": "Watching the schema",
+      "lastActive": "2026-06-12T00:00:00Z"
+    }
+  ]
+}

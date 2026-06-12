@@ -1,0 +1,67 @@
+name: Team · Task
+
+on:
+  issues:
+    types: [opened, labeled]
+  workflow_dispatch:
+    inputs:
+      task:
+        description: 'Task for the team'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: team-state
+  cancel-in-progress: false
+
+jobs:
+  task:
+    # Issues only count when labeled agent-task; manual dispatch always runs.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.issue.labels.*.name, 'agent-task')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Run the task
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          TEAM_RUN: '1'
+          TEAM_TASK: ${{ github.event_name == 'workflow_dispatch' && inputs.task || format('{0}{1}{2}', github.event.issue.title, ' — ', github.event.issue.body) }}
+        run: |
+          claude -p "$(cat prompts/task-run.md)" \
+            --permission-mode acceptEdits \
+            --allowedTools "Read,Glob,Grep,Write,Edit,Task" \
+            --max-turns 80
+
+      - name: Validate team state
+        run: node scripts/team/validate-state.mjs
+
+      - name: Commit and push
+        run: |
+          bash scripts/team/commit-state.sh "team(task): ${{ github.event_name == 'workflow_dispatch' && 'manual dispatch' || format('issue #{0}', github.event.issue.number) }}"
+
+      - name: Reply on the issue
+        if: github.event_name == 'issues'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          summary=$(cat /tmp/task-summary.md 2>/dev/null || echo "Task processed — see the team/ directory for results.")
+          jq -n --arg body "$summary" '{body: $body}' | curl -sS -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            --data-binary @- \
+            "${{ github.api_url }}/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments" >/dev/null

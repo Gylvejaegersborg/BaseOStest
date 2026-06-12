@@ -1,5 +1,6 @@
 import {
   Orbit,
+  Briefcase,
   NotebookPen,
   MessagesSquare,
   CalendarDays,
@@ -19,6 +20,7 @@ export type SectionId =
   | 'projects'
   | 'lab'
   | 'room'
+  | 'team'
   | 'ops'
   | 'weather'
 
@@ -95,6 +97,15 @@ export const SECTIONS: Section[] = [
     icon: Users,
     blurb: 'The agents, in one open room. Watch them work and talk.',
     accent: '#e0408a',
+  },
+  {
+    id: 'team',
+    label: 'Team',
+    code: 'AGT.07',
+    route: '/team',
+    icon: Briefcase,
+    blurb: 'The management team: briefs, task board, approvals and beat intake.',
+    accent: '#f0a020',
   },
   {
     id: 'ops',

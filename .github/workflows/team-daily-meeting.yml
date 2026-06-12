@@ -1,0 +1,61 @@
+name: Team · Daily Meeting
+
+on:
+  schedule:
+    - cron: '30 5 * * *' # 07:30 Oslo in summer (06:30 in winter — accepted drift)
+  workflow_dispatch:
+    inputs:
+      agenda:
+        description: 'Optional agenda focus from ISΛRK'
+        required: false
+        type: string
+  repository_dispatch:
+    types: [team-meeting]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: team-state
+  cancel-in-progress: false
+
+jobs:
+  meeting:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Require Claude token
+        run: |
+          if [ -z "${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}" ]; then
+            echo "::error::CLAUDE_CODE_OAUTH_TOKEN secret is not set — run 'claude setup-token' and add it."
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Run the daily meeting
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          TEAM_RUN: '1'
+          MEETING_DATE: ''
+          MEETING_AGENDA: ${{ inputs.agenda }}
+        run: |
+          export MEETING_DATE=$(date -u +%F)
+          claude -p "$(cat prompts/daily-meeting.md)" \
+            --permission-mode acceptEdits \
+            --allowedTools "Read,Glob,Grep,Write,Edit,Task" \
+            --max-turns 100
+
+      - name: Validate team state
+        run: node scripts/team/validate-state.mjs
+
+      - name: Commit and push
+        run: |
+          bash scripts/team/commit-state.sh "team(meeting): daily standup $(date -u +%F)"
