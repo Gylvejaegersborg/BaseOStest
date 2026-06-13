@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Check, ChevronLeft, FileText, Hash, Pencil, Plus, Trash2, Wand2, X } from 'lucide-react'
 import { NOTES, NOTE_FOLDERS, NOTE_TAGS, type Note } from '@/data/notes'
+import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
 import { SearchInput } from '@/components/ui/SearchInput'
 import { relTime } from '@/lib/time'
 import { cn } from '@/lib/cn'
@@ -57,12 +58,14 @@ export function Notes() {
     loadJSON(STORAGE.tags, {}),
   )
 
+  const overlay = useOsOverlay()
   const allNotes = useMemo<Note[]>(() => {
     const del = new Set(deleted)
-    return [...userNotes, ...NOTES]
+    // Agent-authored notes (overlay) sit alongside the user's and the seed notes.
+    return mergeById([...userNotes, ...NOTES], overlay.notes)
       .filter((n) => !del.has(n.id))
       .map((n) => ({ ...n, tags: tagsOverride[n.id] ?? n.tags }))
-  }, [userNotes, deleted, tagsOverride])
+  }, [userNotes, deleted, tagsOverride, overlay.notes])
 
   const [selectedId, setSelectedId] = useState<string>(allNotes[0]?.id ?? '')
   const selected = allNotes.find((n) => n.id === selectedId) ?? allNotes[0]

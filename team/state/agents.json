@@ -40,6 +40,22 @@
       "status": "idle",
       "task": "Watching the schema",
       "lastActive": "2026-06-12T00:00:00Z"
+    },
+    {
+      "id": "theia",
+      "name": "Theia",
+      "role": "Market · Research",
+      "status": "idle",
+      "task": "Scanning the scene for the weekly read",
+      "lastActive": "2026-06-12T00:00:00Z"
+    },
+    {
+      "id": "argus",
+      "name": "Argus",
+      "role": "Oversight · Pipeline",
+      "status": "idle",
+      "task": "Auditing the last run",
+      "lastActive": "2026-06-12T00:00:00Z"
     }
   ]
 }

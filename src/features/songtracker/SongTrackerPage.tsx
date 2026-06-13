@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Check, ChevronRight, ListChecks, Music2, Plus, X } from 'lucide-react'
 import { Badge } from '@/components/ui/Badge'
 import { cn } from '@/lib/cn'
+import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
 import {
   RECENT_RELEASES,
   SONG_PROJECTS,
@@ -29,7 +30,13 @@ function newTaskId(): string {
  * project. Tasks are really checkable and state holds for the session.
  */
 export function SongTrackerPage({ open, onClose }: SongTrackerPageProps) {
-  const [projects, setProjects] = useState<SongProject[]>(SONG_PROJECTS)
+  // Seed with the static projects merged with any agent-authored ones (overlay).
+  const overlay = useOsOverlay()
+  const [projects, setProjects] = useState<SongProject[]>(() => mergeById(SONG_PROJECTS, overlay.songs))
+  // Fold in overlay songs once they load, without clobbering in-session edits.
+  useEffect(() => {
+    if (overlay.songs.length) setProjects((prev) => mergeById(prev, overlay.songs))
+  }, [overlay.songs])
 
   const toggleTask = (projectId: string, taskId: string) => {
     setProjects((prev) =>

@@ -21,9 +21,56 @@ approvals/archive/     resolved approval entries, one file per id
 drafts/content/<id>.md post copy / captions / art prompts
 drafts/booking/<id>.md email reply drafts (frontmatter: to, subject, inReplyTo)
 drafts/uploads/<id>/   upload packages (metadata.json, description.md, checklist.md)
-reports/trends/        weekly trend reports (<ISO week>.md)
+reports/market/        weekly market/social reads + deep-dives (Theia)
+reports/pipeline/      run-by-run oversight / health reports (Argus, <date>.md)
 reports/analysis/      per-beat musical analyses (<beatId>.md)
+os/overlay.json        the user-facing OS write surface (see below)
 ```
+
+## The team (7 agents)
+
+- **Hemera** — Manager · Strategy (chairs the meeting)
+- **Nyx** — Execution · Content
+- **Aether** — A&R · Sound (interprets measured beat features)
+- **Hermes** — Booking · Outreach
+- **Mnemosyne** — Archive · Ops (writes minutes, keeps schema true)
+- **Theia** — Market · Research (trends/social; reports to ISΛRK via Hemera)
+- **Argus** — Oversight · Pipeline (audits the team; reports to ISΛRK directly)
+
+## os/overlay.json — feeding the user's dashboard
+
+The dashboard merges this file over its built-in data so agent output shows up where
+ISΛRK already looks (Notes, Calendar reminders/tasks, Projects, Song Tracker, Beat DB,
+the in-OS beat store + artist page, Lab). It is INTERNAL to the user's OS, so writing
+here is NOT approval-gated — only outward-facing publishing is.
+
+Shape (every key is an array; items need a stable `id`; matching ids merge/override the
+built-in item, new ids are added):
+```json
+{ "updatedAt": "ISO-8601",
+  "notes":     [ { "id": "os-note-…", "title": "…", "folder": "Team", "tags": ["…"],
+                   "updated": "ISO-8601", "body": "markdown" } ],
+  "reminders": [ { "id": "os-rem-…", "title": "…", "dayOffset": 0, "time": 9.5,
+                   "notes": "…" } ],
+  "tasks":     [ { "id": "os-task-…", "title": "…", "status": "todo|doing|done",
+                   "priority": "low|med|high", "dayOffset": 0, "dueTime": "14:00" } ],
+  "projects":  [ { "id": "<existing or new>", "lastMove": "…", "nextMove": "…",
+                   "progress": 0 } ],
+  "songs":     [ { "id": "…", "title": "…", "stage": "record|mix|master|tag|upload|distribute",
+                   "bpm": 0, "musicalKey": "…", "accent": "#hex", "note": "…",
+                   "tasks": [ { "id": "…", "label": "…", "done": false, "today": true } ] } ],
+  "library":   [ { "id": "…", "title": "…", "category": "beat|song|…", "artist": "ISΛRK",
+                   "date": "YYYY-MM-DD", "tags": ["…"], "fileType": "mp3", "bpm": 0,
+                   "musicalKey": "…", "durationSec": 0, "audioFile": "/…", "gradient": ["#a","#b"] } ],
+  "beats":     [ { "id": "…", "title": "…", "artist": "ISΛRK", "bpm": 0, "musicalKey": "…",
+                   "mood": ["…"], "durationSec": 0, "gradient": ["#a","#b"], "plays": 0,
+                   "licenses": [], "audioFile": "/…" } ],
+  "lab":       [ { "id": "…", "name": "…", "kind": "…", "status": "live|staging|local",
+                   "description": "…", "stack": ["…"], "url": "https://…" } ] }
+```
+Prefix agent-created ids with `os-` so they never collide with built-in items. To patch
+an existing project/song/lab item, reuse its existing id and include only the fields you
+change plus `id`.
 
 ## JSON shapes (contract — keep these exact)
 

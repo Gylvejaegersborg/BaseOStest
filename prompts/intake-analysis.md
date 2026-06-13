@@ -14,6 +14,10 @@ Read `team/README.md` first. Then, for each new record:
   `team/library/beats.json` — otherwise `analyzed` or `rejected`).
 - Write the full read to `team/reports/analysis/<id>.md`, comparing against the
   existing catalog.
+- On a `keep`, also add the beat to the OS overlay so ISΛRK sees it in his dashboard:
+  a `library` entry (so it appears in Beat DB) using the measured features, and — when
+  it's release-worthy — a `beats` entry (so it appears in the in-OS store/artist page).
+  Use `os-`-prefixed ids. This is internal, not approval-gated.
 
 **Message records (`kind: "message"`)** — convene the **hermes** subagent:
 - Triage; for anything reply-worthy, draft `team/drafts/booking/<id>.md` and append a

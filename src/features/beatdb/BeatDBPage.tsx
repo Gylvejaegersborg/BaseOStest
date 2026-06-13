@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Database, X } from 'lucide-react'
 import { LIBRARY, PLAYABLE_BEATS, isAudio, toBeat, type Asset, type AssetCategory } from '@/data/library'
 import { useBeatPlayer } from '@/features/beatstore/useBeatPlayer'
+import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
 import { SearchInput } from '@/components/ui/SearchInput'
 import { Modal } from '@/components/ui/Modal'
 import { useIsDesktop } from '@/lib/useMediaQuery'
@@ -35,7 +36,11 @@ export function BeatDBPage({ open, onClose }: BeatDBPageProps) {
   const [selectedId, setSelectedId] = useState<string>(LIBRARY[0].id)
   const [mobileDetail, setMobileDetail] = useState(false)
   const isDesktop = useIsDesktop()
-  const player = useBeatPlayer(PLAYABLE_BEATS)
+  // Agent-cataloged assets (OS overlay) join the static library.
+  const overlay = useOsOverlay()
+  const library = useMemo(() => mergeById(LIBRARY, overlay.library), [overlay.library])
+  const playable = useMemo(() => mergeById(PLAYABLE_BEATS, overlay.library.filter(isAudio).map(toBeat)), [overlay.library])
+  const player = useBeatPlayer(playable)
 
   // Esc closes the app; pause audio when it unmounts via close.
   useEffect(() => {
@@ -50,7 +55,7 @@ export function BeatDBPage({ open, onClose }: BeatDBPageProps) {
   }, [open])
 
   const q = query.trim().toLowerCase()
-  const bySearch = useMemo(() => LIBRARY.filter((a) => matchesQuery(a, q)), [q])
+  const bySearch = useMemo(() => library.filter((a) => matchesQuery(a, q)), [q, library])
   const counts = useMemo(() => {
     const c: Record<string, number> = {}
     for (const a of bySearch) c[a.category] = (c[a.category] ?? 0) + 1
@@ -61,7 +66,7 @@ export function BeatDBPage({ open, onClose }: BeatDBPageProps) {
     [bySearch, category],
   )
 
-  const selected = LIBRARY.find((a) => a.id === selectedId) ?? filtered[0] ?? LIBRARY[0]
+  const selected = library.find((a) => a.id === selectedId) ?? filtered[0] ?? library[0]
   const playingId = player.playing ? player.current?.id ?? null : null
 
   const select = (a: Asset) => {

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import {
-  CheckCircle2, ClipboardList, Eye, EyeOff, FileAudio, Inbox, Key, ListChecks,
+  CheckCircle2, ClipboardList, Eye, EyeOff, FileAudio, Inbox, Key, LineChart, ListChecks,
   Mail, MessageSquare, Newspaper, RefreshCw, ThumbsDown, ThumbsUp, Users2, X,
 } from 'lucide-react'
 import { AGENTS } from '@/data/agents'
@@ -13,13 +13,14 @@ import { dispatchWorkflow, fetchFile, getToken, listDir } from '@/features/team/
 import { useTeamState } from '@/features/team/useTeamState'
 import type { ApprovalItem, IntakeRecord, TeamTask, TeamTaskStatus } from '@/features/team/types'
 
-type Tab = 'brief' | 'board' | 'approvals' | 'intake' | 'meetings'
+type Tab = 'brief' | 'board' | 'approvals' | 'intake' | 'reports' | 'meetings'
 
 const TABS: { id: Tab; label: string; icon: typeof Newspaper }[] = [
   { id: 'brief', label: 'Brief', icon: Newspaper },
   { id: 'board', label: 'Board', icon: ClipboardList },
   { id: 'approvals', label: 'Approvals', icon: ListChecks },
   { id: 'intake', label: 'Intake', icon: Inbox },
+  { id: 'reports', label: 'Reports', icon: LineChart },
   { id: 'meetings', label: 'Meetings', icon: Users2 },
 ]
 
@@ -95,6 +96,7 @@ export function Team() {
         {tab === 'board' && <BoardTab tasks={team.tasks} />}
         {tab === 'approvals' && <ApprovalsTab approvals={team.approvals} onResolved={team.refresh} />}
         {tab === 'intake' && <IntakeTab records={team.intake} live={team.connection === 'live'} />}
+        {tab === 'reports' && <ReportsTab live={team.connection === 'live'} />}
         {tab === 'meetings' && <MeetingsTab live={team.connection === 'live'} />}
       </div>
     </div>
@@ -348,6 +350,87 @@ function FeatureChip({ label, value }: { label: string; value: string }) {
     <div className="border border-line bg-bg/40 px-1 py-1.5">
       <div className="text-[8px] uppercase tracking-widest text-dim">{label}</div>
       <div className="font-display text-sm text-text">{value}</div>
+    </div>
+  )
+}
+
+// ── Reports ──────────────────────────────────────────────────────────────────
+const REPORT_DIRS: { dir: string; label: string; color: string }[] = [
+  { dir: 'team/reports/market', label: 'Market (Theia)', color: '#e3d24b' },
+  { dir: 'team/reports/pipeline', label: 'Pipeline (Argus)', color: '#ff6b6b' },
+  { dir: 'team/reports/analysis', label: 'Beat analysis (Aether)', color: '#58b6f0' },
+]
+
+function ReportsTab({ live }: { live: boolean }) {
+  const [files, setFiles] = useState<{ path: string; name: string; group: string }[]>([])
+  const [selected, setSelected] = useState('')
+  const [content, setContent] = useState('')
+
+  useEffect(() => {
+    if (!live) return
+    Promise.all(
+      REPORT_DIRS.map((d) =>
+        listDir(d.dir)
+          .then((entries) =>
+            entries
+              .filter((e) => e.type === 'file' && e.name.endsWith('.md'))
+              .map((e) => ({ path: e.path, name: e.name.replace('.md', ''), group: d.label })),
+          )
+          .catch(() => []),
+      ),
+    ).then((groups) => {
+      const flat = groups.flat()
+      setFiles(flat)
+      if (flat.length) setSelected((s) => s || flat[0].path)
+    })
+  }, [live])
+
+  useEffect(() => {
+    if (!selected) return
+    setContent('')
+    fetchFile(selected).then(setContent).catch(() => setContent('_Could not load report._'))
+  }, [selected])
+
+  if (!live) return <p className="p-2 text-xs text-dim">Connect GitHub to read the team's reports.</p>
+  if (!files.length) {
+    return (
+      <p className="p-2 text-xs text-dim">
+        No reports yet. Theia writes the weekly market read (Mondays), Argus writes a
+        pipeline health report each run, and Aether writes a per-beat analysis on intake.
+      </p>
+    )
+  }
+
+  return (
+    <div className="grid gap-3 lg:grid-cols-[230px_1fr]">
+      <Panel title="Reports" code="TEAM.RPT" accent="#e3d24b" bodyClassName="space-y-1 p-2">
+        {REPORT_DIRS.map((d) => {
+          const group = files.filter((f) => f.group === d.label)
+          if (!group.length) return null
+          return (
+            <div key={d.dir} className="mb-1">
+              <div className="px-2 py-1 text-[10px] uppercase tracking-wider" style={{ color: d.color }}>{d.label}</div>
+              {group.map((f) => (
+                <button
+                  key={f.path}
+                  onClick={() => setSelected(f.path)}
+                  className={cn(
+                    'block w-full border-l-2 px-2 py-1.5 text-left text-xs transition-colors',
+                    f.path === selected ? 'border-accent bg-accent/5 text-text' : 'border-transparent text-dim hover:text-text',
+                  )}
+                >
+                  {f.name}
+                </button>
+              ))}
+            </div>
+          )
+        })}
+      </Panel>
+      <Panel title={files.find((f) => f.path === selected)?.name ?? 'Report'} code="REPORT" accent="#e3d24b">
+        <article className="prose-term">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{content || 'Loading…'}</ReactMarkdown>
+        </article>
+      </Panel>
     </div>
   )
 }

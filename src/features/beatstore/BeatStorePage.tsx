@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { BEATS, CONTACT_EMAIL, formatPrice, type Beat, type CartItem, type LicenseTier } from '@/data/beats'
+import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
 import { useBeatPlayer } from './useBeatPlayer'
 import { BeatStoreNav, type StoreView } from './BeatStoreNav'
 import { BeatsView } from './views/BeatsView'
@@ -27,7 +28,10 @@ export function BeatStorePage({ open, onClose }: BeatStorePageProps) {
   const [purchased, setPurchased] = useState<CartItem[]>([])
   const [orderNo, setOrderNo] = useState('')
   const [orderEmail, setOrderEmail] = useState('')
-  const player = useBeatPlayer(BEATS)
+  // Agent-staged beats (OS overlay) appear in the store alongside the catalog.
+  const overlay = useOsOverlay()
+  const allBeats = useMemo(() => mergeById(BEATS, overlay.beats), [overlay.beats])
+  const player = useBeatPlayer(allBeats)
 
   // Reset to Beats on open; pause + reset state on close.
   useEffect(() => {
@@ -124,6 +128,8 @@ function DoneView({
   orderEmail: string
   onBack: () => void
 }) {
+  const overlay = useOsOverlay()
+  const allBeats = useMemo(() => mergeById(BEATS, overlay.beats), [overlay.beats])
   const total = purchased.reduce((s, i) => s + i.price, 0)
 
   // Build a mailto: link that drafts an order receipt in the customer's mail
@@ -135,7 +141,7 @@ function DoneView({
     `Thanks for your purchase — here are your files:\n\n` +
     purchased
       .map((p) => {
-        const beat = BEATS.find((b) => b.id === p.beatId)
+        const beat = allBeats.find((b) => b.id === p.beatId)
         const link = beat?.audioFile ? `${window.location.origin}${beat.audioFile}` : '(demo — no file)'
         return `• ${p.title} · ${p.tier} license · ${formatPrice(p.price)}\n  ${link}`
       })
@@ -160,7 +166,7 @@ function DoneView({
 
       <div className="mt-5 w-full max-w-md space-y-2">
         {purchased.map((item) => {
-          const beat = BEATS.find((b) => b.id === item.beatId)
+          const beat = allBeats.find((b) => b.id === item.beatId)
           const audioUrl = beat?.audioFile
           const downloadName = `${item.title} — ISARK [${item.tier}].mp3`
           return (

@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { ArrowRight, Cloud, Instagram, Mail, Pause, Play, X, Youtube } from 'lucide-react'
 import { BEATS, CONTACT_EMAIL, formatPlays, type Beat } from '@/data/beats'
 import { useBeatPlayer } from '../beatstore/useBeatPlayer'
+import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
 import { cn } from '@/lib/cn'
 
 interface ArtistWebPageProps {
@@ -25,7 +26,9 @@ const LINKS = [
  * Web-Audio player; the "Get Beats" CTA hands off to the purchase-focused store.
  */
 export function ArtistWebPage({ open, onClose, onGetBeats }: ArtistWebPageProps) {
-  const player = useBeatPlayer(BEATS)
+  const overlay = useOsOverlay()
+  const allBeats = useMemo(() => mergeById(BEATS, overlay.beats), [overlay.beats])
+  const player = useBeatPlayer(allBeats)
 
   // Pause audio when the page is closed.
   useEffect(() => {
@@ -135,9 +138,9 @@ export function ArtistWebPage({ open, onClose, onGetBeats }: ArtistWebPageProps)
 
       {/* ─────────────────────── Releases ─────────────────────── */}
       <section id="releases" className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6">
-        <SectionHeading label="Releases" count={BEATS.length} />
+        <SectionHeading label="Releases" count={allBeats.length} />
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {BEATS.map((beat) => (
+          {allBeats.map((beat) => (
             <ReleaseCard
               key={beat.id}
               beat={beat}

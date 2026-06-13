@@ -1,5 +1,6 @@
-import { createContext, useCallback, useContext, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
 import type { Appt, CronJob, Reminder, Task } from '@/data/calendar'
+import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
 import {
   APPTS_KEY,
   CRONS_KEY,
@@ -127,7 +128,13 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
-  const remindersEngine = useReminders(appts, tasks, reminders, {
+  // Agent-authored reminders/tasks from the OS overlay are merged in read-only;
+  // user-created items still live in (and persist to) the localStorage-backed state.
+  const overlay = useOsOverlay()
+  const mergedReminders = useMemo(() => mergeById(reminders, overlay.reminders), [reminders, overlay.reminders])
+  const mergedTasks = useMemo(() => mergeById(tasks, overlay.tasks), [tasks, overlay.tasks])
+
+  const remindersEngine = useReminders(appts, mergedTasks, mergedReminders, {
     onCompleteTask: completeTask,
     onCompleteReminder: completeReminder,
   })
@@ -136,8 +143,8 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
     <CalendarContext.Provider
       value={{
         appts,
-        tasks,
-        reminders,
+        tasks: mergedTasks,
+        reminders: mergedReminders,
         crons,
         saveAppt,
         toggleTask,
