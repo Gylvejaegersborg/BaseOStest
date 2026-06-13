@@ -1,13 +1,13 @@
 {
-  "updatedAt": "2026-06-12T13:00:00Z",
+  "updatedAt": "2026-06-13T07:30:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "Standup closed. Next check-in June 20 — Switch approval gate.",
-      "lastActive": "2026-06-12T13:00:00Z"
+      "task": "Holding until June 20 — Switch approval gate.",
+      "lastActive": "2026-06-13T07:30:00Z"
     },
     {
       "id": "aether",
@@ -23,7 +23,7 @@
       "role": "Execution · Content",
       "status": "idle",
       "task": "Switch upload package in review (ap-2026-06-19-switch-upload). Awaiting user approval.",
-      "lastActive": "2026-06-12T13:00:00Z"
+      "lastActive": "2026-06-13T07:30:00Z"
     },
     {
       "id": "hermes",
@@ -38,8 +38,8 @@
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "idle",
-      "task": "2026-06-12 meeting record closed. Board and agents.json current.",
-      "lastActive": "2026-06-12T13:00:00Z"
+      "task": "2026-06-13 meeting record closed. Board and agents.json current.",
+      "lastActive": "2026-06-13T07:30:00Z"
     }
   ]
 }
