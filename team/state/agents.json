@@ -1,13 +1,13 @@
 {
-  "updatedAt": "2026-06-13T07:30:00Z",
+  "updatedAt": "2026-06-14T07:30:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "Holding until June 20 — Switch approval gate.",
-      "lastActive": "2026-06-13T07:30:00Z"
+      "task": "Holding until June 20 — Switch approval gate. Nightshade watch item raised with ISΛRK.",
+      "lastActive": "2026-06-14T07:30:00Z"
     },
     {
       "id": "aether",
@@ -15,7 +15,7 @@
       "role": "A&R · Sound",
       "status": "idle",
       "task": "No intake today. Dark until Discord intake channels are configured by user.",
-      "lastActive": "2026-06-12T00:00:00Z"
+      "lastActive": "2026-06-14T07:30:00Z"
     },
     {
       "id": "nyx",
@@ -23,7 +23,7 @@
       "role": "Execution · Content",
       "status": "idle",
       "task": "Switch upload package in review (ap-2026-06-19-switch-upload). Awaiting user approval.",
-      "lastActive": "2026-06-13T07:30:00Z"
+      "lastActive": "2026-06-14T07:30:00Z"
     },
     {
       "id": "hermes",
@@ -31,15 +31,15 @@
       "role": "Booking · Outreach",
       "status": "idle",
       "task": "No booking messages today. Dark until IMAP credentials and Discord intake are live.",
-      "lastActive": "2026-06-12T00:00:00Z"
+      "lastActive": "2026-06-14T07:30:00Z"
     },
     {
       "id": "mnemosyne",
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "idle",
-      "task": "2026-06-13 meeting record closed. Board and agents.json current.",
-      "lastActive": "2026-06-13T07:30:00Z"
+      "task": "2026-06-14 meeting record closed. Board current.",
+      "lastActive": "2026-06-14T07:30:00Z"
     }
   ]
 }
