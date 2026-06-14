@@ -1,14 +1,20 @@
 {
-  "updatedAt": "2026-06-12T00:00:00Z",
+  "updatedAt": "2026-06-12T12:30:00Z",
   "items": [
     {
-      "id": "ap-2026-06-12-team-online-post",
-      "type": "social_post",
-      "title": "Announcement draft: management team is online",
-      "summary": "A short post announcing that the ISΛRK management pipeline is live. Approving this builds a manual posting package (no social APIs are connected yet) — nothing is published automatically. This entry mainly exists so you can test the approve/reject round-trip end to end.",
-      "draftPaths": ["team/drafts/content/team-online-post.md"],
+      "id": "ap-2026-06-19-switch-upload",
+      "type": "soundcloud_upload",
+      "title": "Switch — SoundCloud + YouTube upload package",
+      "summary": "Approving this queues the Switch instrumental (ISΛRK × 10k.emraan, 186 bpm, C min, drill) for manual upload to SoundCloud and YouTube, scheduled to go public on 2026-07-18. The package includes: metadata, upload description, pre-upload checklist, social captions for Instagram/X and YouTube community post, and an art direction prompt for cover/thumbnail production. No files are published automatically — all uploads and posts are manual steps listed in checklist.md.",
+      "draftPaths": [
+        "team/drafts/uploads/switch/metadata.json",
+        "team/drafts/uploads/switch/description.md",
+        "team/drafts/uploads/switch/checklist.md",
+        "team/drafts/uploads/switch/captions.md",
+        "team/drafts/uploads/switch/art-prompt.md"
+      ],
       "draftedBy": "nyx",
-      "createdAt": "2026-06-12T00:00:00Z",
+      "createdAt": "2026-06-12T12:30:00Z",
       "status": "pending"
     }
   ]

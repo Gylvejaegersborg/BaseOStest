@@ -1,61 +1,61 @@
 {
-  "updatedAt": "2026-06-12T00:00:00Z",
+  "updatedAt": "2026-06-14T07:30:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "Waiting for the first daily meeting",
-      "lastActive": "2026-06-12T00:00:00Z"
-    },
-    {
-      "id": "nyx",
-      "name": "Nyx",
-      "role": "Execution · Content",
-      "status": "idle",
-      "task": "Waiting for the first content handoff",
-      "lastActive": "2026-06-12T00:00:00Z"
+      "task": "Holding until June 20 — Switch approval gate. Nightshade watch item raised with ISΛRK.",
+      "lastActive": "2026-06-14T07:30:00Z"
     },
     {
       "id": "aether",
       "name": "Aether",
       "role": "A&R · Sound",
       "status": "idle",
-      "task": "Waiting for the first beat intake",
-      "lastActive": "2026-06-12T00:00:00Z"
+      "task": "No intake today. Dark until Discord intake channels are configured by user.",
+      "lastActive": "2026-06-14T07:30:00Z"
+    },
+    {
+      "id": "nyx",
+      "name": "Nyx",
+      "role": "Execution · Content",
+      "status": "idle",
+      "task": "Switch upload package in review (ap-2026-06-19-switch-upload). Awaiting user approval.",
+      "lastActive": "2026-06-14T07:30:00Z"
     },
     {
       "id": "hermes",
       "name": "Hermes",
       "role": "Booking · Outreach",
       "status": "idle",
-      "task": "Waiting for inbox triage",
-      "lastActive": "2026-06-12T00:00:00Z"
+      "task": "No booking messages today. Dark until IMAP credentials and Discord intake are live.",
+      "lastActive": "2026-06-14T07:30:00Z"
     },
     {
       "id": "mnemosyne",
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "idle",
-      "task": "Watching the schema",
-      "lastActive": "2026-06-12T00:00:00Z"
+      "task": "2026-06-14 meeting record closed. Board current.",
+      "lastActive": "2026-06-14T07:30:00Z"
     },
     {
       "id": "theia",
       "name": "Theia",
       "role": "Market · Research",
       "status": "idle",
-      "task": "Scanning the scene for the weekly read",
-      "lastActive": "2026-06-12T00:00:00Z"
+      "task": "Not yet active — joins the next standup; first market read due Monday.",
+      "lastActive": "2026-06-14T07:30:00Z"
     },
     {
       "id": "argus",
       "name": "Argus",
       "role": "Oversight · Pipeline",
       "status": "idle",
-      "task": "Auditing the last run",
-      "lastActive": "2026-06-12T00:00:00Z"
+      "task": "Not yet active — joins the next standup; first pipeline audit at that run.",
+      "lastActive": "2026-06-14T07:30:00Z"
     }
   ]
 }

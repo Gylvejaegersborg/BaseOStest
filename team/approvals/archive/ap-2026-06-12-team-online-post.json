@@ -1,0 +1,14 @@
+{
+  "id": "ap-2026-06-12-team-online-post",
+  "type": "social_post",
+  "title": "Announcement draft: management team is online",
+  "summary": "A short post announcing that the ISΛRK management pipeline is live. Approving this builds a manual posting package (no social APIs are connected yet) — nothing is published automatically. This entry mainly exists so you can test the approve/reject round-trip end to end.",
+  "draftPaths": [
+    "team/drafts/content/team-online-post.md"
+  ],
+  "draftedBy": "nyx",
+  "createdAt": "2026-06-12T00:00:00Z",
+  "status": "published (manual)",
+  "resolvedAt": "2026-06-12T11:33:20.265Z",
+  "result": "Manual posting package ready at team/drafts/uploads/ap-2026-06-12-team-online-post."
+}

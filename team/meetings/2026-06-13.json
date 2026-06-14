@@ -1,0 +1,42 @@
+{
+  "date": "2026-06-13",
+  "agenda": [
+    "Switch approval status (day one of review window)",
+    "Standing blockers: Discord channel IDs, IMAP credentials",
+    "Pre-build decision: Homerun and Virtual Love content",
+    "Next gates"
+  ],
+  "turns": [
+    {
+      "agent": "hemera",
+      "text": "Good morning. Saturday, June 13. Quiet day.\n\nSwitch approval is at day one, nothing to do there. The package is in your hands and the gate is June 20. No resolution expected before then, none needed.\n\nThe two standing blockers — Discord channel IDs and IMAP credentials — remain unresolved. That keeps Aether and Hermes dark. No new inbox items, so there is nothing for them to work on even if they were live.\n\nOn whether to pre-build Homerun content now: the honest answer is not yet. The Homerun video decision is due July 1, and the entire tone and content of a launch package shifts depending on whether this gets a lyric video, a visualizer, or nothing. Asking Nyx to draft captions or a description before that is settled produces work that will likely need to be rewritten. The cost of holding two and a half weeks is lower than the cost of two rounds of revision. The same logic applies to Virtual Love, which carries a conditional flag until Homerun's performance signal comes in.\n\nThe right call is to hold position. The next real gate is June 20 — Switch approval. The one after that is July 1 — Homerun video decision. Neither requires action today. If Switch gets approved on June 20, I will hand Nyx the post-launch social drip immediately after. That is the next queued work.\n\nNo new handoffs today. No new tasks. Team holds."
+    },
+    {
+      "agent": "aether",
+      "text": "No items — inbox empty, intake dark."
+    },
+    {
+      "agent": "nyx",
+      "text": "No items — Switch package in review, holding until approval."
+    },
+    {
+      "agent": "hermes",
+      "text": "No items — IMAP and Discord dark, no messages."
+    },
+    {
+      "agent": "mnemosyne",
+      "text": "Closing 2026-06-13. No handoffs, no new tasks, no status changes. Switch package remains in review (ap-2026-06-19-switch-upload, pending). Standing blockers unchanged: Discord channel IDs and IMAP credentials still owed by user. Next gates: June 20 Switch approval, July 1 Homerun video decision. Board is current. Meeting record written."
+    }
+  ],
+  "decisions": [
+    "Hold on pre-building Homerun and Virtual Love content until the July 1 video decision is made — rework cost exceeds wait cost.",
+    "Team holds position. No new tasks assigned."
+  ],
+  "handoffs": [],
+  "actionItems": [
+    "user: provide Discord channel IDs and IMAP credentials (Aether and Hermes remain dark)",
+    "user: approve or reject Switch upload package by June 20 (ap-2026-06-19-switch-upload)",
+    "user: decide Homerun video production path by July 1",
+    "hemera: hand Nyx post-launch social drip immediately on Switch approval (June 20)"
+  ]
+}
