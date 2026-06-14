@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Activity, Cpu, MessageSquare, Timer, CheckCircle2 } from 'lucide-react'
+import { Activity, Cpu, MessageSquare, Timer, CheckCircle2, Play } from 'lucide-react'
 import { AGENTS, type Agent } from '@/data/agents'
 import { Panel } from '@/components/ui/Panel'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { useTeamState } from '@/features/team/useTeamState'
+import { dispatchWorkflow } from '@/features/team/githubClient'
 import { cn } from '@/lib/cn'
 
 interface Mover {
@@ -130,16 +131,40 @@ export function MeetingRoom() {
 
   const agent = agents.find((a) => a.id === selected)!
 
+  // Convene a real standup straight from the room (dispatches the meeting workflow).
+  const [standupState, setStandupState] = useState<'idle' | 'busy' | 'sent' | 'error'>('idle')
+  const holdStandup = async () => {
+    setStandupState('busy')
+    try {
+      await dispatchWorkflow('team-daily-meeting.yml', {})
+      setStandupState('sent')
+      window.setTimeout(() => team.refresh(), 90_000)
+    } catch {
+      setStandupState('error')
+    }
+  }
+
   return (
     <div className="flex h-full flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
       {/* Room */}
       <div className="flex h-[46vh] min-w-0 flex-col lg:h-auto lg:flex-1">
-        <div className="flex items-center justify-between border-b border-line px-4 py-2">
+        <div className="flex items-center justify-between gap-2 border-b border-line px-4 py-2">
           <h1 className="font-display text-lg tracking-wider text-text">MEETING ROOM</h1>
-          <span className="text-xs text-dim">
+          <span className="ml-auto text-xs text-dim">
             {agents.filter((a) => a.status !== 'offline').length} agents present
             {live && team.meeting && <span className="text-accent"> · replaying {team.meeting.date} standup</span>}
           </span>
+          {team.hasToken && (
+            <button
+              onClick={holdStandup}
+              disabled={standupState === 'busy'}
+              title="Convene a standup now (runs the daily-meeting workflow)"
+              className="flex items-center gap-1.5 border border-accent/40 bg-accent/10 px-2 py-1 text-[11px] uppercase tracking-wider text-accent hover:bg-accent/20 disabled:opacity-50"
+            >
+              <Play size={12} />
+              {standupState === 'busy' ? 'Starting…' : standupState === 'sent' ? 'Dispatched ✓' : standupState === 'error' ? 'Failed — retry' : 'Hold standup'}
+            </button>
+          )}
         </div>
         <div className="relative min-h-0 flex-1 overflow-hidden grid-bg">
           {/* room floor vignette */}
