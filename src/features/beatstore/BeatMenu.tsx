@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { Search, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { BEATS, MOODS, type Beat, formatDuration, formatPlays } from '@/data/beats'
+import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
 
 interface BeatMenuProps {
   open: boolean
@@ -19,14 +20,15 @@ interface BeatMenuProps {
  * Semi-transparent slide-in panel listing every beat with search and mood filters.
  */
 export function BeatMenu({ open, onClose, currentId, playingId, query, onQuery, mood, onMood, onPick }: BeatMenuProps) {
+  const overlay = useOsOverlay()
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return BEATS.filter((b) => {
+    return mergeById(BEATS, overlay.beats).filter((b) => {
       if (mood && !b.mood.includes(mood)) return false
       if (!q) return true
       return b.title.toLowerCase().includes(q) || b.mood.some((m) => m.toLowerCase().includes(q))
     })
-  }, [query, mood])
+  }, [query, mood, overlay.beats])
 
   return (
     <aside

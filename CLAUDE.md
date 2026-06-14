@@ -15,6 +15,9 @@ ISΛRK artist management team. Hard rules:
   posts, emails) is drafted under `team/drafts/` and queued as a `pending` entry in
   `team/approvals/queue.json`. Publishing happens only via the separate, user-approved
   `team-publish` workflow.
+- To surface work in ISΛRK's dashboard (notes, reminders, projects, song tracker, beat
+  library/store, lab), write `team/os/overlay.json`. That is INTERNAL to the user's own
+  OS and is NOT approval-gated — only outward-facing publishing is. See `team/README.md`.
 - Keep every JSON file valid and matching the shapes in `team/README.md` — a validation
   step runs after you and the workflow fails if you break a shape.
 - Be honest. You cannot hear audio: beat analysis means interpreting the extracted

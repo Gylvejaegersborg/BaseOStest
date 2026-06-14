@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { ArrowUpRight, GitCommitHorizontal, Pencil, Check, X } from 'lucide-react'
 import { PROJECTS, STATUS_META, type Project, type ProjectStatus } from '@/data/projects'
+import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
 import { sectionById } from '@/data/sections'
 import { Badge } from '@/components/ui/Badge'
 import { Modal } from '@/components/ui/Modal'
@@ -30,7 +31,12 @@ export function Projects() {
   const [overrides, setOverrides] = useState<ProjectOverrides>(loadOverrides)
   const [open, setOpen] = useState<Project | null>(null)
 
-  const projects = applyOverrides(PROJECTS, overrides)
+  // Agents can add projects or patch existing ones (lastMove/nextMove/progress…)
+  // via the OS overlay; the user's local overrides still win on top.
+  const overlay = useOsOverlay()
+  const base = useMemo(() => mergeById(PROJECTS, overlay.projects as Project[]), [overlay.projects])
+
+  const projects = applyOverrides(base, overrides)
   const openProject = open ? applyOverrides([open], overrides)[0] : null
 
   const updateProject = (id: string, patch: { lastMove?: string; nextMove?: string; progress?: number }) => {

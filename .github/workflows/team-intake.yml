@@ -32,9 +32,11 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Poll Discord for beat drops
+        # Defaults to the "Andres Beats" channel in the "Skit og drit 2" server
+        # (1383805863860633700); override with a DISCORD_INTAKE_CHANNELS repo variable.
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
-          DISCORD_INTAKE_CHANNELS: ${{ vars.DISCORD_INTAKE_CHANNELS }}
+          DISCORD_INTAKE_CHANNELS: ${{ vars.DISCORD_INTAKE_CHANNELS || '1453486181982404804' }}
         run: node scripts/team/intake-discord.mjs
 
       - name: Poll the artist mailbox

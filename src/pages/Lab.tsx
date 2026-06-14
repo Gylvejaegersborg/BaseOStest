@@ -1,6 +1,7 @@
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense, useMemo, useState } from 'react'
 import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe, Gauge, Music2, Download, Workflow } from 'lucide-react'
 import { LAB_MODULES, type LabModule } from '@/data/labs'
+import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
 import { Panel } from '@/components/ui/Panel'
 import { Modal } from '@/components/ui/Modal'
 import { Badge } from '@/components/ui/Badge'
@@ -54,7 +55,10 @@ export function Lab() {
   const [ytdlpOpen, setYtdlpOpen] = useState(false)
   const [n8nOpen, setN8nOpen] = useState(false)
   const isDesktop = useIsDesktop()
-  const selected = LAB_MODULES.find((m) => m.id === selectedId)!
+  // Agents can add or update lab module cards (status/description) via the overlay.
+  const overlay = useOsOverlay()
+  const labModules = useMemo(() => mergeById(LAB_MODULES, overlay.lab), [overlay.lab])
+  const selected = labModules.find((m) => m.id === selectedId)!
 
   const openModule = (id: string) => {
     setSelectedId(id)
@@ -72,7 +76,7 @@ export function Lab() {
           <p className="text-xs text-dim">Pages and apps you have built. Preview, launch and poke them.</p>
         </div>
         <div className={cn('grid gap-3', isSudoku && isDesktop ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3')}>
-          {LAB_MODULES.map((m) => (
+          {labModules.map((m) => (
             <ModuleCard key={m.id} mod={m} active={m.id === selectedId} onClick={() => openModule(m.id)} />
           ))}
         </div>

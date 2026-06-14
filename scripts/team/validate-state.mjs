@@ -15,7 +15,7 @@ function json(path) {
   }
 }
 
-const AGENT_IDS = ['hemera', 'nyx', 'aether', 'hermes', 'mnemosyne']
+const AGENT_IDS = ['hemera', 'nyx', 'aether', 'hermes', 'mnemosyne', 'theia', 'argus']
 const TASK_STATUS = ['backlog', 'doing', 'review', 'blocked', 'done']
 const AGENT_STATUS = ['working', 'thinking', 'idle', 'offline']
 const APPROVAL_TYPES = ['youtube_upload', 'soundcloud_upload', 'social_post', 'booking_reply', 'site_publish']
@@ -86,6 +86,19 @@ for (const f of readdirSync('team/inbox').filter((f) => f.endsWith('.json'))) {
   check(['discord', 'email', 'copyparty'].includes(r.source), `inbox/${f}: bad source`)
   check(['audio', 'message'].includes(r.kind), `inbox/${f}: bad kind`)
   check(['new', 'analyzed', 'cataloged', 'rejected'].includes(r.status), `inbox/${f}: bad status`)
+}
+
+// OS overlay (the user-facing write surface) — arrays of {id} where applicable.
+if (existsSync('team/os/overlay.json')) {
+  const ov = json('team/os/overlay.json')
+  if (ov) {
+    for (const k of ['notes', 'reminders', 'tasks', 'projects', 'songs', 'beats', 'library', 'lab']) {
+      check(Array.isArray(ov[k]), `os/overlay.json: .${k} must be an array`)
+      for (const item of ov[k] ?? []) {
+        check(item && typeof item.id === 'string' && item.id.length > 0, `os/overlay.json: ${k}[] item missing id`)
+      }
+    }
+  }
 }
 
 if (errors.length) {
