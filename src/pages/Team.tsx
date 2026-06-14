@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import {
   CheckCircle2, ClipboardList, Eye, EyeOff, FileAudio, Inbox, Key, LineChart, ListChecks,
-  Mail, MessageSquare, Newspaper, RefreshCw, ThumbsDown, ThumbsUp, Users2, X,
+  Mail, MessageSquare, Newspaper, RefreshCw, Send, ThumbsDown, ThumbsUp, Users2, X,
 } from 'lucide-react'
 import { AGENTS } from '@/data/agents'
 import { Panel } from '@/components/ui/Panel'
@@ -92,7 +92,7 @@ export function Team() {
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-3">
-        {tab === 'brief' && <BriefTab brief={team.brief} agents={team.agents} />}
+        {tab === 'brief' && <BriefTab brief={team.brief} agents={team.agents} hasToken={team.hasToken} onRefresh={team.refresh} />}
         {tab === 'board' && <BoardTab tasks={team.tasks} />}
         {tab === 'approvals' && <ApprovalsTab approvals={team.approvals} onResolved={team.refresh} />}
         {tab === 'intake' && <IntakeTab records={team.intake} live={team.connection === 'live'} />}
@@ -104,7 +104,14 @@ export function Team() {
 }
 
 // ── Brief ────────────────────────────────────────────────────────────────────
-function BriefTab({ brief, agents }: { brief: string; agents: ReturnType<typeof useTeamState>['agents'] }) {
+function BriefTab({
+  brief, agents, hasToken, onRefresh,
+}: {
+  brief: string
+  agents: ReturnType<typeof useTeamState>['agents']
+  hasToken: boolean
+  onRefresh: () => void
+}) {
   return (
     <div className="grid gap-3 lg:grid-cols-[1fr_300px]">
       <Panel title="Daily Brief" code="TEAM.BRF" accent="#f0a020">
@@ -114,12 +121,14 @@ function BriefTab({ brief, agents }: { brief: string; agents: ReturnType<typeof 
           </article>
         ) : (
           <p className="text-xs text-dim">
-            No brief yet. The team writes one at every daily meeting (07:30 Oslo) — or trigger
-            “Team · Daily Meeting” from the Actions tab to get the first one now.
+            No brief yet. The team writes one at every daily meeting (07:30 Oslo) — or use the
+            Run panel to hold a standup right now.
           </p>
         )}
       </Panel>
-      <Panel title="Roster" code="TEAM.AGT" accent="#36e0c8" bodyClassName="space-y-2 p-2">
+      <div className="space-y-3">
+        <RunPanel hasToken={hasToken} onRefresh={onRefresh} />
+        <Panel title="Roster" code="TEAM.AGT" accent="#36e0c8" bodyClassName="space-y-2 p-2">
         {agents.map((a) => (
           <div key={a.id} className="border border-line bg-bg/40 p-2" style={{ borderLeftColor: agentColor(a.id), borderLeftWidth: 2 }}>
             <div className="flex items-center gap-2 text-xs">
@@ -130,8 +139,97 @@ function BriefTab({ brief, agents }: { brief: string; agents: ReturnType<typeof 
             <div className="mt-1 text-[11px] text-text/80">{a.task}</div>
           </div>
         ))}
-      </Panel>
+        </Panel>
+      </div>
     </div>
+  )
+}
+
+// ── Run controls ─────────────────────────────────────────────────────────────
+function RunPanel({ hasToken, onRefresh }: { hasToken: boolean; onRefresh: () => void }) {
+  const [agenda, setAgenda] = useState('')
+  const [task, setTask] = useState('')
+  const [busy, setBusy] = useState('')
+  const [done, setDone] = useState('')
+  const [error, setError] = useState('')
+
+  const run = async (label: string, workflow: string, inputs: Record<string, string>) => {
+    setError('')
+    setDone('')
+    setBusy(label)
+    try {
+      await dispatchWorkflow(workflow, inputs)
+      setDone(label)
+      // Runs take a couple of minutes; pull fresh state in once it should be done.
+      window.setTimeout(onRefresh, 90_000)
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setBusy('')
+    }
+  }
+
+  if (!hasToken) {
+    return (
+      <Panel title="Run the team" code="TEAM.RUN" accent="#46d369">
+        <p className="text-xs text-dim">Connect GitHub (top right) to launch workflows from here.</p>
+      </Panel>
+    )
+  }
+
+  return (
+    <Panel title="Run the team" code="TEAM.RUN" accent="#46d369" bodyClassName="space-y-3 p-3">
+      {/* Daily standup (optional agenda focus) */}
+      <div className="space-y-1.5">
+        <input
+          value={agenda}
+          onChange={(e) => setAgenda(e.target.value)}
+          placeholder="Optional agenda focus…"
+          className="w-full border border-line bg-bg/60 px-2 py-1.5 text-xs text-text placeholder:text-dim focus:border-accent/60 focus:outline-none"
+        />
+        <button
+          onClick={() => run('standup', 'team-daily-meeting.yml', agenda.trim() ? { agenda: agenda.trim() } : {})}
+          disabled={busy === 'standup'}
+          className="flex w-full items-center justify-center gap-1.5 border border-accent/40 bg-accent/10 px-3 py-1.5 text-xs uppercase tracking-wider text-accent hover:bg-accent/20 disabled:opacity-50"
+        >
+          <Users2 size={13} /> {busy === 'standup' ? 'Starting…' : 'Hold standup now'}
+        </button>
+      </div>
+
+      {/* Intake sweep */}
+      <button
+        onClick={() => run('intake', 'team-intake.yml', {})}
+        disabled={busy === 'intake'}
+        className="flex w-full items-center justify-center gap-1.5 border border-line px-3 py-1.5 text-xs uppercase tracking-wider text-dim hover:border-accent/60 hover:text-accent disabled:opacity-50"
+      >
+        <Inbox size={13} /> {busy === 'intake' ? 'Starting…' : 'Run intake sweep'}
+      </button>
+
+      {/* Ad-hoc task to the team */}
+      <div className="space-y-1.5 border-t border-line pt-3">
+        <textarea
+          value={task}
+          onChange={(e) => setTask(e.target.value)}
+          rows={2}
+          placeholder="Give the team a task… (routed to the right agent)"
+          className="w-full resize-none border border-line bg-bg/60 px-2 py-1.5 text-xs text-text placeholder:text-dim focus:border-accent/60 focus:outline-none"
+        />
+        <button
+          onClick={() => run('task', 'team-task.yml', { task: task.trim() })}
+          disabled={!task.trim() || busy === 'task'}
+          className="flex w-full items-center justify-center gap-1.5 border border-accent/40 bg-accent/10 px-3 py-1.5 text-xs uppercase tracking-wider text-accent hover:bg-accent/20 disabled:opacity-50"
+        >
+          <Send size={13} /> {busy === 'task' ? 'Sending…' : 'Send task'}
+        </button>
+      </div>
+
+      {done && (
+        <p className="text-[11px] text-ok" style={{ color: '#46d369' }}>
+          Dispatched “{done}” — it runs in a minute or two. Hit Refresh up top when it lands.
+        </p>
+      )}
+      {error && <p className="text-[11px] text-danger">{error}</p>}
+    </Panel>
   )
 }
 
