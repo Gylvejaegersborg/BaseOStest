@@ -19,6 +19,7 @@ import { buildAgenda, type AgendaItem } from '@/features/calendar/agenda'
 import { cronScheduleLabel } from '@/features/calendar/cron'
 import { AgendaList } from '@/features/calendar/AgendaList'
 import { DateField } from '@/features/calendar/DateField'
+import { DayView } from '@/features/calendar/DayView'
 import { MonthView } from '@/features/calendar/MonthView'
 import { DayDetailModal } from '@/features/calendar/DayDetailModal'
 import { CronDetailModal } from '@/features/calendar/CronDetailModal'
@@ -50,7 +51,7 @@ export function Calendar() {
     remindersEngine,
   } = useCalendar()
 
-  const [view, setView] = useState<'week' | 'month'>('week')
+  const [view, setView] = useState<'day' | 'week' | 'month'>('week')
   const [weekOffset, setWeekOffset] = useState(0)
   const [monthOffset, setMonthOffset] = useState(0)
 
@@ -146,15 +147,17 @@ export function Calendar() {
           <div className="flex items-center gap-3">
             <h1 className="font-display text-lg tracking-wider text-text">CALENDAR</h1>
             <span className="text-xs text-dim">
-              {view === 'week'
-                ? `${format(weekStart, 'dd MMM')} – ${format(addDays(weekStart, 6), 'dd MMM yyyy')}`
-                : format(month, 'MMMM yyyy')}
+              {view === 'day'
+                ? format(TODAY, 'EEEE dd MMM yyyy')
+                : view === 'week'
+                  ? `${format(weekStart, 'dd MMM')} – ${format(addDays(weekStart, 6), 'dd MMM yyyy')}`
+                  : format(month, 'MMMM yyyy')}
             </span>
           </div>
           <div className="flex items-center gap-2">
             {/* View toggle */}
             <div className="flex border border-line">
-              {(['week', 'month'] as const).map((v) => (
+              {(['day', 'week', 'month'] as const).map((v) => (
                 <button
                   key={v}
                   onClick={() => setView(v)}
@@ -178,31 +181,45 @@ export function Calendar() {
             >
               {remindersEngine.enabled ? <Bell size={14} /> : <BellOff size={14} />}
             </button>
-            {/* Period nav */}
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => (view === 'week' ? setWeekOffset((w) => w - 1) : setMonthOffset((m) => m - 1))}
-                className="border border-line p-1 text-dim hover:text-text"
-              >
-                <ChevronLeft size={14} />
-              </button>
-              <button
-                onClick={() => (view === 'week' ? setWeekOffset(0) : setMonthOffset(0))}
-                className="border border-line px-2 py-1 text-[11px] uppercase tracking-wider text-dim hover:text-text"
-              >
-                Today
-              </button>
-              <button
-                onClick={() => (view === 'week' ? setWeekOffset((w) => w + 1) : setMonthOffset((m) => m + 1))}
-                className="border border-line p-1 text-dim hover:text-text"
-              >
-                <ChevronRight size={14} />
-              </button>
-            </div>
+            {/* Period nav — day view is fixed to today, so no prev/next */}
+            {view !== 'day' && (
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => (view === 'week' ? setWeekOffset((w) => w - 1) : setMonthOffset((m) => m - 1))}
+                  className="border border-line p-1 text-dim hover:text-text"
+                >
+                  <ChevronLeft size={14} />
+                </button>
+                <button
+                  onClick={() => (view === 'week' ? setWeekOffset(0) : setMonthOffset(0))}
+                  className="border border-line px-2 py-1 text-[11px] uppercase tracking-wider text-dim hover:text-text"
+                >
+                  Today
+                </button>
+                <button
+                  onClick={() => (view === 'week' ? setWeekOffset((w) => w + 1) : setMonthOffset((m) => m + 1))}
+                  className="border border-line p-1 text-dim hover:text-text"
+                >
+                  <ChevronRight size={14} />
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
-        {view === 'week' ? (
+        {view === 'day' ? (
+          <DayView
+            appts={appts}
+            tasks={tasks}
+            reminders={reminders}
+            crons={crons}
+            onSelectAppt={setEditing}
+            onSelectTask={setEditingTask}
+            onToggleTask={toggleTask}
+            onSelectReminder={setEditingReminder}
+            onSelectCron={setCronJob}
+          />
+        ) : view === 'week' ? (
           <WeekGrid
             days={days}
             appts={appts}
