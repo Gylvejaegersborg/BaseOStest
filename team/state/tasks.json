@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-14T07:30:00Z",
+  "updatedAt": "2026-06-15T11:00:00Z",
   "tasks": [
     {
       "id": "t-secrets-setup",
@@ -38,7 +38,7 @@
       "createdAt": "2026-06-12T12:00:00Z",
       "handedFrom": "hemera",
       "due": "2026-06-19",
-      "notes": "Draft complete. Package at team/drafts/uploads/switch/ — metadata, description, checklist, captions, art-prompt. Queued as ap-2026-06-19-switch-upload (pending). Awaiting user approval by June 20.",
+      "notes": "Draft complete. Package at team/drafts/uploads/switch/ — metadata, description, checklist, captions, art-prompt. Queued as ap-2026-06-19-switch-upload (pending). Awaiting user approval by June 20. Two hard inputs still outstanding from user: (1) beat store listing URL for Switch, (2) July 18 publish time preference.",
       "links": [
         "team/reports/q3-2026-release-calendar.md",
         "team/drafts/uploads/switch/metadata.json",
@@ -47,6 +47,105 @@
         "team/drafts/uploads/switch/captions.md",
         "team/drafts/uploads/switch/art-prompt.md"
       ]
+    },
+    {
+      "id": "t-w25-market-report",
+      "title": "ISO week 25 market read — drill / electronic / ambient trends",
+      "owner": "theia",
+      "status": "done",
+      "createdBy": "hemera",
+      "createdAt": "2026-06-15T07:30:00Z",
+      "due": "2026-06-15",
+      "notes": "Complete. Report at team/reports/market/2026-W25.md. Three opportunities surfaced: (1) 4-week Switch pre-release content arc starting now, (2) extended-loop YouTube format for Virtual Love + Cold Storage, (3) beat-store discoverability audit before Jul 18.",
+      "links": ["team/reports/market/2026-W25.md"]
+    },
+    {
+      "id": "t-switch-prerelease-arc",
+      "title": "Draft 4-week pre-release content arc for Switch (W25–W28)",
+      "owner": "nyx",
+      "status": "review",
+      "createdBy": "theia",
+      "createdAt": "2026-06-15T09:00:00Z",
+      "handedFrom": "theia",
+      "due": "2026-06-18",
+      "notes": "Draft complete. 4-week arc at team/drafts/content/switch-prerelease-arc-w25-w28.md. Collab narrative spine woven through W25–W28. Hard blockers: Aether hook-moment timestamp (needed before any clip is cut), user beat store URL (W28 CTA posts), user July 18 publish time (W27 countdown story). Internal planning doc — no approval queue entry needed.",
+      "links": [
+        "team/reports/market/2026-W25.md",
+        "team/drafts/content/switch-prerelease-arc-w25-w28.md"
+      ]
+    },
+    {
+      "id": "t-virtual-love-extended-loop",
+      "title": "Scope and produce 15–30 min extended loop of Virtual Love for YouTube",
+      "owner": "nyx",
+      "status": "backlog",
+      "createdBy": "theia",
+      "createdAt": "2026-06-15T09:00:00Z",
+      "handedFrom": "theia",
+      "due": "2026-09-01",
+      "notes": "Market signal: extended-loop format (15–30 min) on YouTube serves the creator/study audience and generates disproportionate watch-time. Target upload no later than Sep 1, ahead of the Sep 5 Virtual Love drop. Nightshade (if remix completes) is a secondary candidate for same format.",
+      "links": ["team/reports/market/2026-W25.md"]
+    },
+    {
+      "id": "t-store-discoverability-audit",
+      "title": "Beat-store tags and SEO copy audit before Switch upload",
+      "owner": "hemera",
+      "status": "backlog",
+      "createdBy": "theia",
+      "createdAt": "2026-06-15T09:00:00Z",
+      "handedFrom": "theia",
+      "due": "2026-07-11",
+      "notes": "Market signal: Switch upload on Jul 18 will bring external traffic to the store. Existing listing tags, descriptions and searchability should be reviewed and cleaned before that date. Theia cannot audit the live store from this run — assign to Hemera or Nyx for a manual pass. One week lead time before upload is the hard floor.",
+      "links": ["team/reports/market/2026-W25.md"]
+    },
+    {
+      "id": "t-nightshade-eta-decision",
+      "title": "Nightshade Q3 slot — surface re-mix ETA or drop from calendar",
+      "owner": "user",
+      "status": "blocked",
+      "createdBy": "hemera",
+      "createdAt": "2026-06-15T07:30:00Z",
+      "due": "2026-06-22",
+      "notes": "Sep 26 slot is tentative. Hemera recommendation: give ISARK until June 22 to surface a re-mix ETA. If no ETA by then, drop Nightshade from Q3 and treat as Q4 carry-over. Keeping a blank tentative slot in a 4-track quarter blocks promo planning for the back half."
+    },
+    {
+      "id": "t-homerun-video-decision",
+      "title": "Homerun — decide internal edit vs commissioned video",
+      "owner": "user",
+      "status": "blocked",
+      "createdBy": "hemera",
+      "createdAt": "2026-06-15T07:30:00Z",
+      "due": "2026-07-01",
+      "notes": "Art and master are done. Video direction (internal edit or commission) needed by July 1 — 16 days from today — to keep Aug 8 release on schedule. If commissioned, lead time means the decision is effectively overdue within the week."
+    },
+    {
+      "id": "t-argus-pipeline-audit",
+      "title": "First Argus pipeline health audit",
+      "owner": "argus",
+      "status": "done",
+      "createdBy": "hemera",
+      "createdAt": "2026-06-15T07:30:00Z",
+      "due": "2026-06-15",
+      "notes": "Complete. Report at team/reports/pipeline/2026-06-15.md. Verdict: YELLOW. Two new tasks filed: t-homerun-due-date-correction (hemera), t-retroactive-intake-path (user).",
+      "links": ["team/reports/pipeline/2026-06-15.md"]
+    },
+    {
+      "id": "t-homerun-due-date-correction",
+      "title": "Update t-homerun-video-decision due date to reflect real commission lead time",
+      "owner": "hemera",
+      "status": "backlog",
+      "createdBy": "argus",
+      "createdAt": "2026-06-15T10:30:00Z",
+      "notes": "t-homerun-video-decision currently has due: 2026-07-01, but Hemera's own notes state the decision is effectively overdue within the week if a commission is involved. The due date should be updated to 2026-06-19 so Mnemosyne surfaces it correctly. Hemera to update the task record."
+    },
+    {
+      "id": "t-retroactive-intake-path",
+      "title": "Decide: retroactive intake path for existing catalog beats",
+      "owner": "user",
+      "status": "backlog",
+      "createdBy": "argus",
+      "createdAt": "2026-06-15T10:30:00Z",
+      "notes": "Aether is structurally locked out of analyzing existing catalog beats (Switch, Virtual Love, Homerun, Cold Storage, Nightshade) because they predate the Discord intake setup and have no inbox records. Immediate case: Switch hook-moment analysis is a hard blocker for Nyx's W25 short-form content. User decision needed: either (1) configure Discord intake and re-submit existing beats, or (2) define an alternative path (e.g., manual inbox record creation). This is a user/infrastructure decision."
     }
   ]
 }

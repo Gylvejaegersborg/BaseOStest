@@ -1,6 +1,23 @@
 {
-  "updatedAt": "2026-06-12T00:00:00Z",
-  "notes": [],
+  "updatedAt": "2026-06-15T10:30:00Z",
+  "notes": [
+    {
+      "id": "os-note-market-pulse-w25",
+      "title": "Market Pulse — W25 (Jun 15)",
+      "folder": "Team",
+      "tags": ["market", "research", "theia", "w25"],
+      "updated": "2026-06-15T09:00:00Z",
+      "body": "**W25 market read filed** (general knowledge through Aug 2025; no live scrape — intake dark).\n\n**3 signals for you:**\n\n1. **Switch's 186 BPM C min lane is differentiated, not crowded.** The ISΛRK × 10k.emraan collab framing is an earned story — use it as the content spine across the 4-week pre-release window. That clock starts *now*, not July.\n\n2. **Extended loops (15–30 min) on YouTube are a low-effort win for Virtual Love and Cold Storage.** Serves creator/licensing audience; builds watch-time passively. Scope this before Sep 1.\n\n3. **Beat store needs a tag/description pass before Jul 18.** Switch will bring outside eyes. Make sure what they land on is searchable and clean.\n\nFull report: `team/reports/market/2026-W25.md`"
+    },
+    {
+      "id": "os-note-argus-pipeline-w25",
+      "title": "Pipeline Health — W25 (Jun 15) — ACTION NEEDED BY JUN 18",
+      "folder": "Team",
+      "tags": ["pipeline", "argus", "urgent", "switch"],
+      "updated": "2026-06-15T10:30:00Z",
+      "body": "**Pipeline verdict: YELLOW.** Team outputs are solid. One time-sensitive risk requires your action.\n\n**You need to do two things by June 18 (not June 20):**\n\n1. **Beat store listing URL for Switch** — Nyx needs this to finalize the upload package before you approve it. Without it, you would be approving a package with a TBD placeholder in the store CTA copy.\n\n2. **July 18 publish time preference** — Required for the IG countdown story (W27) and YouTube community post copy. Also blocks the approval package being complete.\n\nThe approval gate is June 20. If these two inputs land on June 20, Nyx has no time to fold them in. June 18 is the real deadline.\n\n**Also flagged:**\n- Homerun video decision (internal edit vs. commission) is more urgent than its Jul 1 due date suggests. If you commission, lead time means the decision is due this week.\n- Aether cannot analyze existing catalog beats (Switch, Virtual Love, etc.) because they were never submitted through the intake channel. If you want Aether to identify Switch's hook moment for short-form content, a retroactive intake path is needed — or you configure the Discord intake channel and re-submit.\n\nFull audit: `team/reports/pipeline/2026-06-15.md`"
+    }
+  ],
   "reminders": [],
   "tasks": [],
   "projects": [],
