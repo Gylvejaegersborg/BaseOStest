@@ -1,29 +1,29 @@
 {
-  "updatedAt": "2026-06-15T11:00:00Z",
+  "updatedAt": "2026-06-16T12:00:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "Strategy hold — Switch at June 18 hard gate. Nightshade deadline June 22. Store audit and Homerun decision items open.",
-      "lastActive": "2026-06-15T11:00:00Z"
+      "task": "Holding Switch input escalation (store URL + publish time now due Jun 17). Owns t-propagate-deadline-escalation (due Jun 17) to write that date into checklist.md, Q3 calendar, overlay. Homerun due-date correction closed.",
+      "lastActive": "2026-06-16T12:00:00Z"
     },
     {
       "id": "aether",
       "name": "Aether",
       "role": "A&R · Sound",
       "status": "idle",
-      "task": "Dark — no intake. Catalog beats lack inbox records; retroactive intake path decision pending user.",
-      "lastActive": "2026-06-15T11:00:00Z"
+      "task": "Dark — no intake. Still structurally locked out of Switch hook-moment analysis pending t-retroactive-intake-path (user decision).",
+      "lastActive": "2026-06-16T12:00:00Z"
     },
     {
       "id": "nyx",
       "name": "Nyx",
       "role": "Execution · Content",
       "status": "working",
-      "task": "Switch pre-release arc in review (t-switch-prerelease-arc). Blocked on Aether hook-moment for short-form clips.",
-      "lastActive": "2026-06-15T11:00:00Z"
+      "task": "Switch upload package and pre-release arc both in review, unchanged on blockers (store URL, publish time, Aether hook moment). Shipped two unblocked asset specs today: W26 waveform visualizer, W27 collab graphic prompts.",
+      "lastActive": "2026-06-16T12:00:00Z"
     },
     {
       "id": "hermes",
@@ -31,31 +31,31 @@
       "role": "Booking · Outreach",
       "status": "idle",
       "task": "Dark — no messages. IMAP and Discord intake unconfigured.",
-      "lastActive": "2026-06-15T11:00:00Z"
+      "lastActive": "2026-06-16T12:00:00Z"
     },
     {
       "id": "mnemosyne",
       "name": "Mnemosyne",
       "role": "Archive · Ops",
-      "status": "working",
-      "task": "Writing 2026-06-15 meeting record.",
-      "lastActive": "2026-06-15T11:00:00Z"
+      "status": "idle",
+      "task": "2026-06-16 meeting record closed: board, overlay and approvals queue confirmed consistent. No schema drift found.",
+      "lastActive": "2026-06-16T12:00:00Z"
     },
     {
       "id": "theia",
       "name": "Theia",
       "role": "Market · Research",
       "status": "idle",
-      "task": "W25 market read complete (team/reports/market/2026-W25.md). W26 read due 2026-06-22.",
-      "lastActive": "2026-06-15T11:00:00Z"
+      "task": "W25 market read current (team/reports/market/2026-W25.md). No turn today by design — next read Monday 2026-06-22.",
+      "lastActive": "2026-06-16T12:00:00Z"
     },
     {
       "id": "argus",
       "name": "Argus",
       "role": "Oversight · Pipeline",
       "status": "idle",
-      "task": "W25 pipeline audit complete (team/reports/pipeline/2026-06-15.md). YELLOW verdict. Two new tasks filed.",
-      "lastActive": "2026-06-15T11:00:00Z"
+      "task": "W26 pipeline audit complete (team/reports/pipeline/2026-06-16.md). YELLOW verdict. Filed t-propagate-deadline-escalation and flagged real Jun 17 deadline directly to ISΛRK via overlay.",
+      "lastActive": "2026-06-16T12:00:00Z"
     }
   ]
 }

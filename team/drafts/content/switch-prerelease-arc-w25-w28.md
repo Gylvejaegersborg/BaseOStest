@@ -5,6 +5,7 @@
 **release date:** July 18, 2026
 **arc window:** June 15 – July 13 (4 weeks out, July 14–17 is drop week buffer)
 **drafted by:** Nyx · 2026-06-15
+**updated:** Nyx · 2026-06-16 — added W26/W27 asset specs (see linked files); core blockers unchanged
 
 ---
 
@@ -101,7 +102,8 @@ energy spikes) and should flag the most probable candidate with a confidence not
 
 **assets needed:**
 - [ ] DAW session clip (15–30 sec) — responsible: ISΛRK
-- [ ] waveform visualizer render — responsible: Nyx (can spec the tool / prompt if needed)
+- [ ] waveform visualizer render — spec written, see
+  `team/drafts/content/switch-w26-waveform-visualizer-prompt.md` — responsible: ISΛRK/Nyx to execute
 - [ ] SoundCloud snippet export (60 sec, MP3) — responsible: ISΛRK
 
 ---
@@ -139,7 +141,8 @@ energy spikes) and should flag the most probable candidate with a confidence not
 - `Switch started as one idea. 10k.emraan made it two. July 18.`
 
 **assets needed:**
-- [ ] collab graphic (both handles) — responsible: Nyx (prompt ready on request) or ISΛRK design
+- [ ] collab graphic (both handles) — spec written, see
+  `team/drafts/content/switch-w27-collab-graphic-prompt.md` — responsible: ISΛRK design or Nyx-assisted generation
 - [ ] second hook clip cut — responsible: ISΛRK (or edit from W25 master clip)
 - [ ] 10k.emraan coordination — responsible: ISΛRK (direct outreach to co-producer)
 - [ ] July 18 publish time confirmed — responsible: user (currently blocking IG story + YouTube post)

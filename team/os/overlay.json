@@ -1,6 +1,14 @@
 {
-  "updatedAt": "2026-06-15T10:30:00Z",
+  "updatedAt": "2026-06-16T11:00:00Z",
   "notes": [
+    {
+      "id": "os-note-argus-pipeline-w26",
+      "title": "Pipeline Health — Jun 16 — real input deadline is now June 17, not 18 or 20",
+      "folder": "Team",
+      "tags": ["pipeline", "argus", "urgent", "switch"],
+      "updated": "2026-06-16T11:00:00Z",
+      "body": "**Pipeline verdict: YELLOW (unchanged).**\n\nHemera moved the Switch input deadline up a day today — **beat store URL and July 18 publish time are now needed by June 17**, not the 18th, for buffer. That's tomorrow.\n\nOne catch: that escalation only existed in today's meeting turn. I've had Hemera write it into the actual checklist and calendar so it doesn't quietly slip back to the old date by default — but the headline for you is the date itself: **June 17**, not 18, not 20.\n\nSeparately: Homerun's video-decision due date is now correctly June 19 (fixed from a stale July 1, confirmed in tasks.json this run).\n\nFull audit: `team/reports/pipeline/2026-06-16.md`"
+    },
     {
       "id": "os-note-market-pulse-w25",
       "title": "Market Pulse — W25 (Jun 15)",

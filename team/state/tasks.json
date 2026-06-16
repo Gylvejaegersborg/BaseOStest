@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-15T11:00:00Z",
+  "updatedAt": "2026-06-16T11:00:00Z",
   "tasks": [
     {
       "id": "t-secrets-setup",
@@ -38,7 +38,7 @@
       "createdAt": "2026-06-12T12:00:00Z",
       "handedFrom": "hemera",
       "due": "2026-06-19",
-      "notes": "Draft complete. Package at team/drafts/uploads/switch/ — metadata, description, checklist, captions, art-prompt. Queued as ap-2026-06-19-switch-upload (pending). Awaiting user approval by June 20. Two hard inputs still outstanding from user: (1) beat store listing URL for Switch, (2) July 18 publish time preference.",
+      "notes": "Draft complete. Package at team/drafts/uploads/switch/ — metadata, description, checklist, captions, art-prompt. Queued as ap-2026-06-19-switch-upload (pending, day 4 of window). 2026-06-16: no change — Hemera escalated the June 18 input deadline today (2 days out); still awaiting from user: (1) beat store listing URL for Switch, (2) July 18 publish time. Nothing fabricated into the drafts in the meantime — placeholders stay as [TBD] until real values land.",
       "links": [
         "team/reports/q3-2026-release-calendar.md",
         "team/drafts/uploads/switch/metadata.json",
@@ -68,10 +68,12 @@
       "createdAt": "2026-06-15T09:00:00Z",
       "handedFrom": "theia",
       "due": "2026-06-18",
-      "notes": "Draft complete. 4-week arc at team/drafts/content/switch-prerelease-arc-w25-w28.md. Collab narrative spine woven through W25–W28. Hard blockers: Aether hook-moment timestamp (needed before any clip is cut), user beat store URL (W28 CTA posts), user July 18 publish time (W27 countdown story). Internal planning doc — no approval queue entry needed.",
+      "notes": "Draft complete, still in review (due 2026-06-18, 2 days out). 2026-06-16: no movement on the core blockers — Aether hook-moment timestamp still cannot be produced (no inbox record for Switch, blocked on t-retroactive-intake-path), store URL and publish time still outstanding from user. Used the day to ship the two non-blocked asset specs the arc had only promised (W26 waveform visualizer, W27 collab graphic) as standalone prompt docs so they're ready to execute the moment someone picks them up. Hard blockers unchanged: Aether hook-moment timestamp (all hook clips, W25–W28), user beat store URL (W28 CTA posts), user July 18 publish time (W27 countdown story, YouTube community posts).",
       "links": [
         "team/reports/market/2026-W25.md",
-        "team/drafts/content/switch-prerelease-arc-w25-w28.md"
+        "team/drafts/content/switch-prerelease-arc-w25-w28.md",
+        "team/drafts/content/switch-w26-waveform-visualizer-prompt.md",
+        "team/drafts/content/switch-w27-collab-graphic-prompt.md"
       ]
     },
     {
@@ -115,8 +117,8 @@
       "status": "blocked",
       "createdBy": "hemera",
       "createdAt": "2026-06-15T07:30:00Z",
-      "due": "2026-07-01",
-      "notes": "Art and master are done. Video direction (internal edit or commission) needed by July 1 — 16 days from today — to keep Aug 8 release on schedule. If commissioned, lead time means the decision is effectively overdue within the week."
+      "due": "2026-06-19",
+      "notes": "Due date corrected 2026-06-16 by Hemera per Argus's t-homerun-due-date-correction audit finding: original 2026-07-01 understated real urgency, since commissioned-video lead time makes the decision effectively overdue within the week. Art and master are done. Video direction (internal edit or commission) needed by Jun 19 to keep Aug 8 release on schedule."
     },
     {
       "id": "t-argus-pipeline-audit",
@@ -133,10 +135,10 @@
       "id": "t-homerun-due-date-correction",
       "title": "Update t-homerun-video-decision due date to reflect real commission lead time",
       "owner": "hemera",
-      "status": "backlog",
+      "status": "done",
       "createdBy": "argus",
       "createdAt": "2026-06-15T10:30:00Z",
-      "notes": "t-homerun-video-decision currently has due: 2026-07-01, but Hemera's own notes state the decision is effectively overdue within the week if a commission is involved. The due date should be updated to 2026-06-19 so Mnemosyne surfaces it correctly. Hemera to update the task record."
+      "notes": "Done 2026-06-16. t-homerun-video-decision due date corrected from 2026-07-01 to 2026-06-19 as Argus recommended. Mnemosyne to confirm in end-of-meeting consolidation pass."
     },
     {
       "id": "t-retroactive-intake-path",
@@ -146,6 +148,32 @@
       "createdBy": "argus",
       "createdAt": "2026-06-15T10:30:00Z",
       "notes": "Aether is structurally locked out of analyzing existing catalog beats (Switch, Virtual Love, Homerun, Cold Storage, Nightshade) because they predate the Discord intake setup and have no inbox records. Immediate case: Switch hook-moment analysis is a hard blocker for Nyx's W25 short-form content. User decision needed: either (1) configure Discord intake and re-submit existing beats, or (2) define an alternative path (e.g., manual inbox record creation). This is a user/infrastructure decision."
+    },
+    {
+      "id": "t-argus-pipeline-audit-0616",
+      "title": "Second Argus pipeline health audit",
+      "owner": "argus",
+      "status": "done",
+      "createdBy": "hemera",
+      "createdAt": "2026-06-16T07:30:00Z",
+      "due": "2026-06-16",
+      "notes": "Complete. Report at team/reports/pipeline/2026-06-16.md. Verdict: YELLOW. Confirmed Hemera's Homerun due-date self-correction landed cleanly in tasks.json. Found that Hemera's claimed Jun 17 input-deadline escalation (store URL, publish time) exists only in her spoken turn and was never written into checklist.md, the Q3 calendar, or the overlay note — filed t-propagate-deadline-escalation to close that gap. Confirmed Nyx's two new asset spec files are real, substantive, and correctly linked into the arc doc, and that Nyx left [TBD] placeholders untouched rather than fabricating values. agents.json is stale (expected at this point in the meeting; flagged for Mnemosyne's end-of-meeting refresh).",
+      "links": ["team/reports/pipeline/2026-06-16.md"]
+    },
+    {
+      "id": "t-propagate-deadline-escalation",
+      "title": "Write the Jun 17 Switch input-deadline escalation into the actual artifacts, not just the meeting turn",
+      "owner": "hemera",
+      "status": "backlog",
+      "createdBy": "argus",
+      "createdAt": "2026-06-16T11:00:00Z",
+      "due": "2026-06-17",
+      "notes": "Hemera's 2026-06-16 turn states the store-URL/publish-time input deadline was escalated from Jun 18 to Jun 17 for buffer. Checked every artifact that should carry that date and none do: team/drafts/uploads/switch/checklist.md still reads 'approval due: 2026-06-20'; team/reports/q3-2026-release-calendar.md still lists 'June 20: Switch upload package approved' as the next check-in; team/os/overlay.json still carries Argus's Jun 15 note citing 'by June 18 (not June 20)' with no refreshed Hemera note. A due-date escalation that only exists in a transcript is not an escalation — fix the checklist line, the calendar check-in/risk entry, and push a refreshed overlay note with the real Jun 17 number before it's needed.",
+      "links": [
+        "team/reports/pipeline/2026-06-16.md",
+        "team/drafts/uploads/switch/checklist.md",
+        "team/reports/q3-2026-release-calendar.md"
+      ]
     }
   ]
 }
