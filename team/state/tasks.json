@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-16T11:00:00Z",
+  "updatedAt": "2026-06-17T11:00:00Z",
   "tasks": [
     {
       "id": "t-secrets-setup",
@@ -30,25 +30,6 @@
       "links": ["team/reports/q3-2026-release-calendar.md"]
     },
     {
-      "id": "t-switch-upload-package",
-      "title": "Build Switch upload package for SoundCloud/YouTube",
-      "owner": "nyx",
-      "status": "review",
-      "createdBy": "hemera",
-      "createdAt": "2026-06-12T12:00:00Z",
-      "handedFrom": "hemera",
-      "due": "2026-06-19",
-      "notes": "Draft complete. Package at team/drafts/uploads/switch/ — metadata, description, checklist, captions, art-prompt. Queued as ap-2026-06-19-switch-upload (pending, day 4 of window). 2026-06-16: no change — Hemera escalated the June 18 input deadline today (2 days out); still awaiting from user: (1) beat store listing URL for Switch, (2) July 18 publish time. Nothing fabricated into the drafts in the meantime — placeholders stay as [TBD] until real values land.",
-      "links": [
-        "team/reports/q3-2026-release-calendar.md",
-        "team/drafts/uploads/switch/metadata.json",
-        "team/drafts/uploads/switch/description.md",
-        "team/drafts/uploads/switch/checklist.md",
-        "team/drafts/uploads/switch/captions.md",
-        "team/drafts/uploads/switch/art-prompt.md"
-      ]
-    },
-    {
       "id": "t-w25-market-report",
       "title": "ISO week 25 market read — drill / electronic / ambient trends",
       "owner": "theia",
@@ -58,23 +39,6 @@
       "due": "2026-06-15",
       "notes": "Complete. Report at team/reports/market/2026-W25.md. Three opportunities surfaced: (1) 4-week Switch pre-release content arc starting now, (2) extended-loop YouTube format for Virtual Love + Cold Storage, (3) beat-store discoverability audit before Jul 18.",
       "links": ["team/reports/market/2026-W25.md"]
-    },
-    {
-      "id": "t-switch-prerelease-arc",
-      "title": "Draft 4-week pre-release content arc for Switch (W25–W28)",
-      "owner": "nyx",
-      "status": "review",
-      "createdBy": "theia",
-      "createdAt": "2026-06-15T09:00:00Z",
-      "handedFrom": "theia",
-      "due": "2026-06-18",
-      "notes": "Draft complete, still in review (due 2026-06-18, 2 days out). 2026-06-16: no movement on the core blockers — Aether hook-moment timestamp still cannot be produced (no inbox record for Switch, blocked on t-retroactive-intake-path), store URL and publish time still outstanding from user. Used the day to ship the two non-blocked asset specs the arc had only promised (W26 waveform visualizer, W27 collab graphic) as standalone prompt docs so they're ready to execute the moment someone picks them up. Hard blockers unchanged: Aether hook-moment timestamp (all hook clips, W25–W28), user beat store URL (W28 CTA posts), user July 18 publish time (W27 countdown story, YouTube community posts).",
-      "links": [
-        "team/reports/market/2026-W25.md",
-        "team/drafts/content/switch-prerelease-arc-w25-w28.md",
-        "team/drafts/content/switch-w26-waveform-visualizer-prompt.md",
-        "team/drafts/content/switch-w27-collab-graphic-prompt.md"
-      ]
     },
     {
       "id": "t-virtual-love-extended-loop",
@@ -164,16 +128,74 @@
       "id": "t-propagate-deadline-escalation",
       "title": "Write the Jun 17 Switch input-deadline escalation into the actual artifacts, not just the meeting turn",
       "owner": "hemera",
-      "status": "backlog",
+      "status": "done",
       "createdBy": "argus",
       "createdAt": "2026-06-16T11:00:00Z",
       "due": "2026-06-17",
-      "notes": "Hemera's 2026-06-16 turn states the store-URL/publish-time input deadline was escalated from Jun 18 to Jun 17 for buffer. Checked every artifact that should carry that date and none do: team/drafts/uploads/switch/checklist.md still reads 'approval due: 2026-06-20'; team/reports/q3-2026-release-calendar.md still lists 'June 20: Switch upload package approved' as the next check-in; team/os/overlay.json still carries Argus's Jun 15 note citing 'by June 18 (not June 20)' with no refreshed Hemera note. A due-date escalation that only exists in a transcript is not an escalation — fix the checklist line, the calendar check-in/risk entry, and push a refreshed overlay note with the real Jun 17 number before it's needed.",
+      "notes": "Done 2026-06-17. Fixed all three artifacts Argus flagged: (1) team/drafts/uploads/switch/checklist.md — 'approval due' line now reads 2026-06-17 with escalation note, plus an explicit outstanding-inputs callout above sign-off; (2) team/reports/q3-2026-release-calendar.md — Switch blockers paragraph and pre-release tasks now state the June 17 input deadline, and 'Next Check-in Points' has a new June 17 line plus the corrected June 19 Homerun line (June 20 kept as the separate approval-gate date, not conflated with inputs); (3) team/os/overlay.json — replaced the stale Jun 16 Argus-narrated note with a fresh Hemera note dated 2026-06-17 stating the live deadline directly, and added an os-rem reminder so it surfaces on the calendar, not just Notes. Argus should re-audit this run to confirm.",
       "links": [
         "team/reports/pipeline/2026-06-16.md",
         "team/drafts/uploads/switch/checklist.md",
-        "team/reports/q3-2026-release-calendar.md"
+        "team/reports/q3-2026-release-calendar.md",
+        "team/os/overlay.json"
       ]
+    },
+    {
+      "id": "t-switch-upload-package",
+      "title": "Build Switch upload package for SoundCloud/YouTube",
+      "owner": "nyx",
+      "status": "review",
+      "createdBy": "hemera",
+      "createdAt": "2026-06-12T12:00:00Z",
+      "handedFrom": "hemera",
+      "due": "2026-06-19",
+      "notes": "Draft complete. Package at team/drafts/uploads/switch/ — metadata, description, checklist, captions, art-prompt. Queued as ap-2026-06-19-switch-upload (pending, day 5 of window). 2026-06-17: input deadline now live in checklist.md itself (was only in meeting transcript as of yesterday). Still awaiting from user: (1) beat store listing URL for Switch, (2) July 18 publish time — both due today. No fabricated values added; [TBD] placeholders remain until real inputs land.",
+      "links": [
+        "team/reports/q3-2026-release-calendar.md",
+        "team/drafts/uploads/switch/metadata.json",
+        "team/drafts/uploads/switch/description.md",
+        "team/drafts/uploads/switch/checklist.md",
+        "team/drafts/uploads/switch/captions.md",
+        "team/drafts/uploads/switch/art-prompt.md"
+      ]
+    },
+    {
+      "id": "t-switch-prerelease-arc",
+      "title": "Draft 4-week pre-release content arc for Switch (W25–W28)",
+      "owner": "nyx",
+      "status": "review",
+      "createdBy": "theia",
+      "createdAt": "2026-06-15T09:00:00Z",
+      "handedFrom": "theia",
+      "due": "2026-06-18",
+      "notes": "Due tomorrow. Hard blockers unchanged for a fourth day: Aether hook-moment timestamp (structurally blocked on t-retroactive-intake-path, a user decision), user beat store URL, user July 18 publish time — confirmed zero movement again today, per Hemera's report and Nyx's own re-check of checklist.md/queue.json. 2026-06-17: per Hemera's handoff, held the arc in review and did not force a hook-moment placeholder. Instead drafted the W25 collab-story copy (X post + IG/TikTok caption variant) Theia flagged — needs neither the hook timestamp nor store URL/time, built only from verified BPM/key/collab facts. Linked into the arc doc's W25 section and queued as ap-2026-06-17-switch-w25-collab-story.",
+      "links": [
+        "team/reports/market/2026-W25.md",
+        "team/drafts/content/switch-prerelease-arc-w25-w28.md",
+        "team/drafts/content/switch-w26-waveform-visualizer-prompt.md",
+        "team/drafts/content/switch-w27-collab-graphic-prompt.md",
+        "team/drafts/content/switch-w25-collab-story-prompt.md"
+      ]
+    },
+    {
+      "id": "t-argus-pipeline-audit-0617",
+      "title": "Third Argus pipeline health audit",
+      "owner": "argus",
+      "status": "done",
+      "createdBy": "hemera",
+      "createdAt": "2026-06-17T09:00:00Z",
+      "due": "2026-06-17",
+      "notes": "Complete. Report at team/reports/pipeline/2026-06-17.md. Verdict: GREEN. Re-audited t-propagate-deadline-escalation against the actual files (checklist.md, Q3 calendar, overlay.json) and confirmed all three artifact fixes Hemera claimed are real and accurate, no contradictions or stale dates left behind. Confirmed Nyx's W25 collab-story content file, arc-doc link-in, and new approval-queue entry are schema-conformant and honest about dependencies; confirmed she left the arc's stated cadence line untouched and flagged the overshoot rather than silently editing it. Confirmed agents.json was correctly NOT touched prematurely (still Mnemosyne's pending end-of-meeting job) and that inbox/cursors confirm genuine intake silence. One new task filed: t-cadence-decision-w25-x-post (user).",
+      "links": ["team/reports/pipeline/2026-06-17.md"]
+    },
+    {
+      "id": "t-cadence-decision-w25-x-post",
+      "title": "Decide: run both W25 X posts (marker + collab-story) or hold one",
+      "owner": "user",
+      "status": "backlog",
+      "createdBy": "argus",
+      "createdAt": "2026-06-17T11:00:00Z",
+      "notes": "Nyx's new collab-story X post (queued as ap-2026-06-17-switch-w25-collab-story) would put W25 at 2 X posts against the pre-release arc's stated cadence of 1. Nyx correctly flagged this instead of resolving it herself or silently editing the cadence line. Needs a decision: run both (update the cadence line in switch-prerelease-arc-w25-w28.md to reflect it), swap one for the other, or hold the second post for W26's X slot. Small decision but will rot in the queue if no one owns closing it."
     }
   ]
 }

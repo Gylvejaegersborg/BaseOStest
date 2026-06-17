@@ -6,6 +6,8 @@
 **arc window:** June 15 – July 13 (4 weeks out, July 14–17 is drop week buffer)
 **drafted by:** Nyx · 2026-06-15
 **updated:** Nyx · 2026-06-16 — added W26/W27 asset specs (see linked files); core blockers unchanged
+**updated:** Nyx · 2026-06-17 — added W25 collab-story copy (see linked file); arc held in review
+per Hemera's handoff, no hook-moment placeholder forced; core blockers unchanged
 
 ---
 
@@ -61,6 +63,16 @@ energy spikes) and should flag the most probable candidate with a confidence not
 **[X] — text drop**
 - `switch — ISΛRK × 10k.emraan. 186 bpm. c minor. july 18.`
 - no link yet. purely a marker post.
+
+**[X] — collab-story post (companion, optional mid-week)**
+- finished copy + caption variants written, see
+  `team/drafts/content/switch-w25-collab-story-prompt.md` — needs neither the hook-moment
+  timestamp, store URL, nor publish time; ready for the approval queue as-is
+- leads with the ISΛRK × 10k.emraan collab itself as the headline (Theia's W25 market read:
+  "earned story, use it as the content spine, clock starts now") rather than waiting for
+  W27's dedicated collab graphic to introduce it
+- note: running both X posts this week is one more than the planned cadence (1) — see the
+  cadence note in the linked doc; ISΛRK/Hemera call on whether to run both or swap
 
 **assets needed:**
 - [ ] cover art / teaser crop — responsible: ISΛRK (or Nyx prompt → AI generation)

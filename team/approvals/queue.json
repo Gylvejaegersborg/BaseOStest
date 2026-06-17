@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-12T12:30:00Z",
+  "updatedAt": "2026-06-17T09:00:00Z",
   "items": [
     {
       "id": "ap-2026-06-19-switch-upload",
@@ -15,6 +15,19 @@
       ],
       "draftedBy": "nyx",
       "createdAt": "2026-06-12T12:30:00Z",
+      "status": "pending"
+    },
+    {
+      "id": "ap-2026-06-17-switch-w25-collab-story",
+      "type": "social_post",
+      "title": "Switch W25 collab-story post — X (+ optional IG/TikTok caption variant)",
+      "summary": "Approving this queues a companion X post for the W25 'signal' week of the Switch pre-release arc, leading with the ISΛRK x 10k.emraan collab as the headline ('two producers. one 186 bpm idea...'), plus an alternate collab-forward caption variant for the producer-tag hook clip IG/TikTok post. No link, no store URL, no publish-time claim — text and BPM/key/date facts only, all verified against metadata.json and the Q3 release calendar. Does not require Aether's hook-moment timestamp. Posting both this and the existing W25 X marker post would run one X post over the arc's planned W25 cadence (1) — flagged for Hemera/ISARK to decide before scheduling.",
+      "draftPaths": [
+        "team/drafts/content/switch-w25-collab-story-prompt.md",
+        "team/drafts/content/switch-prerelease-arc-w25-w28.md"
+      ],
+      "draftedBy": "nyx",
+      "createdAt": "2026-06-17T09:00:00Z",
       "status": "pending"
     }
   ]

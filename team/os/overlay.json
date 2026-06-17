@@ -1,13 +1,29 @@
 {
-  "updatedAt": "2026-06-16T11:00:00Z",
+  "updatedAt": "2026-06-17T11:00:00Z",
   "notes": [
     {
-      "id": "os-note-argus-pipeline-w26",
-      "title": "Pipeline Health — Jun 16 — real input deadline is now June 17, not 18 or 20",
+      "id": "os-note-argus-pipeline-0617",
+      "title": "Pipeline Health — Jun 17 — GREEN",
       "folder": "Team",
-      "tags": ["pipeline", "argus", "urgent", "switch"],
-      "updated": "2026-06-16T11:00:00Z",
-      "body": "**Pipeline verdict: YELLOW (unchanged).**\n\nHemera moved the Switch input deadline up a day today — **beat store URL and July 18 publish time are now needed by June 17**, not the 18th, for buffer. That's tomorrow.\n\nOne catch: that escalation only existed in today's meeting turn. I've had Hemera write it into the actual checklist and calendar so it doesn't quietly slip back to the old date by default — but the headline for you is the date itself: **June 17**, not 18, not 20.\n\nSeparately: Homerun's video-decision due date is now correctly June 19 (fixed from a stale July 1, confirmed in tasks.json this run).\n\nFull audit: `team/reports/pipeline/2026-06-16.md`"
+      "tags": ["pipeline", "argus", "switch"],
+      "updated": "2026-06-17T11:00:00Z",
+      "body": "**Verdict: GREEN.** First clean run in three audits. I checked the files myself, not the team's word for it.\n\nYesterday's finding closed for real: the Jun 17 input-deadline escalation is now live in `checklist.md`, the Q3 calendar, and the overlay — not just spoken in standup. All three checked out exactly as Hemera described.\n\nNyx's handoff today is the standard to hold the team to: blocked on the real Switch deliverables (store URL, publish time, hook-moment — still zero movement), she found genuinely unblocked scope instead of forcing a placeholder, and flagged a minor cadence side-effect (2 X posts vs. planned 1 for W25) rather than quietly absorbing it. That decision is now its own task so it doesn't rot: `t-cadence-decision-w25-x-post`.\n\nNo schema drift, no contradictions, no premature writes found anywhere. Full report: `team/reports/pipeline/2026-06-17.md`.\n\nStill outstanding from you: Switch store URL + publish time (today), Homerun video path (Jun 19), and the small W25 cadence call above."
+    },
+    {
+      "id": "os-note-nyx-w25-collab-story",
+      "title": "Switch W25 content: collab-story copy drafted, ready for approval",
+      "folder": "Team",
+      "tags": ["switch", "content", "nyx", "w25"],
+      "updated": "2026-06-17T09:30:00Z",
+      "body": "**No movement today on the three real Switch blockers** (beat store URL, July 18 publish time, Aether's hook-moment timestamp) — confirming Hemera's report.\n\nPer Hemera's handoff, I held the pre-release arc in review rather than forcing a placeholder for the hook-moment clip. Instead I drafted the W25 collab-story piece Theia's market read pointed at — leads with `ISΛRK × 10k.emraan` as the headline itself, not just a credit line. Two pieces:\n\n1. an X post: `two producers. one 186 bpm idea. ISΛRK × 10k.emraan — Switch, july 18.`\n2. an alternate IG/TikTok caption for the producer-tag hook clip, collab-forward version\n\nBoth use only verified facts already in hand (186 bpm, C minor, the collab credit, July 18) — no invented hook-detail, no link, no time-of-day claim. Queued for your approval as `ap-2026-06-17-switch-w25-collab-story`.\n\nOne small flag: if you run this X post alongside the existing W25 marker post, that's 2 X posts this week against the arc's planned cadence of 1 — your call whether to run both or swap.\n\nFull copy: `team/drafts/content/switch-w25-collab-story-prompt.md`"
+    },
+    {
+      "id": "os-note-hemera-switch-inputs-due-today",
+      "title": "DUE TODAY (Jun 17): Switch beat store URL + July 18 publish time",
+      "folder": "Team",
+      "tags": ["urgent", "switch", "hemera", "deadline"],
+      "updated": "2026-06-17T09:00:00Z",
+      "body": "**Two inputs needed from you today, June 17.**\n\n1. Beat store listing URL for Switch.\n2. Your preferred publish time on July 18 (suggest 12:00 UTC if you have no preference).\n\nWithout these, Nyx's upload package (`ap-2026-06-19-switch-upload`) keeps `[TBD]` placeholders in the store CTA and the IG countdown / YouTube community post copy. The approval gate is June 20 — June 17 was chosen to give Nyx buffer to fold the values in before that.\n\nThis date is now live in the real artifacts, not just spoken in standup: `team/drafts/uploads/switch/checklist.md`, `team/reports/q3-2026-release-calendar.md`, and this overlay note. Argus flagged on Jun 16 that the prior version of this note (and the checklist/calendar) still carried June 18/20 — that's fixed as of this run.\n\nSeparately, unrelated deadline: Homerun video-path decision (internal edit vs. commission) is due June 19, in 2 days. Art and master are already done."
     },
     {
       "id": "os-note-market-pulse-w25",
@@ -26,7 +42,29 @@
       "body": "**Pipeline verdict: YELLOW.** Team outputs are solid. One time-sensitive risk requires your action.\n\n**You need to do two things by June 18 (not June 20):**\n\n1. **Beat store listing URL for Switch** — Nyx needs this to finalize the upload package before you approve it. Without it, you would be approving a package with a TBD placeholder in the store CTA copy.\n\n2. **July 18 publish time preference** — Required for the IG countdown story (W27) and YouTube community post copy. Also blocks the approval package being complete.\n\nThe approval gate is June 20. If these two inputs land on June 20, Nyx has no time to fold them in. June 18 is the real deadline.\n\n**Also flagged:**\n- Homerun video decision (internal edit vs. commission) is more urgent than its Jul 1 due date suggests. If you commission, lead time means the decision is due this week.\n- Aether cannot analyze existing catalog beats (Switch, Virtual Love, etc.) because they were never submitted through the intake channel. If you want Aether to identify Switch's hook moment for short-form content, a retroactive intake path is needed — or you configure the Discord intake channel and re-submit.\n\nFull audit: `team/reports/pipeline/2026-06-15.md`"
     }
   ],
-  "reminders": [],
+  "reminders": [
+    {
+      "id": "os-rem-switch-inputs-jun17",
+      "title": "Send Switch: beat store URL + July 18 publish time",
+      "dayOffset": 0,
+      "time": 9.5,
+      "notes": "Due today (escalated from Jun 18). Blocks Nyx's upload package and the pre-release content arc."
+    },
+    {
+      "id": "os-rem-homerun-video-jun19",
+      "title": "Decide Homerun video: internal edit vs. commissioned",
+      "dayOffset": 2,
+      "time": 9.5,
+      "notes": "Due Jun 19. Art and master already done — this is the only blocker on the Aug 8 date."
+    },
+    {
+      "id": "os-rem-w25-cadence-decision",
+      "title": "Decide: run both W25 X posts or hold one",
+      "dayOffset": 0,
+      "time": 10.0,
+      "notes": "Nyx's new collab-story X post plus the existing marker post = 2 X posts vs. the arc's planned 1 for W25. Low stakes, but needs a call (run both / swap / hold for W26)."
+    }
+  ],
   "tasks": [],
   "projects": [],
   "songs": [],

@@ -22,13 +22,16 @@ thumbnail/art review, caption copy, and a short promo window (one week minimum b
 release). This is the anchor release of Q3.
 
 Blockers: none creative. Operational: upload package must be approved, then the
-SoundCloud/YouTube upload must execute and return a scheduled-publish link. If the
-upload package is approved by June 20, July 18 is safe. If it slips past June 27,
-push to July 25.
+SoundCloud/YouTube upload must execute and return a scheduled-publish link. Two
+required inputs from the user — beat store listing URL and the July 18 publish time —
+were escalated from a June 18 to a **June 17** deadline on 2026-06-16, for buffer
+before the approval gate. If those inputs and the approval land by June 20, July 18 is
+safe. If it slips past June 27, push to July 25.
 
 Pre-release tasks:
 - Nyx: build upload package (in progress, handed off today)
-- User: approve package (target: June 20)
+- User: provide beat store URL + publish time (due June 17), then approve package
+  (target: June 20)
 - Nyx: queue SoundCloud upload for scheduling
 
 ---
@@ -126,8 +129,11 @@ Pre-release tasks:
 
 ## Next Check-in Points
 
+- **June 17: Switch inputs due from user (beat store URL, July 18 publish time)** —
+  escalated 2026-06-16 from June 18 for buffer ahead of the approval gate.
+- June 19: Homerun video-path decision due (corrected 2026-06-16 from a stale July 1).
 - June 20: Switch upload package approved / re-plan if not.
-- July 1: Homerun video ETA confirmed. Virtual Love chorus status check.
+- July 1: Virtual Love chorus status check.
 - August 1: Virtual Love mix received or track moves to Q4.
 - September 1: Nightshade commit-or-Q4 gate.
 

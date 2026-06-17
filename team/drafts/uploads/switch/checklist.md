@@ -2,7 +2,7 @@
 
 target release: 2026-07-18
 package drafted: 2026-06-12
-approval due: 2026-06-20
+approval due: 2026-06-17 (escalated from 2026-06-20 on 2026-06-16 for buffer — see sign-off note)
 
 ---
 
@@ -99,3 +99,7 @@ approval due: 2026-06-20
 
 drafted by: nyx · 2026-06-12
 approved by: [TBD — user sign-off via queue ap-2026-06-19-switch-upload]
+
+**Outstanding from user, due 2026-06-17 (today):** beat store listing URL for Switch,
+July 18 publish time. Both block finishing this checklist's `[TBD]` lines (rows 46, 64,
+72) and the approval package itself. Escalated by Hemera 2026-06-16.
