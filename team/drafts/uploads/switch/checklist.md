@@ -2,7 +2,9 @@
 
 target release: 2026-07-18
 package drafted: 2026-06-12
-approval due: 2026-06-17 (escalated from 2026-06-20 on 2026-06-16 for buffer — see sign-off note)
+approval due: 2026-06-20 (June 17 input-deadline MISSED with zero input from user as of
+2026-06-18 — see sign-off note. Re-set to June 20, the existing approval-gate date, rather
+than inventing a new one. No more buffer beyond this without re-planning July 18.)
 
 ---
 
@@ -100,6 +102,15 @@ approval due: 2026-06-17 (escalated from 2026-06-20 on 2026-06-16 for buffer —
 drafted by: nyx · 2026-06-12
 approved by: [TBD — user sign-off via queue ap-2026-06-19-switch-upload]
 
-**Outstanding from user, due 2026-06-17 (today):** beat store listing URL for Switch,
-July 18 publish time. Both block finishing this checklist's `[TBD]` lines (rows 46, 64,
-72) and the approval package itself. Escalated by Hemera 2026-06-16.
+**2026-06-18 status: the June 17 input deadline passed with zero input.** Beat store
+listing URL for Switch and the July 18 publish time are still both outstanding — same two
+items as the last four standups. This checklist's `[TBD]` lines (rows 46, 64, 72) and the
+approval package itself remain blocked on them.
+
+**New hard date: June 20.** This is not a new escalation — it is the approval-gate date
+that was already on the calendar before the June 17 escalation existed. Collapsing the
+"input deadline" and "approval gate" into one date removes the ambiguity of having two
+numbers in play. If both inputs and the approval do not land by June 20, July 18 is no
+longer safe without re-planning (per `q3-2026-release-calendar.md`: slip past June 27 and
+the date moves to July 25). There is real runway left — this is not yet a crisis — but
+the next miss is a date-moving event, not a re-ask.

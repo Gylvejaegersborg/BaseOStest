@@ -8,6 +8,10 @@
 **updated:** Nyx · 2026-06-16 — added W26/W27 asset specs (see linked files); core blockers unchanged
 **updated:** Nyx · 2026-06-17 — added W25 collab-story copy (see linked file); arc held in review
 per Hemera's handoff, no hook-moment placeholder forced; core blockers unchanged
+**updated:** Nyx · 2026-06-18 — W26 content prep per Hemera's handoff (`t-switch-w26-content-prep`):
+waveform visualizer spec reviewed and signed off as ready, W26 X post finalized, SoundCloud
+preview-snippet packaging copy written (see `switch-w26-content-prep.md`); BTS clip and final
+waveform render still hold on user-supplied raw material, not forced; core blockers unchanged
 
 ---
 
@@ -107,15 +111,23 @@ energy spikes) and should flag the most probable candidate with a confidence not
 - caption on the IG story share: `60 seconds. july 18. link in bio.`
 - note: upload as a separate private SoundCloud track titled "Switch (preview)" — do not
   use the final upload slot. delete or re-private after Jul 18 upload goes live.
+- packaging copy finalized (title, description, IG-story caption, posting sequence): see
+  `team/drafts/content/switch-w26-content-prep.md` §3 — copy is ready, the 60-sec MP3
+  export itself is still outstanding (on ISΛRK)
 
 **[X] — engagement post**
 - `we made something for the ones who need 186 in the morning.` — no link, no hashtags
 - reply to own thread from W25 X post to keep the thread visible
+- finished, fact-checked copy and posting notes: see
+  `team/drafts/content/switch-w26-content-prep.md` §2 — queued for approval, ready as-is
 
 **assets needed:**
 - [ ] DAW session clip (15–30 sec) — responsible: ISΛRK
-- [ ] waveform visualizer render — spec written, see
-  `team/drafts/content/switch-w26-waveform-visualizer-prompt.md` — responsible: ISΛRK/Nyx to execute
+- [ ] waveform visualizer render — spec written and signed off as ready (no changes
+  needed), see `team/drafts/content/switch-w26-waveform-visualizer-prompt.md` and the
+  sign-off note in `switch-w26-content-prep.md` §1 — still needs an audio source file to
+  render against (any sustained section, not necessarily the hook moment) — responsible:
+  ISΛRK to supply source / Nyx to execute once it lands
 - [ ] SoundCloud snippet export (60 sec, MP3) — responsible: ISΛRK
 
 ---

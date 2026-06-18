@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-17T09:00:00Z",
+  "updatedAt": "2026-06-18T11:00:00Z",
   "items": [
     {
       "id": "ap-2026-06-19-switch-upload",
@@ -28,6 +28,19 @@
       ],
       "draftedBy": "nyx",
       "createdAt": "2026-06-17T09:00:00Z",
+      "status": "pending"
+    },
+    {
+      "id": "ap-2026-06-18-switch-w26-x-post",
+      "type": "social_post",
+      "title": "Switch W26 X engagement post — \"process\" week",
+      "summary": "Approving this queues a single X post for the W26 'process' week of the Switch pre-release arc: 'we made something for the ones who need 186 in the morning.' No link, no hashtags, no store URL or publish-time claim. Posting note: reply to the existing W25 marker-post thread to keep the algorithm signal consolidated, per the arc's stated X strategy — if that W25 post has not yet been published when this is scheduled, post standalone instead. Does not require Aether's hook-moment timestamp, the beat store URL, or the July 18 publish time.",
+      "draftPaths": [
+        "team/drafts/content/switch-w26-content-prep.md",
+        "team/drafts/content/switch-prerelease-arc-w25-w28.md"
+      ],
+      "draftedBy": "nyx",
+      "createdAt": "2026-06-18T11:00:00Z",
       "status": "pending"
     }
   ]

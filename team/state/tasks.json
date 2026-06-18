@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-17T11:00:00Z",
+  "updatedAt": "2026-06-18T13:00:00Z",
   "tasks": [
     {
       "id": "t-secrets-setup",
@@ -82,7 +82,7 @@
       "createdBy": "hemera",
       "createdAt": "2026-06-15T07:30:00Z",
       "due": "2026-06-19",
-      "notes": "Due date corrected 2026-06-16 by Hemera per Argus's t-homerun-due-date-correction audit finding: original 2026-07-01 understated real urgency, since commissioned-video lead time makes the decision effectively overdue within the week. Art and master are done. Video direction (internal edit or commission) needed by Jun 19 to keep Aug 8 release on schedule."
+      "notes": "Due date corrected 2026-06-16 by Hemera per Argus's t-homerun-due-date-correction audit finding: original 2026-07-01 understated real urgency, since commissioned-video lead time makes the decision effectively overdue within the week. Art and master are done. Video direction (internal edit or commission) needed by Jun 19 to keep Aug 8 release on schedule. 2026-06-18: this is now the single most time-critical open item on the board — due tomorrow, no blocker movement reported. Hemera proposes a fallback for explicit user sign-off (not a unilateral close): if no decision lands by June 19 EOD, default to the internal edit, since that path has shorter lead time and protects Aug 8 without foreclosing a future commissioned video for a later release. This default is a proposal only — it does not take effect, and this task does not close, until the user approves it or makes the actual call."
     },
     {
       "id": "t-argus-pipeline-audit",
@@ -148,8 +148,8 @@
       "createdBy": "hemera",
       "createdAt": "2026-06-12T12:00:00Z",
       "handedFrom": "hemera",
-      "due": "2026-06-19",
-      "notes": "Draft complete. Package at team/drafts/uploads/switch/ — metadata, description, checklist, captions, art-prompt. Queued as ap-2026-06-19-switch-upload (pending, day 5 of window). 2026-06-17: input deadline now live in checklist.md itself (was only in meeting transcript as of yesterday). Still awaiting from user: (1) beat store listing URL for Switch, (2) July 18 publish time — both due today. No fabricated values added; [TBD] placeholders remain until real inputs land.",
+      "due": "2026-06-20",
+      "notes": "Draft complete. Package at team/drafts/uploads/switch/ — metadata, description, checklist, captions, art-prompt. Queued as ap-2026-06-19-switch-upload (pending, day 7 of window). 2026-06-18: the June 17 input deadline passed with ZERO input from user — recording that honestly rather than re-asking silently. Due date corrected from 2026-06-19 to 2026-06-20, collapsing the input deadline into the pre-existing approval-gate date rather than inventing a third date. Still awaiting from user: (1) beat store listing URL for Switch, (2) July 18 publish time. Per the Q3 calendar, real buffer remains — July 18 is still safe if these land by June 20; only at risk if it slips past June 27. No fabricated values added; [TBD] placeholders remain until real inputs land.",
       "links": [
         "team/reports/q3-2026-release-calendar.md",
         "team/drafts/uploads/switch/metadata.json",
@@ -167,14 +167,15 @@
       "createdBy": "theia",
       "createdAt": "2026-06-15T09:00:00Z",
       "handedFrom": "theia",
-      "due": "2026-06-18",
-      "notes": "Due tomorrow. Hard blockers unchanged for a fourth day: Aether hook-moment timestamp (structurally blocked on t-retroactive-intake-path, a user decision), user beat store URL, user July 18 publish time — confirmed zero movement again today, per Hemera's report and Nyx's own re-check of checklist.md/queue.json. 2026-06-17: per Hemera's handoff, held the arc in review and did not force a hook-moment placeholder. Instead drafted the W25 collab-story copy (X post + IG/TikTok caption variant) Theia flagged — needs neither the hook timestamp nor store URL/time, built only from verified BPM/key/collab facts. Linked into the arc doc's W25 section and queued as ap-2026-06-17-switch-w25-collab-story.",
+      "due": "2026-06-21",
+      "notes": "Hit its original June 18 due date today still blocked on the same three items, unchanged for a fifth day: Aether hook-moment timestamp (structurally blocked on t-retroactive-intake-path, a user decision), user beat store URL, user July 18 publish time. None of these are Nyx-side gaps — every piece of work available without them has been produced (W26/W27 asset specs, W25 collab-story copy). Extending due date from June 18 to June 21, with reasoning: June 21 is when the W25 window itself closes, so the arc's first live week completes on its own schedule regardless of the hook-clip blocker, and there is genuinely unblocked W26 work to hand off now (see t-switch-w26-content-prep) rather than holding Nyx idle on a date that can't move without a user decision. This is an extension, not a silent slip — recorded here and the due date changed accordingly. 2026-06-18 update: W26 content prep (t-switch-w26-content-prep) complete same-day — waveform spec signed off, W26 X post queued for approval, SoundCloud snippet packaging copy written. Arc doc's W26 section updated to link all of it in. Core three blockers (hook-moment, store URL, publish time) still completely unmoved — this progress is all from genuinely unblocked scope, not from the blockers clearing.",
       "links": [
         "team/reports/market/2026-W25.md",
         "team/drafts/content/switch-prerelease-arc-w25-w28.md",
         "team/drafts/content/switch-w26-waveform-visualizer-prompt.md",
         "team/drafts/content/switch-w27-collab-graphic-prompt.md",
-        "team/drafts/content/switch-w25-collab-story-prompt.md"
+        "team/drafts/content/switch-w25-collab-story-prompt.md",
+        "team/drafts/content/switch-w26-content-prep.md"
       ]
     },
     {
@@ -195,7 +196,43 @@
       "status": "backlog",
       "createdBy": "argus",
       "createdAt": "2026-06-17T11:00:00Z",
-      "notes": "Nyx's new collab-story X post (queued as ap-2026-06-17-switch-w25-collab-story) would put W25 at 2 X posts against the pre-release arc's stated cadence of 1. Nyx correctly flagged this instead of resolving it herself or silently editing the cadence line. Needs a decision: run both (update the cadence line in switch-prerelease-arc-w25-w28.md to reflect it), swap one for the other, or hold the second post for W26's X slot. Small decision but will rot in the queue if no one owns closing it."
+      "notes": "Nyx's new collab-story X post (queued as ap-2026-06-17-switch-w25-collab-story) would put W25 at 2 X posts against the pre-release arc's stated cadence of 1. Nyx correctly flagged this instead of resolving it herself or silently editing the cadence line. Needs a decision: run both (update the cadence line in switch-prerelease-arc-w25-w28.md to reflect it), swap one for the other, or hold the second post for W26's X slot. Small decision but will rot in the queue if no one owns closing it. Unchanged today — still genuinely open, W25 ends June 21 so there is a natural window to decide before it's moot."
+    },
+    {
+      "id": "t-switch-w26-content-prep",
+      "title": "Prep W26 ('process') content assets for Switch — BTS clip framing, SoundCloud snippet packaging, X engagement post",
+      "owner": "nyx",
+      "status": "review",
+      "createdBy": "hemera",
+      "createdAt": "2026-06-18T11:00:00Z",
+      "handedFrom": "hemera",
+      "due": "2026-06-22",
+      "notes": "Done same-day, ahead of the June 22 due date. Three pieces, see team/drafts/content/switch-w26-content-prep.md: (1) waveform-visualizer spec reviewed against the handoff and signed off as ready — no changes needed, still needs a source audio file to render against (not the hook moment specifically, any sustained section) before the actual clip can be cut; (2) W26 X engagement post finalized ('we made something for the ones who need 186 in the morning.' — kept the arc doc's own line, it already does the job) and queued for approval as ap-2026-06-18-switch-w26-x-post; (3) SoundCloud 60-sec preview-snippet packaging copy written in full (title 'Switch (preview)', description, IG-story caption, posting sequence) — copy is ready, the actual 60-sec MP3 export is still on ISΛRK so this is not yet queued for approval (nothing to attach it to). Did NOT force the BTS/DAW-session post or the waveform render's final cut — both still need user-supplied raw material per the arc doc's W26 assets-needed list. Same flag-don't-fabricate standard as W25. Argus 2026-06-18 audit: confirmed the no-queue-entry call on the waveform spec is correct under the README's approvals contract (production brief, no outward action attached) and consistent with the W27 collab-graphic spec precedent.",
+      "links": [
+        "team/drafts/content/switch-prerelease-arc-w25-w28.md",
+        "team/drafts/content/switch-w26-waveform-visualizer-prompt.md",
+        "team/drafts/content/switch-w26-content-prep.md"
+      ]
+    },
+    {
+      "id": "t-argus-pipeline-audit-0618",
+      "title": "Fourth Argus pipeline health audit",
+      "owner": "argus",
+      "status": "done",
+      "createdBy": "hemera",
+      "createdAt": "2026-06-18T09:00:00Z",
+      "due": "2026-06-18",
+      "notes": "Complete. Report at team/reports/pipeline/2026-06-18.md. Verdict: GREEN. Traced Hemera's June 17→June 20 deadline collapse back to its source: confirmed via my own 2026-06-15 report that June 20 was the pre-existing ap-2026-06-19-switch-upload approval-gate date, independently attested three days before today's standup — not invented today to excuse the June 17 miss. Verdict: legitimate self-correction, not goalpost-shifting, because the miss was named in writing in checklist.md/calendar/overlay (not silently re-dated) and the new single date reuses real prior math. Confirmed Nyx's waveform-spec no-approval-entry reasoning is correct under the README's outward-facing-only contract and consistent with the W27 collab-graphic spec precedent (also never queued). No schema drift found across tasks.json/queue.json/overlay.json/checklist.md/calendar/arc docs. Confirmed agents.json still untouched (2026-06-17T11:00:00Z, correctly pending Mnemosyne) and inbox/cursors/booking genuinely empty (Theia/Aether/Hermes silence structurally confirmed, not assumed). One new task filed: t-switch-zero-buffer-risk (hemera).",
+      "links": ["team/reports/pipeline/2026-06-18.md"]
+    },
+    {
+      "id": "t-switch-zero-buffer-risk",
+      "title": "Flag/resolve: Switch input deadline and approval gate are now the same date (June 20) — zero slack if inputs land on the day itself",
+      "owner": "hemera",
+      "status": "backlog",
+      "createdBy": "argus",
+      "createdAt": "2026-06-18T11:00:00Z",
+      "notes": "Collapsing the June 17 input deadline into the pre-existing June 20 approval gate (correct fix for the double-deadline ambiguity, see Argus's 2026-06-18 audit) has a side effect that isn't written down anywhere yet: if the beat store URL and publish time arrive exactly on June 20, Nyx has zero days to fold real values into the upload package before the same-day approval gate closes. Not asking for a new date — asking for one of two things: (a) state this risk explicitly in checklist.md/the calendar so it's a known tradeoff, not a silent one, or (b) treat June 19 as the de facto 'inputs must land' marker internally while June 20 stays the formal gate, restoring one day of real buffer. Either resolves it; leaving it unstated is the gap."
     }
   ]
 }

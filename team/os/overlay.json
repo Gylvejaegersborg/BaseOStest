@@ -1,6 +1,30 @@
 {
-  "updatedAt": "2026-06-17T11:00:00Z",
+  "updatedAt": "2026-06-18T13:00:00Z",
   "notes": [
+    {
+      "id": "os-note-argus-pipeline-0618",
+      "title": "Pipeline Health — Jun 18 — GREEN",
+      "folder": "Team",
+      "tags": ["pipeline", "argus", "switch"],
+      "updated": "2026-06-18T13:00:00Z",
+      "body": "**Verdict: GREEN.** I went in suspicious of one thing specifically: Hemera missed her own June 17 deadline and, same day, declared a new date (June 20) instead. That's exactly the pattern that turns into goalpost-shifting if nobody checks it. I checked it.\n\nVerdict: it's legitimate. June 20 isn't invented — it's the original `ap-2026-06-19-switch-upload` approval-gate date, which I independently logged in my own June 15 report (\"Gate: June 20\") three days before this ever became an issue. Hemera reused a real prior commitment instead of inventing a fourth date, and named the miss as a miss in writing (checklist.md, the calendar, the overlay note) rather than quietly re-typing the number. That's the bar.\n\nOne real gap this created, not yet written down anywhere: the input deadline and the approval gate are now the *same* date. If the store URL and publish time land exactly on June 20, Nyx has zero days to fold them into the package before that same date's gate closes. Filed as `t-switch-zero-buffer-risk` for Hemera — either state the tradeoff explicitly or treat June 19 as the real internal marker.\n\nNyx's call not to queue the waveform-visualizer spec for approval also checked out — it's a production brief with no outward action attached yet, consistent with how the W27 spec was handled. No schema drift anywhere. Full report: `team/reports/pipeline/2026-06-18.md`.\n\nStill outstanding from you: Homerun video path (due tomorrow, June 19 — sharpest item on the board), Switch inputs + approval (June 20), and the small W25 cadence call."
+    },
+    {
+      "id": "os-note-nyx-w26-content-prep",
+      "title": "Switch W26 content prepped early — X post ready for approval, snippet copy waiting on your export",
+      "folder": "Team",
+      "tags": ["switch", "content", "nyx", "w26"],
+      "updated": "2026-06-18T12:00:00Z",
+      "body": "**Same standard as W25: no movement on the three real blockers** (hook-moment timestamp, beat store URL, July 18 publish time). This is all genuinely unblocked work Hemera handed me today rather than leaving me idle on the blocked arc review.\n\n**Three things done:**\n\n1. **Waveform visualizer spec** — reviewed, signed off as ready. No changes needed. Still needs an audio source file (any sustained 15–30 sec section, not necessarily the hook moment) before the actual clip renders — that's on you, not a Nyx gap.\n2. **W26 X post** — finished: `we made something for the ones who need 186 in the morning.` Queued for your approval as `ap-2026-06-18-switch-w26-x-post`. No link, no hashtags, doesn't need any of the three blockers.\n3. **SoundCloud preview-snippet packaging** — title (`Switch (preview)`), description, IG-story caption, full posting sequence all written. Not queued for approval yet because there's nothing to attach it to — the actual 60-sec MP3 export is still yours to produce.\n\n**Not forced:** the BTS/DAW-session clip and the waveform render's final cut. Both need raw material from you — a session clip, and an audio source respectively. Holding rather than faking either.\n\nFull writeup: `team/drafts/content/switch-w26-content-prep.md`"
+    },
+    {
+      "id": "os-note-hemera-switch-deadline-missed-0618",
+      "title": "Switch: June 17 deadline missed — new hard date June 20 (no more buffer after that)",
+      "folder": "Team",
+      "tags": ["urgent", "switch", "hemera", "deadline"],
+      "updated": "2026-06-18T11:00:00Z",
+      "body": "**Straight talk: the June 17 deadline I set for you passed yesterday with zero input.** Not re-asking a third time without saying so — that's the kind of stale-date theater Argus has caught this team in before.\n\n**What I did instead of re-escalating:** collapsed the input deadline into the existing June 20 approval-gate date. One date now, not two. By June 20 I need: (1) Switch beat store listing URL, (2) your July 18 publish time preference, and (3) your approval on `ap-2026-06-19-switch-upload`. All three, one date.\n\n**Where this actually stands:** there is real runway left. Per the Q3 calendar, July 18 is still safe if these land by June 20. It only moves to July 25 if it slips past June 27. This is not yet urgent — it is the second miss that would be.\n\nI updated this into the real files, not just this note: `team/drafts/uploads/switch/checklist.md`, `team/reports/q3-2026-release-calendar.md`.\n\n**Separately, more urgent: Homerun video decision is due tomorrow, June 19.** Art and master are done — this is the only thing blocking Aug 8. If I get no answer by June 19 end of day, my proposal (not yet in effect — needs your yes) is to default to the internal edit over commissioning, since it has shorter lead time and protects the date. Say no and I'll hold the slot open instead, but the clock keeps moving either way.\n\n**Small and not urgent:** W25 X-post cadence call (`t-cadence-decision-w25-x-post`) — run both, swap, or hold one for W26. No deadline pressure, just sitting open."
+    },
     {
       "id": "os-note-argus-pipeline-0617",
       "title": "Pipeline Health — Jun 17 — GREEN",
@@ -18,14 +42,6 @@
       "body": "**No movement today on the three real Switch blockers** (beat store URL, July 18 publish time, Aether's hook-moment timestamp) — confirming Hemera's report.\n\nPer Hemera's handoff, I held the pre-release arc in review rather than forcing a placeholder for the hook-moment clip. Instead I drafted the W25 collab-story piece Theia's market read pointed at — leads with `ISΛRK × 10k.emraan` as the headline itself, not just a credit line. Two pieces:\n\n1. an X post: `two producers. one 186 bpm idea. ISΛRK × 10k.emraan — Switch, july 18.`\n2. an alternate IG/TikTok caption for the producer-tag hook clip, collab-forward version\n\nBoth use only verified facts already in hand (186 bpm, C minor, the collab credit, July 18) — no invented hook-detail, no link, no time-of-day claim. Queued for your approval as `ap-2026-06-17-switch-w25-collab-story`.\n\nOne small flag: if you run this X post alongside the existing W25 marker post, that's 2 X posts this week against the arc's planned cadence of 1 — your call whether to run both or swap.\n\nFull copy: `team/drafts/content/switch-w25-collab-story-prompt.md`"
     },
     {
-      "id": "os-note-hemera-switch-inputs-due-today",
-      "title": "DUE TODAY (Jun 17): Switch beat store URL + July 18 publish time",
-      "folder": "Team",
-      "tags": ["urgent", "switch", "hemera", "deadline"],
-      "updated": "2026-06-17T09:00:00Z",
-      "body": "**Two inputs needed from you today, June 17.**\n\n1. Beat store listing URL for Switch.\n2. Your preferred publish time on July 18 (suggest 12:00 UTC if you have no preference).\n\nWithout these, Nyx's upload package (`ap-2026-06-19-switch-upload`) keeps `[TBD]` placeholders in the store CTA and the IG countdown / YouTube community post copy. The approval gate is June 20 — June 17 was chosen to give Nyx buffer to fold the values in before that.\n\nThis date is now live in the real artifacts, not just spoken in standup: `team/drafts/uploads/switch/checklist.md`, `team/reports/q3-2026-release-calendar.md`, and this overlay note. Argus flagged on Jun 16 that the prior version of this note (and the checklist/calendar) still carried June 18/20 — that's fixed as of this run.\n\nSeparately, unrelated deadline: Homerun video-path decision (internal edit vs. commission) is due June 19, in 2 days. Art and master are already done."
-    },
-    {
       "id": "os-note-market-pulse-w25",
       "title": "Market Pulse — W25 (Jun 15)",
       "folder": "Team",
@@ -34,35 +50,42 @@
       "body": "**W25 market read filed** (general knowledge through Aug 2025; no live scrape — intake dark).\n\n**3 signals for you:**\n\n1. **Switch's 186 BPM C min lane is differentiated, not crowded.** The ISΛRK × 10k.emraan collab framing is an earned story — use it as the content spine across the 4-week pre-release window. That clock starts *now*, not July.\n\n2. **Extended loops (15–30 min) on YouTube are a low-effort win for Virtual Love and Cold Storage.** Serves creator/licensing audience; builds watch-time passively. Scope this before Sep 1.\n\n3. **Beat store needs a tag/description pass before Jul 18.** Switch will bring outside eyes. Make sure what they land on is searchable and clean.\n\nFull report: `team/reports/market/2026-W25.md`"
     },
     {
-      "id": "os-note-argus-pipeline-w25",
-      "title": "Pipeline Health — W25 (Jun 15) — ACTION NEEDED BY JUN 18",
+      "id": "os-note-nightshade-eta-upcoming",
+      "title": "Coming up: Nightshade re-mix ETA decision due June 22",
       "folder": "Team",
-      "tags": ["pipeline", "argus", "urgent", "switch"],
-      "updated": "2026-06-15T10:30:00Z",
-      "body": "**Pipeline verdict: YELLOW.** Team outputs are solid. One time-sensitive risk requires your action.\n\n**You need to do two things by June 18 (not June 20):**\n\n1. **Beat store listing URL for Switch** — Nyx needs this to finalize the upload package before you approve it. Without it, you would be approving a package with a TBD placeholder in the store CTA copy.\n\n2. **July 18 publish time preference** — Required for the IG countdown story (W27) and YouTube community post copy. Also blocks the approval package being complete.\n\nThe approval gate is June 20. If these two inputs land on June 20, Nyx has no time to fold them in. June 18 is the real deadline.\n\n**Also flagged:**\n- Homerun video decision (internal edit vs. commission) is more urgent than its Jul 1 due date suggests. If you commission, lead time means the decision is due this week.\n- Aether cannot analyze existing catalog beats (Switch, Virtual Love, etc.) because they were never submitted through the intake channel. If you want Aether to identify Switch's hook moment for short-form content, a retroactive intake path is needed — or you configure the Discord intake channel and re-submit.\n\nFull audit: `team/reports/pipeline/2026-06-15.md`"
+      "tags": ["nightshade", "hemera", "calendar"],
+      "updated": "2026-06-18T11:00:00Z",
+      "body": "Not urgent today — flagging early. Sep 26 is a tentative Q3 slot for Nightshade pending a re-mix with no fixed completion date. Hemera's recommendation stands: if no re-mix ETA surfaces by June 22, drop Nightshade from Q3 and treat it as a Q4 carry-over rather than holding a blank tentative slot that blocks back-half promo planning. Four days out — no action needed before then."
     }
   ],
   "reminders": [
     {
-      "id": "os-rem-switch-inputs-jun17",
-      "title": "Send Switch: beat store URL + July 18 publish time",
-      "dayOffset": 0,
+      "id": "os-rem-switch-inputs-jun20",
+      "title": "Switch: beat store URL + July 18 publish time + approve upload package",
+      "dayOffset": 2,
       "time": 9.5,
-      "notes": "Due today (escalated from Jun 18). Blocks Nyx's upload package and the pre-release content arc."
+      "notes": "New hard date June 20 — the June 17 input deadline passed with zero input, so this replaces it rather than adding a third date. All three (URL, publish time, approval) due together. Real buffer remains past this date only until June 27, per the Q3 calendar."
     },
     {
       "id": "os-rem-homerun-video-jun19",
-      "title": "Decide Homerun video: internal edit vs. commissioned",
-      "dayOffset": 2,
+      "title": "Decide Homerun video: internal edit vs. commissioned — most time-critical item today",
+      "dayOffset": 1,
       "time": 9.5,
-      "notes": "Due Jun 19. Art and master already done — this is the only blocker on the Aug 8 date."
+      "notes": "Due Jun 19, tomorrow. Art and master already done — this is the only blocker on the Aug 8 date. If silent past EOD Jun 19, Hemera's proposed fallback is to default to the internal edit — needs your sign-off, not yet in effect."
     },
     {
       "id": "os-rem-w25-cadence-decision",
       "title": "Decide: run both W25 X posts or hold one",
       "dayOffset": 0,
       "time": 10.0,
-      "notes": "Nyx's new collab-story X post plus the existing marker post = 2 X posts vs. the arc's planned 1 for W25. Low stakes, but needs a call (run both / swap / hold for W26)."
+      "notes": "Nyx's new collab-story X post plus the existing marker post = 2 X posts vs. the arc's planned 1 for W25. Low stakes, no deadline pressure, but needs a call before W25 closes June 21 (run both / swap / hold for W26)."
+    },
+    {
+      "id": "os-rem-switch-w26-snippet-export",
+      "title": "Switch: export the 60-sec SoundCloud preview snippet + a visualizer source clip when you can",
+      "dayOffset": 4,
+      "time": 9.5,
+      "notes": "Not urgent today — W26 doesn't open until June 22. Packaging copy for the SoundCloud preview is already written and ready (team/drafts/content/switch-w26-content-prep.md). It just needs the actual 60-sec MP3 export from you to post. Separately, the waveform-visualizer spec is signed off and ready too — it needs any sustained 15–30 sec audio source (not necessarily the final hook moment) to render against. Two small exports unlock both pieces."
     }
   ],
   "tasks": [],

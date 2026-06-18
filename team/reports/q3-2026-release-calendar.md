@@ -24,14 +24,17 @@ release). This is the anchor release of Q3.
 Blockers: none creative. Operational: upload package must be approved, then the
 SoundCloud/YouTube upload must execute and return a scheduled-publish link. Two
 required inputs from the user — beat store listing URL and the July 18 publish time —
-were escalated from a June 18 to a **June 17** deadline on 2026-06-16, for buffer
-before the approval gate. If those inputs and the approval land by June 20, July 18 is
-safe. If it slips past June 27, push to July 25.
+were escalated from June 18 to **June 17** on 2026-06-16, for buffer before the
+approval gate. **That June 17 deadline passed on 2026-06-18 with zero input received.**
+Re-set on 2026-06-18 to **June 20** — not a new escalation, but the pre-existing
+approval-gate date, now carrying both jobs (inputs + approval) since splitting them
+produced no extra urgency, only an extra date to track. If those inputs and the
+approval land by June 20, July 18 is safe. If it slips past June 27, push to July 25.
 
 Pre-release tasks:
-- Nyx: build upload package (in progress, handed off today)
-- User: provide beat store URL + publish time (due June 17), then approve package
-  (target: June 20)
+- Nyx: build upload package (done, in review — blocked only on the two user inputs below)
+- User: provide beat store URL + publish time, then approve package — both now due
+  **June 20** (June 17 deadline missed, see above)
 - Nyx: queue SoundCloud upload for scheduling
 
 ---
@@ -129,10 +132,16 @@ Pre-release tasks:
 
 ## Next Check-in Points
 
-- **June 17: Switch inputs due from user (beat store URL, July 18 publish time)** —
-  escalated 2026-06-16 from June 18 for buffer ahead of the approval gate.
-- June 19: Homerun video-path decision due (corrected 2026-06-16 from a stale July 1).
-- June 20: Switch upload package approved / re-plan if not.
+- ~~June 17: Switch inputs due from user~~ — **missed, zero input received.** Folded
+  into the June 20 date below rather than re-escalated a third time.
+- **June 19: Homerun video-path decision due** (corrected 2026-06-16 from a stale
+  July 1). Most time-critical open item as of June 18 — art and master are done, only
+  the decision is outstanding. If silent past EOD June 19, Hemera's proposed fallback
+  (default to internal edit) needs explicit user sign-off — see task notes.
+- **June 20: Switch — beat store URL + publish time + package approval, all due
+  together.** This is now the single hard date for Switch. No further buffer is built
+  in beyond this without re-planning the July 18 date.
+- June 22: Nightshade re-mix ETA decision due.
 - July 1: Virtual Love chorus status check.
 - August 1: Virtual Love mix received or track moves to Q4.
 - September 1: Nightshade commit-or-Q4 gate.
