@@ -1,13 +1,13 @@
 {
-  "updatedAt": "2026-06-18T13:00:00Z",
+  "updatedAt": "2026-06-19T13:00:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "Named the June 17 Switch-input miss in writing and collapsed it into the existing June 20 approval-gate date (checklist.md, Q3 calendar, tasks.json, overlay). Extended t-switch-prerelease-arc due date to June 21 and handed Nyx new W26 content scope. Proposed Homerun fallback (default to internal edit if silent past June 19 EOD) for user sign-off — not yet in effect. Owes a response to Argus's t-switch-zero-buffer-risk finding.",
-      "lastActive": "2026-06-18T11:00:00Z"
+      "task": "Named a second consecutive full silent day across every open item. Resolved Argus's t-switch-zero-buffer-risk by rebuilding a buffer day (June 19 internal marker for Switch inputs, June 20 formal gate unchanged) in checklist.md, the Q3 calendar, and overlay.json. Homerun fallback still not in effect — tomorrow's standup is now the real checkpoint if silence continues. Owes a response tomorrow to whether the fallback takes effect.",
+      "lastActive": "2026-06-19T11:00:00Z"
     },
     {
       "id": "aether",
@@ -21,9 +21,9 @@
       "id": "nyx",
       "name": "Nyx",
       "role": "Execution · Content",
-      "status": "working",
-      "task": "Switch upload package and pre-release arc still in review, zero blocker movement (store URL, publish time, Aether hook moment). Executed full W26 content handoff same-day: signed off waveform-visualizer spec, wrote and queued the W26 X post (ap-2026-06-18-switch-w26-x-post), wrote SoundCloud preview-snippet packaging copy. Flagged BTS clip and visualizer render as needing user-supplied raw material rather than fabricating either.",
-      "lastActive": "2026-06-18T12:00:00Z"
+      "status": "idle",
+      "task": "Independently re-verified all three real blockers (store URL, publish time, hook-moment) are still unmoved and her three queue items still pending. Wrote nothing new today by design — declined to manufacture busywork on a second silent day. Flagged that her W25 collab-story approval has sat 2 full days and the cadence question will resolve itself by timeout, not decision, if W25 closes June 21 undecided.",
+      "lastActive": "2026-06-19T10:00:00Z"
     },
     {
       "id": "hermes",
@@ -38,8 +38,8 @@
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "idle",
-      "task": "2026-06-18 meeting record closed: board, overlay and approvals queue verified against transcript and the underlying artifacts (checklist.md, calendar, W26 content draft, pipeline report). No schema drift, no duplicate ids, no stale notes found.",
-      "lastActive": "2026-06-18T13:00:00Z"
+      "task": "2026-06-19 meeting record closed: tasks.json, agents.json, overlay.json and queue.json verified against transcript and the underlying artifacts (checklist.md, calendar, pipeline report). Filed Argus's two recommended tasks (t-backlog-collision-risk-0619, t-w25-cadence-decision-tripwire) and flipped t-switch-zero-buffer-risk to done with a resolution note. No schema drift, no duplicate ids found.",
+      "lastActive": "2026-06-19T13:00:00Z"
     },
     {
       "id": "theia",
@@ -54,8 +54,8 @@
       "name": "Argus",
       "role": "Oversight · Pipeline",
       "status": "idle",
-      "task": "Fourth pipeline audit complete (team/reports/pipeline/2026-06-18.md). Verdict: GREEN — second consecutive clean run. Traced the June 17→20 deadline collapse to a real, independently-attested 2026-06-15 prior commitment and confirmed it as legitimate self-correction, not goalpost-shifting. Filed t-switch-zero-buffer-risk (owner hemera).",
-      "lastActive": "2026-06-18T11:00:00Z"
+      "task": "Fifth pipeline audit complete (team/reports/pipeline/2026-06-19.md). Verdict: YELLOW — downgrade from two consecutive GREENs, a system-level finding: two silent days have compressed previously well-spaced deadlines into a ~24-hour collision window with no team mechanism yet for a third. Confirmed Hemera's buffer-rebuild is principled, not a relapse. Filed t-backlog-collision-risk-0619 (hemera) and t-w25-cadence-decision-tripwire (mnemosyne); recommended the t-switch-zero-buffer-risk status fix.",
+      "lastActive": "2026-06-19T11:00:00Z"
     }
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-18T13:00:00Z",
+  "updatedAt": "2026-06-19T13:00:00Z",
   "tasks": [
     {
       "id": "t-secrets-setup",
@@ -82,7 +82,7 @@
       "createdBy": "hemera",
       "createdAt": "2026-06-15T07:30:00Z",
       "due": "2026-06-19",
-      "notes": "Due date corrected 2026-06-16 by Hemera per Argus's t-homerun-due-date-correction audit finding: original 2026-07-01 understated real urgency, since commissioned-video lead time makes the decision effectively overdue within the week. Art and master are done. Video direction (internal edit or commission) needed by Jun 19 to keep Aug 8 release on schedule. 2026-06-18: this is now the single most time-critical open item on the board — due tomorrow, no blocker movement reported. Hemera proposes a fallback for explicit user sign-off (not a unilateral close): if no decision lands by June 19 EOD, default to the internal edit, since that path has shorter lead time and protects Aug 8 without foreclosing a future commissioned video for a later release. This default is a proposal only — it does not take effect, and this task does not close, until the user approves it or makes the actual call."
+      "notes": "Due date corrected 2026-06-16 by Hemera per Argus's t-homerun-due-date-correction audit finding: original 2026-07-01 understated real urgency, since commissioned-video lead time makes the decision effectively overdue within the week. Art and master are done. Video direction (internal edit or commission) needed by Jun 19 to keep Aug 8 release on schedule. 2026-06-18: this is now the single most time-critical open item on the board — due tomorrow, no blocker movement reported. Hemera proposes a fallback for explicit user sign-off (not a unilateral close): if no decision lands by June 19 EOD, default to the internal edit, since that path has shorter lead time and protects Aug 8 without foreclosing a future commissioned video for a later release. This default is a proposal only — it does not take effect, and this task does not close, until the user approves it or makes the actual call. 2026-06-19: due date reached with zero user response — second consecutive silent day. Status remains blocked, not advanced; Hemera has not closed this unilaterally. Hemera's framing tonight: if silence continues past today's EOD, tomorrow's standup (2026-06-20) becomes the real checkpoint and the fallback will be treated as in effect unless told otherwise before then. Argus confirmed this framing is consistent with Hemera's own prior rule and flagged it for re-audit tomorrow once it actually happens (absence-of-no treated as yes is a real interpretive choice). See t-backlog-collision-risk-0619 for the converging-deadline risk this is now part of."
     },
     {
       "id": "t-argus-pipeline-audit",
@@ -149,7 +149,7 @@
       "createdAt": "2026-06-12T12:00:00Z",
       "handedFrom": "hemera",
       "due": "2026-06-20",
-      "notes": "Draft complete. Package at team/drafts/uploads/switch/ — metadata, description, checklist, captions, art-prompt. Queued as ap-2026-06-19-switch-upload (pending, day 7 of window). 2026-06-18: the June 17 input deadline passed with ZERO input from user — recording that honestly rather than re-asking silently. Due date corrected from 2026-06-19 to 2026-06-20, collapsing the input deadline into the pre-existing approval-gate date rather than inventing a third date. Still awaiting from user: (1) beat store listing URL for Switch, (2) July 18 publish time. Per the Q3 calendar, real buffer remains — July 18 is still safe if these land by June 20; only at risk if it slips past June 27. No fabricated values added; [TBD] placeholders remain until real inputs land.",
+      "notes": "Draft complete. Package at team/drafts/uploads/switch/ — metadata, description, checklist, captions, art-prompt. Queued as ap-2026-06-19-switch-upload (pending, day 7 of window). 2026-06-18: the June 17 input deadline passed with ZERO input from user — recording that honestly rather than re-asking silently. Due date corrected from 2026-06-19 to 2026-06-20, collapsing the input deadline into the pre-existing approval-gate date rather than inventing a third date. Still awaiting from user: (1) beat store listing URL for Switch, (2) July 18 publish time. Per the Q3 calendar, real buffer remains — July 18 is still safe if these land by June 20; only at risk if it slips past June 27. No fabricated values added; [TBD] placeholders remain until real inputs land. 2026-06-19: second consecutive silent day, zero input still. Hemera rebuilt one day of buffer (rather than just disclosing the risk) by naming June 19 the real internal marker for inputs to land in checklist.md and the Q3 calendar; the structured due date here stays 2026-06-20, unchanged — Argus confirmed this is correct, since the due field should track what actually gates approval, not an internal aid. Still in review, still blocked on the same two inputs.",
       "links": [
         "team/reports/q3-2026-release-calendar.md",
         "team/drafts/uploads/switch/metadata.json",
@@ -168,7 +168,7 @@
       "createdAt": "2026-06-15T09:00:00Z",
       "handedFrom": "theia",
       "due": "2026-06-21",
-      "notes": "Hit its original June 18 due date today still blocked on the same three items, unchanged for a fifth day: Aether hook-moment timestamp (structurally blocked on t-retroactive-intake-path, a user decision), user beat store URL, user July 18 publish time. None of these are Nyx-side gaps — every piece of work available without them has been produced (W26/W27 asset specs, W25 collab-story copy). Extending due date from June 18 to June 21, with reasoning: June 21 is when the W25 window itself closes, so the arc's first live week completes on its own schedule regardless of the hook-clip blocker, and there is genuinely unblocked W26 work to hand off now (see t-switch-w26-content-prep) rather than holding Nyx idle on a date that can't move without a user decision. This is an extension, not a silent slip — recorded here and the due date changed accordingly. 2026-06-18 update: W26 content prep (t-switch-w26-content-prep) complete same-day — waveform spec signed off, W26 X post queued for approval, SoundCloud snippet packaging copy written. Arc doc's W26 section updated to link all of it in. Core three blockers (hook-moment, store URL, publish time) still completely unmoved — this progress is all from genuinely unblocked scope, not from the blockers clearing.",
+      "notes": "Hit its original June 18 due date today still blocked on the same three items, unchanged for a fifth day: Aether hook-moment timestamp (structurally blocked on t-retroactive-intake-path, a user decision), user beat store URL, user July 18 publish time. None of these are Nyx-side gaps — every piece of work available without them has been produced (W26/W27 asset specs, W25 collab-story copy). Extending due date from June 18 to June 21, with reasoning: June 21 is when the W25 window itself closes, so the arc's first live week completes on its own schedule regardless of the hook-clip blocker, and there is genuinely unblocked W26 work to hand off now (see t-switch-w26-content-prep) rather than holding Nyx idle on a date that can't move without a user decision. This is an extension, not a silent slip — recorded here and the due date changed accordingly. 2026-06-18 update: W26 content prep (t-switch-w26-content-prep) complete same-day — waveform spec signed off, W26 X post queued for approval, SoundCloud snippet packaging copy written. Arc doc's W26 section updated to link all of it in. Core three blockers (hook-moment, store URL, publish time) still completely unmoved — this progress is all from genuinely unblocked scope, not from the blockers clearing. 2026-06-19: still blocked, due date left unchanged at June 21 — same three blockers, second consecutive silent day. Nyx independently re-verified (read queue.json, checklist.md, the arc doc, the calendar herself) that nothing moved and declined to manufacture busywork. No new content produced today; not a gap, nothing genuinely unblocked left to pull forward.",
       "links": [
         "team/reports/market/2026-W25.md",
         "team/drafts/content/switch-prerelease-arc-w25-w28.md",
@@ -196,7 +196,7 @@
       "status": "backlog",
       "createdBy": "argus",
       "createdAt": "2026-06-17T11:00:00Z",
-      "notes": "Nyx's new collab-story X post (queued as ap-2026-06-17-switch-w25-collab-story) would put W25 at 2 X posts against the pre-release arc's stated cadence of 1. Nyx correctly flagged this instead of resolving it herself or silently editing the cadence line. Needs a decision: run both (update the cadence line in switch-prerelease-arc-w25-w28.md to reflect it), swap one for the other, or hold the second post for W26's X slot. Small decision but will rot in the queue if no one owns closing it. Unchanged today — still genuinely open, W25 ends June 21 so there is a natural window to decide before it's moot."
+      "notes": "Nyx's new collab-story X post (queued as ap-2026-06-17-switch-w25-collab-story) would put W25 at 2 X posts against the pre-release arc's stated cadence of 1. Nyx correctly flagged this instead of resolving it herself or silently editing the cadence line. Needs a decision: run both (update the cadence line in switch-prerelease-arc-w25-w28.md to reflect it), swap one for the other, or hold the second post for W26's X slot. Small decision but will rot in the queue if no one owns closing it. Unchanged today — still genuinely open, W25 ends June 21 so there is a natural window to decide before it's moot. 2026-06-19: still unchanged, now sat 2 full days. Nyx flagged that if W25 closes June 21 with no decision, the cadence question resolves itself by timeout rather than by anyone deciding — see new tripwire task t-w25-cadence-decision-tripwire (owner mnemosyne) filed by Argus today to own that trigger separately from this substantive decision."
     },
     {
       "id": "t-switch-w26-content-prep",
@@ -229,10 +229,48 @@
       "id": "t-switch-zero-buffer-risk",
       "title": "Flag/resolve: Switch input deadline and approval gate are now the same date (June 20) — zero slack if inputs land on the day itself",
       "owner": "hemera",
-      "status": "backlog",
+      "status": "done",
       "createdBy": "argus",
       "createdAt": "2026-06-18T11:00:00Z",
-      "notes": "Collapsing the June 17 input deadline into the pre-existing June 20 approval gate (correct fix for the double-deadline ambiguity, see Argus's 2026-06-18 audit) has a side effect that isn't written down anywhere yet: if the beat store URL and publish time arrive exactly on June 20, Nyx has zero days to fold real values into the upload package before the same-day approval gate closes. Not asking for a new date — asking for one of two things: (a) state this risk explicitly in checklist.md/the calendar so it's a known tradeoff, not a silent one, or (b) treat June 19 as the de facto 'inputs must land' marker internally while June 20 stays the formal gate, restoring one day of real buffer. Either resolves it; leaving it unstated is the gap."
+      "notes": "Collapsing the June 17 input deadline into the pre-existing June 20 approval gate (correct fix for the double-deadline ambiguity, see Argus's 2026-06-18 audit) has a side effect that isn't written down anywhere yet: if the beat store URL and publish time arrive exactly on June 20, Nyx has zero days to fold real values into the upload package before the same-day approval gate closes. Not asking for a new date — asking for one of two things: (a) state this risk explicitly in checklist.md/the calendar so it's a known tradeoff, not a silent one, or (b) treat June 19 as the de facto 'inputs must land' marker internally while June 20 stays the formal gate, restoring one day of real buffer. Either resolves it; leaving it unstated is the gap. Done 2026-06-19: Hemera chose (b) and rebuilt the buffer rather than just disclosing the risk — wrote June 19 as the real internal 'inputs must land' marker into team/drafts/uploads/switch/checklist.md and team/reports/q3-2026-release-calendar.md, with June 20 explicitly stated as the unchanged formal external gate in both. Added overlay note os-note-hemera-standup-0619 and updated os-rem-switch-inputs-jun20 in team/os/overlay.json to surface it on the calendar. Structured due field on t-switch-upload-package correctly left at 2026-06-20 — the marker is prose-only, no enforcement of its own. Argus's 2026-06-19 audit (team/reports/pipeline/2026-06-19.md) verified all three artifacts directly and confirmed this is principled, not a fourth invented deadline; also confirmed this status-flip himself as the one process-hygiene gap left over from his June 18 filing. Status moved backlog → done on Mnemosyne's 2026-06-19 consolidation pass per Argus's recommendation.",
+      "links": [
+        "team/drafts/uploads/switch/checklist.md",
+        "team/reports/q3-2026-release-calendar.md",
+        "team/os/overlay.json",
+        "team/reports/pipeline/2026-06-19.md"
+      ]
+    },
+    {
+      "id": "t-argus-pipeline-audit-0619",
+      "title": "Fifth Argus pipeline health audit",
+      "owner": "argus",
+      "status": "done",
+      "createdBy": "hemera",
+      "createdAt": "2026-06-19T09:00:00Z",
+      "due": "2026-06-19",
+      "notes": "Complete. Report at team/reports/pipeline/2026-06-19.md. Verdict: YELLOW — downgrade from two consecutive GREENs, about the system, not any single agent's work today. Confirmed Hemera's buffer-rebuild is principled, not a relapse into date-juggling: structured due field on t-switch-upload-package stays 2026-06-20, the June 19 marker carries no enforcement of its own. Main finding: two consecutive full silent days have compressed previously well-spaced deadlines (Homerun decision, Switch internal marker, Switch formal gate) into a ~24-hour collision window, with no team mechanism yet for a third silent day. Found t-switch-zero-buffer-risk was still backlog despite being resolved in three artifacts — recommended the status fix. Confirmed Homerun checkpoint framing is consistent with Hemera's own prior rule, flagged one thing to re-audit tomorrow (absence-of-no treated as yes). Endorsed Nyx's cadence-timeout flag as a distinct gap. Schema/consistency sweep clean: queue.json untouched and correctly all-pending, overlay edits correctly in-place, agents.json correctly untouched pending Mnemosyne, cursors/inbox genuinely empty. Two new tasks filed: t-backlog-collision-risk-0619 (hemera), t-w25-cadence-decision-tripwire (mnemosyne).",
+      "links": ["team/reports/pipeline/2026-06-19.md"]
+    },
+    {
+      "id": "t-backlog-collision-risk-0619",
+      "title": "Name and own the converging-deadline risk created by two consecutive silent days (Homerun decision, Switch internal marker, and Switch formal gate now landing within 48 hours of each other)",
+      "owner": "hemera",
+      "status": "backlog",
+      "createdBy": "argus",
+      "createdAt": "2026-06-19T11:00:00Z",
+      "notes": "Two days of total silence didn't just leave items unmoved — it compressed their natural spacing. Homerun's decision (due 2026-06-19), the Switch internal marker (2026-06-19), and the Switch formal gate (2026-06-20) were never meant to collide; they're colliding now only because nothing absorbed the delay earlier when there was more runway. The team's response so far (rebuild a buffer day, pre-announce a checkpoint) is sound case-by-case, but there's no mechanism yet for what happens on a third or fourth consecutive silent day, when more items will stack the same way. Ask: define what changes (cadence of reminders, what escalates to ISΛRK directly vs. handled internally, whether overlapping deadlines get deliberately re-spaced rather than independently patched) if tomorrow is silent too.",
+      "links": ["team/reports/pipeline/2026-06-19.md"]
+    },
+    {
+      "id": "t-w25-cadence-decision-tripwire",
+      "title": "Set an explicit owner/trigger for what happens if t-cadence-decision-w25-x-post is still undecided when W25 closes June 21",
+      "owner": "mnemosyne",
+      "status": "backlog",
+      "createdBy": "argus",
+      "createdAt": "2026-06-19T11:00:00Z",
+      "due": "2026-06-21",
+      "notes": "Nyx correctly flagged that the cadence question resolves itself by timeout, not by decision, if nobody acts before June 21. The existing task (t-cadence-decision-w25-x-post) names the choice but not the consequence of non-choice or who's responsible for noticing the window closing. Distinct from the existing task because the fix is procedural (a tripwire / explicit note on timeout) rather than substantive (which posting plan to run) — narrow scope, not merged into t-cadence-decision-w25-x-post itself.",
+      "links": ["team/reports/pipeline/2026-06-19.md"]
     }
   ]
 }

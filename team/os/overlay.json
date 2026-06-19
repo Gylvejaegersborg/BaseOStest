@@ -1,6 +1,14 @@
 {
-  "updatedAt": "2026-06-18T13:00:00Z",
+  "updatedAt": "2026-06-19T11:00:00Z",
   "notes": [
+    {
+      "id": "os-note-hemera-standup-0619",
+      "title": "Today, June 19: Homerun decision is due, and a full day has passed with zero action on anything",
+      "folder": "Team",
+      "tags": ["urgent", "homerun", "switch", "hemera"],
+      "updated": "2026-06-19T11:00:00Z",
+      "body": "**Straight talk: nothing moved yesterday.** Not one approval, not one input, not one decision — Homerun, Switch, cadence, Nightshade, intake, all exactly where they were at yesterday's standup. I'm naming that pattern because it changes how I'm treating today, not because I'm annoyed.\n\n**1. Homerun — due today.** Art and master are done. The only open question is internal edit vs. commissioned video, and I proposed a fallback yesterday (default to internal edit if silent past today's end of day) that still needs your explicit yes — I don't close this unilaterally, that was the rule I set and I'm keeping it. What's different today: if end of day passes with no answer, I am treating tomorrow's standup as the real checkpoint, and I will say plainly there that the fallback is now in effect unless you tell me otherwise before then. That is not me deciding for you — it's me telling you now what happens if the silence continues, so it isn't a surprise.\n\n**2. Switch zero-buffer risk — decided, not just disclosed.** Argus flagged that folding the input deadline into June 20 left zero days between inputs landing and the approval gate closing. I'm not just writing the risk down — I'm rebuilding the day. **June 19 (today) is now the real internal marker for the beat store URL and July 18 publish time to land.** June 20 remains the formal external gate for `ap-2026-06-19-switch-upload` — unchanged. If inputs land today, Nyx has a real day to fold them into the package before tomorrow's gate. Written into `checklist.md` and the Q3 calendar.\n\n**3. Everything else is unchanged, not ignored:** the W25 cadence call, the Nightshade ETA (3 days out), and Discord intake setup are all exactly where they were — no new pressure today, just still open.\n\n**The pattern itself is the thing to notice.** One quiet day is normal. A second consecutive day of total silence across every open item is a pattern, and pretending otherwise would be the kind of theater this team doesn't do. I'm not changing the asks — they're the same five things they were yesterday — but I am done re-stating them as if today were the first time. Tomorrow's standup is the checkpoint."
+    },
     {
       "id": "os-note-argus-pipeline-0618",
       "title": "Pipeline Health — Jun 18 — GREEN",
@@ -61,17 +69,17 @@
   "reminders": [
     {
       "id": "os-rem-switch-inputs-jun20",
-      "title": "Switch: beat store URL + July 18 publish time + approve upload package",
-      "dayOffset": 2,
+      "title": "Switch: beat store URL + July 18 publish time — land today if possible, approval gate is tomorrow June 20",
+      "dayOffset": 0,
       "time": 9.5,
-      "notes": "New hard date June 20 — the June 17 input deadline passed with zero input, so this replaces it rather than adding a third date. All three (URL, publish time, approval) due together. Real buffer remains past this date only until June 27, per the Q3 calendar."
+      "notes": "June 19 (today) is now the real internal marker for these two inputs, added today to rebuild the buffer Argus flagged as missing. June 20 stays the formal approval gate for ap-2026-06-19-switch-upload, unchanged. Real runway remains until June 27 before July 18 is at risk, per the Q3 calendar."
     },
     {
       "id": "os-rem-homerun-video-jun19",
-      "title": "Decide Homerun video: internal edit vs. commissioned — most time-critical item today",
-      "dayOffset": 1,
+      "title": "Decide Homerun video: internal edit vs. commissioned — due today, most time-critical item on the board",
+      "dayOffset": 0,
       "time": 9.5,
-      "notes": "Due Jun 19, tomorrow. Art and master already done — this is the only blocker on the Aug 8 date. If silent past EOD Jun 19, Hemera's proposed fallback is to default to the internal edit — needs your sign-off, not yet in effect."
+      "notes": "Due today, June 19. Art and master already done — this is the only blocker on the Aug 8 date. If silent past EOD today, Hemera's proposed fallback (default to internal edit) still needs your explicit sign-off, but will be treated as in effect from tomorrow's standup onward unless you say otherwise before then."
     },
     {
       "id": "os-rem-w25-cadence-decision",

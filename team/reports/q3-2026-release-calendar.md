@@ -31,10 +31,20 @@ approval-gate date, now carrying both jobs (inputs + approval) since splitting t
 produced no extra urgency, only an extra date to track. If those inputs and the
 approval land by June 20, July 18 is safe. If it slips past June 27, push to July 25.
 
+**2026-06-19 — buffer rebuilt, not just disclosed.** Argus flagged (`t-switch-zero-
+buffer-risk`) that collapsing the two dates into one left zero days between inputs
+arriving and the gate closing, if both land on June 20 itself. A full additional day of
+total silence followed with no movement on anything. Decision: rebuild the day rather
+than just write the risk down. **June 19 (today) is now the real internal marker for
+inputs to land; June 20 stays the formal external gate, unchanged.** If inputs arrive
+today, Nyx has a clear day to fold them in before tomorrow's gate. If they arrive on
+June 20 itself anyway, the zero-buffer risk is still live by definition — this gives the
+inputs a real shot at landing inside a buffer instead of guaranteeing they land past one.
+
 Pre-release tasks:
 - Nyx: build upload package (done, in review — blocked only on the two user inputs below)
-- User: provide beat store URL + publish time, then approve package — both now due
-  **June 20** (June 17 deadline missed, see above)
+- User: provide beat store URL + publish time — internal target **June 19 (today)**,
+  formal gate **June 20** — then approve package
 - Nyx: queue SoundCloud upload for scheduling
 
 ---
@@ -138,9 +148,11 @@ Pre-release tasks:
   July 1). Most time-critical open item as of June 18 — art and master are done, only
   the decision is outstanding. If silent past EOD June 19, Hemera's proposed fallback
   (default to internal edit) needs explicit user sign-off — see task notes.
-- **June 20: Switch — beat store URL + publish time + package approval, all due
-  together.** This is now the single hard date for Switch. No further buffer is built
-  in beyond this without re-planning the July 18 date.
+- **June 19 (today): real internal marker for Switch inputs to land** (beat store URL +
+  publish time) — added 2026-06-19 to rebuild the buffer Argus flagged as missing
+  (`t-switch-zero-buffer-risk`). Does not move the formal gate below.
+- **June 20: Switch — package approval, formal external gate.** Unchanged. No further
+  buffer is built in beyond this without re-planning the July 18 date.
 - June 22: Nightshade re-mix ETA decision due.
 - July 1: Virtual Love chorus status check.
 - August 1: Virtual Love mix received or track moves to Q4.

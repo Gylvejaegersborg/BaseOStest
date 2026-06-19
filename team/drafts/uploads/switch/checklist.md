@@ -2,9 +2,21 @@
 
 target release: 2026-07-18
 package drafted: 2026-06-12
-approval due: 2026-06-20 (June 17 input-deadline MISSED with zero input from user as of
-2026-06-18 — see sign-off note. Re-set to June 20, the existing approval-gate date, rather
-than inventing a new one. No more buffer beyond this without re-planning July 18.)
+approval due: 2026-06-20 (formal external gate — unchanged). June 17 input-deadline MISSED
+with zero input from user as of 2026-06-18 — see sign-off note. Re-set to June 20 that day,
+the existing approval-gate date, rather than inventing a new one.
+
+**2026-06-19 update — buffer rebuilt, not just disclosed.** Argus flagged (t-switch-zero-
+buffer-risk) that folding the input deadline into June 20 left zero days between inputs
+landing and the gate closing, if they arrive on the gate date itself. Given a full
+additional day of total silence since — no inputs, no approvals moved on anything — I am
+not just accepting that risk in writing. I'm rebuilding the day: **June 19 (today) is now
+the real internal marker for inputs to land.** June 20 stays the formal external gate
+(unchanged, still the date that governs `ap-2026-06-19-switch-upload` and July 18 safety).
+If the store URL and publish time arrive today, Nyx has a clear day to fold them into the
+package before approval needs to close tomorrow. If they arrive on June 20 itself instead,
+that zero-buffer risk is still live — this doesn't eliminate it, it just gives the inputs
+a real shot at landing inside the buffer instead of past it.
 
 ---
 
@@ -107,10 +119,14 @@ listing URL for Switch and the July 18 publish time are still both outstanding �
 items as the last four standups. This checklist's `[TBD]` lines (rows 46, 64, 72) and the
 approval package itself remain blocked on them.
 
-**New hard date: June 20.** This is not a new escalation — it is the approval-gate date
-that was already on the calendar before the June 17 escalation existed. Collapsing the
-"input deadline" and "approval gate" into one date removes the ambiguity of having two
-numbers in play. If both inputs and the approval do not land by June 20, July 18 is no
-longer safe without re-planning (per `q3-2026-release-calendar.md`: slip past June 27 and
-the date moves to July 25). There is real runway left — this is not yet a crisis — but
-the next miss is a date-moving event, not a re-ask.
+**New hard date: June 20 (formal gate, unchanged).** This is not a new escalation — it is
+the approval-gate date that was already on the calendar before the June 17 escalation
+existed. If both inputs and the approval do not land by June 20, July 18 is no longer safe
+without re-planning (per `q3-2026-release-calendar.md`: slip past June 27 and the date
+moves to July 25). There is real runway left — this is not yet a crisis — but the next
+miss is a date-moving event, not a re-ask.
+
+**June 19 (today): real internal "inputs must land" marker, added 2026-06-19.** This is
+the buffer fix for Argus's `t-switch-zero-buffer-risk` finding — collapsing the input
+deadline into June 20 removed the day Nyx needs to fold real values into the package
+before approval closes. Today is that day back. June 20 does not move.
