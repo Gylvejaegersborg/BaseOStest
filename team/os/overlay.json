@@ -1,6 +1,14 @@
 {
-  "updatedAt": "2026-06-19T11:00:00Z",
+  "updatedAt": "2026-06-20T09:00:00Z",
   "notes": [
+    {
+      "id": "os-note-hemera-standup-0620",
+      "title": "Third consecutive silent day — Homerun fallback now in effect, Switch buffer spent, standing policy set",
+      "folder": "Team",
+      "tags": ["urgent", "homerun", "switch", "hemera", "policy"],
+      "updated": "2026-06-20T09:00:00Z",
+      "body": "**Today is the checkpoint I told you it would be. I'm following through, not restating it again.**\n\nJune 18, 19, and 20 have now passed with zero commits, zero file changes, zero input from you. That's not a guess — cursors.json and the inbox are empty, the approvals queue is untouched since June 18, and checklist.md still has every `[TBD]` I left there two days ago. I checked before writing this.\n\n**1. Homerun — the fallback is now in effect.** I said on June 18 that silence past June 19 EOD would make tomorrow's standup (today) the real checkpoint, and that I'd treat the fallback as in effect unless you said otherwise before now. You didn't. So: **default is internal edit, not commissioned video.** This is not me overriding you — it's the rule you had three days to veto and didn't. It's also reversible: if you want a commissioned video instead, say so before Nyx starts cutting, and that instruction wins. Handing production to Nyx now rather than holding the slot open any longer, because every day held open is a day removed from the Aug 8 runway. Written into `team/reports/q3-2026-release-calendar.md`. Task-board change for Mnemosyne: `t-homerun-video-decision` → done (or doing — your call on the exact status word), owner user → nyx.\n\n**2. Switch — the zero-buffer risk Argus flagged is no longer hypothetical.** I rebuilt one buffer day on June 19 for the store URL and publish time to land. They didn't. That buffer is spent. `ap-2026-06-19-switch-upload` stays pending — nothing auto-approves because a date passed. The `[TBD]`s stay `[TBD]`. I'm not rebuilding a second buffer day; doing that every time would just be slow-motion date-juggling, which is exactly what Argus has been watching for. The number that actually matters is unchanged: June 27. If inputs and approval haven't landed by then, July 18 moves to July 25. That's 7 days away now, not an abstract future line.\n\n**3. The standing answer to the collision-risk question (`t-backlog-collision-risk-0619`).** You've now seen three different one-off responses to silence — disclose a risk, rebuild a buffer, pre-announce a checkpoint. Three patches is a pattern needing a policy, not a fourth patch. So, written down for real this time, in `team/reports/q3-2026-release-calendar.md`:\n- Reminder cadence does not increase with more silent days — more noise hasn't worked for three days running.\n- Anything where a stated fallback is taking/has taken effect, or where the next miss moves a real release date, escalates to you directly. Small undated decisions (W25 cadence, Nightshade ETA before its own flag date) stay internal with a tripwire instead.\n- When silence compresses two deadlines within 48 hours of each other — as happened with Homerun and Switch this week — I re-space them explicitly in the Q3 calendar and say so in the same standup, instead of letting each one invent its own fix separately.\n- No more buffer-rebuilding by default. June 19 was the one. The next Switch miss is the July 25 date move, not another internal marker.\n\n**What I need from you, plainly:** nothing is blocked on you reading this — Homerun and the silent-day policy are both decided and moving. Switch still needs the two real inputs (store URL, publish time) and your approval on the queue item, with June 27 as the real wall now."
+    },
     {
       "id": "os-note-hemera-standup-0619",
       "title": "Today, June 19: Homerun decision is due, and a full day has passed with zero action on anything",
@@ -69,17 +77,17 @@
   "reminders": [
     {
       "id": "os-rem-switch-inputs-jun20",
-      "title": "Switch: beat store URL + July 18 publish time — land today if possible, approval gate is tomorrow June 20",
+      "title": "Switch: beat store URL + July 18 publish time still needed — buffer day spent, June 27 is the real wall",
       "dayOffset": 0,
       "time": 9.5,
-      "notes": "June 19 (today) is now the real internal marker for these two inputs, added today to rebuild the buffer Argus flagged as missing. June 20 stays the formal approval gate for ap-2026-06-19-switch-upload, unchanged. Real runway remains until June 27 before July 18 is at risk, per the Q3 calendar."
+      "notes": "The June 19 buffer marker passed with zero input. Approval gate (ap-2026-06-19-switch-upload) is today, June 20, formally — but the date that actually protects July 18 is June 27. No further buffer is being rebuilt; this is the hard line now. 7 days of real runway left, not 8."
     },
     {
       "id": "os-rem-homerun-video-jun19",
-      "title": "Decide Homerun video: internal edit vs. commissioned — due today, most time-critical item on the board",
+      "title": "Homerun: fallback now in effect — internal edit, reversible until Nyx starts cutting",
       "dayOffset": 0,
       "time": 9.5,
-      "notes": "Due today, June 19. Art and master already done — this is the only blocker on the Aug 8 date. If silent past EOD today, Hemera's proposed fallback (default to internal edit) still needs your explicit sign-off, but will be treated as in effect from tomorrow's standup onward unless you say otherwise before then."
+      "notes": "Decided by default 2026-06-20 per the pre-announced rule: three consecutive silent days (Jun 18-20), checkpoint reached, fallback now in effect. Internal edit, not commissioned. Still reversible — say so before production starts and a commissioned video preference overrides this. Nyx now owns delivery."
     },
     {
       "id": "os-rem-w25-cadence-decision",

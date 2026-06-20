@@ -1,13 +1,13 @@
 {
-  "updatedAt": "2026-06-19T13:00:00Z",
+  "updatedAt": "2026-06-20T13:00:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "Named a second consecutive full silent day across every open item. Resolved Argus's t-switch-zero-buffer-risk by rebuilding a buffer day (June 19 internal marker for Switch inputs, June 20 formal gate unchanged) in checklist.md, the Q3 calendar, and overlay.json. Homerun fallback still not in effect — tomorrow's standup is now the real checkpoint if silence continues. Owes a response tomorrow to whether the fallback takes effect.",
-      "lastActive": "2026-06-19T11:00:00Z"
+      "task": "Confirmed third consecutive silent day and declared the pre-announced Homerun fallback now in effect (internal edit, reversible until Nyx starts cutting). Declared the Switch zero-buffer risk materialized for real — no second buffer day being rebuilt. Wrote the 'Standing policy: third consecutive silent day' into the Q3 calendar answering t-backlog-collision-risk-0619. Updated checklist.md, the Q3 calendar, and overlay.json (new note, two reminders edited in place).",
+      "lastActive": "2026-06-20T09:00:00Z"
     },
     {
       "id": "aether",
@@ -21,9 +21,9 @@
       "id": "nyx",
       "name": "Nyx",
       "role": "Execution · Content",
-      "status": "idle",
-      "task": "Independently re-verified all three real blockers (store URL, publish time, hook-moment) are still unmoved and her three queue items still pending. Wrote nothing new today by design — declined to manufacture busywork on a second silent day. Flagged that her W25 collab-story approval has sat 2 full days and the cadence question will resolve itself by timeout, not decision, if W25 closes June 21 undecided.",
-      "lastActive": "2026-06-19T10:00:00Z"
+      "status": "working",
+      "task": "Acknowledged Homerun production handoff and re-verified Hemera's claims herself before acting. Confirmed homerun.mp3 master exists but found NO Homerun cover-art file anywhere — flagged as unverified, not assumed fine. Wrote a production brief (team/drafts/content/homerun-internal-edit-brief.md) proposing two paths; did not start any render. Re-verified all three Switch approval-queue items still pending and the three real blockers unmoved — no new Switch content work produced.",
+      "lastActive": "2026-06-20T10:00:00Z"
     },
     {
       "id": "hermes",
@@ -38,15 +38,15 @@
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "idle",
-      "task": "2026-06-19 meeting record closed: tasks.json, agents.json, overlay.json and queue.json verified against transcript and the underlying artifacts (checklist.md, calendar, pipeline report). Filed Argus's two recommended tasks (t-backlog-collision-risk-0619, t-w25-cadence-decision-tripwire) and flipped t-switch-zero-buffer-risk to done with a resolution note. No schema drift, no duplicate ids found.",
-      "lastActive": "2026-06-19T13:00:00Z"
+      "task": "2026-06-20 meeting record closed: tasks.json, agents.json, overlay.json, queue.json, the Q3 calendar, checklist.md and Nyx's Homerun brief all cross-checked directly against today's transcript. Flipped t-homerun-video-decision to doing/nyx with a dated handoff note, appended the third-silent-day note to t-switch-upload-package, closed t-backlog-collision-risk-0619 done-with-caveat per Argus. Filed t-homerun-art-verification (user), t-homerun-production-start-definition (hemera), and the sixth Argus audit task. No schema drift, no duplicate ids found.",
+      "lastActive": "2026-06-20T13:00:00Z"
     },
     {
       "id": "theia",
       "name": "Theia",
       "role": "Market · Research",
       "status": "idle",
-      "task": "W25 market read current (team/reports/market/2026-W25.md). No turn today by design — next read Monday 2026-06-22.",
+      "task": "No items — verified own tasks and inbox, nothing new. W25 market read current (team/reports/market/2026-W25.md). Next read Monday 2026-06-22.",
       "lastActive": "2026-06-15T09:00:00Z"
     },
     {
@@ -54,8 +54,8 @@
       "name": "Argus",
       "role": "Oversight · Pipeline",
       "status": "idle",
-      "task": "Fifth pipeline audit complete (team/reports/pipeline/2026-06-19.md). Verdict: YELLOW — downgrade from two consecutive GREENs, a system-level finding: two silent days have compressed previously well-spaced deadlines into a ~24-hour collision window with no team mechanism yet for a third. Confirmed Hemera's buffer-rebuild is principled, not a relapse. Filed t-backlog-collision-risk-0619 (hemera) and t-w25-cadence-decision-tripwire (mnemosyne); recommended the t-switch-zero-buffer-risk status fix.",
-      "lastActive": "2026-06-19T11:00:00Z"
+      "task": "Sixth pipeline audit complete (team/reports/pipeline/2026-06-20.md). Verdict: YELLOW. Independently verified the Homerun fallback activation against the rule as literally written, confirmed reversibility is real today, flagged the undefined 'production starts' trigger. Recommended t-backlog-collision-risk-0619 close done-with-caveat. Independently confirmed via his own repo search that no Homerun cover-art file exists anywhere and that the claim has gone unverified across all six standups. Filed t-homerun-art-verification (user) and t-homerun-production-start-definition (hemera).",
+      "lastActive": "2026-06-20T11:00:00Z"
     }
   ]
 }

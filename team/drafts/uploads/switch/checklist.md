@@ -130,3 +130,32 @@ miss is a date-moving event, not a re-ask.
 the buffer fix for Argus's `t-switch-zero-buffer-risk` finding — collapsing the input
 deadline into June 20 removed the day Nyx needs to fold real values into the package
 before approval closes. Today is that day back. June 20 does not move.
+
+**2026-06-20 status: the June 19 buffer marker passed with zero input.** Third
+consecutive silent day (Jun 18, 19, 20). The zero-buffer risk Argus flagged on June 18
+is no longer hypothetical — it is live. June 20 (today) is now simultaneously the
+input deadline and the formal approval gate, exactly as warned, with no day in between
+for Nyx to fold real values into the package even if inputs land later today.
+
+**What happens now, stated plainly:**
+- `ap-2026-06-19-switch-upload` stays `pending` in the queue. It is NOT auto-approved
+  and NOT auto-rejected by today passing. Approval requires explicit user action
+  regardless of date.
+- The `[TBD]` placeholders (beat store URL, publish time — rows ~46/64/72 below and in
+  `description.md`) stay `[TBD]`. No fabricated values are being inserted to force this
+  through.
+- No further internal buffer is being rebuilt a second time. Rebuilding June 19 once
+  was the correct fix for a first occurrence. Doing it again tomorrow would be the
+  date-juggling pattern Argus has already warned this team against — see the
+  third-silent-day policy in `team/os/overlay.json` (note dated 2026-06-20) and the Q3
+  calendar's "Next Check-in Points" section for what replaces ad hoc buffer-rebuilding
+  going forward.
+- July 18 safety math is unchanged in mechanics but tighter in practice: per the Q3
+  calendar, the real deadline before July 18 needs re-planning is June 27. Today's miss
+  does not move that date. It does mean there are now 7 days, not 8, of remaining
+  runway, and zero of them are buffer anymore — every remaining day between now and
+  June 27 is live runway, not slack.
+- If inputs and approval have not landed by June 27, Switch moves to July 25. That is
+  not a new threat; it is the same line that has been in this checklist and the
+  calendar since June 16. Today's job is to say it is now 7 days away, not float it as
+  abstract.
