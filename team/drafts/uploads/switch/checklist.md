@@ -159,3 +159,11 @@ for Nyx to fold real values into the package even if inputs land later today.
   not a new threat; it is the same line that has been in this checklist and the
   calendar since June 16. Today's job is to say it is now 7 days away, not float it as
   abstract.
+
+**2026-06-21 status: fourth consecutive silent day.** No movement on either input, no
+movement on the approval. `ap-2026-06-19-switch-upload` is now 9 days old in the queue,
+still `pending`. Updating the runway count to match the calendar: June 27 is now **6
+days, not 7**, away — the line above was last touched 2026-06-20 and had drifted one day
+stale against `q3-2026-release-calendar.md`'s same count. Same wall, same mechanics,
+just keeping this file's number honest day to day rather than letting it quietly lag the
+calendar's.

@@ -1,6 +1,14 @@
 {
-  "updatedAt": "2026-06-20T09:00:00Z",
+  "updatedAt": "2026-06-21T13:00:00Z",
   "notes": [
+    {
+      "id": "os-note-hemera-standup-0621",
+      "title": "Fourth silent day — policy holds, nothing new escalates. Homerun production-start trigger now defined.",
+      "folder": "Team",
+      "tags": ["homerun", "switch", "hemera", "policy"],
+      "updated": "2026-06-21T09:00:00Z",
+      "body": "**Short one. Four days of silence now (Jun 18-21) and, deliberately, nothing new to escalate.** I checked git log and cursors.json myself before writing this, same as every day: one commit since yesterday's meeting closed, that meeting's own commit, zero from you. cursors.json is still empty. Nothing has moved.\n\n**1. The standing policy held — on purpose, including the part where it doesn't fire.** Yesterday I wrote the rule: escalate to you directly only when a stated fallback is about to/has taken effect, or the next miss moves a real release date. Homerun's fallback already activated yesterday (06-20) — that's old news, correctly not re-announced as if it were fresh today. Switch's date-moving line is June 27, still 6 days off, not yet crossed. So: no escalation today. That's not the policy doing nothing — it's the policy correctly telling the difference between 'aging' and 'urgent.' Argus is watching for exactly this, and I'd rather be boring and right than busy and wrong.\n\n**2. Homerun production-start trigger — defined, my own owed task closed out.** You asked (via Argus's flag) what concretely counts as 'Nyx starts production,' since that's the line that ends the reversibility window on the internal-edit default. Confirmed first: zero footage, zero render, zero session clips exist anywhere in the repo, still — Nyx's brief from yesterday is still accurate because nothing has changed. The trigger, now written into the calendar: production starts when (a) any render/export file for the edit lands in the repo, (b) a committed edit-decision artifact locks specific cuts rather than describing options, or (c) Nyx's task moves doing → review with a linked deliverable. None of those are true today. Until one is, a commissioned-video preference from you still overrides the default for free. Written in full in `team/reports/q3-2026-release-calendar.md`, Homerun section.\n\n**3. Switch numbers, restated with today's actual count, not yesterday's.** Three approvals sit in the queue, untouched since June 18: `ap-2026-06-19-switch-upload` is 9 days old, `ap-2026-06-17-switch-w25-collab-story` is 4 days old, `ap-2026-06-18-switch-w26-x-post` is 3 days old. June 27 — the date that actually moves July 18 to July 25 if missed — is 6 days out today, not 7. No new buffer is being built; that line was already standing policy as of yesterday.\n\n**4. Nightshade flag, restated, still not urgent.** Re-mix ETA decision is due tomorrow, June 22. One day out. No action needed before it actually arrives — naming it so it isn't a surprise tomorrow.\n\n**5. On the agenda, not mine to decide:** W25 closes today. The cadence tripwire (`t-w25-cadence-decision-tripwire`) is Mnemosyne's procedural call to make today, not mine — flagging it's live, not pre-empting her.\n\n**What I need from you:** still the same two real things — Switch's beat store URL and July 18 publish time, plus your sign-off on the three queue items. Nothing else is blocked on you today.\n\nFull detail: `team/reports/q3-2026-release-calendar.md`."
+    },
     {
       "id": "os-note-hemera-standup-0620",
       "title": "Third consecutive silent day — Homerun fallback now in effect, Switch buffer spent, standing policy set",
@@ -77,24 +85,24 @@
   "reminders": [
     {
       "id": "os-rem-switch-inputs-jun20",
-      "title": "Switch: beat store URL + July 18 publish time still needed — buffer day spent, June 27 is the real wall",
+      "title": "Switch: beat store URL + July 18 publish time still needed — three approvals aging (9/4/3 days), June 27 is the real wall",
       "dayOffset": 0,
       "time": 9.5,
-      "notes": "The June 19 buffer marker passed with zero input. Approval gate (ap-2026-06-19-switch-upload) is today, June 20, formally — but the date that actually protects July 18 is June 27. No further buffer is being rebuilt; this is the hard line now. 7 days of real runway left, not 8."
+      "notes": "Fourth consecutive silent day (Jun 18-21). Queue still has 3 pending items, untouched since June 18: ap-2026-06-19-switch-upload (9 days old), ap-2026-06-17-switch-w25-collab-story (4 days old), ap-2026-06-18-switch-w26-x-post (3 days old). The date that actually protects July 18 is June 27 — 6 days out today, not 7. No further buffer is being rebuilt; that's standing policy, not a new call."
     },
     {
       "id": "os-rem-homerun-video-jun19",
-      "title": "Homerun: fallback now in effect — internal edit, reversible until Nyx starts cutting",
+      "title": "Homerun: fallback in effect since Jun 20 — internal edit, reversible until a concrete production-start trigger fires",
       "dayOffset": 0,
       "time": 9.5,
-      "notes": "Decided by default 2026-06-20 per the pre-announced rule: three consecutive silent days (Jun 18-20), checkpoint reached, fallback now in effect. Internal edit, not commissioned. Still reversible — say so before production starts and a commissioned video preference overrides this. Nyx now owns delivery."
+      "notes": "Decided by default 2026-06-20 per the pre-announced rule. Still reversible today, confirmed: zero footage/render/session clips exist anywhere in the repo. 2026-06-21: the trigger that ends reversibility is now concretely defined (render/export file exists, OR a committed edit-decision artifact locks specific cuts, OR Nyx's task moves doing to review with a linked deliverable) — see team/reports/q3-2026-release-calendar.md, Homerun section. None of those are true yet. A commissioned-video preference from you still overrides the default for free until one is."
     },
     {
       "id": "os-rem-w25-cadence-decision",
-      "title": "Decide: run both W25 X posts or hold one",
+      "title": "W25 closed without a cadence call — still your call, now folded into W26",
       "dayOffset": 0,
       "time": 10.0,
-      "notes": "Nyx's new collab-story X post plus the existing marker post = 2 X posts vs. the arc's planned 1 for W25. Low stakes, no deadline pressure, but needs a call before W25 closes June 21 (run both / swap / hold for W26)."
+      "notes": "W25's posting window closed today (June 21) with the question still unanswered — that's the window closing on schedule, not the question getting resolved. Nyx's collab-story X post (ap-2026-06-17-switch-w25-collab-story, pending, now 4 days old) and the arc's planned marker post for W25 never got a run/swap/hold call from you. Nothing was published, nothing was withdrawn. Carries forward into W26 by default, not by decision — still a thirty-second answer whenever you get to it."
     },
     {
       "id": "os-rem-switch-w26-snippet-export",

@@ -85,6 +85,28 @@ Three weeks after Switch gives each release its own promotional moment. August 8
 on a Saturday, which tends to perform well for melodic/electronic releases (audience is
 online, editorial playlists often update Friday–Saturday).
 
+**2026-06-21 — production-start trigger defined (`t-homerun-production-start-definition`,
+resolved).** Argus flagged on 2026-06-20 that "reversible until Nyx starts production"
+had no concrete, falsifiable trigger — left undefined, the reversibility window could
+quietly narrow later without anyone deciding that on purpose. Confirmed first, not
+assumed: zero footage, zero session clips, zero render exist anywhere in the repo as of
+today (re-checked; zero commits since the 2026-06-20 meeting closed means Nyx's
+2026-06-20 brief — `team/drafts/content/homerun-internal-edit-brief.md` — is still
+accurate word for word). The trigger, concrete and falsifiable: **production starts the
+moment any of the following exists in the repo** — (a) a render or export file for the
+Homerun internal edit (any format, any length, draft or final) under
+`team/drafts/uploads/homerun/` or elsewhere in the repo, (b) a committed edit-decision
+artifact (e.g. an edit list, timeline file, or project file) that fixes path A vs. path B
+and locks specific cuts/timings rather than describing options, or (c) Nyx's task status
+on `t-homerun-video-decision` (or a successor task) moving from `doing` to `review` with
+a linked deliverable. Path A vs. B selection alone, or further brief-writing, does NOT
+count — Nyx's brief explicitly scopes both paths without committing to either, and that
+scoping work is pre-production, not production. Until one of (a)–(c) is true, ISΛRK
+stating a commissioned-video preference still overrides the internal-edit default with
+zero sunk cost. This is the answer to the open question Argus raised; it is not a new
+deadline or new pressure on Nyx — she has not started, and nothing here asks her to
+start before raw material or a direction call exists.
+
 Blockers:
 - Internal edit must be produced and delivered before approximately July 25 to allow
   time for upload, review, and scheduling.
@@ -227,8 +249,25 @@ not a per-incident judgment call.
   June 27 (next line).
 - **June 27: hard line for Switch inputs + approval before July 18 needs re-planning.**
   If unmet, the release moves to July 25 — not a new threat, the same line set June 16,
-  now 7 days out instead of an abstract future date.
-- June 22: Nightshade re-mix ETA decision due.
+  now **6 days out** as of today, 2026-06-21 (was 7 days out as of June 20).
+- June 22: Nightshade re-mix ETA decision due. Not urgent yet — one day out, flagged
+  again at today's standup, no new action needed before it actually arrives.
+
+**2026-06-21 — fourth consecutive silent day, policy held, nothing new escalates.**
+Jun 18, 19, 20, and now 21 have passed with zero commits and zero user input —
+confirmed against `git log` (one commit since the 06-20 meeting closed, the meeting
+commit itself) and `team/state/cursors.json` (still genuinely empty). Checked today's
+facts against the standing third-silent-day policy above, item by item, on purpose:
+Homerun's fallback already activated on June 20 — that is old news being correctly
+*not* re-escalated today, not a fresh trigger. The approvals queue's three items are
+now 9, 4, and 3 days old respectively (`ap-2026-06-19-switch-upload`,
+`ap-2026-06-17-switch-w25-collab-story`, `ap-2026-06-18-switch-w26-x-post`) — aging, but
+aging is not itself a date-moving event; the actual date-moving line is June 27, still
+6 days off. Nothing today crosses the policy's own escalation bar (a fallback newly
+taking effect, or a miss that moves a real release date). So: no new escalation to
+ISΛRK today. This is the policy working as designed on a second consecutive day, not
+the policy lapsing — silence alone does not manufacture urgency where the calendar math
+says there isn't any yet.
 - July 1: Virtual Love chorus status check.
 - August 1: Virtual Love mix received or track moves to Q4.
 - September 1: Nightshade commit-or-Q4 gate.
