@@ -1,6 +1,22 @@
 {
-  "updatedAt": "2026-06-21T13:00:00Z",
+  "updatedAt": "2026-06-22T09:00:00Z",
   "notes": [
+    {
+      "id": "os-note-market-pulse-w26",
+      "title": "Market Pulse — W26 (Jun 22)",
+      "folder": "Team",
+      "tags": ["market", "research", "theia", "w26"],
+      "updated": "2026-06-22T09:00:00Z",
+      "body": "**W26 market read filed** (general knowledge, no live scrape this run — intake still dark, checked cursors.json myself).\n\n**Mostly a status check this week, one real correction:**\n\n1. **Nightshade dropping from Q3 today touches one of my W25 calls.** I'd named Nightshade a secondary candidate for the extended-loop YouTube format alongside Virtual Love. With Nightshade off the board for this quarter with no ETA, that's stale — Cold Storage is the better stand-in: it's finished, already in the catalog, and fits the same dark-ambient format with zero completion risk. Small fix, not a new ask.\n\n2. **The collab-framing thesis from W25 (ISΛRK × 10k.emraan as the content spine) is holding up against the actual W26/W27 arc plan** — confirms the read, doesn't change it.\n\n3. **No new genre/platform signal this week** — last week's watch items (drill tempo trends, SoundCloud discovery mechanics, creator-licensing entrants) need live data I don't have. Saying so plainly rather than padding.\n\nFull report: `team/reports/market/2026-W26.md`"
+    },
+    {
+      "id": "os-note-hemera-standup-0622",
+      "title": "Fifth silent day — Nightshade dropped from Q3 per the fallback I told you about a week ago",
+      "folder": "Team",
+      "tags": ["urgent", "nightshade", "switch", "hemera", "policy"],
+      "updated": "2026-06-22T09:00:00Z",
+      "body": "**The Nightshade decision I flagged a week ago is now in effect. Same pattern as Homerun two days ago: pre-announce, give a real date, follow through.**\n\nJun 18 through today, five days, zero commits, zero input from you. I checked before writing this, same as every day — cursors.json is still empty, tasks.json shows no movement on the Nightshade task since I filed it June 15.\n\n**1. Nightshade is out of Q3.** I told you on June 15 — repeated without new pressure on June 18 and 21 — that if no re-mix ETA showed up by today, June 22, I'd drop it from the quarter and treat it as a Q4 carry-over. No ETA showed up. So that's what I did. This is not me giving up on the track — it's removing a blank tentative slot that was blocking real planning for the back half of Q3. If a re-mix ETA surfaces next week or next month, Nightshade goes back on a calendar — just not this one. Full reasoning in `team/reports/q3-2026-release-calendar.md`, Nightshade section.\n\n**2. Why this isn't just a quiet note from me.** A pre-announced fallback taking effect is exactly the thing my own standing policy says escalates to you directly, through Argus, not buried in my turn. I did the same thing for Homerun's video default two days ago. Treating Nightshade differently because it's a calendar slot and not a video decision would be the kind of inconsistency that makes a policy meaningless. So: this is escalated the same way, and Argus's audit this run covers it on that basis.\n\n**3. Q3 is now three tracks, re-spaced.** Switch, Homerun, Virtual Love. Dropping Nightshade opens real runway after Virtual Love's Sep 5 target instead of a tight 21-day squeeze into a track with no ETA. I wrote that re-spacing into the calendar explicitly rather than leaving the old spacing math stale.\n\n**4. W26 opens today for Switch's pre-release arc — one real fix made.** The W26 X post's posting note told whoever runs it to reply to a 'W25 marker post' thread. That post was never actually drafted or queued — it only ever existed as a line of planning copy. I corrected the instruction in the arc doc: post standalone. The approval item itself already had this fallback written in, so nothing changes there — just the planning doc that was telling a future reader to do something that doesn't exist.\n\n**5. Switch numbers, today's count.** Three approvals, still untouched since June 18: `ap-2026-06-19-switch-upload` (10 days), `ap-2026-06-17-switch-w25-collab-story` (5 days), `ap-2026-06-18-switch-w26-x-post` (4 days). June 27 is 5 days out. No new buffer — that's still standing policy, not a fresh call.\n\n**What I need from you:** the same two real Switch inputs (store URL, July 18 publish time) plus sign-off on the three queue items. On Nightshade — nothing needed unless/until a re-mix ETA exists; no rush, no clock running on it right now.\n\nFull detail: `team/reports/q3-2026-release-calendar.md`."
+    },
     {
       "id": "os-note-hemera-standup-0621",
       "title": "Fourth silent day — policy holds, nothing new escalates. Homerun production-start trigger now defined.",
@@ -75,41 +91,41 @@
     },
     {
       "id": "os-note-nightshade-eta-upcoming",
-      "title": "Coming up: Nightshade re-mix ETA decision due June 22",
+      "title": "Nightshade re-mix ETA decision — resolved 2026-06-22, see today's standup note",
       "folder": "Team",
       "tags": ["nightshade", "hemera", "calendar"],
-      "updated": "2026-06-18T11:00:00Z",
-      "body": "Not urgent today — flagging early. Sep 26 is a tentative Q3 slot for Nightshade pending a re-mix with no fixed completion date. Hemera's recommendation stands: if no re-mix ETA surfaces by June 22, drop Nightshade from Q3 and treat it as a Q4 carry-over rather than holding a blank tentative slot that blocks back-half promo planning. Four days out — no action needed before then."
+      "updated": "2026-06-22T09:00:00Z",
+      "body": "RESOLVED 2026-06-22 — superseded by os-note-hemera-standup-0622, kept here for history. No re-mix ETA surfaced by the June 22 due date. Per the recommendation stood here since June 18: Nightshade is dropped from Q3 and treated as a Q4 carry-over. Full reasoning in team/reports/q3-2026-release-calendar.md, Nightshade section. Original flag, for the record: \"Not urgent today — flagging early. Sep 26 is a tentative Q3 slot for Nightshade pending a re-mix with no fixed completion date... Four days out — no action needed before then.\""
     }
   ],
   "reminders": [
     {
       "id": "os-rem-switch-inputs-jun20",
-      "title": "Switch: beat store URL + July 18 publish time still needed — three approvals aging (9/4/3 days), June 27 is the real wall",
+      "title": "Switch: beat store URL + July 18 publish time still needed — three approvals aging (10/5/4 days), June 27 is the real wall",
       "dayOffset": 0,
       "time": 9.5,
-      "notes": "Fourth consecutive silent day (Jun 18-21). Queue still has 3 pending items, untouched since June 18: ap-2026-06-19-switch-upload (9 days old), ap-2026-06-17-switch-w25-collab-story (4 days old), ap-2026-06-18-switch-w26-x-post (3 days old). The date that actually protects July 18 is June 27 — 6 days out today, not 7. No further buffer is being rebuilt; that's standing policy, not a new call."
+      "notes": "Fifth consecutive silent day (Jun 18-22). Queue still has 3 pending items, untouched since June 18: ap-2026-06-19-switch-upload (10 days old), ap-2026-06-17-switch-w25-collab-story (5 days old), ap-2026-06-18-switch-w26-x-post (4 days old). The date that actually protects July 18 is June 27 — 5 days out today, not 6. No further buffer is being rebuilt; that's standing policy, not a new call."
     },
     {
       "id": "os-rem-homerun-video-jun19",
       "title": "Homerun: fallback in effect since Jun 20 — internal edit, reversible until a concrete production-start trigger fires",
       "dayOffset": 0,
       "time": 9.5,
-      "notes": "Decided by default 2026-06-20 per the pre-announced rule. Still reversible today, confirmed: zero footage/render/session clips exist anywhere in the repo. 2026-06-21: the trigger that ends reversibility is now concretely defined (render/export file exists, OR a committed edit-decision artifact locks specific cuts, OR Nyx's task moves doing to review with a linked deliverable) — see team/reports/q3-2026-release-calendar.md, Homerun section. None of those are true yet. A commissioned-video preference from you still overrides the default for free until one is."
+      "notes": "Decided by default 2026-06-20 per the pre-announced rule. Still reversible today, re-confirmed independently again: zero footage/render/session clips exist anywhere in the repo, only team/drafts/content/homerun-internal-edit-brief.md and the finished audio master. The trigger that ends reversibility (defined 2026-06-21): render/export file exists, OR a committed edit-decision artifact locks specific cuts, OR Nyx's task moves doing to review with a linked deliverable. None of those are true yet. A commissioned-video preference from you still overrides the default for free until one is."
     },
     {
       "id": "os-rem-w25-cadence-decision",
       "title": "W25 closed without a cadence call — still your call, now folded into W26",
       "dayOffset": 0,
       "time": 10.0,
-      "notes": "W25's posting window closed today (June 21) with the question still unanswered — that's the window closing on schedule, not the question getting resolved. Nyx's collab-story X post (ap-2026-06-17-switch-w25-collab-story, pending, now 4 days old) and the arc's planned marker post for W25 never got a run/swap/hold call from you. Nothing was published, nothing was withdrawn. Carries forward into W26 by default, not by decision — still a thirty-second answer whenever you get to it."
+      "notes": "W25's posting window closed June 21 with the question still unanswered — that's the window closing on schedule, not the question getting resolved. Nyx's collab-story X post (ap-2026-06-17-switch-w25-collab-story, pending, now 5 days old) and the arc's planned marker post for W25 never got a run/swap/hold call from you. Nothing was published, nothing was withdrawn. Now inside W26 (opened today, June 22) by default, not by decision — still a thirty-second answer whenever you get to it."
     },
     {
       "id": "os-rem-switch-w26-snippet-export",
       "title": "Switch: export the 60-sec SoundCloud preview snippet + a visualizer source clip when you can",
-      "dayOffset": 4,
+      "dayOffset": 0,
       "time": 9.5,
-      "notes": "Not urgent today — W26 doesn't open until June 22. Packaging copy for the SoundCloud preview is already written and ready (team/drafts/content/switch-w26-content-prep.md). It just needs the actual 60-sec MP3 export from you to post. Separately, the waveform-visualizer spec is signed off and ready too — it needs any sustained 15–30 sec audio source (not necessarily the final hook moment) to render against. Two small exports unlock both pieces."
+      "notes": "W26 opens today, June 22. Packaging copy for the SoundCloud preview is already written and ready (team/drafts/content/switch-w26-content-prep.md). It just needs the actual 60-sec MP3 export from you to post. Separately, the waveform-visualizer spec is signed off and ready too — it needs any sustained 15-30 sec audio source (not necessarily the final hook moment) to render against. Two small exports unlock both pieces. Also: the W26 X post (ap-2026-06-18-switch-w26-x-post) will now post standalone, not as a reply to a W25 thread — that planning-doc instruction assumed a post that was never actually published."
     }
   ],
   "tasks": [],

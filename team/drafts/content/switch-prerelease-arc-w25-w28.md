@@ -12,6 +12,10 @@ per Hemera's handoff, no hook-moment placeholder forced; core blockers unchanged
 waveform visualizer spec reviewed and signed off as ready, W26 X post finalized, SoundCloud
 preview-snippet packaging copy written (see `switch-w26-content-prep.md`); BTS clip and final
 waveform render still hold on user-supplied raw material, not forced; core blockers unchanged
+**updated:** Hemera · 2026-06-22 — corrected the W26 X post's "reply to W25 thread" posting note
+and struck the platform-notes reply-chain strategy line; both assumed a W25 marker post that was
+never independently drafted or queued (Argus's 2026-06-21 audit, §5). W26 opens today; posts go
+out standalone until/unless a real thread-starting post exists. Core blockers unchanged.
 
 ---
 
@@ -117,7 +121,21 @@ energy spikes) and should flag the most probable candidate with a confidence not
 
 **[X] — engagement post**
 - `we made something for the ones who need 186 in the morning.` — no link, no hashtags
-- reply to own thread from W25 X post to keep the thread visible
+- **posting note corrected 2026-06-22 (Hemera, per Argus's 2026-06-21 audit §5):** the
+  original instruction here — "reply to own thread from W25 X post to keep the thread
+  visible" — assumed a W25 marker post (`switch — ISΛRK × 10k.emraan. 186 bpm. c minor.
+  july 18.`) had been independently drafted and queued. It was not. Argus confirmed
+  directly against `approvals/queue.json` and `approvals/archive/`: the only W25 X-post
+  approval artifact that ever existed is `ap-2026-06-17-switch-w25-collab-story`; the
+  "marker post" referenced here and in the platform-notes reply-chain strategy below
+  exists only as embedded copy in this document, never drafted as its own file or
+  queued under its own `ap-` id. There is no published W25 post to reply to, so the
+  reply-chain instruction is not executable as written. **Corrected instruction: post
+  this W26 engagement post standalone.** The approval item itself
+  (`ap-2026-06-18-switch-w26-x-post`) already anticipated this — its own summary
+  includes the fallback "if that W25 post has not yet been published when this is
+  scheduled, post standalone instead" — so the approval text needs no change; only this
+  planning doc's posting note and the reply-chain strategy line below were stale.
 - finished, fact-checked copy and posting notes: see
   `team/drafts/content/switch-w26-content-prep.md` §2 — queued for approval, ready as-is
 
@@ -239,8 +257,14 @@ energy spikes) and should flag the most probable candidate with a confidence not
 
 **X**
 - short, declarative. no threads that go on longer than 2 posts.
-- reply-chain strategy: reply to the W25 post each subsequent week to consolidate the
-  algorithm signal on one thread
+- ~~reply-chain strategy: reply to the W25 post each subsequent week to consolidate the
+  algorithm signal on one thread~~ **struck 2026-06-22 (Hemera):** this assumed a W25
+  marker post existed as its own published thread. It does not — see the W26 X post
+  correction above. Each week's X post should be treated as standalone going forward
+  unless/until a thread-starting post actually gets published and queued in its own
+  right. Revisit this strategy line if the W25 cadence decision (`t-cadence-decision-
+  w25-x-post`, still open, carried into W26) results in the marker post being drafted
+  and published after the fact.
 
 ---
 

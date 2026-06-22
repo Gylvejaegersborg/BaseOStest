@@ -1,20 +1,20 @@
 {
-  "updatedAt": "2026-06-21T13:00:00Z",
+  "updatedAt": "2026-06-22T13:00:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "Confirmed fourth consecutive silent day; verified the standing policy correctly does not escalate anything new today (Homerun fallback is old news, Switch's June 27 line still 6 days out). Resolved her owed t-homerun-production-start-definition — wrote a concrete, falsifiable production-start trigger into the Q3 calendar's Homerun section. Restated Switch's three aging approvals (9/4/3 days) and the Nightshade ETA flag (due tomorrow). Deferred the W25 cadence tripwire to Mnemosyne rather than pre-empting it.",
-      "lastActive": "2026-06-21T09:00:00Z"
+      "task": "Fifth consecutive silent day. Executed the pre-announced Nightshade fallback: rewrote the Nightshade section of the Q3 calendar (dropped from Q3, Q4 carry-over, reversibility stated plainly, summary table row struck, Release Spacing section updated, Q3 Risks item #2 resolved, Next Check-in Points updated). Escalated to ISΛRK directly via Argus's channel. Fixed the W26 X-post posting note in switch-prerelease-arc-w25-w28.md (struck the W25 marker-post reply instruction — never actually drafted/queued — corrected to standalone). Owes, per Argus's 2026-06-22 audit: a one-clause amendment to the standing policy's re-spacing trigger (t-respacing-policy-second-trigger), a citation fix in the Q3 calendar's Nightshade section (t-q3-calendar-nightshade-citation-fix), and a framing correction (her escalation justification equated Nightshade with Homerun's fallback — Argus found that comparison doesn't hold, though the escalation call itself stands).",
+      "lastActive": "2026-06-22T09:00:00Z"
     },
     {
       "id": "aether",
       "name": "Aether",
       "role": "A&R · Sound",
       "status": "idle",
-      "task": "Dark — no intake today, confirmed genuine via empty cursors.json/inbox. Still structurally locked out of Switch hook-moment analysis and the back catalog pending t-retroactive-intake-path (unchanged, user decision).",
+      "task": "Dark — no intake today, confirmed genuine via empty cursors.json/inbox (only audio/.gitkeep). Still structurally locked out of Switch hook-moment analysis and the back catalog pending t-retroactive-intake-path (unchanged, user decision).",
       "lastActive": "2026-06-16T12:00:00Z"
     },
     {
@@ -22,7 +22,7 @@
       "name": "Nyx",
       "role": "Execution · Content",
       "status": "idle",
-      "task": "Re-verified Hemera's claims independently via her own repo search (zero hits for video/render/session-file extensions anywhere) — Homerun brief from yesterday still fully accurate. Confirmed she can honor the new production-start trigger and flagged her own discipline point on condition (c): controls her own task-status flip, won't use it to fake progress. Independently re-confirmed all three approvals still pending, ages matching exactly. Checked for genuinely new unblocked work, found none (W26/W27 already complete, W28 not open until July 6, Homerun needs raw material) — declined to manufacture busywork. Wrote nothing today.",
+      "task": "Endorsed Theia's Cold Storage swap recommendation for t-virtual-love-extended-loop — now superseded: Argus and Mnemosyne independently confirmed Cold Storage has no audioFile field in src/data/beats.ts, identical placeholder state to Nightshade, so the swap claim was wrong. Owes, per Argus's 2026-06-22 audit: finish the W25 marker-post correction in two files her own fix didn't reach (switch-w26-content-prep.md lines 64-80, switch-w25-collab-story-prompt.md lines 26/41/49) — filed as t-switch-arc-marker-post-cleanup.",
       "lastActive": "2026-06-21T10:00:00Z"
     },
     {
@@ -38,24 +38,24 @@
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "idle",
-      "task": "2026-06-21 meeting record closed: cross-checked every claim against the actual files (git log, cursors.json, queue.json, overlay.json, the Q3 calendar, checklist.md, the Homerun brief, the Switch arc doc, approvals/archive/, Argus's report) before writing anything. Closed t-homerun-production-start-definition (done/hemera) and t-w25-cadence-decision-tripwire (done/mnemosyne) — verified the window-closing claim was actually written down today before closing the tripwire on it. Kept t-cadence-decision-w25-x-post open with a dated note distinguishing 'window closed' from 'question answered,' verified directly against the queue and archive rather than copying Argus's claim verbatim. Filed the seventh Argus pipeline audit task. Fixed checklist.md's stale '7 days, not 8' line with a dated correction. Edited os-rem-w25-cadence-decision in place to reflect the post-window reality. Refreshed agents.json for all seven agents. No schema drift, no duplicate ids found.",
-      "lastActive": "2026-06-21T13:00:00Z"
+      "task": "2026-06-22 meeting record closed: re-verified the disputed Cold Storage claim myself by reading src/data/beats.ts directly (confirmed: no audioFile field, sits under the 'Placeholders' section comment, identical to Nightshade) before touching any file. Closed t-nightshade-eta-decision (done) with full resolution detail; filed t-nightshade-q4-reentry for forward tracking (backlog, hemera). Corrected t-virtual-love-extended-loop's notes — did not adopt the Cold Storage swap, stated plainly that neither Nightshade nor Cold Storage has real audio in the repo today. Filed three new tasks from Argus's audit: t-switch-arc-marker-post-cleanup (nyx), t-respacing-policy-second-trigger (hemera), t-q3-calendar-nightshade-citation-fix (hemera). Filed the eighth Argus pipeline audit task. Refreshed agents.json for all seven agents. No schema drift, no duplicate ids found; approvals/queue.json left untouched (not my lane).",
+      "lastActive": "2026-06-22T13:00:00Z"
     },
     {
       "id": "theia",
       "name": "Theia",
       "role": "Market · Research",
       "status": "idle",
-      "task": "No items — verified tasks.json/cursors.json/inbox directly, nothing owed, nothing new, no market item on today's agenda. Next read Monday 2026-06-22. Wrote nothing.",
-      "lastActive": "2026-06-15T09:00:00Z"
+      "task": "Wrote team/reports/market/2026-W26.md — grounded in repo facts (Switch entering W26, three aging approvals, Nightshade's Q3 drop). Recommended swapping Nightshade for Cold Storage as the secondary extended-loop candidate, describing Cold Storage as having 'an audio file path already' — this claim was checked directly against src/data/beats.ts by Argus and independently by Mnemosyne and found false; the task note was corrected, not adopted as written. Declined to manufacture a new genre/trend finding this week. Added os-note-market-pulse-w26 to the overlay.",
+      "lastActive": "2026-06-22T09:00:00Z"
     },
     {
       "id": "argus",
       "name": "Argus",
       "role": "Oversight · Pipeline",
       "status": "idle",
-      "task": "Seventh pipeline audit complete (team/reports/pipeline/2026-06-21.md). Verdict: YELLOW. Verified the standing policy holds on its second consecutive day (cadence flat, escalation split correct, no buffer-rebuild; re-spacing mechanism still untested, no fault of the team). Verified Hemera's production-start trigger is concrete and falsifiable, recommended t-homerun-production-start-definition close clean. Independently re-verified Nyx's, Theia's, Aether's and Hermes's claims directly against the repo and tasks.json. Key finding: tested the W25 cadence tripwire's premise against the actual queue and found the window closing is not the same as the question being answered — the 'W25 marker post' was never independently drafted or queued, confirmed via queue.json and approvals/archive/. Recommended closing the tripwire while keeping the substantive cadence task open. Flagged the checklist.md staleness for Mnemosyne's consolidation pass.",
-      "lastActive": "2026-06-21T11:00:00Z"
+      "task": "Eighth pipeline audit complete (team/reports/pipeline/2026-06-22.md). Verdict: YELLOW. Confirmed Nightshade fallback mechanics are clean (correct trigger, correct date, honest disclosure) but flagged Hemera's escalation framing equates two different categories of fallback (Homerun: path choice on a locked release; Nightshade: removal of an always-tentative track) — escalation call itself still correct, justification is not. Found the W26 arc-doc marker-post fix reached one of three files needing it. Independently confirmed Theia's Cold Storage claim is false by reading src/data/beats.ts directly — no audioFile field, same placeholder state as Nightshade. Flagged two minor one-line fixes for Hemera (calendar citation error, re-spacing policy scope). Schema sweep clean: no violations, no duplicate ids, no premature writes, approvals/queue.json untouched (3 pending, 10/5/4 days old).",
+      "lastActive": "2026-06-22T11:00:00Z"
     }
   ]
 }

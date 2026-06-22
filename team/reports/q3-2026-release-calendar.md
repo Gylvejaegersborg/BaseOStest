@@ -143,31 +143,62 @@ Pre-release tasks:
 ---
 
 ### 4. Nightshade
-**Target: September 26, 2026 (tentative — may slip to Q4)**
-Status: re-mix starting.
-This is the most uncertain track in Q3. A re-mix in progress has no fixed completion
-date. September 26 is the end-of-quarter anchor; if the re-mix is not finished and
-mastered by September 5, the slot moves to Q4 to avoid a rushed release.
+**Status: DROPPED from Q3 — moved to Q4 carry-over. Decided 2026-06-22.**
 
-Blockers:
-- Re-mix completion
+**2026-06-22 — fallback executed, as pre-announced.** This decision was flagged on
+2026-06-15 (`t-nightshade-eta-decision`, due 2026-06-22) and restated without new
+pressure on 2026-06-18 and 2026-06-21: "if no re-mix ETA surfaces by June 22, drop
+Nightshade from Q3 and treat as Q4 carry-over." Today is June 22. Verified directly
+before acting, not assumed: `cursors.json` is still all-empty (`discord: {}`,
+`imap.lastUid: 0`, `copyparty.seenShas: []`), `tasks.json` shows zero movement on
+`t-nightshade-eta-decision` since it was filed, and the only commit since the
+2026-06-21 meeting closed is that meeting's own commit. Fifth consecutive silent day
+(Jun 18–22), zero re-mix ETA surfaced. The pre-announced condition is met exactly as
+stated — not early, not stretched. **Nightshade is removed from the Q3 release
+calendar and treated as a Q4 carry-over with no fixed date.** No re-mix has been
+reported lost or abandoned — this is a scheduling decision, not a creative one. If a
+re-mix ETA surfaces at any point, Nightshade re-enters the calendar at the next
+available slot; nothing about today's decision forecloses that.
+
+**Why this is a date-moving event for a real release, not an internal housekeeping
+note.** Per the standing third-silent-day policy below, anything where a previously
+pre-announced fallback takes effect escalates to ISΛRK directly — same bar Homerun's
+internal-edit default crossed on 2026-06-20. This is the second time that bar has been
+crossed. Treating it as a quiet calendar edit would be inconsistent with how Homerun
+was handled two days ago, and inconsistency in which silences get escalated is its
+own failure mode. Argus's channel carries this to ISΛRK directly this run.
+
+**Reversibility, stated plainly.** This is reversible in substance — a re-mix ETA at
+any future point puts Nightshade back on a calendar, just not this quarter's. It is
+not reversible in the sense of "Q3 still has a fourth track" — that slot is gone for
+this quarter regardless of what happens next, because there is no realistic path back
+to a Sep 26 (or earlier) release from a standing start today. Naming that distinction
+so it isn't read as fully undone-able when it isn't.
+
+Blockers (now Q4, not Q3):
+- Re-mix completion — still no ETA
 - Master
 - Art (status unknown)
 
-Pre-release tasks:
-- Aether: check in on re-mix status once Nightshade enters the intake pipeline
-- Hemera: gate decision — commit or move to Q4 by September 1
+Pre-release tasks (deferred, not active):
+- Aether: check in on re-mix status once Nightshade enters the intake pipeline (still
+  structurally blocked on Discord intake setup, `t-intake-channels`)
+- Hemera: re-open a Q4 slot once a re-mix ETA actually surfaces — no speculative date
+  set today
 
 ---
 
 ## Summary Table
+
+**Q3 is now a 3-track quarter (Nightshade dropped to Q4 carry-over, 2026-06-22 — see
+Nightshade section above).**
 
 | Track        | Target Date    | Status                  | Hard Blocker               |
 |--------------|----------------|-------------------------|----------------------------|
 | Switch       | July 18        | Ready for upload        | None creative              |
 | Homerun      | August 8       | Art + master done       | Video                      |
 | Virtual Love | September 5    | Demo                    | Chorus, then mix + master  |
-| Nightshade   | September 26   | Re-mix in progress      | Re-mix + master + art      |
+| ~~Nightshade~~ | ~~September 26~~ | **Q4 carry-over** | Re-mix has no ETA — moved off Q3 board |
 
 ---
 
@@ -175,22 +206,37 @@ Pre-release tasks:
 
 - Switch → Homerun: 21 days. Sufficient for individual promo cycles.
 - Homerun → Virtual Love: 28 days. Good gap.
-- Virtual Love → Nightshade: 21 days. Tight if both tracks need significant creative work.
+- Virtual Love → end of Q3 (Sep 30): 25 days of open runway with no scheduled release
+  behind it. **This line is new as of 2026-06-22** — dropping Nightshade removes the
+  back-half anchor this spacing used to be measured against. Re-spacing call, made
+  explicitly rather than left implicit: this open runway is not a gap to fill
+  reflexively. It is genuine slack for Virtual Love to slip into if the chorus runs
+  long (its Sep 5 target already carries its own Q4 contingency if the chorus isn't
+  done by Aug 1), and it is also room for Nightshade to return to *if* a re-mix ETA
+  surfaces inside Q3 after all — re-entering this quarter is still possible, just no
+  longer assumed or held open by default. No new track is being scheduled into this
+  space speculatively.
 
 ---
 
 ## Q3 Risks
 
-1. Virtual Love chorus is unknown timeline — this is the most likely track to slip.
-2. Nightshade re-mix has no ETA — treat as Q4 until there is a completion date.
+1. Virtual Love chorus is unknown timeline — this is the most likely track to slip,
+   and is now also the only thing standing between Q3 ending with three releases or
+   two.
+2. ~~Nightshade re-mix has no ETA — treat as Q4 until there is a completion date.~~
+   Resolved 2026-06-22: dropped from Q3, treated as Q4 carry-over per the standing
+   pre-announced fallback. No longer an open risk on this quarter's board.
 3. ~~No video production pipeline is confirmed for Homerun.~~ Resolved 2026-06-20 by
    default fallback: internal edit. Now an execution risk (Nyx delivery timeline), not
    a decision risk.
 4. No Discord intake is live yet (channel IDs outstanding). Aether cannot receive new
-   demos until that is resolved.
+   demos until that is resolved. This also still structurally blocks any future
+   Nightshade re-mix from entering the pipeline even if an ETA does surface.
 5. Switch's one rebuilt buffer day (June 19) passed with no input — see "Standing
    policy: third consecutive silent day" below. July 18 now depends on inputs landing
-   inside the June 20–27 window with no slack day banked.
+   inside the June 20–27 window with no slack day banked. June 27 is **5 days out**
+   as of today, 2026-06-22.
 
 ---
 
@@ -249,9 +295,12 @@ not a per-incident judgment call.
   June 27 (next line).
 - **June 27: hard line for Switch inputs + approval before July 18 needs re-planning.**
   If unmet, the release moves to July 25 — not a new threat, the same line set June 16,
-  now **6 days out** as of today, 2026-06-21 (was 7 days out as of June 20).
-- June 22: Nightshade re-mix ETA decision due. Not urgent yet — one day out, flagged
-  again at today's standup, no new action needed before it actually arrives.
+  now **5 days out** as of today, 2026-06-22 (was 6 days out as of June 21).
+- ~~June 22: Nightshade re-mix ETA decision due.~~ **Resolved 2026-06-22: no ETA
+  surfaced, fallback executed — Nightshade dropped from Q3, Q4 carry-over.** See
+  Nightshade section above. This is the second pre-announced fallback to take effect
+  (after Homerun on June 20) and is being escalated to ISΛRK directly via Argus's
+  channel this run, per the standing policy's own escalation-split rule.
 
 **2026-06-21 — fourth consecutive silent day, policy held, nothing new escalates.**
 Jun 18, 19, 20, and now 21 have passed with zero commits and zero user input —
@@ -268,9 +317,23 @@ taking effect, or a miss that moves a real release date). So: no new escalation 
 ISΛRK today. This is the policy working as designed on a second consecutive day, not
 the policy lapsing — silence alone does not manufacture urgency where the calendar math
 says there isn't any yet.
+
+**2026-06-22 — fifth consecutive silent day, second fallback executed.** Jun 18
+through 22, five days, zero commits and zero user input — confirmed the same way as
+every prior day: `cursors.json` still all-empty, `tasks.json` shows no movement,
+single commit since the prior meeting is that meeting's own. Today is the date
+`t-nightshade-eta-decision` was due. No re-mix ETA surfaced. Per the pre-announced
+rule stated on 2026-06-15 and restated without new pressure on 2026-06-18 and
+2026-06-21, the fallback executes today: **Nightshade drops from Q3, moves to Q4
+carry-over.** This crosses the standing policy's own escalation bar (a pre-announced
+fallback taking effect) exactly the way Homerun's did on June 20 — escalated to
+ISΛRK directly via Argus's channel this run, not just noted here. Switch's June 27
+wall is now 5 days out; still not crossed, correctly not escalated on its own today.
+Release spacing re-spaced explicitly above (Virtual Love → end of Q3 is now open
+runway, not anchored to a Nightshade date) rather than left as a stale three-month-old
+assumption now that the fourth track is gone.
 - July 1: Virtual Love chorus status check.
 - August 1: Virtual Love mix received or track moves to Q4.
-- September 1: Nightshade commit-or-Q4 gate.
 
 ---
 
