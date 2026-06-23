@@ -63,21 +63,22 @@ register exactly.
 
 **Posting notes:**
 - no link, no hashtags — matches the rest of the arc's pre-store-URL discipline
-- reply to ISΛRK's own W25 X thread (the marker post, `switch — ISΛRK × 10k.emraan. 186
-  bpm. c minor. july 18.`) rather than posting standalone — keeps the algorithm signal on
-  one thread per the arc's stated X strategy
+- **post standalone.** There is no W25 marker post — the line `switch — ISΛRK ×
+  10k.emraan. 186 bpm. c minor. july 18.` only ever existed as embedded planning copy in
+  the arc doc, never independently drafted or queued as its own approval artifact
+  (corrected 2026-06-23, per Hemera's 2026-06-22 fix to the arc doc and Argus's
+  2026-06-22 audit, which flagged this file as one of two not yet updated to match).
+  Standalone is the default, not a fallback.
+- minor caveat, not a plan: if a thread-starting W25 post happens to exist and be
+  published by the time this is scheduled, replying into it instead of posting standalone
+  is a fine option — but nothing is being drafted to make that true, and don't wait on it
 - does not reference 10k.emraan directly — W26 is "process" week, the solo-perspective
   beat; the collab voice is W27's job, not this post's
 
 **What this needs vs. doesn't:**
-- does not need: hook-moment timestamp, store URL, publish time, any audio asset
-- needs (already in hand): BPM 186 — confirmed against `src/data/beats.ts`; the W25 thread
-  to reply into — exists once posted (currently queued, not yet published)
-
-One dependency worth naming: this post is written as a reply to the W25 marker post. If
-that W25 post hasn't actually been published by the time this goes out, the reply-chain
-instruction doesn't apply yet — post standalone instead. Not a blocker on drafting it now,
-just a sequencing note for whoever schedules it.
+- does not need: hook-moment timestamp, store URL, publish time, any audio asset, a
+  thread to reply into
+- needs (already in hand): BPM 186 — confirmed against `src/data/beats.ts`
 
 ---
 

@@ -147,8 +147,14 @@ Pre-release tasks:
 
 **2026-06-22 — fallback executed, as pre-announced.** This decision was flagged on
 2026-06-15 (`t-nightshade-eta-decision`, due 2026-06-22) and restated without new
-pressure on 2026-06-18 and 2026-06-21: "if no re-mix ETA surfaces by June 22, drop
-Nightshade from Q3 and treat as Q4 carry-over." Today is June 22. Verified directly
+pressure on 2026-06-21: "if no re-mix ETA surfaces by June 22, drop Nightshade from Q3
+and treat as Q4 carry-over." (Corrected 2026-06-23: this previously also cited
+2026-06-18, but Argus's 2026-06-22 audit checked every overlay note Jun 15–22 directly
+and found the June 18 note — `os-note-hemera-switch-deadline-missed-0618` — contains no
+Nightshade mention at all; it is entirely about the Switch/Homerun items. Only the
+June 21 note actually restates Nightshade. The June 22 checkpoint date itself was
+correct and genuinely undisturbed either way — this is a citation fix in the audit
+trail, not a change to what happened.) Today is June 22. Verified directly
 before acting, not assumed: `cursors.json` is still all-empty (`discord: {}`,
 `imap.lastUid: 0`, `copyparty.seenShas: []`), `tasks.json` shows zero movement on
 `t-nightshade-eta-decision` since it was filed, and the only commit since the
@@ -167,6 +173,14 @@ internal-edit default crossed on 2026-06-20. This is the second time that bar ha
 crossed. Treating it as a quiet calendar edit would be inconsistent with how Homerun
 was handled two days ago, and inconsistency in which silences get escalated is its
 own failure mode. Argus's channel carries this to ISΛRK directly this run.
+
+**Correction, added 2026-06-23 — see the full framing correction below this section.**
+The "same bar" comparison above is the escalation *trigger* (both were pre-announced
+fallbacks, honestly executed on schedule) and that part holds. It is not a claim that
+the two events are equally consequential or alike in kind — Homerun was a path choice
+on a release that never moved; Nightshade removed a track from a slot that was always
+tentative. Read this paragraph as "both met the same procedural trigger," not as "both
+are the same kind of event." Detailed correction below.
 
 **Reversibility, stated plainly.** This is reversible in substance — a re-mix ETA at
 any future point puts Nightshade back on a calendar, just not this quarter's. It is
@@ -235,8 +249,8 @@ Nightshade section above).**
    Nightshade re-mix from entering the pipeline even if an ETA does surface.
 5. Switch's one rebuilt buffer day (June 19) passed with no input — see "Standing
    policy: third consecutive silent day" below. July 18 now depends on inputs landing
-   inside the June 20–27 window with no slack day banked. June 27 is **5 days out**
-   as of today, 2026-06-22.
+   inside the June 20–27 window with no slack day banked. June 27 is **4 days out**
+   as of today, 2026-06-23.
 
 ---
 
@@ -271,6 +285,18 @@ rather than letting each one separately invent its own buffer day. This calendar
 "Next Check-in Points" section below is the single source of truth for re-spaced dates;
 overlay notes and checklists reference it rather than carrying competing dates.
 
+**Second trigger, added 2026-06-23:** re-spacing also applies when a previously
+scheduled item is removed from the calendar, changing what adjacent spacing was
+measured against — not just when deadlines compress together. This is a different
+event shape (recalculation after subtraction, not de-collision), but it gets the same
+treatment: stated explicitly in this calendar's Release Spacing section, in the same
+standup turn, rather than left as a stale assumption pointing at a slot that no longer
+exists. (Added after Argus's 2026-06-22 audit found the Nightshade-removal re-spacing
+done that day used this mechanism's name for an event its original text — written
+2026-06-20, covering only deadline collisions — didn't literally describe. The edit
+itself was sound; the policy's scope is being widened on purpose now, in writing, rather
+than by usage drifting ahead of the text.)
+
 **4. No further buffer-rebuilding by default.** June 19 was the one buffer day this
 team rebuilds for the Switch gate. It is spent. The next miss is a date-moving event
 (July 25), not another internal marker. This is stated here so it is a standing rule,
@@ -295,7 +321,7 @@ not a per-incident judgment call.
   June 27 (next line).
 - **June 27: hard line for Switch inputs + approval before July 18 needs re-planning.**
   If unmet, the release moves to July 25 — not a new threat, the same line set June 16,
-  now **5 days out** as of today, 2026-06-22 (was 6 days out as of June 21).
+  now **4 days out** as of today, 2026-06-23 (was 5 days out as of June 22).
 - ~~June 22: Nightshade re-mix ETA decision due.~~ **Resolved 2026-06-22: no ETA
   surfaced, fallback executed — Nightshade dropped from Q3, Q4 carry-over.** See
   Nightshade section above. This is the second pre-announced fallback to take effect
@@ -332,6 +358,36 @@ wall is now 5 days out; still not crossed, correctly not escalated on its own to
 Release spacing re-spaced explicitly above (Virtual Love → end of Q3 is now open
 runway, not anchored to a Nightshade date) rather than left as a stale three-month-old
 assumption now that the fourth track is gone.
+
+**Framing correction, added 2026-06-23.** Argus's 2026-06-22 audit checked the
+"same bar Homerun's fallback crossed" justification above against how locked each item
+actually was before its fallback fired, and it doesn't hold: Homerun's fallback
+resolved a locked release (date never moved, art + master done) down to a production-
+path choice. Nightshade's fallback removed an entire track from a slot that was always
+tentative — Argus's own 2026-06-15 report called it a "phantom" risk from day one, never
+a locked date. Those are different categories of event even though both were honestly
+pre-announced and executed on schedule. The escalation call itself — routing Nightshade's
+removal to ISΛRK directly via Argus's channel — is still correct on its own terms: a
+quarter losing a quarter of its scheduled output deserves direct attention regardless of
+how locked the slot was. But "consistency with Homerun" was the wrong reason to give for
+it. Correcting the record here rather than re-arguing the point or quietly dropping it.
+
+**2026-06-23 — sixth consecutive silent day, policy holds, nothing new escalates.**
+Jun 18 through 23, six days, zero commits and zero user input — confirmed the same way
+as every prior day: `git log` shows one commit since the 06-22 meeting closed (that
+meeting's own commit), `cursors.json` still all-empty (`discord: {}`, `imap.lastUid: 0`,
+`copyparty.seenShas: []`). Checked today's facts against the standing policy item by
+item: no fallback is newly taking effect today (Homerun's activated June 20, Nightshade's
+June 22 — both already-disclosed history, not fresh triggers), and Switch's June 27 wall
+has not been crossed — it is **4 days out**, not 0. Per the policy's own escalation
+split, that does not cross the bar on its own. The approvals queue's three items are now
+**11, 6, and 5 days old** respectively (`ap-2026-06-19-switch-upload`,
+`ap-2026-06-17-switch-w25-collab-story`, `ap-2026-06-18-switch-w26-x-post`) — aging
+further, but aging alone is not a date-moving event. So: no new escalation today. This
+is the policy working as designed on a third consecutive clean day (after June 21 and
+June 22's fallback-driven exception) — June 27 is close enough now to name plainly at
+standup, even though it does not yet trigger anything beyond the existing reminder
+cadence.
 - July 1: Virtual Love chorus status check.
 - August 1: Virtual Love mix received or track moves to Q4.
 

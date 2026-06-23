@@ -22,23 +22,29 @@ required before it can be queued.
 
 ## why this, why now
 
-the arc's W25 section already has an [X] text-drop post:
-`switch — ISΛRK × 10k.emraan. 186 bpm. c minor. july 18.` — a marker post, not a story.
+the arc's W25 section sketches an [X] text-drop line —
+`switch — ISΛRK × 10k.emraan. 186 bpm. c minor. july 18.` — as a marker post. **that line
+has never been independently drafted or queued; it exists only as embedded planning copy
+in the arc doc, not as a real post or its own approval artifact** (corrected 2026-06-23,
+per Hemera's 2026-06-22 fix and Argus's 2026-06-22 audit, which found this file still
+treating it as a settled, existing thing in three places). nothing below assumes that
+marker post exists or will be posted — this piece stands on its own.
 
-what's missing is the version that makes the collab *itself* the headline, the way Theia's
+what this piece adds is the version that makes the collab *itself* the headline, the way Theia's
 report frames it: "two producers on a 186 bpm drill record is a specific, concrete claim
 that earns attention from the production community before it earns streams from general
-listeners." the existing W27 collab content (graphic + announcement post) does this visually
-in week 3. this piece front-loads the same story in text, in week 1, so the collab framing
-is present from day one of the arc rather than introduced three weeks in. it does not
-replace the W27 beats — it gives the production community something to react to and share
-immediately, which Theia's report identifies as the realistic first audience for Switch.
+listeners." the planned W27 collab content (graphic + announcement post) does this visually
+in week 3. this piece front-loads the same story in text, in week 1, standalone, so the
+collab framing is present from day one of the arc rather than introduced three weeks in.
+it does not replace the W27 beats — it gives the production community something to react to
+and share immediately, which Theia's report identifies as the realistic first audience for
+Switch.
 
 ---
 
 ## copy
 
-### [X] — collab-story post (alternative/companion to the existing W25 marker post)
+### [X] — collab-story post (standalone)
 
 > `two producers. one 186 bpm idea. ISΛRK × 10k.emraan — Switch, july 18.`
 
@@ -46,11 +52,11 @@ reasoning: leads with the collab as a fact before the track name. shorter than a
 longer than a tag. no link — matches the rest of W25's no-link discipline (the arc doesn't
 go live with a link until the store URL exists).
 
-**use instead of, or in addition to, the marker post already in the W25 section** — if
-posting both, separate by at least 2 days so the thread doesn't feel doubled-up. recommend
-running the existing marker post first (day 1) and this one mid-week (day 4–5) as the
-"signal" week's second beat, since the existing X cadence for W25 is only 1 post — see
-note below on cadence.
+**post this standalone — there is no existing W25 marker post to pair it with or follow.**
+the `switch — ISΛRK × 10k.emraan. 186 bpm. c minor. july 18.` line in the arc doc's W25
+section is planning copy only, never drafted or queued as a real post. this piece is the
+W25 "signal" week's X content in its own right, not a companion to something else — see
+note below on cadence if a second, separate X post is later drafted for the week.
 
 ### [IG/TikTok] — caption variant for the producer-tag hook clip (#1), collab-forward version
 
@@ -91,11 +97,13 @@ not a Nyx assumption.
 
 ## cadence note
 
-the arc's current W25 posting cadence is "2 IG/TikTok · 1 X." if both X posts (the existing
-marker post and this collab-story post) run in the same week, that's 2 X posts against a
-planned 1 — a minor cadence change, not a blocker. flagging it here rather than silently
-editing the cadence line in the arc doc; ISΛRK or Hemera can decide whether to run both,
-swap one for the other, or hold the second for W26's X slot.
+the arc's current W25 posting cadence is "2 IG/TikTok · 1 X." this collab-story post is
+that one X post — no pairing assumed, no second post needed to complete it. if a separate
+W25 X post is drafted later (the marker-post line is still just a sketch, not drafted),
+running both in the same week would be 2 X posts against a planned 1 — a minor cadence
+change, not a blocker, and not something to force into existence now. flagging the
+arithmetic here rather than silently editing the cadence line in the arc doc; ISΛRK or
+Hemera can decide later whether a second W25 X post gets drafted at all.
 
 ---
 

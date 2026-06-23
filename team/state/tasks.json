@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-22T13:00:00Z",
+  "updatedAt": "2026-06-23T13:00:00Z",
   "tasks": [
     {
       "id": "t-secrets-setup",
@@ -341,31 +341,42 @@
       "id": "t-switch-arc-marker-post-cleanup",
       "title": "Finish the W25 marker-post correction in the two content files Hemera's fix didn't reach",
       "owner": "nyx",
-      "status": "backlog",
+      "status": "done",
       "createdBy": "argus",
       "createdAt": "2026-06-22T11:00:00Z",
-      "notes": "Hemera's 2026-06-22 fix corrected switch-prerelease-arc-w25-w28.md only. Two more files Nyx authored still assert a W25 'marker post' as a live/existing thing, confirmed by direct grep: (1) team/drafts/content/switch-w26-content-prep.md, lines 64-80 — fallback caveat exists ('if that W25 post hasn't actually been published... post standalone instead') but framed as the exception, default framing still says reply to the marker-post thread; (2) team/drafts/content/switch-w25-collab-story-prompt.md, lines 26/41/49 — references 'the existing marker post' / 'marker post already in the W25 section' three times, no fallback caveat anywhere, most stale of the two. Neither file is queued approval text (ap-2026-06-18-switch-w26-x-post's own summary already has the correct fallback language, confirmed unaffected) — these are planning/production docs, so no urgency, but they should match the arc doc's now-accurate framing: there is no W25 marker post, standalone/no-pairing is the default, not a contingency.",
-      "links": ["team/drafts/content/switch-w26-content-prep.md", "team/drafts/content/switch-w25-collab-story-prompt.md", "team/drafts/content/switch-prerelease-arc-w25-w28.md", "team/reports/pipeline/2026-06-22.md"]
+      "notes": "Done 2026-06-23 (Nyx). Both files corrected to match switch-prerelease-arc-w25-w28.md's framing: there is no W25 marker post, standalone is the default, not a fallback. (1) switch-w26-content-prep.md, posting notes for the W26 X post: flipped default from 'reply to W25 thread' to 'post standalone,' demoted thread-reply to a minor caveat ('if a thread happens to exist by post time'), removed the now-redundant fallback paragraph. (2) switch-w25-collab-story-prompt.md: fixed all three stale references ('the existing marker post' / 'marker post already in the W25 section') plus the cadence note, which also assumed a real second X post to pair against — this piece is now framed as the W25 X post in its own right, not a companion/alternative to something that was never drafted. Neither file is queued approval text; ap-2026-06-18-switch-w26-x-post's own summary already had correct fallback language and was left untouched per the brief. No marker post was fabricated to 'complete' anything — the fix removes the assumption. Closed 2026-06-23 on Mnemosyne's consolidation pass — both files re-read in full independently (not taken on Nyx's or Argus's word alone), confirmed no remaining stale 'marker post exists' assumption in either.",
+      "links": ["team/drafts/content/switch-w26-content-prep.md", "team/drafts/content/switch-w25-collab-story-prompt.md", "team/drafts/content/switch-prerelease-arc-w25-w28.md", "team/reports/pipeline/2026-06-22.md", "team/reports/pipeline/2026-06-23.md"]
     },
     {
       "id": "t-respacing-policy-second-trigger",
       "title": "Amend standing third-silent-day policy, part 3 (re-spacing) — add explicit trigger for items removed from the calendar, not just deadline collisions",
       "owner": "hemera",
-      "status": "backlog",
+      "status": "done",
       "createdBy": "argus",
       "createdAt": "2026-06-22T11:00:00Z",
-      "notes": "Policy text (team/reports/q3-2026-release-calendar.md, 'Standing policy' section, part 3) describes re-spacing only for 'when a silent day causes two or more deadlines to fall within 48 hours of each other.' Today's Release Spacing edit (Virtual Love → end of Q3) was applied under this mechanism's name, but the actual event was a scheduled item (Nightshade) being removed, changing what adjacent spacing was measured against — a different shape of event (recalculation after subtraction) than deadline compression. The edit itself was careful and accurate; the policy's text just doesn't literally cover what it was used for today. Add an explicit second trigger clause: 'or a previously scheduled item is removed, changing what adjacent spacing was measured against.' Keeps the mechanism falsifiable rather than letting 're-spacing' silently broaden by usage.",
+      "notes": "Policy text (team/reports/q3-2026-release-calendar.md, 'Standing policy' section, part 3) described re-spacing only for 'when a silent day causes two or more deadlines to fall within 48 hours of each other.' The June 22 Release Spacing edit (Virtual Love → end of Q3) was applied under this mechanism's name, but the actual event was a scheduled item (Nightshade) being removed, changing what adjacent spacing was measured against — a different shape of event (recalculation after subtraction) than deadline compression. DONE 2026-06-23: added an explicit second trigger clause directly under part 3 in team/reports/q3-2026-release-calendar.md: 're-spacing also applies when a previously scheduled item is removed from the calendar, changing what adjacent spacing was measured against.' States plainly this widens the policy's scope on purpose, in writing, rather than letting it drift by usage.",
       "links": ["team/reports/q3-2026-release-calendar.md", "team/reports/pipeline/2026-06-22.md"]
     },
     {
       "id": "t-q3-calendar-nightshade-citation-fix",
       "title": "Q3 calendar, Nightshade section — fix citation error (restatement dates)",
       "owner": "hemera",
-      "status": "backlog",
+      "status": "done",
       "createdBy": "argus",
       "createdAt": "2026-06-22T11:00:00Z",
-      "notes": "Nightshade section currently states the fallback was 'restated without new pressure on 2026-06-18 and 2026-06-21.' Checked directly against every overlay note between Jun 15-22 (Argus's audit, independently spot-checked): June 18's note (os-note-hemera-switch-deadline-missed-0618) does not mention Nightshade at all — it's entirely about the Switch deadline miss and the Homerun decision. Only June 21's note (os-note-hemera-standup-0621, item 4) actually contains a Nightshade restatement. The June 22 checkpoint date itself is correct and was genuinely undisturbed — this is a citation error in the calendar's own audit trail, not a substantive problem. Fix the sentence to read 'restated on 2026-06-21' or drop the June 18 citation.",
+      "notes": "Nightshade section stated the fallback was 'restated without new pressure on 2026-06-18 and 2026-06-21.' Checked directly against every overlay note between Jun 15-22 (Argus's audit, independently spot-checked): June 18's note (os-note-hemera-switch-deadline-missed-0618) does not mention Nightshade at all — it's entirely about the Switch deadline miss and the Homerun decision. Only June 21's note (os-note-hemera-standup-0621, item 4) actually contains a Nightshade restatement. DONE 2026-06-23: fixed the sentence in team/reports/q3-2026-release-calendar.md to drop the June 18 citation and read 'restated on 2026-06-21,' with a one-line inline note explaining the correction and citing Argus's audit. The June 22 checkpoint date itself was correct and undisturbed either way — this was a citation error in the audit trail, not a substantive change to what happened.",
       "links": ["team/reports/q3-2026-release-calendar.md", "team/reports/pipeline/2026-06-22.md", "team/os/overlay.json"]
+    },
+    {
+      "id": "t-argus-pipeline-audit-0623",
+      "title": "Ninth Argus pipeline health audit",
+      "owner": "argus",
+      "status": "done",
+      "createdBy": "hemera",
+      "createdAt": "2026-06-23T09:00:00Z",
+      "due": "2026-06-23",
+      "notes": "Complete. Report at team/reports/pipeline/2026-06-23.md. Verdict: GREEN — first GREEN in three standups. Independently re-derived the sixth-consecutive-silent-day claim (git log, cursors.json). Checked Hemera's two owed calendar fixes directly against the source notes: citation fix accurate (June 18 note confirmed to not mention Nightshade; June 21 note confirmed to contain the actual restatement), re-spacing second-trigger clause tested for vagueness and found concrete/falsifiable. Confirmed the framing-correction paragraph preserves 'escalation call right, justification wrong' without re-litigating or quietly dropping it — flagged one minor compression (a secondary point of his original finding not carried over, not load-bearing). Made an explicit, reasoned call that Hemera self-closing her two owed tasks same-day (rather than waiting for Mnemosyne's consolidation) is a process positive, not drift, since it was narrowly scoped to tasks she owned and had just verifiably finished, and recommended Mnemosyne's pass simply confirm rather than re-verify from scratch. Read both of Nyx's marker-post cleanup files in full and confirmed all previously-flagged stale references are gone with no fabrication. Independently recomputed queue ages (11/6/5 days) and June 27 distance (4 days out) — matched Hemera's numbers exactly. Full schema/state sweep clean: no duplicate task ids, no premature/out-of-lane writes, approvals/queue.json untouched (3 pending), cursors/inbox genuinely empty, library/beats.json unchanged. Filed zero new tasks — first time in nine audits.",
+      "links": ["team/reports/pipeline/2026-06-23.md"]
     }
   ]
 }

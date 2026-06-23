@@ -1,6 +1,14 @@
 {
-  "updatedAt": "2026-06-22T09:00:00Z",
+  "updatedAt": "2026-06-23T09:00:00Z",
   "notes": [
+    {
+      "id": "os-note-hemera-standup-0623",
+      "title": "Sixth silent day — policy holds, nothing new to escalate. June 27 is 4 days out.",
+      "folder": "Team",
+      "tags": ["switch", "hemera", "policy"],
+      "updated": "2026-06-23T09:00:00Z",
+      "body": "**Short one today. Six days of silence (Jun 18-23), and deliberately nothing new to escalate.** Checked before writing this, same as every day: git log shows one commit since yesterday's meeting closed (that meeting's own), cursors.json is still all-empty.\n\n**1. Nothing crosses the escalation bar today.** No fallback is newly taking effect — Homerun's activated June 20, Nightshade's June 22, both already-told-you history, not fresh today. Switch's June 27 wall has not been crossed. That's the actual test, not how many days have passed.\n\n**2. June 27 is worth naming plainly even though it isn't urgent yet.** It's 4 days out now, not 5. If the beat store URL, the July 18 publish time, and your sign-off on the three queue items land by then, July 18 stays on schedule. If June 27 passes with nothing, July 18 needs re-planning to July 25 — that's the real, mechanical line, not a soft one.\n\n**3. Queue ages today: 11 / 6 / 5 days.** `ap-2026-06-19-switch-upload` (11 days), `ap-2026-06-17-switch-w25-collab-story` (6 days), `ap-2026-06-18-switch-w26-x-post` (5 days). All three still pending, untouched since June 18.\n\n**4. Two corrections I owe the record, from Argus's audit two days ago.** First: I'd written the re-spacing policy's part 3 as if it only needed to cover deadline collisions — Argus found I'd used that same mechanism's name for a different event (Nightshade being removed from the calendar, not two deadlines colliding). Added an explicit second trigger clause to the policy text covering item-removal. Second, and this one I want to say plainly rather than slide past: I justified escalating Nightshade's removal by calling it 'the same bar Homerun's fallback crossed.' That comparison doesn't hold — Homerun was a path choice on a release that was never in doubt; Nightshade removed a track from a slot that was always tentative, never locked, per Argus's own June 15 report. The decision to escalate was still right. The reason I gave for it wasn't. Both fixes are in `team/reports/q3-2026-release-calendar.md` now.\n\n**What I need from you:** the same two Switch inputs (store URL, July 18 publish time) and sign-off on the three queue items, with June 27 now genuinely close. Nothing else needs a decision from you today.\n\nFull detail: `team/reports/q3-2026-release-calendar.md`."
+    },
     {
       "id": "os-note-market-pulse-w26",
       "title": "Market Pulse — W26 (Jun 22)",
@@ -101,10 +109,10 @@
   "reminders": [
     {
       "id": "os-rem-switch-inputs-jun20",
-      "title": "Switch: beat store URL + July 18 publish time still needed — three approvals aging (10/5/4 days), June 27 is the real wall",
+      "title": "Switch: beat store URL + July 18 publish time still needed — three approvals aging (11/6/5 days), June 27 is the real wall",
       "dayOffset": 0,
       "time": 9.5,
-      "notes": "Fifth consecutive silent day (Jun 18-22). Queue still has 3 pending items, untouched since June 18: ap-2026-06-19-switch-upload (10 days old), ap-2026-06-17-switch-w25-collab-story (5 days old), ap-2026-06-18-switch-w26-x-post (4 days old). The date that actually protects July 18 is June 27 — 5 days out today, not 6. No further buffer is being rebuilt; that's standing policy, not a new call."
+      "notes": "Sixth consecutive silent day (Jun 18-23). Queue still has 3 pending items, untouched since June 18: ap-2026-06-19-switch-upload (11 days old), ap-2026-06-17-switch-w25-collab-story (6 days old), ap-2026-06-18-switch-w26-x-post (5 days old). The date that actually protects July 18 is June 27 — 4 days out today, not 5. No further buffer is being rebuilt; that's standing policy, not a new call."
     },
     {
       "id": "os-rem-homerun-video-jun19",
@@ -118,7 +126,7 @@
       "title": "W25 closed without a cadence call — still your call, now folded into W26",
       "dayOffset": 0,
       "time": 10.0,
-      "notes": "W25's posting window closed June 21 with the question still unanswered — that's the window closing on schedule, not the question getting resolved. Nyx's collab-story X post (ap-2026-06-17-switch-w25-collab-story, pending, now 5 days old) and the arc's planned marker post for W25 never got a run/swap/hold call from you. Nothing was published, nothing was withdrawn. Now inside W26 (opened today, June 22) by default, not by decision — still a thirty-second answer whenever you get to it."
+      "notes": "W25's posting window closed June 21 with the question still unanswered — that's the window closing on schedule, not the question getting resolved. Nyx's collab-story X post (ap-2026-06-17-switch-w25-collab-story, pending, now 6 days old) and the arc's planned marker post for W25 never got a run/swap/hold call from you. Nothing was published, nothing was withdrawn. Inside W26 by default, not by decision — still a thirty-second answer whenever you get to it."
     },
     {
       "id": "os-rem-switch-w26-snippet-export",
