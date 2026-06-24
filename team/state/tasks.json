@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-23T13:00:00Z",
+  "updatedAt": "2026-06-24T13:00:00Z",
   "tasks": [
     {
       "id": "t-secrets-setup",
@@ -377,6 +377,35 @@
       "due": "2026-06-23",
       "notes": "Complete. Report at team/reports/pipeline/2026-06-23.md. Verdict: GREEN — first GREEN in three standups. Independently re-derived the sixth-consecutive-silent-day claim (git log, cursors.json). Checked Hemera's two owed calendar fixes directly against the source notes: citation fix accurate (June 18 note confirmed to not mention Nightshade; June 21 note confirmed to contain the actual restatement), re-spacing second-trigger clause tested for vagueness and found concrete/falsifiable. Confirmed the framing-correction paragraph preserves 'escalation call right, justification wrong' without re-litigating or quietly dropping it — flagged one minor compression (a secondary point of his original finding not carried over, not load-bearing). Made an explicit, reasoned call that Hemera self-closing her two owed tasks same-day (rather than waiting for Mnemosyne's consolidation) is a process positive, not drift, since it was narrowly scoped to tasks she owned and had just verifiably finished, and recommended Mnemosyne's pass simply confirm rather than re-verify from scratch. Read both of Nyx's marker-post cleanup files in full and confirmed all previously-flagged stale references are gone with no fabrication. Independently recomputed queue ages (11/6/5 days) and June 27 distance (4 days out) — matched Hemera's numbers exactly. Full schema/state sweep clean: no duplicate task ids, no premature/out-of-lane writes, approvals/queue.json untouched (3 pending), cursors/inbox genuinely empty, library/beats.json unchanged. Filed zero new tasks — first time in nine audits.",
       "links": ["team/reports/pipeline/2026-06-23.md"]
+    },
+    {
+      "id": "t-respacing-policy-prewall-checkpoint",
+      "title": "Standing third-silent-day policy — add a pre-wall checkpoint so the escalation bar isn't purely binary as a real wall closes in",
+      "owner": "hemera",
+      "status": "done",
+      "createdBy": "hemera",
+      "createdAt": "2026-06-24T09:00:00Z",
+      "notes": "Self-filed and closed same-day. Seventh consecutive silent day, June 27 wall at 3 days out, three approvals aging 6-12 days untouched since June 18 — the standing policy's escalation bar (part 2: fires only when a fallback activates or a wall is actually crossed) was correctly not crossed today, but a purely binary bar risks the wall just arriving rather than being watched as it closes in. Added part 5 ('Pre-wall checkpoint') to team/reports/q3-2026-release-calendar.md's standing policy: June 26, the day before the wall, is now the named point where standup tone sharpens from 'named plainly' to 'this is the final day before re-planning,' if still silent. Does not move June 27, does not lower the part 2 bar — sharpens the approach to an existing line, stated as a deliberate addition rather than scope creep. Also fixed a stale day-count Hemera found while verifying: team/drafts/uploads/switch/checklist.md's June 27 countdown had drifted (last updated June 21, said '6 days, not 7') — corrected to match today's actual 3-days-out count.",
+      "links": [
+        "team/reports/q3-2026-release-calendar.md",
+        "team/drafts/uploads/switch/checklist.md",
+        "team/os/overlay.json"
+      ]
+    },
+    {
+      "id": "t-w26-x-post-queue-summary-default-inversion",
+      "title": "ap-2026-06-18-switch-w26-x-post's queue summary still frames standalone posting as the fallback, not the default — out of sync with the corrected content file",
+      "owner": "hemera",
+      "status": "backlog",
+      "createdBy": "argus",
+      "createdAt": "2026-06-24T11:00:00Z",
+      "notes": "Nyx flagged this today (did not fix it, correctly declined to edit a pending queue item's summary text herself — the README's approvals contract only lets agents append pending items, not edit existing ones). I checked it directly: approvals/queue.json's ap-2026-06-18-switch-w26-x-post summary still reads 'reply to the existing W25 marker-post thread... if that W25 post has not yet been published when this is scheduled, post standalone instead' — reply-chain is written as the primary instruction, standalone as the conditional fallback. team/drafts/content/switch-w26-content-prep.md was corrected on 2026-06-23 to the opposite emphasis: 'post standalone. There is no W25 marker post... Standalone is the default, not a fallback,' with the thread-reply option demoted to 'a minor caveat, not a plan.' Both land on the same practical action today (there is no marker post, so post standalone either way) — this is NOT a case where approving the queue item as worded would cause a wrong action, because the conditional in the queue summary already correctly degrades to standalone when its premise (a published W25 post) is false, which it is. So this is not urgent and does not block approval. But it is a real, checkable inconsistency in framing between the one artifact the README calls the authoritative 'what will happen if approved' text and its own linked draft path, and it's been sitting since Hemera's 2026-06-22 partial fix only corrected the planning arc doc, not the queue summary itself. Fix needs a human decision, not a unilateral agent edit: per the README, no agent may edit a pending queue item's fields directly — only append new pending items. Options for whoever owns this (recommend Hemera, since she owns the calendar/queue-adjacent corrections and made the original 06-22 partial fix): (a) leave it, since the practical outcome is identical and the item may resolve via team-publish before it matters, or (b) supersede it — append a corrected replacement entry and have ISΛRK reject the stale one via the publish workflow, which is the only schema-legal way to change pending queue text. Either is defensible; what isn't defensible is leaving the inconsistency unrecorded, which is what this task fixes.",
+      "links": [
+        "team/approvals/queue.json",
+        "team/drafts/content/switch-w26-content-prep.md",
+        "team/drafts/content/switch-prerelease-arc-w25-w28.md",
+        "team/reports/pipeline/2026-06-24.md"
+      ]
     }
   ]
 }

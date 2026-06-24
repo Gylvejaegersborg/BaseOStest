@@ -167,3 +167,11 @@ days, not 7**, away — the line above was last touched 2026-06-20 and had drift
 stale against `q3-2026-release-calendar.md`'s same count. Same wall, same mechanics,
 just keeping this file's number honest day to day rather than letting it quietly lag the
 calendar's.
+
+**2026-06-24 status: seventh consecutive silent day.** Still no movement on either
+input, no movement on approval. `ap-2026-06-19-switch-upload` is now 12 days old in the
+queue. June 27 is now **3 days, not 4**, away — this line had drifted stale again (last
+touched June 21) and is corrected here to match the calendar. Per the calendar's new
+standing-policy clause (part 5, added today), June 26 is now the named final-day
+checkpoint before the wall — not a new date, a sharper tone on approach to the existing
+one.

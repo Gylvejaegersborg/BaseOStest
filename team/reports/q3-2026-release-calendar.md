@@ -249,8 +249,9 @@ Nightshade section above).**
    Nightshade re-mix from entering the pipeline even if an ETA does surface.
 5. Switch's one rebuilt buffer day (June 19) passed with no input — see "Standing
    policy: third consecutive silent day" below. July 18 now depends on inputs landing
-   inside the June 20–27 window with no slack day banked. June 27 is **4 days out**
-   as of today, 2026-06-23.
+   inside the June 20–27 window with no slack day banked. June 27 is **3 days out**
+   as of today, 2026-06-24 — see the new pre-wall checkpoint added to the standing
+   policy below.
 
 ---
 
@@ -302,6 +303,22 @@ team rebuilds for the Switch gate. It is spent. The next miss is a date-moving e
 (July 25), not another internal marker. This is stated here so it is a standing rule,
 not a per-incident judgment call.
 
+**5. Pre-wall checkpoint, added 2026-06-24.** The escalation bar in part 2 is binary —
+it fires exactly when a fallback activates or a wall is actually crossed, nothing in
+between. That was fine when deadlines were freshly spaced with real buffer ahead of
+them. It stops being enough once a wall is genuinely close and nothing has moved in a
+week: seven consecutive silent days as of today, three approvals aging 6–12 days
+untouched since June 18, and June 27 now three days out. A team that only speaks up at
+the instant of crossing risks the wall arriving as a surprise rather than something
+watched. So: this does not move June 27, and it does not lower the bar in part 2 — it
+adds one fixed checkpoint inside the existing window. **June 26 — the day before the
+wall — is the last point where the standup tone is "this is the final day before July
+18 needs re-planning," distinct from June 27 itself (the day the date actually moves).**
+If June 26 arrives still silent, that line gets said plainly and directly, not folded
+into the same "naming it plainly" register used since June 21. This is a sharpening of
+how the existing bar is announced on approach, not a new bar and not an early trigger —
+the rule in part 2 (fallback activating, or wall actually crossed) is unchanged.
+
 ---
 
 ## Next Check-in Points
@@ -321,7 +338,9 @@ not a per-incident judgment call.
   June 27 (next line).
 - **June 27: hard line for Switch inputs + approval before July 18 needs re-planning.**
   If unmet, the release moves to July 25 — not a new threat, the same line set June 16,
-  now **4 days out** as of today, 2026-06-23 (was 5 days out as of June 22).
+  now **3 days out** as of today, 2026-06-24 (was 4 days out as of June 23). **June 26
+  is now the named pre-wall checkpoint** — see the standing policy's new part 5, added
+  today.
 - ~~June 22: Nightshade re-mix ETA decision due.~~ **Resolved 2026-06-22: no ETA
   surfaced, fallback executed — Nightshade dropped from Q3, Q4 carry-over.** See
   Nightshade section above. This is the second pre-announced fallback to take effect
@@ -388,6 +407,25 @@ is the policy working as designed on a third consecutive clean day (after June 2
 June 22's fallback-driven exception) — June 27 is close enough now to name plainly at
 standup, even though it does not yet trigger anything beyond the existing reminder
 cadence.
+
+**2026-06-24 — seventh consecutive silent day, policy holds, pre-wall checkpoint added.**
+Jun 18 through 24, seven days, zero commits and zero user input — confirmed directly,
+not assumed: `git log` shows one commit since the 06-23 meeting closed (that meeting's
+own commit), `cursors.json` still all-empty. Checked today's facts against the standing
+policy: no fallback is newly taking effect (Homerun's and Nightshade's remain prior
+history), and June 27 has not been crossed — it is **3 days out**, not 0. By the
+policy's literal text, that still does not cross the bar. But three days out, after a
+full week of silence and with all three queue items aging 6–12 days untouched since
+June 18, is the point where a binary bar (silent until the exact instant of crossing)
+stops being the right shape on its own — see the new "Pre-wall checkpoint" clause (part
+5) added to the standing policy above today. **June 26 is now the named final-day
+checkpoint** before June 27's wall; today is not that day, so today's tone stays at
+"named plainly," consistent with the policy as it now reads. Homerun: re-checked
+directly against the repo (no `team/drafts/uploads/homerun/` directory exists, no
+render/export file, no edit-decision artifact; `t-homerun-video-decision` is still
+`doing`, not `review`) — none of the three 2026-06-21 production-start triggers have
+fired. The reversibility window is unchanged and still genuinely open; nothing about
+today's silence narrows it, since nothing has been produced to make it narrower.
 - July 1: Virtual Love chorus status check.
 - August 1: Virtual Love mix received or track moves to Q4.
 

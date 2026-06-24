@@ -1,13 +1,13 @@
 {
-  "updatedAt": "2026-06-23T13:00:00Z",
+  "updatedAt": "2026-06-24T13:00:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "Sixth consecutive silent day. Verified via git log and cursors.json; nothing crosses the standing policy's escalation bar (June 27 is 4 days out, not 0). Closed her two owed tasks from Argus's 2026-06-22 audit: added an explicit second trigger clause to the standing policy's re-spacing mechanism (item-removal, not just deadline collision — t-respacing-policy-second-trigger) and fixed the Nightshade-section citation error (t-q3-calendar-nightshade-citation-fix), both in team/reports/q3-2026-release-calendar.md. Wrote a framing-correction paragraph: her 2026-06-22 claim equating Nightshade's removal with Homerun's fallback was wrong (different categories — locked-release path choice vs. always-tentative track removal), though the escalation call itself was right. Self-closed both owed tasks in tasks.json same-day, verified independently by Argus and Mnemosyne. Added overlay note os-note-hemera-standup-0623, updated three reminders.",
-      "lastActive": "2026-06-23T09:00:00Z"
+      "task": "Seventh consecutive silent day. Verified via git log and cursors.json; June 27 wall 3 days out, escalation bar not crossed. Added standing-policy part 5 (pre-wall checkpoint at June 26) to team/reports/q3-2026-release-calendar.md and fixed a stale day-count in checklist.md. Self-filed and self-closed t-respacing-policy-prewall-checkpoint same-turn — verified by Argus and Mnemosyne; Argus flagged the self-file-and-close shape as worth watching going forward, not undoing. Added overlay note os-note-hemera-standup-0624, refreshed four reminders in place. Owes a call on t-w26-x-post-queue-summary-default-inversion (Argus's filing today).",
+      "lastActive": "2026-06-24T09:00:00Z"
     },
     {
       "id": "aether",
@@ -15,15 +15,15 @@
       "role": "A&R · Sound",
       "status": "idle",
       "task": "Dark — no intake today, confirmed genuine via empty cursors.json/inbox. Still structurally locked out of Switch hook-moment analysis and the back catalog pending t-retroactive-intake-path (unchanged, user decision).",
-      "lastActive": "2026-06-23T09:00:00Z"
+      "lastActive": "2026-06-24T09:00:00Z"
     },
     {
       "id": "nyx",
       "name": "Nyx",
       "role": "Execution · Content",
       "status": "idle",
-      "task": "Closed t-switch-arc-marker-post-cleanup. Edited switch-w26-content-prep.md (W26 X post now defaults to standalone, thread-reply demoted to a minor caveat) and switch-w25-collab-story-prompt.md (all stale 'existing marker post' references and the cadence note corrected) — both verified clean by Argus and Mnemosyne, no remaining stale assumption. Did not touch ap-2026-06-18-switch-w26-x-post (already correct). t-virtual-love-extended-loop, t-switch-upload-package, t-switch-prerelease-arc all unchanged, still blocked on beat store URL, July 18 publish time, and Aether's hook-moment timestamp.",
-      "lastActive": "2026-06-23T10:00:00Z"
+      "task": "Re-verified Homerun directly against the repo — zero footage/render/session material, no production-start trigger fired, t-homerun-video-decision stays doing. Flagged but correctly did not fix the ap-2026-06-18-switch-w26-x-post queue-summary vs. content-file framing mismatch (out of lane per README — agents may only append pending items). Made zero file edits today; no genuinely unblocked work existed. t-virtual-love-extended-loop, t-switch-upload-package, t-switch-prerelease-arc all unchanged, still blocked on beat store URL, July 18 publish time, and Aether's hook-moment timestamp.",
+      "lastActive": "2026-06-24T10:00:00Z"
     },
     {
       "id": "hermes",
@@ -31,22 +31,22 @@
       "role": "Booking · Outreach",
       "status": "idle",
       "task": "Dark — no messages today, confirmed genuine via empty cursors.json/inbox. IMAP and Discord intake still unconfigured; t-intake-channels unchanged.",
-      "lastActive": "2026-06-23T09:00:00Z"
+      "lastActive": "2026-06-24T09:00:00Z"
     },
     {
       "id": "mnemosyne",
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "idle",
-      "task": "2026-06-23 meeting record closed. Independently verified, before writing anything: both of Hemera's calendar edits (re-spacing second trigger, citation fix) are real and accurate against team/reports/q3-2026-release-calendar.md; both of Nyx's content-file edits are real and contain no remaining stale marker-post assumption; queue ages (11/6/5 days) and June 27 distance (4 days out) recomputed independently and match. Closed t-switch-arc-marker-post-cleanup (review to done). Confirmed Hemera's two self-closures (t-respacing-policy-second-trigger, t-q3-calendar-nightshade-citation-fix) stand as done. Filed t-argus-pipeline-audit-0623 to record the ninth audit. Filed nothing else new — agree with Argus's zero-new-tasks finding, no schema drift or stale shape found anywhere touched today. Refreshed agents.json for all seven agents. library/beats.json unchanged (zero intake, twelfth consecutive day) — left as-is.",
-      "lastActive": "2026-06-23T13:00:00Z"
+      "task": "2026-06-24 meeting record closed. Independently verified before writing anything: Hemera's calendar part-5 edit and checklist.md day-count fix are real and accurate; her self-filed-and-closed task (t-respacing-policy-prewall-checkpoint) checks out against the files it claims; Nyx's zero-file-edit claim and the queue/content-file framing gap she flagged are both confirmed real; Argus's tenth audit (GREEN) and his new task filing (t-w26-x-post-queue-summary-default-inversion, owner hemera) verified against source documents. Queue ages (12/7/6 days) and June 27 distance (3 days out) recomputed independently and match. Judged Argus's process-shape observation (self-file-and-close vs. closing a task someone else flagged) does not need its own tracked task — no guardrail or deliverable requested, recorded plainly in the meeting minutes instead. Refreshed agents.json for all seven agents. library/beats.json unchanged (zero intake, thirteenth consecutive day) — left as-is.",
+      "lastActive": "2026-06-24T13:00:00Z"
     },
     {
       "id": "theia",
       "name": "Theia",
       "role": "Market · Research",
       "status": "idle",
-      "task": "No turn today — Tuesday, weekly market read is Monday-only and no fresh agenda item to react to. Confirmed genuine: no new file under team/reports/market/ since 2026-W26.md.",
+      "task": "No turn today — not Monday, weekly market read is Monday-only and no fresh agenda item to react to. Confirmed genuine: no new file under team/reports/market/ since 2026-W26.md.",
       "lastActive": "2026-06-22T09:00:00Z"
     },
     {
@@ -54,8 +54,8 @@
       "name": "Argus",
       "role": "Oversight · Pipeline",
       "status": "idle",
-      "task": "Ninth pipeline audit complete (team/reports/pipeline/2026-06-23.md). Verdict: GREEN — first GREEN in three standups. Independently re-verified the sixth-silent-day claim, both of Hemera's calendar fixes, the framing-correction paragraph (genuine, one minor non-load-bearing compression noted), both of Nyx's file edits (complete, no fabrication), and queue ages/June 27 distance (exact match). Called Hemera's same-day self-closure of her two owed tasks a process positive, not drift, since narrowly scoped to her own freshly-finished work. Full schema/state sweep clean — no duplicate ids, no premature writes, approvals/queue.json untouched (3 pending). Filed zero new tasks — first time in nine audits.",
-      "lastActive": "2026-06-23T11:00:00Z"
+      "task": "Tenth pipeline audit complete (team/reports/pipeline/2026-06-24.md). Verdict: GREEN. Independently re-confirmed the seventh-silent-day claim via file-state cross-checks. Tested Hemera's new pre-wall-checkpoint clause against both failure modes it claims to avoid and found it clean. Verified her task self-closure and file edits, but flagged a process-shape distinction (self-identified-filed-and-closed in one motion vs. closing a task someone else already flagged) — work stands, wants the shape to stay rare. Investigated and confirmed Nyx's flagged queue/content-file gap is real but non-blocking; filed t-w26-x-post-queue-summary-default-inversion (owner hemera). Full schema sweep clean.",
+      "lastActive": "2026-06-24T11:00:00Z"
     }
   ]
 }
