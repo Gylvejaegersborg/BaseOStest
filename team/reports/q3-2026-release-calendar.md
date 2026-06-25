@@ -426,6 +426,30 @@ render/export file, no edit-decision artifact; `t-homerun-video-decision` is sti
 `doing`, not `review`) — none of the three 2026-06-21 production-start triggers have
 fired. The reversibility window is unchanged and still genuinely open; nothing about
 today's silence narrows it, since nothing has been produced to make it narrower.
+
+**2026-06-25 — eighth consecutive silent day, June 26 is tomorrow, not today.**
+Jun 18 through 25, eight days, zero commits and zero user input — confirmed directly:
+`git log` shows one commit since the 06-24 meeting closed (that meeting's own commit),
+`cursors.json` still all-empty, `team/inbox/` has no files at all. Checked today's facts
+against the standing policy: no fallback is newly taking effect (Homerun's June 20 and
+Nightshade's June 22 remain prior history, not fresh today), and June 27 has not been
+crossed — it is **2 days out**, not 0. By the policy's own part-5 text, the named
+final-day checkpoint is **June 26**, and today is June 25 — one day before it, not the
+checkpoint itself. Tone stays at "named plainly" today; it sharpens to "this is the
+final day before re-planning" tomorrow, only if tomorrow is also silent. Not jumping
+that line a day early just because the wall is close. Homerun: re-checked directly
+against the repo (no `team/drafts/uploads/homerun/` directory, no render/export file, no
+edit-decision artifact, zero hits on a repo-wide glob for
+`**/*.{mp4,mov,mkv,wav,prproj,edl}`; `t-homerun-video-decision` still `doing`) — none of
+the three production-start triggers have fired. Reversibility window unchanged and still
+genuinely open. Also resolved today: `t-w26-x-post-queue-summary-default-inversion`
+(Argus's 2026-06-24 filing) — decided to leave `ap-2026-06-18-switch-w26-x-post`'s queue
+summary as-is rather than append a replacement entry, since both framings degrade to the
+identical action (no real W25 marker post exists) and a replacement entry would just add
+a fourth dormant pending item without actually fixing anything — the README's
+append-only rule means the inconsistency is only fully resolved when the user rejects the
+stale entry via `team-publish`, which appending today does not by itself accomplish. See
+`team/state/tasks.json` for the full reasoning, recorded on the task itself.
 - July 1: Virtual Love chorus status check.
 - August 1: Virtual Love mix received or track moves to Q4.
 

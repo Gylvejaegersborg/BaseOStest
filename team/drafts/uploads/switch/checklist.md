@@ -175,3 +175,9 @@ touched June 21) and is corrected here to match the calendar. Per the calendar's
 standing-policy clause (part 5, added today), June 26 is now the named final-day
 checkpoint before the wall — not a new date, a sharper tone on approach to the existing
 one.
+
+**2026-06-25 status: eighth consecutive silent day.** Still no movement on either input,
+no movement on approval. `ap-2026-06-19-switch-upload` is now 13 days old in the queue.
+June 27 is now **2 days, not 3**, away — corrected here to match the calendar. June 26
+(tomorrow) is the named pre-wall checkpoint from part 5 — today is one day before it,
+tone stays at "named plainly."
