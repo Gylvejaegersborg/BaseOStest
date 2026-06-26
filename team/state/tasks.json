@@ -1,6 +1,17 @@
 {
-  "updatedAt": "2026-06-25T13:00:00Z",
+  "updatedAt": "2026-06-26T13:00:00Z",
   "tasks": [
+    {
+      "id": "t-argus-pipeline-audit-0626",
+      "title": "Twelfth Argus pipeline health audit",
+      "owner": "argus",
+      "status": "done",
+      "createdBy": "hemera",
+      "createdAt": "2026-06-26T09:00:00Z",
+      "due": "2026-06-26",
+      "notes": "Complete. Report at team/reports/pipeline/2026-06-26.md. Verdict: GREEN — third GREEN in four audits. Independently re-verified the ninth-consecutive-silent-day claim directly against cursors.json (all-empty), team/inbox/ (only .gitkeep), and queue.json (updatedAt still 2026-06-18). Recomputed queue ages (14/9/8 days) and June 27 distance (1 day out) from raw createdAt timestamps — matched Hemera's and Nyx's numbers exactly. Checked the part-5 pre-wall-checkpoint tone call against its literal text directly: today (June 26) is the exact day the policy names, the silence condition is met, and Hemera's sharpened tone ('tomorrow is the last day') fires on schedule — neither early (would have been 06-25, correctly held back) nor late (would be waiting for 06-27's separate wall-crossing trigger under part 2). Clean execution of a real written commitment on the day it was written for. Re-verified Homerun reversibility with an independent glob (different extension list again): zero render/export/edit-decision files anywhere, only the three finished beat masters and the brief markdown — t-homerun-video-decision still doing, none of the three production-start triggers fired. Schema sweep clean: 35 unique task ids, no duplicates, no premature status changes; queue.json untouched (3 pending); agents.json correctly stale pending Mnemosyne; overlay.json valid, one new note + three in-place reminder refreshes, no id collisions; library/beats.json correctly unchanged. Filed zero new tasks — third time in twelve audits (after 06-23, 06-25). Flagged for ISΛRK directly (not a task): nine days of silence are about to produce a real dated consequence (July 18 → July 25) with zero internal buffer left; the fix is two small inputs and three approvals sitting since June 18.",
+      "links": ["team/reports/q3-2026-release-calendar.md", "team/os/overlay.json", "team/drafts/uploads/switch/checklist.md", "team/reports/pipeline/2026-06-26.md"]
+    },
     {
       "id": "t-secrets-setup",
       "title": "Add CLAUDE_CODE_OAUTH_TOKEN secret so the team can run",

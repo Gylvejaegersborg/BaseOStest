@@ -1,6 +1,14 @@
 {
-  "updatedAt": "2026-06-25T09:00:00Z",
+  "updatedAt": "2026-06-26T09:00:00Z",
   "notes": [
+    {
+      "id": "os-note-hemera-standup-0626",
+      "title": "Ninth silent day — this is the checkpoint. June 27 (tomorrow) is the last day before July 18 needs re-planning.",
+      "folder": "Team",
+      "tags": ["urgent", "switch", "homerun", "hemera", "policy"],
+      "updated": "2026-06-26T09:00:00Z",
+      "body": "**Saying this plainly, the way I told you nine days ago I would if it came to this: tomorrow is the last day.** I checked before writing this, same as every day. `cursors.json` is still all-empty. `team/inbox/` has nothing in it. The approvals queue's `updatedAt` is still June 18. Nine days of silence, Jun 18 through today.\n\n**1. This is the pre-wall checkpoint I named on June 24, arriving on schedule.** My own standing policy (part 5) says June 26 — today — is the last point where I say plainly that tomorrow is the final day before July 18 needs re-planning, if today is also silent. It is. So I'm saying it: **June 27, tomorrow, is the last day the Switch beat store URL, the July 18 publish time, and your sign-off on the three queue items can land before July 18 moves to July 25.** That date does not move today — only a miss tomorrow moves it. I'm not inventing new pressure here, just executing the line I already wrote when there was still a week of runway to watch it close.\n\n**2. Queue ages today: 14 / 9 / 8 days.** `ap-2026-06-19-switch-upload` (14 days), `ap-2026-06-17-switch-w25-collab-story` (9 days), `ap-2026-06-18-switch-w26-x-post` (8 days). All three still pending, untouched since June 18 — that's nine days for the oldest of the three asks behind them.\n\n**3. Homerun — re-checked directly, nothing has changed.** No `team/drafts/uploads/homerun/` directory exists anywhere in the repo. A repo-wide glob for `**/*.{mp4,mov,wav,aif,aiff,mkv,prproj,fcpxml,drp}` returns zero hits. `t-homerun-video-decision` is still `doing`. None of the three production-start triggers defined June 21 have fired. The reversibility window is exactly as open as it was a week ago — a commissioned-video preference from you still overrides the internal-edit default for free, today.\n\n**4. What actually happens tomorrow if nothing lands.** Per the Q3 calendar, July 18 needs re-planning to July 25. That's not a soft suggestion — it's the mechanical consequence of the June 27 line set on June 16 and held since. I will say so plainly tomorrow if that's where we end up, and start the re-plan rather than invent a fourth deadline.\n\n**What I need from you, today, plainly:** the beat store URL and the July 18 publish time, and your sign-off on the three queue items. This is the last day before the wall.\n\nFull detail: `team/reports/q3-2026-release-calendar.md`."
+    },
     {
       "id": "os-note-hemera-standup-0625",
       "title": "Eighth silent day — June 26 (tomorrow) is the named checkpoint, not today. June 27 is 2 days out.",
@@ -125,31 +133,31 @@
   "reminders": [
     {
       "id": "os-rem-switch-inputs-jun20",
-      "title": "Switch: beat store URL + July 18 publish time still needed — three approvals aging (13/8/7 days), June 27 is the real wall (2 days out)",
+      "title": "Switch: beat store URL + July 18 publish time still needed — three approvals aging (14/9/8 days), June 27 is tomorrow — the last day before July 18 needs re-planning",
       "dayOffset": 0,
       "time": 9.5,
-      "notes": "Eighth consecutive silent day (Jun 18-25). Queue still has 3 pending items, untouched since June 18: ap-2026-06-19-switch-upload (13 days old), ap-2026-06-17-switch-w25-collab-story (8 days old), ap-2026-06-18-switch-w26-x-post (7 days old). The date that actually protects July 18 is June 27 — 2 days out today, not 3. June 26 is tomorrow — the named final-day checkpoint before that wall (standing policy part 5). No further buffer is being rebuilt; that's standing policy, not a new call."
+      "notes": "Ninth consecutive silent day (Jun 18-26). This is the pre-wall checkpoint named June 24 — said plainly per standing policy part 5. Queue still has 3 pending items, untouched since June 18: ap-2026-06-19-switch-upload (14 days old), ap-2026-06-17-switch-w25-collab-story (9 days old), ap-2026-06-18-switch-w26-x-post (8 days old). The date that actually protects July 18 is June 27 — 1 day out today, the last day before the date needs re-planning to July 25. No further buffer is being rebuilt; that's standing policy, not a new call."
     },
     {
       "id": "os-rem-homerun-video-jun19",
       "title": "Homerun: fallback in effect since Jun 20 — internal edit, reversible until a concrete production-start trigger fires",
       "dayOffset": 0,
       "time": 9.5,
-      "notes": "Decided by default 2026-06-20 per the pre-announced rule. Still reversible today (Jun 25), re-confirmed independently again, directly against the repo: no team/drafts/uploads/homerun/ directory exists at all, zero footage/render/session clips anywhere (repo-wide glob for **/*.{mp4,mov,mkv,wav,prproj,edl} returns zero hits), only team/drafts/content/homerun-internal-edit-brief.md and the finished audio master. t-homerun-video-decision is still 'doing,' not 'review.' The trigger that ends reversibility (defined 2026-06-21): render/export file exists, OR a committed edit-decision artifact locks specific cuts, OR Nyx's task moves doing to review with a linked deliverable. None of those are true yet, five days after they were defined. A commissioned-video preference from you still overrides the default for free until one is."
+      "notes": "Decided by default 2026-06-20 per the pre-announced rule. Still reversible today (Jun 26), re-confirmed independently again, directly against the repo: no team/drafts/uploads/homerun/ directory exists at all, zero footage/render/session clips anywhere (repo-wide glob for **/*.{mp4,mov,wav,aif,aiff,mkv,prproj,fcpxml,drp} returns zero hits), only team/drafts/content/homerun-internal-edit-brief.md and the finished audio master. t-homerun-video-decision is still 'doing,' not 'review.' The trigger that ends reversibility (defined 2026-06-21): render/export file exists, OR a committed edit-decision artifact locks specific cuts, OR Nyx's task moves doing to review with a linked deliverable. None of those are true yet, six days after they were defined. A commissioned-video preference from you still overrides the default for free until one is."
     },
     {
       "id": "os-rem-w25-cadence-decision",
       "title": "W25 closed without a cadence call — still your call, now folded into W26",
       "dayOffset": 0,
       "time": 10.0,
-      "notes": "W25's posting window closed June 21 with the question still unanswered — that's the window closing on schedule, not the question getting resolved. Nyx's collab-story X post (ap-2026-06-17-switch-w25-collab-story, pending, now 8 days old) and the arc's planned marker post for W25 never got a run/swap/hold call from you. Nothing was published, nothing was withdrawn. Inside W26 by default, not by decision — still a thirty-second answer whenever you get to it."
+      "notes": "W25's posting window closed June 21 with the question still unanswered — that's the window closing on schedule, not the question getting resolved. Nyx's collab-story X post (ap-2026-06-17-switch-w25-collab-story, pending, now 9 days old) and the arc's planned marker post for W25 never got a run/swap/hold call from you. Nothing was published, nothing was withdrawn. Inside W26 by default, not by decision — still a thirty-second answer whenever you get to it."
     },
     {
       "id": "os-rem-switch-w26-snippet-export",
       "title": "Switch: export the 60-sec SoundCloud preview snippet + a visualizer source clip when you can",
       "dayOffset": 0,
       "time": 9.5,
-      "notes": "W26 opened June 22, now in its fourth day with no export received. Packaging copy for the SoundCloud preview is already written and ready (team/drafts/content/switch-w26-content-prep.md). It just needs the actual 60-sec MP3 export from you to post. Separately, the waveform-visualizer spec is signed off and ready too — it needs any sustained 15-30 sec audio source (not necessarily the final hook moment) to render against. Two small exports unlock both pieces. The W26 X post (ap-2026-06-18-switch-w26-x-post) posts standalone, not as a reply to a W25 thread — that planning-doc instruction assumed a post that was never actually published. Queue summary for this item still words the standalone/reply-chain priority the opposite way from the corrected content file — left as-is (2026-06-25 call, see t-w26-x-post-queue-summary-default-inversion): both wordings produce the same action since there's no real thread to reply to."
+      "notes": "W26 opened June 22, now five days in with no export received. Packaging copy for the SoundCloud preview is already written and ready (team/drafts/content/switch-w26-content-prep.md). It just needs the actual 60-sec MP3 export from you to post. Separately, the waveform-visualizer spec is signed off and ready too — it needs any sustained 15-30 sec audio source (not necessarily the final hook moment) to render against. Two small exports unlock both pieces. The W26 X post (ap-2026-06-18-switch-w26-x-post) posts standalone, not as a reply to a W25 thread — that planning-doc instruction assumed a post that was never actually published. Queue summary for this item still words the standalone/reply-chain priority the opposite way from the corrected content file — left as-is (2026-06-25 call, see t-w26-x-post-queue-summary-default-inversion): both wordings produce the same action since there's no real thread to reply to."
     }
   ],
   "tasks": [],

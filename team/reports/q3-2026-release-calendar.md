@@ -450,6 +450,30 @@ a fourth dormant pending item without actually fixing anything — the README's
 append-only rule means the inconsistency is only fully resolved when the user rejects the
 stale entry via `team-publish`, which appending today does not by itself accomplish. See
 `team/state/tasks.json` for the full reasoning, recorded on the task itself.
+**2026-06-26 — ninth consecutive silent day. This is the pre-wall checkpoint named on
+2026-06-24. The tone sharpens, as pre-announced — not early, not invented fresh today.**
+Jun 18 through 26, nine days, zero commits and zero user input — confirmed directly:
+`git log` shows one commit since the 06-25 meeting closed (that meeting's own commit),
+`cursors.json` still all-empty (`discord: {}`, `imap.lastUid: 0`, `copyparty.seenShas: []`),
+`team/inbox/` has no files beyond `.gitkeep`. Checked today's date against the standing
+policy's part 5 literally: "June 26 — the day before the wall — is the last point where
+the standup tone is 'this is the final day before July 18 needs re-planning.'" Today is
+June 26. That condition is met exactly, not approximated. So: **said plainly, not folded
+into the softer "named plainly" register used since June 21 — June 27, tomorrow, is the
+last day Switch's two inputs and approval can land before July 18 needs re-planning to
+July 25.** This does not move June 27 itself and does not lower part 2's escalation bar
+— per the policy's own text, that bar still only fires on an actual fallback activation or
+an actual wall-crossing, neither of which has happened yet. June 27 is **1 day out**, not
+0. If tomorrow is also silent, July 18 needs re-planning — that is the next real event on
+this calendar, not a hypothetical one. Queue ages today, recomputed from raw `createdAt`:
+**14, 9, and 8 days** (`ap-2026-06-19-switch-upload`, `ap-2026-06-17-switch-w25-collab-
+story`, `ap-2026-06-18-switch-w26-x-post`). Homerun: re-checked directly against the repo,
+not assumed unchanged — no `team/drafts/uploads/homerun/` directory exists, repo-wide
+glob for `**/*.{mp4,mov,wav,aif,aiff,mkv,prproj,fcpxml,drp}` returns zero hits anywhere in
+the repo, `t-homerun-video-decision` is still `doing`, not `review`. None of the three
+2026-06-21 production-start triggers have fired. The reversibility window is unchanged and
+still genuinely open — a commissioned-video preference from ISΛRK still overrides the
+internal-edit default for free, today, the same as every day this week.
 - July 1: Virtual Love chorus status check.
 - August 1: Virtual Love mix received or track moves to Q4.
 

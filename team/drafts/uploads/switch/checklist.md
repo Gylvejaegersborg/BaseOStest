@@ -181,3 +181,12 @@ no movement on approval. `ap-2026-06-19-switch-upload` is now 13 days old in the
 June 27 is now **2 days, not 3**, away — corrected here to match the calendar. June 26
 (tomorrow) is the named pre-wall checkpoint from part 5 — today is one day before it,
 tone stays at "named plainly."
+
+**2026-06-26 status: ninth consecutive silent day. This is the pre-wall checkpoint.**
+Still no movement on either input, no movement on approval. `ap-2026-06-19-switch-upload`
+is now **14 days** old in the queue. June 27 is now **1 day, not 2**, away — corrected
+here to match the calendar. Per the standing policy's part 5, today is the named
+checkpoint itself, not the day before it — said plainly: **tomorrow, June 27, is the last
+day these inputs and this approval can land before July 18 needs re-planning to July 25.**
+That date has not moved and is not moving today; this is the sharpened tone the policy
+called for on arrival at this exact day, not a new threat.

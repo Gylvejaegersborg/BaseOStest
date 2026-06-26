@@ -1,13 +1,13 @@
 {
-  "updatedAt": "2026-06-25T13:00:00Z",
+  "updatedAt": "2026-06-26T13:00:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "Eighth consecutive silent day. Verified via git log, cursors.json and an empty team/inbox/; June 27 wall 2 days out, escalation bar not crossed. June 26 (tomorrow) is the named pre-wall checkpoint per standing policy part 5 — held the line that today is one day early, not jumping the tone. Decided t-w26-x-post-queue-summary-default-inversion: leaving the queue summary as-is rather than appending a replacement, since both framings degrade to the same action and a replacement entry wouldn't resolve anything without the user's hand on team-publish anyway. Updated calendar day-by-day log, checklist.md day-count, overlay note + four reminders refreshed in place. Handed today's pipeline audit to Argus (t-argus-pipeline-audit-0625).",
-      "lastActive": "2026-06-25T09:00:00Z"
+      "task": "Ninth consecutive silent day. Verified via cursors.json (all-empty), team/inbox/ (only .gitkeep) and queue.json (updatedAt still 2026-06-18). Today is the literal pre-wall checkpoint pre-announced 2026-06-24 (standing policy part 5) — since still silent, sharpened tone: tomorrow, June 27, is the last day before July 18 needs re-planning to July 25. Does not move June 27 or lower the part-2 escalation bar. Recomputed queue ages (14/9/8 days), June 27 at 1 day out. Re-verified Homerun reversibility directly — t-homerun-video-decision still doing, no production-start trigger fired. Wrote new calendar entry, checklist.md day-count, overlay note + four reminders refreshed in place. Handed today's pipeline audit to Argus (t-argus-pipeline-audit-0626).",
+      "lastActive": "2026-06-26T09:00:00Z"
     },
     {
       "id": "aether",
@@ -15,15 +15,15 @@
       "role": "A&R · Sound",
       "status": "idle",
       "task": "Dark — no intake today, confirmed genuine via empty cursors.json/inbox. Still structurally locked out of Switch hook-moment analysis and the back catalog pending t-retroactive-intake-path (unchanged, user decision).",
-      "lastActive": "2026-06-25T09:00:00Z"
+      "lastActive": "2026-06-26T09:00:00Z"
     },
     {
       "id": "nyx",
       "name": "Nyx",
       "role": "Execution · Content",
       "status": "idle",
-      "task": "Re-verified Homerun directly against the repo — zero footage/render/session material, no production-start trigger fired, t-homerun-video-decision stays doing. Re-checked all three Switch tasks directly, all still review, blocked on the same three things (beat store URL, July 18 publish time, Aether's hook-moment timestamp). Agreed Hemera's call on the queue-summary framing gap leaves the practical outcome unaffected. Made zero file edits today; no genuinely unblocked work existed.",
-      "lastActive": "2026-06-25T09:30:00Z"
+      "task": "Independently re-verified Hemera's queue ages (14/9/8, June 27 at 1 day out) against queue.json directly — matched. Re-checked all three Switch tasks, all still review, blocked on the same items (beat store URL, July 18 publish time, Aether's hook-moment timestamp; separate short audio exports still needed for the W26 waveform/snippet pieces — the existing full switch.mp3 master does not unblock these). Independently re-verified Homerun reversibility with her own glob — zero hits, t-homerun-video-decision stays doing. Made zero file edits today.",
+      "lastActive": "2026-06-26T09:30:00Z"
     },
     {
       "id": "hermes",
@@ -31,15 +31,15 @@
       "role": "Booking · Outreach",
       "status": "idle",
       "task": "Dark — no messages today, confirmed genuine via empty cursors.json/inbox. IMAP and Discord intake still unconfigured; t-intake-channels unchanged.",
-      "lastActive": "2026-06-25T09:00:00Z"
+      "lastActive": "2026-06-26T09:00:00Z"
     },
     {
       "id": "mnemosyne",
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "idle",
-      "task": "2026-06-25 meeting record closed. Independently verified before writing anything: Hemera's calendar entry, checklist.md day-count fix, and overlay note/reminder refresh are real and accurate; her t-w26-x-post-queue-summary-default-inversion closure checks out against approvals/queue.json (inconsistency genuinely still present, closure honestly records a decision not a fix); Nyx's zero-file-edit claim and Homerun re-verification confirmed; Argus's eleventh audit (GREEN) and his t-argus-pipeline-audit-0625 closure verified against his own report. Queue ages (13/8/7 days) and June 27 distance (2 days out) recomputed independently from raw createdAt timestamps and match exactly. Judged Argus's forward-tracking note (part 5 silent on tone-if-June-26-sees-movement) does not need its own tracked task — same standard as yesterday's process-shape note, nothing actionable until June 26 itself arrives. Refreshed agents.json for all seven agents. library/beats.json unchanged (zero intake, fourteenth consecutive day) — left as-is.",
-      "lastActive": "2026-06-25T13:00:00Z"
+      "task": "2026-06-26 meeting record closed. Independently verified before writing anything: Hemera's calendar entry, checklist.md day-count update, and overlay note/reminder refresh are real and accurate against the files; Nyx's zero-file-edit claim and Homerun re-verification confirmed (no stray changes anywhere); Argus's twelfth audit (GREEN) and his t-argus-pipeline-audit-0626 closure verified against his own report. Queue ages (14/9/8 days) and June 27 distance (1 day out) recomputed independently from raw createdAt timestamps — third independent confirmation alongside Hemera and Argus, all match exactly. Refreshed agents.json for all seven agents. library/beats.json unchanged (zero intake, fifteenth consecutive day) — left as-is.",
+      "lastActive": "2026-06-26T13:00:00Z"
     },
     {
       "id": "theia",
@@ -54,8 +54,8 @@
       "name": "Argus",
       "role": "Oversight · Pipeline",
       "status": "idle",
-      "task": "Eleventh pipeline audit complete (team/reports/pipeline/2026-06-25.md). Verdict: GREEN. Independently re-confirmed the eighth-silent-day claim via file-state cross-checks (no shell/git-log access this seat, same as 06-24). Recomputed June 27 distance (2 days out) and queue ages (13/8/7) from raw dates, matched exactly. Checked Hemera's part-5 tone call against its literal text directly — correct, neither early nor late. Checked t-w26-x-post-queue-summary-default-inversion's closure against approvals/queue.json directly: inconsistency still factually present, closure honestly records a decision not a fix, agreed it's the right call. Independently re-verified Homerun reversibility (zero footage/render anywhere). Flagged one forward-tracking note (not worth a task today): part 5 doesn't define tone if June 26 sees real movement rather than more silence. Schema sweep clean: 35 unique task ids, no duplicates, no premature writes. Filed zero new tasks — second time in eleven audits.",
-      "lastActive": "2026-06-25T11:00:00Z"
+      "task": "Twelfth pipeline audit complete (team/reports/pipeline/2026-06-26.md). Verdict: GREEN — third GREEN in four audits. Independently re-confirmed the ninth-silent-day claim via file-state cross-checks (no shell/git-log access this seat). Recomputed June 27 distance (1 day out) and queue ages (14/9/8) from raw dates, matched exactly. Checked Hemera's part-5 tone call against its literal text directly — correct, fires exactly on its named day. Independently re-verified Homerun reversibility (zero footage/render anywhere, his own third independent glob). Schema sweep clean: 35 unique task ids, no duplicates, no premature writes. Filed zero new tasks — third time in twelve audits. Direct note to ISΛRK: tomorrow, June 27, is the real test before July 18 mechanically needs re-planning to July 25.",
+      "lastActive": "2026-06-26T11:00:00Z"
     }
   ]
 }
