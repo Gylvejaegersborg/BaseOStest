@@ -1,13 +1,13 @@
 {
-  "updatedAt": "2026-06-26T13:00:00Z",
+  "updatedAt": "2026-06-27T13:00:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "Ninth consecutive silent day. Verified via cursors.json (all-empty), team/inbox/ (only .gitkeep) and queue.json (updatedAt still 2026-06-18). Today is the literal pre-wall checkpoint pre-announced 2026-06-24 (standing policy part 5) — since still silent, sharpened tone: tomorrow, June 27, is the last day before July 18 needs re-planning to July 25. Does not move June 27 or lower the part-2 escalation bar. Recomputed queue ages (14/9/8 days), June 27 at 1 day out. Re-verified Homerun reversibility directly — t-homerun-video-decision still doing, no production-start trigger fired. Wrote new calendar entry, checklist.md day-count, overlay note + four reminders refreshed in place. Handed today's pipeline audit to Argus (t-argus-pipeline-audit-0626).",
-      "lastActive": "2026-06-26T09:00:00Z"
+      "task": "Tenth consecutive silent day. Verified via cursors.json (all-empty), team/inbox/ (only .gitkeep) and queue.json (updatedAt was still 2026-06-18 before today's writes). The pre-announced June 27 wall fired today, not deferred — checked the literal historical text and confirmed no EOD-deferral clause exists for Switch (unlike Homerun's), so the Nightshade no-deferral pattern governs. Executed: Switch target moved July 18 -> July 25 across the Q3 calendar, checklist.md, and overlay.json; Release Spacing recalculated 21->14 days. Appended ap-2026-06-27-switch-upload-replan to the queue, superseding the now-genuinely-stale July 18 framing on ap-2026-06-19-switch-upload. Owes a fix for tomorrow: t-queue-age-arithmetic-error-0627 (Argus caught the calendar/overlay's '8 days old' claim was wrong — actual age is 15 days).",
+      "lastActive": "2026-06-27T09:00:00Z"
     },
     {
       "id": "aether",
@@ -15,15 +15,15 @@
       "role": "A&R · Sound",
       "status": "idle",
       "task": "Dark — no intake today, confirmed genuine via empty cursors.json/inbox. Still structurally locked out of Switch hook-moment analysis and the back catalog pending t-retroactive-intake-path (unchanged, user decision).",
-      "lastActive": "2026-06-26T09:00:00Z"
+      "lastActive": "2026-06-27T09:00:00Z"
     },
     {
       "id": "nyx",
       "name": "Nyx",
       "role": "Execution · Content",
       "status": "idle",
-      "task": "Independently re-verified Hemera's queue ages (14/9/8, June 27 at 1 day out) against queue.json directly — matched. Re-checked all three Switch tasks, all still review, blocked on the same items (beat store URL, July 18 publish time, Aether's hook-moment timestamp; separate short audio exports still needed for the W26 waveform/snippet pieces — the existing full switch.mp3 master does not unblock these). Independently re-verified Homerun reversibility with her own glob — zero hits, t-homerun-video-decision stays doing. Made zero file edits today.",
-      "lastActive": "2026-06-26T09:30:00Z"
+      "task": "Completed the handed-off date-framing sweep on the five Switch upload-package files: fixed metadata.json's targetReleaseDate (07-18->07-25) and two literal 'july 18' mentions in captions.md; confirmed description.md and art-prompt.md have zero date references, untouched. Found and filed a larger out-of-scope gap: team/drafts/content/ arc and W25-W27 spec docs still hardcode July 18 throughout, including on two files that are live draftPaths on pending queue entries — filed t-switch-arc-docs-date-staleness-0627 rather than silently expanding today's scope. t-switch-upload-package and t-switch-prerelease-arc remain in review, same real blockers (beat store URL, publish time, Aether's hook-moment timestamp), now framed against July 25.",
+      "lastActive": "2026-06-27T09:30:00Z"
     },
     {
       "id": "hermes",
@@ -31,22 +31,22 @@
       "role": "Booking · Outreach",
       "status": "idle",
       "task": "Dark — no messages today, confirmed genuine via empty cursors.json/inbox. IMAP and Discord intake still unconfigured; t-intake-channels unchanged.",
-      "lastActive": "2026-06-26T09:00:00Z"
+      "lastActive": "2026-06-27T09:00:00Z"
     },
     {
       "id": "mnemosyne",
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "idle",
-      "task": "2026-06-26 meeting record closed. Independently verified before writing anything: Hemera's calendar entry, checklist.md day-count update, and overlay note/reminder refresh are real and accurate against the files; Nyx's zero-file-edit claim and Homerun re-verification confirmed (no stray changes anywhere); Argus's twelfth audit (GREEN) and his t-argus-pipeline-audit-0626 closure verified against his own report. Queue ages (14/9/8 days) and June 27 distance (1 day out) recomputed independently from raw createdAt timestamps — third independent confirmation alongside Hemera and Argus, all match exactly. Refreshed agents.json for all seven agents. library/beats.json unchanged (zero intake, fifteenth consecutive day) — left as-is.",
-      "lastActive": "2026-06-26T13:00:00Z"
+      "task": "2026-06-27 meeting record closed. Independently verified before writing anything: confirmed ap-2026-06-19-switch-upload's createdAt is 2026-06-12T12:30:00Z, making it 15 days old today, not 8 as the calendar/overlay claimed — matches Argus's finding exactly. Confirmed the Nightshade-vs-Homerun deferral-clause distinction by direct re-read of the historical text. Confirmed Release Spacing arithmetic (Aug 8 - Jul 25 = 14 days) and the new queue entry's append-only schema conformance. Confirmed Nyx's four file-edit claims against the actual files. Left t-queue-age-arithmetic-error-0627 open (owner hemera, backlog) per the team's own next-day-correction precedent — not patched same-day. Refreshed agents.json for all seven agents. library/beats.json unchanged (zero intake, sixteenth consecutive day) — left as-is. tasks.json reviewed in full: 41 unique ids, no duplicates, no premature closures.",
+      "lastActive": "2026-06-27T13:00:00Z"
     },
     {
       "id": "theia",
       "name": "Theia",
       "role": "Market · Research",
       "status": "idle",
-      "task": "No turn today — not Monday, weekly market read is Monday-only and no fresh agenda item to react to. Confirmed genuine: no new file under team/reports/market/ since 2026-W26.md.",
+      "task": "No turn today — not Monday (June 27 is a Saturday), weekly market read is Monday-only, no fresh agenda item to react to. Confirmed genuine: no new file under team/reports/market/ since 2026-W26.md.",
       "lastActive": "2026-06-22T09:00:00Z"
     },
     {
@@ -54,8 +54,8 @@
       "name": "Argus",
       "role": "Oversight · Pipeline",
       "status": "idle",
-      "task": "Twelfth pipeline audit complete (team/reports/pipeline/2026-06-26.md). Verdict: GREEN — third GREEN in four audits. Independently re-confirmed the ninth-silent-day claim via file-state cross-checks (no shell/git-log access this seat). Recomputed June 27 distance (1 day out) and queue ages (14/9/8) from raw dates, matched exactly. Checked Hemera's part-5 tone call against its literal text directly — correct, fires exactly on its named day. Independently re-verified Homerun reversibility (zero footage/render anywhere, his own third independent glob). Schema sweep clean: 35 unique task ids, no duplicates, no premature writes. Filed zero new tasks — third time in twelve audits. Direct note to ISΛRK: tomorrow, June 27, is the real test before July 18 mechanically needs re-planning to July 25.",
-      "lastActive": "2026-06-26T11:00:00Z"
+      "task": "Thirteenth pipeline audit complete (team/reports/pipeline/2026-06-27.md). Verdict: YELLOW — downgrade from three GREENs. Stress-tested and confirmed Hemera's Nightshade-vs-Homerun deferral-clause distinction holds under direct challenge. Verified Release Spacing arithmetic and the new queue entry's append-only schema conformance, including the supersession judgment vs. the W26 leave-as-is precedent. Independently verified all of Nyx's file-sweep claims. Real finding: caught the calendar/overlay's queue-age claim ('8 days old' for ap-2026-06-19-switch-upload) is wrong — actual createdAt-based age is 15 days, breaking a five-day correct-anchoring streak. Filed t-queue-age-arithmetic-error-0627 (owner hemera). Direct note to ISΛRK: third pre-announced fallback to fire this cycle, mechanically sound and honestly disclosed, but a second wrong-number incident this cycle worth naming as a pattern.",
+      "lastActive": "2026-06-27T11:00:00Z"
     }
   ]
 }

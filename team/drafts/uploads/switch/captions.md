@@ -14,7 +14,7 @@ for: Instagram / X (short-form) + YouTube community post
 switch.
 
 ISΛRK × 10k.emraan
-186 bpm · c minor · july 18
+186 bpm · c minor · july 25
 
 link in bio.
 
@@ -26,7 +26,7 @@ link in bio.
 
 ---
 
-new beat out july 18 — Switch.
+new beat out july 25 — Switch.
 
 ISΛRK × 10k.emraan. 186 bpm. drill. built to move weight.
 

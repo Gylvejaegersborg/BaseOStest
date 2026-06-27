@@ -14,7 +14,7 @@ locked. Dates below are targets; they shift if blockers slip.
 ## Track-by-Track
 
 ### 1. Switch
-**Target: July 18, 2026**
+**Target: July 25, 2026 (moved from July 18 — decided by default, 2026-06-27. See below.)**
 Status: export done, upload scheduled.
 This is the most ready asset. Upload package is being built now (Nyx). No known
 creative blocker. The gap between now and July 18 gives six weeks for the upload,
@@ -52,11 +52,64 @@ now been used without result. No second buffer-rebuild is planned; see the stand
 silent-day policy below and in `team/os/overlay.json` for what happens instead if
 silence continues.
 
+**2026-06-27 — the wall arrived. July 18 moves to July 25, decided by default, not by
+user instruction.** Ten consecutive silent days (Jun 18–27), verified directly before
+acting: `cursors.json` still all-empty (`discord: {}`, `imap.lastUid: 0`,
+`copyparty.seenShas: []`), `team/inbox/` has nothing beyond `audio/.gitkeep`,
+`approvals/queue.json` `updatedAt` still `2026-06-18T11:00:00Z`, all three items still
+`pending`. The two real inputs (beat store listing URL, July 18 publish time) never
+landed, and none of the three queue items received user action.
+
+**Why this fires today and not tomorrow — the literal text, checked, not assumed.**
+This calendar's own "Next Check-in Points" section states plainly: "June 27: hard line
+for Switch inputs + approval before July 18 needs re-planning. If unmet, the release
+moves to July 25." The standing policy's part 5 (pre-wall checkpoint) names June 27
+explicitly as "the day the date actually moves," distinct from June 26 (the day before
+it, where only the tone sharpens). That is the same mechanism as Nightshade's June 22
+fallback, which fired on its literal stated due date with no deferral. It is not the
+same mechanism as Homerun's: Homerun's checkpoint moved from its literal due date
+(June 19) to the day after (June 20) only because Hemera wrote an explicit EOD-deferral
+clause in writing, in advance, on June 18/19 — "if silence continues past today's EOD,
+tomorrow's standup becomes the real checkpoint." No equivalent deferral clause exists
+anywhere in this calendar or the standing policy for Switch's June 27 line. Absent that
+kind of explicit advance deferral, the literal date governs, the same way it governed
+Nightshade. June 27 is today. The condition ("if unmet") is met. The fallback executes
+today, not tomorrow.
+
+**What this actually costs, using this calendar's own stated lead-time assumptions —
+not invented numbers.** The original Switch section called six weeks from kickoff to
+July 18 sufficient for "the upload, thumbnail/art review, caption copy, and a short
+promo window (one week minimum before release)." A 7-day slip to July 25 does not
+remove that one-week promo-window floor, but it does compress Release Spacing: Switch →
+Homerun was stated as 21 days, "sufficient for individual promo cycles" — that gap is
+now 14 days (Homerun's Aug 8 target is unchanged; nothing here moves Homerun). 14 days
+is tighter but not impossible for two releases that don't share content assets. This
+is flagged, not absorbed silently. If Homerun's own timeline also slips, the two
+releases' promo windows could begin to overlap — watching for that, not yet a problem
+today.
+
+**What is and isn't reversible right now.** The July 25 date is the mechanical default,
+not a locked outward commitment — nothing has been published, no platform-side
+schedule exists yet (the upload package is still `pending` in the approval queue).
+If the two real inputs and approval land in the next few days, Nyx can still build
+toward July 25 or, if there's real reason to pull it back earlier, that's the user's
+call to make — this default does not foreclose an earlier re-target, it just stops
+assuming July 18 is still live. What is not reversible: the nineteen-day gap between
+when these inputs were first asked for (June 12, package drafted) and today is real
+elapsed time; no fallback un-spends that. The `[TBD]` placeholders (beat store URL,
+publish time) stay `[TBD]` — no fabricated values inserted anywhere to force this
+through.
+
 Pre-release tasks:
 - Nyx: build upload package (done, in review — blocked only on the two user inputs below)
-- User: provide beat store URL + publish time — internal target **June 19 (today)**,
-  formal gate **June 20** — then approve package
-- Nyx: queue SoundCloud upload for scheduling
+- User: provide beat store URL + publish time, and act on the now-four pending queue
+  items (the original upload approval, the new superseding entry with the corrected
+  July 25 date, and the two W25/W26 content pieces) — no new internal date being set;
+  the wall already passed once, see standing policy, part 4 (no further buffer-rebuilding
+  by default)
+- Nyx: queue SoundCloud upload for scheduling once inputs land; sweep metadata.json,
+  description.md, captions.md, art-prompt.md for any hardcoded July 18 date text per
+  Hemera's 2026-06-27 handoff (`t-switch-upload-package-date-framing-nyx`)
 
 ---
 
@@ -209,7 +262,7 @@ Nightshade section above).**
 
 | Track        | Target Date    | Status                  | Hard Blocker               |
 |--------------|----------------|-------------------------|----------------------------|
-| Switch       | July 18        | Ready for upload        | None creative              |
+| Switch       | ~~July 18~~ → **July 25** (moved 2026-06-27, by default) | Ready for upload, inputs still outstanding | Two user inputs + approval, all 10 days overdue |
 | Homerun      | August 8       | Art + master done       | Video                      |
 | Virtual Love | September 5    | Demo                    | Chorus, then mix + master  |
 | ~~Nightshade~~ | ~~September 26~~ | **Q4 carry-over** | Re-mix has no ETA — moved off Q3 board |
@@ -218,7 +271,10 @@ Nightshade section above).**
 
 ## Release Spacing
 
-- Switch → Homerun: 21 days. Sufficient for individual promo cycles.
+- Switch → Homerun: ~~21 days~~ **14 days, as of 2026-06-27** (Switch moved July 18 →
+  July 25; Homerun's Aug 8 target is unchanged). Tighter than the original "sufficient
+  for individual promo cycles" read, not yet a hard problem — watching for overlap if
+  Homerun's own video-decision timeline also slips.
 - Homerun → Virtual Love: 28 days. Good gap.
 - Virtual Love → end of Q3 (Sep 30): 25 days of open runway with no scheduled release
   behind it. **This line is new as of 2026-06-22** — dropping Nightshade removes the
@@ -336,11 +392,11 @@ the rule in part 2 (fallback activating, or wall actually crossed) is unchanged.
   still open, still `pending` in the approvals queue. No further buffer beyond this
   without re-planning the July 18 date. The date that actually protects July 18 is
   June 27 (next line).
-- **June 27: hard line for Switch inputs + approval before July 18 needs re-planning.**
-  If unmet, the release moves to July 25 — not a new threat, the same line set June 16,
-  now **3 days out** as of today, 2026-06-24 (was 4 days out as of June 23). **June 26
-  is now the named pre-wall checkpoint** — see the standing policy's new part 5, added
-  today.
+- ~~June 27: hard line for Switch inputs + approval before July 18 needs
+  re-planning.~~ **Resolved 2026-06-27: unmet, fallback executed — Switch moves to
+  July 25.** See Switch section above for the full literal-text reasoning (this fires
+  on the named date itself, Nightshade's pattern, not Homerun's EOD-deferral pattern)
+  and the operational cost (Release Spacing, Switch → Homerun now 14 days not 21).
 - ~~June 22: Nightshade re-mix ETA decision due.~~ **Resolved 2026-06-22: no ETA
   surfaced, fallback executed — Nightshade dropped from Q3, Q4 carry-over.** See
   Nightshade section above. This is the second pre-announced fallback to take effect
@@ -474,6 +530,31 @@ the repo, `t-homerun-video-decision` is still `doing`, not `review`. None of the
 2026-06-21 production-start triggers have fired. The reversibility window is unchanged and
 still genuinely open — a commissioned-video preference from ISΛRK still overrides the
 internal-edit default for free, today, the same as every day this week.
+**2026-06-27 — tenth consecutive silent day. The wall arrived; July 18 moves to July 25,
+decided by default.** Jun 18 through 27, ten days, zero commits and zero user input —
+confirmed directly: `cursors.json` still all-empty (`discord: {}`, `imap.lastUid: 0`,
+`copyparty.seenShas: []`), `team/inbox/` has nothing beyond `audio/.gitkeep`,
+`approvals/queue.json` `updatedAt` still `2026-06-18T11:00:00Z`, all three items still
+`pending` (recomputed ages from raw `createdAt`: `ap-2026-06-19-switch-upload` 8 days
+since June 19, `ap-2026-06-17-switch-w25-collab-story` 10 days since June 17,
+`ap-2026-06-18-switch-w26-x-post` 9 days since June 18). Checked today's date against
+the calendar's own literal text, not assumed: "June 27: hard line for Switch inputs +
+approval before July 18 needs re-planning. If unmet, the release moves to July 25."
+Today is June 27. The condition is met. This is the date itself, not the day before it
+(June 26, already used for the sharpened-tone checkpoint) and not a deferred day-after
+checkpoint (that pattern belongs to Homerun's explicit, separately pre-announced
+EOD-deferral, never written for Switch). **Switch's target moves from July 18 to
+July 25, decided by default, not by user instruction.** Full reasoning, cost, and
+reversibility statement in the Switch section above. This is the third pre-announced
+fallback to take effect this cycle (after Homerun on June 20 and Nightshade on June 22)
+and, per the standing policy's own escalation split (part 2), is being escalated to
+ISΛRK directly via Argus's channel this run, the same as the other two. Homerun:
+re-checked directly against the repo, not assumed unchanged — no
+`team/drafts/uploads/homerun/` directory exists, repo-wide glob for
+`**/*.{mp4,mov,wav,aif,aiff,mkv,prproj,fcpxml,drp}` returns zero hits, `t-homerun-
+video-decision` is still `doing`, not `review`. None of the three 2026-06-21
+production-start triggers have fired. The reversibility window is unchanged and still
+genuinely open today.
 - July 1: Virtual Love chorus status check.
 - August 1: Virtual Love mix received or track moves to Q4.
 

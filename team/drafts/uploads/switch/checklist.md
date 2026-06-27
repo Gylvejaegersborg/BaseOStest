@@ -1,6 +1,7 @@
 # Switch — pre-upload checklist
 
-target release: 2026-07-18
+target release: ~~2026-07-18~~ → **2026-07-25** (moved 2026-06-27, by default — see
+sign-off section below for full reasoning)
 package drafted: 2026-06-12
 approval due: 2026-06-20 (formal external gate — unchanged). June 17 input-deadline MISSED
 with zero input from user as of 2026-06-18 — see sign-off note. Re-set to June 20 that day,
@@ -57,7 +58,8 @@ a real shot at landing inside the buffer instead of past it.
 - [ ] set genre: Hip-hop & Rap / Beats
 - [ ] add tags from `metadata.json` (comma-separated in the tags field)
 - [ ] set visibility: **private** until release day
-- [ ] schedule publish for 2026-07-18 at [TBD — confirm time, suggest 12:00 UTC]
+- [ ] schedule publish for **2026-07-25** (moved from 2026-07-18, see sign-off) at
+      [TBD — confirm time, suggest 12:00 UTC]
 - [ ] enable direct download (optional — decide before upload)
 - [ ] enable comments
 
@@ -75,7 +77,8 @@ a real shot at landing inside the buffer instead of past it.
 - [ ] add tags from `metadata.json`
 - [ ] set playlist: Beats / Instrumentals (create if it doesn't exist)
 - [ ] set visibility: **private** until release day
-- [ ] schedule publish for 2026-07-18 — match SoundCloud publish time
+- [ ] schedule publish for **2026-07-25** (moved from 2026-07-18) — match SoundCloud
+      publish time
 - [ ] add end screen / cards to beat store link (set up in YouTube Studio after upload)
 - [ ] enable monetisation if channel is eligible
 
@@ -93,9 +96,12 @@ a real shot at landing inside the buffer instead of past it.
 ## 7. promo post queue
 
 - [ ] approve captions in `captions.md` via the approval queue
-- [ ] schedule Instagram post for 2026-07-18 (match release time)
-- [ ] schedule YouTube community post for 2026-07-18 (match release time)
-- [ ] optional: 2–3 day pre-release teaser post (2026-07-15/16) — tbd
+- [ ] schedule Instagram post for **2026-07-25** (moved from 2026-07-18, match release
+      time)
+- [ ] schedule YouTube community post for **2026-07-25** (moved from 2026-07-18, match
+      release time)
+- [ ] optional: 2–3 day pre-release teaser post (now **2026-07-22/23**, moved from
+      2026-07-15/16) — tbd
 
 ---
 
@@ -190,3 +196,23 @@ checkpoint itself, not the day before it — said plainly: **tomorrow, June 27, 
 day these inputs and this approval can land before July 18 needs re-planning to July 25.**
 That date has not moved and is not moving today; this is the sharpened tone the policy
 called for on arrival at this exact day, not a new threat.
+
+**2026-06-27 status: tenth consecutive silent day. The wall arrived. Target release
+moves to 2026-07-25, decided by default, not by user sign-off.** No movement on either
+input, no movement on approval — verified directly before writing this: `cursors.json`
+all-empty, `team/inbox/` empty beyond `.gitkeep`, `approvals/queue.json` `updatedAt`
+still `2026-06-18T11:00:00Z`. The calendar's own literal text named today as the date
+the fallback fires, not a deferred day after it (see
+`team/reports/q3-2026-release-calendar.md`, Switch section, for the full reasoning on
+why this fires today and not tomorrow). `target release` at the top of this file is
+updated to **2026-07-25**. This is a mechanical default applied because the
+pre-announced condition was met, not a user decision — recorded honestly as such, the
+same way Homerun's internal-edit default was recorded on 2026-06-20. It is reversible
+in the sense that nothing outward-facing has been published and the user can still
+direct an earlier or different date at any point before the upload actually executes;
+it is not reversible in the sense that the ten days of elapsed silence are real and
+cannot be un-spent. The `[TBD]` placeholders below (beat store URL, publish time) stay
+`[TBD]` — no fabricated values inserted to force this through. `ap-2026-06-19-switch-
+upload` stays `pending`; this checklist update does not change its approval status,
+only the target-date framing it should now be read against (see Hemera's standup turn,
+2026-06-27, on whether the queue summary itself needs a parallel correction).

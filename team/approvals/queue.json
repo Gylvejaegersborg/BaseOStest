@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-18T11:00:00Z",
+  "updatedAt": "2026-06-27T09:00:00Z",
   "items": [
     {
       "id": "ap-2026-06-19-switch-upload",
@@ -41,6 +41,22 @@
       ],
       "draftedBy": "nyx",
       "createdAt": "2026-06-18T11:00:00Z",
+      "status": "pending"
+    },
+    {
+      "id": "ap-2026-06-27-switch-upload-replan",
+      "type": "soundcloud_upload",
+      "title": "Switch — SoundCloud + YouTube upload package (SUPERSEDES ap-2026-06-19-switch-upload: target date corrected to 2026-07-25)",
+      "summary": "Same package as ap-2026-06-19-switch-upload (metadata, description, checklist, captions, art-prompt — unchanged, no content edits). The only difference is the date this approval targets: ap-2026-06-19-switch-upload's summary still says 'scheduled to go public on 2026-07-18.' That date is no longer the team's plan. Ten consecutive silent days (Jun 18-27) on the two required inputs (beat store URL, July 18 publish time) crossed the calendar's own pre-announced June 27 hard line — see team/reports/q3-2026-release-calendar.md, Switch section, dated 2026-06-27. Switch's target moved to 2026-07-25 by default today. This entry exists because the README's approvals contract only lets agents append pending items, not edit existing ones — approving the original entry as literally worded would direct a July 18 schedule that contradicts the current plan, a real risk, not a cosmetic one (distinct from the W26 X-post queue-summary case on 06-24/06-25, where both possible framings degraded to the same action). Recommend: if you approve a Switch upload, approve THIS entry (07-25) and reject ap-2026-06-19-switch-upload as stale; or simply note your intended date when you act and either is fine procedurally — only the date framing differs, not the underlying package. The two required inputs (beat store URL, publish time) are still [TBD] in the linked drafts regardless of which entry is actioned.",
+      "draftPaths": [
+        "team/drafts/uploads/switch/metadata.json",
+        "team/drafts/uploads/switch/description.md",
+        "team/drafts/uploads/switch/checklist.md",
+        "team/drafts/uploads/switch/captions.md",
+        "team/drafts/uploads/switch/art-prompt.md"
+      ],
+      "draftedBy": "hemera",
+      "createdAt": "2026-06-27T09:00:00Z",
       "status": "pending"
     }
   ]
