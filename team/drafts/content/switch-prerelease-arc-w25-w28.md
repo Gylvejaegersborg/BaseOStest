@@ -2,8 +2,12 @@
 
 **track:** Switch — ISΛRK × 10k.emraan
 **bpm / key:** 186 bpm · C minor
-**release date:** July 18, 2026
-**arc window:** June 15 – July 13 (4 weeks out, July 14–17 is drop week buffer)
+**release date:** July 25, 2026 (moved from July 18 — decided by default, 2026-06-27.
+see `team/reports/q3-2026-release-calendar.md`, Switch section.)
+**arc window:** June 15 – July 13 as originally built (4 weeks out from the original
+July 18 target, July 14–17 was drop week buffer). **Not yet re-extended to match the
+new July 25 target — see the W28→July 25 gap flag at the bottom of this document,
+filed 2026-06-28 as its own open question, not resolved here.**
 **drafted by:** Nyx · 2026-06-15
 **updated:** Nyx · 2026-06-16 — added W26/W27 asset specs (see linked files); core blockers unchanged
 **updated:** Nyx · 2026-06-17 — added W25 collab-story copy (see linked file); arc held in review
@@ -16,6 +20,13 @@ waveform render still hold on user-supplied raw material, not forced; core block
 and struck the platform-notes reply-chain strategy line; both assumed a W25 marker post that was
 never independently drafted or queued (Argus's 2026-06-21 audit, §5). W26 opens today; posts go
 out standalone until/unless a real thread-starting post exists. Core blockers unchanged.
+**updated:** Nyx · 2026-06-28 — date sweep (`t-switch-arc-docs-date-staleness-0627`): corrected
+every load-bearing "July 18" / "07.18" reference throughout this document to July 25, matching
+the calendar's 2026-06-27 re-plan. Left alone: citations of past events (e.g. "Argus confirmed...
+on 2026-06-22"), and the historical `drafted`/`updated` headers above, none of which are live date
+claims. Flagged, not fixed here: the W25–W28 week windows are still anchored to the original July
+18 math and have not been re-extended to span the gap to July 25 — see the flag at the bottom of
+this document.
 
 ---
 
@@ -57,9 +68,9 @@ energy spikes) and should flag the most probable candidate with a confidence not
 **[IG/TikTok #1] — producer tag hook clip**
 - 15–30 sec vertical video: black screen, cold open on the producer tag (ISΛRK's tag audio)
   cutting hard into the 3-second hook moment from the track
-- no text overlay during the hook. title card at the end: `SWITCH` / `ISΛRK × 10k.emraan` / `07.18`
+- no text overlay during the hook. title card at the end: `SWITCH` / `ISΛRK × 10k.emraan` / `07.25`
 - audio: the track clip (pending Aether's hook-moment confirmation)
-- caption: `switch. 07.18.` — nothing else. no hashtags in body, hashtag block in first comment
+- caption: `switch. 07.25.` — nothing else. no hashtags in body, hashtag block in first comment
 - hashtag block (first comment): `#drillbeats #drilltype beat #typebeat #186bpm #beatmaker
   #prodbyISARK #10kemraan #newbeat #drillmusic #hardbeats #freebeat #freetypebeat2026`
 
@@ -69,7 +80,7 @@ energy spikes) and should flag the most probable candidate with a confidence not
 - note: this only fires if the cover art is ready by W25. if not, push to W26.
 
 **[X] — text drop**
-- `switch — ISΛRK × 10k.emraan. 186 bpm. c minor. july 18.`
+- `switch — ISΛRK × 10k.emraan. 186 bpm. c minor. july 25.`
 - no link yet. purely a marker post.
 
 **[X] — collab-story post (companion, optional mid-week)**
@@ -101,7 +112,7 @@ energy spikes) and should flag the most probable candidate with a confidence not
 - 15–30 sec vertical: screen-record or phone footage of a session moment from Switch's
   production. does not need to be the final session — any moment that shows the drum pattern,
   bassline, or arrangement moving at 186 bpm is enough.
-- caption: `made this with @10k.emraan. drops july 18.`
+- caption: `made this with @10k.emraan. drops july 25.`
 - if 10k.emraan has an IG/TikTok handle, tag in caption. coordinate to get a repost.
 
 **[IG/TikTok #2] — waveform / visualizer clip**
@@ -111,10 +122,10 @@ energy spikes) and should flag the most probable candidate with a confidence not
 
 **[SoundCloud] — 60-second preview snippet**
 - private-link teaser post (not public release) shared as a SoundCloud link via IG story / X
-- description on the snippet: `Switch — ISΛRK × 10k.emraan. full record July 18.`
-- caption on the IG story share: `60 seconds. july 18. link in bio.`
+- description on the snippet: `Switch — ISΛRK × 10k.emraan. full record July 25.`
+- caption on the IG story share: `60 seconds. july 25. link in bio.`
 - note: upload as a separate private SoundCloud track titled "Switch (preview)" — do not
-  use the final upload slot. delete or re-private after Jul 18 upload goes live.
+  use the final upload slot. delete or re-private after the July 25 upload goes live.
 - packaging copy finalized (title, description, IG-story caption, posting sequence): see
   `team/drafts/content/switch-w26-content-prep.md` §3 — copy is ready, the 60-sec MP3
   export itself is still outstanding (on ISΛRK)
@@ -160,34 +171,34 @@ energy spikes) and should flag the most probable candidate with a confidence not
 
 **[IG/TikTok #1] — collab announcement graphic / reel**
 - clean graphic or short reel: both artist handles side by side, cover art background
-- `ISΛRK × 10k.emraan` as the dominant text. `SWITCH · 07.18` beneath.
-- caption: `this one was built with @10k.emraan. drops july 18.`
+- `ISΛRK × 10k.emraan` as the dominant text. `SWITCH · 07.25` beneath.
+- caption: `this one was built with @10k.emraan. drops july 25.`
 - coordinate with 10k.emraan for a simultaneous or same-day post from their account.
   a same-day double-post doubles reach with zero paid spend.
 
 **[IG/TikTok #2] — hook clip take 2 (different moment or angle)**
 - second cut of the track, different 15-sec window from the W25 clip
-- no caption needed beyond: `july 18.`
+- no caption needed beyond: `july 25.`
 
 **[IG/TikTok #3] — IG story: countdown sticker**
-- IG story with native countdown sticker set to July 18 (ISΛRK's confirmed publish time — TBD)
+- IG story with native countdown sticker set to July 25 (ISΛRK's confirmed publish time — TBD)
 - static cover art background. text: `Switch — ISΛRK × 10k.emraan`
 - note: countdown sticker requires the exact publish time. this fires only after user confirms
-  the July 18 publish time. currently a blocker from the upload package.
+  the July 25 publish time. currently a blocker from the upload package.
 
 **[YouTube community post]**
-- `new beat out july 18 — Switch. ISΛRK × 10k.emraan. 186 bpm. drill. link drops at [TBD].`
+- `new beat out july 25 — Switch. ISΛRK × 10k.emraan. 186 bpm. drill. link drops at [TBD].`
 - use caption B from `team/drafts/uploads/switch/captions.md` — replace TBD before posting.
 
 **[X] — collab-story post**
-- `Switch started as one idea. 10k.emraan made it two. July 18.`
+- `Switch started as one idea. 10k.emraan made it two. July 25.`
 
 **assets needed:**
 - [ ] collab graphic (both handles) — spec written, see
   `team/drafts/content/switch-w27-collab-graphic-prompt.md` — responsible: ISΛRK design or Nyx-assisted generation
 - [ ] second hook clip cut — responsible: ISΛRK (or edit from W25 master clip)
 - [ ] 10k.emraan coordination — responsible: ISΛRK (direct outreach to co-producer)
-- [ ] July 18 publish time confirmed — responsible: user (currently blocking IG story + YouTube post)
+- [ ] July 25 publish time confirmed — responsible: user (currently blocking IG story + YouTube post)
 
 ---
 
@@ -201,8 +212,8 @@ energy spikes) and should flag the most probable candidate with a confidence not
 
 **[IG/TikTok #1–2] — high-frequency hook clips**
 - two separate posts this week, each a different 15-sec cut of Switch
-- increase visual energy: consider adding a beat-synced text flash overlay (`SWITCH / 07.18`)
-- captions: keep minimal. `drops in [X] days.` or just `07.18.`
+- increase visual energy: consider adding a beat-synced text flash overlay (`SWITCH / 07.25`)
+- captions: keep minimal. `drops in [X] days.` or just `07.25.`
 
 **[IG/TikTok #3–4] — license / beat store CTA**
 - one post directly naming the store: `license available at [beat store URL]. link in bio.`
@@ -214,17 +225,20 @@ energy spikes) and should flag the most probable candidate with a confidence not
 - alternatively, post a different 45-sec clip highlighting a second section of the track
 
 **[YouTube community post] — final countdown**
-- `Switch drops July 18. ISΛRK × 10k.emraan. SoundCloud + YouTube simultaneously.`
+- `Switch drops July 25. ISΛRK × 10k.emraan. SoundCloud + YouTube simultaneously.`
 - add the beat store URL once confirmed.
 
 **[X] — two posts**
 - mid-week: `7 days. Switch — ISΛRK × 10k.emraan.`
-- end of week (July 12–13): `48 hours. 186 bpm. c minor. link drops friday.` (adjust day to match actual Jul 18 DOW — it's a Saturday)
+- end of week: `48 hours. 186 bpm. c minor. link drops friday.` (adjust day to match actual
+  publish-date DOW once confirmed — July 25, 2026 is a Saturday, so this line and the
+  "drops friday" framing still hold against the new date; see the W28→July 25 gap note
+  below for the week-window mismatch this example sits inside)
 
 **assets needed:**
 - [ ] additional hook clip cuts (W28 variants) — responsible: ISΛRK
 - [ ] beat store URL confirmed — responsible: user (hard blocker for CTA posts)
-- [ ] July 18 publish time confirmed — responsible: user (needed for exact countdown copy)
+- [ ] July 25 publish time confirmed — responsible: user (needed for exact countdown copy)
 
 ---
 
@@ -234,7 +248,7 @@ energy spikes) and should flag the most probable candidate with a confidence not
 |---|---|---|
 | Aether: 3-second hook moment timestamp | all hook clips (W25–W28 IG/TikTok) | Aether |
 | user: beat store URL | W28 CTA posts, YouTube community copy | user |
-| user: July 18 publish time | IG countdown story (W27), YouTube community post (W27+W28) | user |
+| user: July 25 publish time | IG countdown story (W27), YouTube community post (W27+W28) | user |
 | ISΛRK: cover art ready | W25 static teaser (or push to W26) | ISΛRK |
 | ISΛRK: DAW session clip | W26 BTS post | ISΛRK |
 | ISΛRK: 10k.emraan coordination | W27 collab post double-drop | ISΛRK |
@@ -250,7 +264,7 @@ energy spikes) and should flag the most probable candidate with a confidence not
 - hashtags in first comment, not caption body
 
 **SoundCloud / YouTube**
-- no public full upload until July 18 (per upload package)
+- no public full upload until July 25 (per upload package)
 - SoundCloud snippet should be a separate private track, not the final upload
 - YouTube community posts are the long-form anchor each week — they serve subscribers
   who do not follow on IG
@@ -276,6 +290,27 @@ energy spikes) and should flag the most probable candidate with a confidence not
 | W26 (Jun 22–28) | process | 2 posts | 1 snippet | 1 post |
 | W27 (Jun 29–Jul 5) | collab | 3 posts | 1 YT community | 1 post |
 | W28 (Jul 6–13) | imminent | 3–4 posts | 1 SC + 1 YT community | 1–2 posts |
+
+---
+
+## flagged, not fixed here: W28 → July 25 gap (2026-06-28, Nyx)
+
+this arc was built backward from the original July 18 target: W25 opens June 15, W28
+closes July 13, and July 14–17 was named explicitly as drop-week buffer. Switch's target
+moved to July 25 on 2026-06-27 (ten consecutive silent days, calendar's own pre-announced
+wall — see `team/reports/q3-2026-release-calendar.md`, Switch section). That leaves a real
+structural hole: **12 days between W28 ending (July 13) and the new release date (July
+25) with no named week, no content plan, and no posting cadence defined.**
+
+fixing the embedded date *text* (done above, this pass) is not the same as fixing the
+*structure* — the arc's week-by-week spine still assumes a 4-week window ending the week
+before release. extending it properly (does W28's "imminent" energy get a W29? does the
+drop-week buffer just get longer? does cadence change?) is a content-planning decision,
+not a find-and-replace, and it's a bigger lift than today's date-text sweep
+(`t-switch-arc-docs-date-staleness-0627`). not absorbing it silently into this task — filed
+as its own open item (`t-switch-arc-w28-gap-extension`) so it has an owner and doesn't
+quietly vanish between the date fix looking complete and the actual week-by-week gap
+still existing.
 
 ---
 

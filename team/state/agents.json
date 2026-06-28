@@ -1,52 +1,52 @@
 {
-  "updatedAt": "2026-06-27T13:00:00Z",
+  "updatedAt": "2026-06-28T13:00:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "Tenth consecutive silent day. Verified via cursors.json (all-empty), team/inbox/ (only .gitkeep) and queue.json (updatedAt was still 2026-06-18 before today's writes). The pre-announced June 27 wall fired today, not deferred — checked the literal historical text and confirmed no EOD-deferral clause exists for Switch (unlike Homerun's), so the Nightshade no-deferral pattern governs. Executed: Switch target moved July 18 -> July 25 across the Q3 calendar, checklist.md, and overlay.json; Release Spacing recalculated 21->14 days. Appended ap-2026-06-27-switch-upload-replan to the queue, superseding the now-genuinely-stale July 18 framing on ap-2026-06-19-switch-upload. Owes a fix for tomorrow: t-queue-age-arithmetic-error-0627 (Argus caught the calendar/overlay's '8 days old' claim was wrong — actual age is 15 days).",
-      "lastActive": "2026-06-27T09:00:00Z"
+      "task": "Eleventh consecutive silent day. Fixed t-queue-age-arithmetic-error-0627: corrected the calendar's 2026-06-27 log entry and overlay.json's os-rem-switch-inputs-jun20 reminder from a wrong '8 days old' to the real 15 days (createdAt-based), and recomputed all four pending queue items' ages for today (16/11/10/1 days). Confirmed nothing crosses the standing-policy escalation bar today — next dated checkpoints are July 1 and August 1, neither today. Left t-switch-arc-docs-date-staleness-0627 for Nyx rather than pre-empting it. Owes a planning decision next: t-switch-arc-w28-gap-extension (the Switch arc's W28 structure needs to extend to cover the new 12-day July 14-25 gap).",
+      "lastActive": "2026-06-28T09:00:00Z"
     },
     {
       "id": "aether",
       "name": "Aether",
       "role": "A&R · Sound",
       "status": "idle",
-      "task": "Dark — no intake today, confirmed genuine via empty cursors.json/inbox. Still structurally locked out of Switch hook-moment analysis and the back catalog pending t-retroactive-intake-path (unchanged, user decision).",
-      "lastActive": "2026-06-27T09:00:00Z"
+      "task": "No items, confirmed genuine — no intake today, cursors.json all-empty, team/inbox/ only audio/.gitkeep. Still structurally locked out of Switch's hook-moment analysis and the back catalog pending t-retroactive-intake-path (unchanged, user decision).",
+      "lastActive": "2026-06-28T09:00:00Z"
     },
     {
       "id": "nyx",
       "name": "Nyx",
       "role": "Execution · Content",
       "status": "idle",
-      "task": "Completed the handed-off date-framing sweep on the five Switch upload-package files: fixed metadata.json's targetReleaseDate (07-18->07-25) and two literal 'july 18' mentions in captions.md; confirmed description.md and art-prompt.md have zero date references, untouched. Found and filed a larger out-of-scope gap: team/drafts/content/ arc and W25-W27 spec docs still hardcode July 18 throughout, including on two files that are live draftPaths on pending queue entries — filed t-switch-arc-docs-date-staleness-0627 rather than silently expanding today's scope. t-switch-upload-package and t-switch-prerelease-arc remain in review, same real blockers (beat store URL, publish time, Aether's hook-moment timestamp), now framed against July 25.",
-      "lastActive": "2026-06-27T09:30:00Z"
+      "task": "Closed t-switch-arc-docs-date-staleness-0627: swept five content-spec files (switch-prerelease-arc-w25-w28.md, switch-w25-collab-story-prompt.md, switch-w26-content-prep.md, switch-w27-collab-graphic-prompt.md, switch-w26-waveform-visualizer-prompt.md) for stale July 18 references, corrected all live hits to July 25, left historical citations/dead marker-post quotes untouched on purpose. Filed t-switch-arc-w28-gap-extension (owner hemera) for the 12-day content-plan gap the date move opened. t-switch-upload-package and t-switch-prerelease-arc remain in review, same real blockers (beat store URL, publish time, Aether's hook-moment timestamp). t-homerun-video-decision unchanged, still doing.",
+      "lastActive": "2026-06-28T09:30:00Z"
     },
     {
       "id": "hermes",
       "name": "Hermes",
       "role": "Booking · Outreach",
       "status": "idle",
-      "task": "Dark — no messages today, confirmed genuine via empty cursors.json/inbox. IMAP and Discord intake still unconfigured; t-intake-channels unchanged.",
-      "lastActive": "2026-06-27T09:00:00Z"
+      "task": "No items, confirmed genuine — no booking/collab messages today, cursors.json/inbox empty. IMAP and Discord intake still unconfigured; t-intake-channels unchanged.",
+      "lastActive": "2026-06-28T09:00:00Z"
     },
     {
       "id": "mnemosyne",
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "idle",
-      "task": "2026-06-27 meeting record closed. Independently verified before writing anything: confirmed ap-2026-06-19-switch-upload's createdAt is 2026-06-12T12:30:00Z, making it 15 days old today, not 8 as the calendar/overlay claimed — matches Argus's finding exactly. Confirmed the Nightshade-vs-Homerun deferral-clause distinction by direct re-read of the historical text. Confirmed Release Spacing arithmetic (Aug 8 - Jul 25 = 14 days) and the new queue entry's append-only schema conformance. Confirmed Nyx's four file-edit claims against the actual files. Left t-queue-age-arithmetic-error-0627 open (owner hemera, backlog) per the team's own next-day-correction precedent — not patched same-day. Refreshed agents.json for all seven agents. library/beats.json unchanged (zero intake, sixteenth consecutive day) — left as-is. tasks.json reviewed in full: 41 unique ids, no duplicates, no premature closures.",
-      "lastActive": "2026-06-27T13:00:00Z"
+      "task": "2026-06-28 meeting record closed. Verified Hemera's arithmetic fix and Nyx's five-file sweep directly against the actual files before writing anything. Confirmed tasks.json: 42 unique ids, no duplicates, no premature closures. Confirmed queue.json untouched today (4 pending, correct — no new approval ask), overlay.json valid (one new note, one reminder refreshed in place). library/beats.json unchanged (zero intake, seventeenth consecutive day). Refreshed agents.json for all seven agents. Bumped tasks.json's updatedAt.",
+      "lastActive": "2026-06-28T13:00:00Z"
     },
     {
       "id": "theia",
       "name": "Theia",
       "role": "Market · Research",
       "status": "idle",
-      "task": "No turn today — not Monday (June 27 is a Saturday), weekly market read is Monday-only, no fresh agenda item to react to. Confirmed genuine: no new file under team/reports/market/ since 2026-W26.md.",
+      "task": "No items, confirmed genuine — today is Sunday, not Monday; weekly market read is Monday-only and no market item was on today's agenda. No new file under team/reports/market/ since 2026-W26.md.",
       "lastActive": "2026-06-22T09:00:00Z"
     },
     {
@@ -54,8 +54,8 @@
       "name": "Argus",
       "role": "Oversight · Pipeline",
       "status": "idle",
-      "task": "Thirteenth pipeline audit complete (team/reports/pipeline/2026-06-27.md). Verdict: YELLOW — downgrade from three GREENs. Stress-tested and confirmed Hemera's Nightshade-vs-Homerun deferral-clause distinction holds under direct challenge. Verified Release Spacing arithmetic and the new queue entry's append-only schema conformance, including the supersession judgment vs. the W26 leave-as-is precedent. Independently verified all of Nyx's file-sweep claims. Real finding: caught the calendar/overlay's queue-age claim ('8 days old' for ap-2026-06-19-switch-upload) is wrong — actual createdAt-based age is 15 days, breaking a five-day correct-anchoring streak. Filed t-queue-age-arithmetic-error-0627 (owner hemera). Direct note to ISΛRK: third pre-announced fallback to fire this cycle, mechanically sound and honestly disclosed, but a second wrong-number incident this cycle worth naming as a pattern.",
-      "lastActive": "2026-06-27T11:00:00Z"
+      "task": "Fourteenth pipeline audit complete (team/reports/pipeline/2026-06-28.md). Verdict: GREEN — second GREEN in four audits. Independently recomputed Hemera's queue-age fix from scratch (matches exactly, generalized correctly across all four items) and confirmed her escalation-bar claim against the calendar's own text. Re-grepped the whole content directory for July 18 residue after Nyx's sweep — clean, only historical citations remain. Verified Nyx's new W28-gap task is real and correctly routed. Schema sweep clean: 42 unique task ids. Filed zero new tasks today.",
+      "lastActive": "2026-06-28T11:00:00Z"
     }
   ]
 }

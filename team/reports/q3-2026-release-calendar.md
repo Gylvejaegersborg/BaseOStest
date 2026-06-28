@@ -535,8 +535,10 @@ decided by default.** Jun 18 through 27, ten days, zero commits and zero user in
 confirmed directly: `cursors.json` still all-empty (`discord: {}`, `imap.lastUid: 0`,
 `copyparty.seenShas: []`), `team/inbox/` has nothing beyond `audio/.gitkeep`,
 `approvals/queue.json` `updatedAt` still `2026-06-18T11:00:00Z`, all three items still
-`pending` (recomputed ages from raw `createdAt`: `ap-2026-06-19-switch-upload` 8 days
-since June 19, `ap-2026-06-17-switch-w25-collab-story` 10 days since June 17,
+`pending` (recomputed ages from raw `createdAt`, corrected 2026-06-28 — see note
+immediately below: `ap-2026-06-19-switch-upload` 15 days since its real `createdAt` of
+June 12, not 8 since June 19 as originally and incorrectly stated here;
+`ap-2026-06-17-switch-w25-collab-story` 10 days since June 17;
 `ap-2026-06-18-switch-w26-x-post` 9 days since June 18). Checked today's date against
 the calendar's own literal text, not assumed: "June 27: hard line for Switch inputs +
 approval before July 18 needs re-planning. If unmet, the release moves to July 25."
@@ -555,6 +557,49 @@ re-checked directly against the repo, not assumed unchanged — no
 video-decision` is still `doing`, not `review`. None of the three 2026-06-21
 production-start triggers have fired. The reversibility window is unchanged and still
 genuinely open today.
+**2026-06-28 — eleventh consecutive silent day. Bookkeeping/correction day: fixing
+yesterday's arithmetic error, nothing new crosses the escalation bar.** Jun 18 through
+28, eleven days, zero commits and zero user input — confirmed directly:
+`cursors.json` still all-empty (`discord: {}`, `imap.lastUid: 0`,
+`copyparty.seenShas: []`), `team/inbox/` has nothing beyond `audio/.gitkeep`,
+`approvals/queue.json` still shows all four items `pending` (the original three plus
+yesterday's superseding entry), untouched by any user action since June 18.
+
+**The correction, owed from Argus's 2026-06-27 audit (`t-queue-age-arithmetic-error-
+0627`).** Yesterday's log entry above, and the overlay reminder `os-rem-switch-inputs-
+jun20`, both stated `ap-2026-06-19-switch-upload` was "8 days old, recomputed from raw
+`createdAt`." That was wrong on its own terms — its actual `createdAt` field is
+`2026-06-12T12:30:00Z`. June 12 to June 27 is 15 days, not 8. The "8" came from
+quietly anchoring to the date embedded in the item's id slug (`...06-19...`, the day it
+entered the approval gate) instead of its real `createdAt`. Fixed in place above, and
+fixed in the overlay reminder today. Per Argus's filing, this is a same-class repeat of
+the June 22 Nightshade citation error — a wrong number landing inside a high-stakes
+turn — worth naming as a pattern, not just patching silently. Not fixed same-day on
+purpose, per this team's own precedent for small errors (Argus's recommendation,
+consistent with how the W26 queue-summary framing gap and the Nightshade citation error
+were both handled the day after they were found): fixed today, the next standup.
+
+**Today's actual queue ages, recomputed from each item's real `createdAt`, all four
+items, not just the one that was wrong:**
+- `ap-2026-06-19-switch-upload` (`createdAt` 2026-06-12T12:30:00Z) — **16 days old.**
+- `ap-2026-06-17-switch-w25-collab-story` (`createdAt` 2026-06-17T09:00:00Z) — **11
+  days old.**
+- `ap-2026-06-18-switch-w26-x-post` (`createdAt` 2026-06-18T11:00:00Z) — **10 days
+  old.**
+- `ap-2026-06-27-switch-upload-replan` (`createdAt` 2026-06-27T09:00:00Z) — **1 day
+  old.**
+
+**Nothing crosses the escalation bar today.** Checked this section (Next Check-in
+Points) directly rather than assuming: the next two dated checkpoints are July 1
+(Virtual Love chorus status check) and August 1 (Virtual Love mix check) — both still
+in the future, neither today. The June 27 wall already fired, yesterday, by default
+(see the 2026-06-27 entry above and the Switch section). Homerun's fallback fired June
+20. Nightshade's fallback fired June 22. No fallback is newly taking effect today, and
+no wall is being crossed today. Per the standing policy's part 2, that means today does
+not escalate on its own terms — eleven days of silence is a real fact, but it is not a
+new consequence today, and saying otherwise would be manufacturing urgency the calendar
+math doesn't support. This is a correction day, not a fallback day.
+
 - July 1: Virtual Love chorus status check.
 - August 1: Virtual Love mix received or track moves to Q4.
 

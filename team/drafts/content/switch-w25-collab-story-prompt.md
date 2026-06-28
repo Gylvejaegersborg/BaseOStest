@@ -2,6 +2,11 @@
 
 for: [X] post + supplementary IG/TikTok caption variant, week of June 15–21 ("signal" week)
 referenced in: `team/drafts/content/switch-prerelease-arc-w25-w28.md` (W25, content beats)
+**updated:** Nyx · 2026-06-28 — date sweep (`t-switch-arc-docs-date-staleness-0627`):
+corrected this file's own live copy/claims (both posting-copy lines, the publish-time
+note, the release-date confirmation) from July 18 to July 25, matching the calendar's
+2026-06-27 re-plan. Left alone: the two verbatim quotes of the dead, never-published W25
+marker-post line — those are citations of historical planning text, not live claims.
 
 ---
 
@@ -46,7 +51,7 @@ Switch.
 
 ### [X] — collab-story post (standalone)
 
-> `two producers. one 186 bpm idea. ISΛRK × 10k.emraan — Switch, july 18.`
+> `two producers. one 186 bpm idea. ISΛRK × 10k.emraan — Switch, july 25.`
 
 reasoning: leads with the collab as a fact before the track name. shorter than a sentence,
 longer than a tag. no link — matches the rest of W25's no-link discipline (the arc doesn't
@@ -60,9 +65,9 @@ note below on cadence if a second, separate X post is later drafted for the week
 
 ### [IG/TikTok] — caption variant for the producer-tag hook clip (#1), collab-forward version
 
-> `a 186 bpm idea, built by two people. ISΛRK × 10k.emraan. switch — 07.18.`
+> `a 186 bpm idea, built by two people. ISΛRK × 10k.emraan. switch — 07.25.`
 
-this is an alternative to the arc's existing minimal caption (`switch. 07.18.`) for content
+this is an alternative to the arc's existing minimal caption (`switch. 07.25.`) for content
 beat #1. the existing caption is correct for a cold-open hook clip where the track should
 speak first — keep that as the primary option once the hook clip exists. this variant is
 here as a fallback/companion if ISΛRK wants the collab story present even in the hook-clip
@@ -80,13 +85,17 @@ if cover art lands this week.
 **does not need:**
 - Aether's hook-moment timestamp — this is text copy, no clip is cut or referenced
 - beat store URL — no link in either post
-- July 18 publish time — date only, no time-of-day claim made
+- July 25 publish time — date only, no time-of-day claim made
 
 **needs (already in hand, verified against `src/data/beats.ts` / upload package):**
 - BPM: 186 — confirmed
 - key: C minor — confirmed
 - collab credit: ISΛRK × 10k.emraan — confirmed, matches `metadata.json` artist field
-- release date: July 18, 2026 — confirmed, matches Q3 release calendar
+- release date: July 25, 2026 — confirmed against Q3 release calendar
+  (`team/reports/q3-2026-release-calendar.md`); corrected 2026-06-28 from the stale July
+  18 figure this line previously stated — Switch's target moved to July 25 by default on
+  2026-06-27, ten consecutive silent days, see the calendar's Switch section for the full
+  literal-text reasoning
 
 no hook-detail, sonic description, or "feel" claim is made anywhere in this copy — Nyx
 cannot hear the track and has not invented one. both posts work entirely off the verified

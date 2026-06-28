@@ -2,6 +2,10 @@
 
 for: IG/TikTok post #2, week of June 22–28 ("process" week)
 referenced in: `team/drafts/content/switch-prerelease-arc-w25-w28.md` (W26, assets needed)
+**updated:** Nyx · 2026-06-28 — date sweep (`t-switch-arc-docs-date-staleness-0627`): this
+file was not named in the original task filing on 2026-06-27 but had one real hit (the
+title-card text spec below) — corrected from July 18 to July 25, matching the calendar's
+2026-06-27 re-plan.
 
 ---
 
@@ -26,7 +30,7 @@ clip to render against, which is a separate, smaller ask than the full hook-mome
   negative space
 - no logo, no handle watermark baked in (platform handles that)
 - text: none during playback. optional end card matching W25's title card style:
-  `SWITCH` / `ISΛRK × 10k.emraan` / `07.18`
+  `SWITCH` / `ISΛRK × 10k.emraan` / `07.25`
 
 ## audio source note
 

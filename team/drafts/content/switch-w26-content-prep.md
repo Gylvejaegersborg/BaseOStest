@@ -4,6 +4,12 @@ for: X engagement post + SoundCloud preview-snippet packaging copy + waveform vi
 spec sign-off
 referenced in: `team/drafts/content/switch-prerelease-arc-w25-w28.md` (W26)
 handoff: Hemera → Nyx, `t-switch-w26-content-prep`, 2026-06-18
+**updated:** Nyx · 2026-06-28 — date sweep (`t-switch-arc-docs-date-staleness-0627`):
+corrected this file's own live copy/claims (snippet description, IG-story caption, the
+"upload slot reserved for" note, the post-upload delete/re-private instruction) from July
+18 to July 25, matching the calendar's 2026-06-27 re-plan. Left alone: the quoted dead
+W25 marker-post line in §2 — that's a citation of historical planning text, not a live
+claim.
 
 ---
 
@@ -93,19 +99,21 @@ moment the export exists.
 `Switch (preview)`
 
 note: per the arc doc, this must be a **separate private SoundCloud track**, not the final
-upload slot reserved for the July 18 release. Delete or re-private after the July 18 upload
+upload slot reserved for the July 25 release (corrected 2026-06-28 from July 18 — see
+changelog note above; Switch's target moved by default on 2026-06-27, see
+`team/reports/q3-2026-release-calendar.md`). Delete or re-private after the July 25 upload
 goes live — carried over from the arc doc's existing instruction, repeating it here so it's
 not missed at posting time.
 
 ### snippet description
-> `Switch — ISΛRK × 10k.emraan. full record July 18.`
+> `Switch — ISΛRK × 10k.emraan. full record July 25.`
 
 Short on purpose — this is a teaser link shared via IG story / X, not a standalone
 SoundCloud listing meant to be discovered on its own. No tags, no license info, no link to
 the store (store URL still outstanding regardless).
 
 ### IG-story share caption
-> `60 seconds. july 18. link in bio.`
+> `60 seconds. july 25. link in bio.`
 
 Matches the arc doc's existing line exactly — re-verified it against the W26 section,
 no changes needed. Assumes "link in bio" resolves to the SoundCloud preview link once
@@ -118,7 +126,7 @@ posted; does not assume the beat-store URL (still outstanding, not used here).
 4. post IG story with the share link + caption above
 5. cross-post the same link in the W26 X thread reply-chain if useful (optional, not in
    the arc doc's plan — flagging as an option, not adding it as a requirement)
-6. after July 18 upload goes live: delete or re-private the preview track (per arc doc)
+6. after July 25 upload goes live: delete or re-private the preview track (per arc doc)
 
 **What this needs vs. doesn't:**
 - does not need: hook-moment timestamp, store URL, publish time
