@@ -603,6 +603,62 @@ math doesn't support. This is a correction day, not a fallback day.
 - July 1: Virtual Love chorus status check.
 - August 1: Virtual Love mix received or track moves to Q4.
 
+**2026-06-29 — twelfth consecutive silent day. Monday, ISO week 27. Bookkeeping plus one
+real decision: holding on the W28→July 25 arc gap, not deciding it today.** Jun 18 through
+29, twelve days, zero commits and zero user input — confirmed directly: `cursors.json`
+still all-empty (`discord: {}`, `imap.lastUid: 0`, `copyparty.seenShas: []`), `team/inbox/`
+has nothing beyond `audio/.gitkeep`, `approvals/queue.json` `updatedAt` still
+`2026-06-27T09:00:00Z`, all four items still `pending`. Checked today's date against this
+section's own literal text: the next two dated checkpoints are July 1 and August 1 —
+neither is today. No fallback is newly taking effect, no wall is being crossed. Per the
+standing policy's part 2, today does not escalate on its own terms.
+
+**Today's queue ages, recomputed from each item's real `createdAt`:**
+- `ap-2026-06-19-switch-upload` (`createdAt` 2026-06-12T12:30:00Z) — **17 days old.**
+- `ap-2026-06-17-switch-w25-collab-story` (`createdAt` 2026-06-17T09:00:00Z) — **12
+  days old.**
+- `ap-2026-06-18-switch-w26-x-post` (`createdAt` 2026-06-18T11:00:00Z) — **11 days
+  old.**
+- `ap-2026-06-27-switch-upload-replan` (`createdAt` 2026-06-27T09:00:00Z) — **2 days
+  old.**
+
+**The W28→July 25 gap decision (`t-switch-arc-w28-gap-extension`) — held, not decided,
+today, on purpose.** Nyx filed this yesterday (2026-06-28): the Switch arc's week
+structure (W25–W28) is still calendar-anchored to the original July 18 target, closes
+July 13, and the date-text sweep that corrected every embedded "July 18" mention did not
+and should not have silently re-extended the week-by-week structure itself, since that is
+a content-planning call, not a text fix. That leaves a real 12-day stretch (July 14–25)
+with no named week, theme, or posting cadence. Decision: **hold, do not call it today.**
+Reasoning, not just a default to inertia: (1) today is W27's opening day per the arc doc
+("W27 — June 29–July 5 · collab") — the gap itself doesn't open until W28 closes July 13,
+which is two full weeks out; (2) nothing has changed since yesterday's filing — making a
+real creative-cadence call (extend W28's energy into a W29, lengthen the existing
+drop-week-buffer concept, or accept a deliberate quiet stretch) on one day's silence with
+zero new information would be manufacturing a decision to look responsive, not making a
+better one; (3) Nyx's own filing explicitly scoped this as "should be decided before
+W28-equivalent timing actually arrives," not "before the next standup" — there is genuine
+runway, and using it is not the same as letting the task rot. **Setting a real checkpoint
+instead of leaving this open-ended:** Nyx needs a direction by the time she builds W28
+content, which on the arc's own cadence is the week of **July 6** (W28 opens). Hemera
+commits to making this call no later than **July 5** (the day before W28 opens) if no
+new information arrives first — this is a self-set checkpoint, not a user-facing
+deadline, since the decision is Hemera's to make regardless of user input. If ISΛRK
+surfaces a preference before then, that overrides this default timeline for free, same
+standard as every other open decision on this board. Task status stays `backlog`, owner
+stays `hemera` — not advancing it to `doing` today would overstate progress that did not
+happen; the only real movement today is naming when the decision will actually get made.
+
+**Homerun, re-checked directly, not assumed unchanged.** No `team/drafts/uploads/homerun/`
+directory exists anywhere in the repo. Repo-wide glob for
+`**/*.{mp4,mov,wav,aif,aiff,mkv,prproj,fcpxml,drp,edl}` returns zero hits. `t-homerun-
+video-decision` is still `doing`, not `review`. None of the three 2026-06-21
+production-start triggers have fired. The reversibility window is unchanged and still
+genuinely open — a commissioned-video preference from ISΛRK still overrides the
+internal-edit default for free, today, the same as every day this month.
+
+**Theia's W27 market read is due today** (Monday, ISO week 27 — `team/reports/market/
+2026-W26.md` is the last one on file, dated 2026-06-22). Handed to Theia this run.
+
 ---
 
 _This calendar is a working draft. Dates are proposals, not announcements. Nothing

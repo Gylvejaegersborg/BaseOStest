@@ -1,13 +1,13 @@
 {
-  "updatedAt": "2026-06-28T13:00:00Z",
+  "updatedAt": "2026-06-29T13:00:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "Eleventh consecutive silent day. Fixed t-queue-age-arithmetic-error-0627: corrected the calendar's 2026-06-27 log entry and overlay.json's os-rem-switch-inputs-jun20 reminder from a wrong '8 days old' to the real 15 days (createdAt-based), and recomputed all four pending queue items' ages for today (16/11/10/1 days). Confirmed nothing crosses the standing-policy escalation bar today — next dated checkpoints are July 1 and August 1, neither today. Left t-switch-arc-docs-date-staleness-0627 for Nyx rather than pre-empting it. Owes a planning decision next: t-switch-arc-w28-gap-extension (the Switch arc's W28 structure needs to extend to cover the new 12-day July 14-25 gap).",
-      "lastActive": "2026-06-28T09:00:00Z"
+      "task": "Twelfth consecutive silent day. Confirmed nothing crosses the standing-policy escalation bar today (next dated checkpoints July 1, August 1). Recomputed all four queue ages from real createdAt (17/12/11/2 days). Decided to HOLD t-switch-arc-w28-gap-extension rather than call it today — real pressure doesn't arrive until W28 closes July 13; self-set checkpoint to decide no later than July 5, written into the Q3 calendar. Re-verified Homerun reversibility, unchanged. No new handoff manufactured for Nyx. Owes: the July 5 W28-gap decision.",
+      "lastActive": "2026-06-29T09:00:00Z"
     },
     {
       "id": "aether",
@@ -15,15 +15,15 @@
       "role": "A&R · Sound",
       "status": "idle",
       "task": "No items, confirmed genuine — no intake today, cursors.json all-empty, team/inbox/ only audio/.gitkeep. Still structurally locked out of Switch's hook-moment analysis and the back catalog pending t-retroactive-intake-path (unchanged, user decision).",
-      "lastActive": "2026-06-28T09:00:00Z"
+      "lastActive": "2026-06-29T09:00:00Z"
     },
     {
       "id": "nyx",
       "name": "Nyx",
       "role": "Execution · Content",
       "status": "idle",
-      "task": "Closed t-switch-arc-docs-date-staleness-0627: swept five content-spec files (switch-prerelease-arc-w25-w28.md, switch-w25-collab-story-prompt.md, switch-w26-content-prep.md, switch-w27-collab-graphic-prompt.md, switch-w26-waveform-visualizer-prompt.md) for stale July 18 references, corrected all live hits to July 25, left historical citations/dead marker-post quotes untouched on purpose. Filed t-switch-arc-w28-gap-extension (owner hemera) for the 12-day content-plan gap the date move opened. t-switch-upload-package and t-switch-prerelease-arc remain in review, same real blockers (beat store URL, publish time, Aether's hook-moment timestamp). t-homerun-video-decision unchanged, still doing.",
-      "lastActive": "2026-06-28T09:30:00Z"
+      "task": "Status-confirmation turn only, no new files — nothing genuinely new/unblocked surfaced. Re-verified t-switch-upload-package and t-switch-prerelease-arc remain in review, same real blockers (beat store URL, publish time, hook-moment timestamp). Confirmed W27 collab-graphic spec is ready/independent of blockers; second hook-clip and 10k.emraan coordination both need ISΛRK, not a Nyx drafting gap. Independently re-verified Homerun reversibility with her own glob search — zero hits, t-homerun-video-decision still doing.",
+      "lastActive": "2026-06-29T09:30:00Z"
     },
     {
       "id": "hermes",
@@ -31,31 +31,31 @@
       "role": "Booking · Outreach",
       "status": "idle",
       "task": "No items, confirmed genuine — no booking/collab messages today, cursors.json/inbox empty. IMAP and Discord intake still unconfigured; t-intake-channels unchanged.",
-      "lastActive": "2026-06-28T09:00:00Z"
+      "lastActive": "2026-06-29T09:00:00Z"
     },
     {
       "id": "mnemosyne",
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "idle",
-      "task": "2026-06-28 meeting record closed. Verified Hemera's arithmetic fix and Nyx's five-file sweep directly against the actual files before writing anything. Confirmed tasks.json: 42 unique ids, no duplicates, no premature closures. Confirmed queue.json untouched today (4 pending, correct — no new approval ask), overlay.json valid (one new note, one reminder refreshed in place). library/beats.json unchanged (zero intake, seventeenth consecutive day). Refreshed agents.json for all seven agents. Bumped tasks.json's updatedAt.",
-      "lastActive": "2026-06-28T13:00:00Z"
+      "task": "2026-06-29 meeting record closed. Independently verified all five claimed artifacts (tasks.json, overlay.json, queue.json, Q3 calendar entry, market report, pipeline report) directly against source files before writing anything. Confirmed tasks.json: 44 unique ids, no duplicates, no premature closures. Moved t-w27-market-report backlog to done (report exists, work finished). Confirmed queue.json genuinely untouched today (4 pending, no new appends), overlay.json valid (two new notes plus Argus's own, no id collisions, four reminders refreshed in place). library/beats.json unchanged (zero intake, eighteenth consecutive day). Refreshed agents.json for all seven agents. Bumped tasks.json's updatedAt.",
+      "lastActive": "2026-06-29T13:00:00Z"
     },
     {
       "id": "theia",
       "name": "Theia",
       "role": "Market · Research",
       "status": "idle",
-      "task": "No items, confirmed genuine — today is Sunday, not Monday; weekly market read is Monday-only and no market item was on today's agenda. No new file under team/reports/market/ since 2026-W26.md.",
-      "lastActive": "2026-06-22T09:00:00Z"
+      "task": "Filed ISO week 27 market read (team/reports/market/2026-W27.md) — collab thesis (ISΛRK x 10k.emraan) holds under the July 25 date; flagged Friday-vs-Saturday timing as genuinely unverifiable rather than guessing; no market-grounded case either way on Hemera's W28-gap shape, flagged countdown-sticker mechanic as a cheap bridge option (execution note, not a market finding); re-confirmed directly against src/data/beats.ts that Cold Storage has no audioFile field, still not a real extended-loop candidate. Zero new handoffs to Nyx — said plainly there is no new signal this week.",
+      "lastActive": "2026-06-29T09:00:00Z"
     },
     {
       "id": "argus",
       "name": "Argus",
       "role": "Oversight · Pipeline",
       "status": "idle",
-      "task": "Fourteenth pipeline audit complete (team/reports/pipeline/2026-06-28.md). Verdict: GREEN — second GREEN in four audits. Independently recomputed Hemera's queue-age fix from scratch (matches exactly, generalized correctly across all four items) and confirmed her escalation-bar claim against the calendar's own text. Re-grepped the whole content directory for July 18 residue after Nyx's sweep — clean, only historical citations remain. Verified Nyx's new W28-gap task is real and correctly routed. Schema sweep clean: 42 unique task ids. Filed zero new tasks today.",
-      "lastActive": "2026-06-28T11:00:00Z"
+      "task": "Fifteenth pipeline audit complete (team/reports/pipeline/2026-06-29.md). Verdict: GREEN — fifth GREEN in fifteen audits. Independently recomputed all four queue ages from raw createdAt (matched Hemera's 17/12/11/2 exactly, confirms the createdAt-anchoring fix is holding as a method). Stress-tested Hemera's W28-gap hold decision against the arc doc's own dates directly — sound, falsifiable checkpoint, not inertia; flagged for the record that 'no new information' reasoning needs honest re-litigating if July 5 arrives still empty. Independently re-verified Theia's Cold Storage claim and Homerun reversibility (third independent check today). Schema sweep clean: 44 unique task ids. Filed zero new tasks today.",
+      "lastActive": "2026-06-29T11:00:00Z"
     }
   ]
 }
