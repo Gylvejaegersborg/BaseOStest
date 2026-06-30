@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-29T13:00:00Z",
+  "updatedAt": "2026-06-30T13:00:00Z",
   "tasks": [
     {
       "id": "t-argus-pipeline-audit-0626",
@@ -541,6 +541,21 @@
       "links": ["team/reports/market/2026-W27.md", "team/reports/market/2026-W26.md", "team/reports/market/2026-W25.md"]
     },
     {
+      "id": "t-hemera-standup-0630",
+      "title": "Hemera daily standup — 2026-06-30",
+      "owner": "hemera",
+      "status": "done",
+      "createdBy": "hemera",
+      "createdAt": "2026-06-30T09:00:00Z",
+      "due": "2026-06-30",
+      "notes": "Thirteenth consecutive silent day (Jun 18-30), verified directly: cursors.json all-empty, inbox empty beyond .gitkeep, queue.json updatedAt still 2026-06-27T09:00:00Z (four items pending, untouched). Queue ages recomputed from real createdAt: ap-2026-06-19-switch-upload 18 days (June 12), ap-2026-06-17-switch-w25-collab-story 13 days (June 17), ap-2026-06-18-switch-w26-x-post 12 days (June 18), ap-2026-06-27-switch-upload-replan 3 days (June 27). Cross-checked against orchestrator-verified numbers — match exactly. July 1 flagged explicitly (tomorrow, Virtual Love chorus status check — check-in only, not a fallback date; August 1 is the real cliff). W28-gap decision held again, 5 days to the July 5 self-set checkpoint — no new information, holding is correct. Homerun reversibility re-verified independently: no team/drafts/uploads/homerun/ directory, zero render/export files anywhere in the repo, t-homerun-video-decision still doing. No new Nyx handoff — nothing genuinely unblocked surfaced. Wrote os-note-hemera-standup-0630 and os-rem-vl-chorus-jul1 (new) to overlay.json; refreshed os-rem-switch-inputs-jun20, os-rem-homerun-video-jun19, os-rem-w25-cadence-decision, os-rem-switch-w26-snippet-export in place. Added 2026-06-30 dated entry to team/reports/q3-2026-release-calendar.md Next Check-in Points.",
+      "links": [
+        "team/os/overlay.json",
+        "team/reports/q3-2026-release-calendar.md",
+        "team/state/tasks.json"
+      ]
+    },
+    {
       "id": "t-argus-pipeline-audit-0629",
       "title": "Fifteenth Argus pipeline health audit",
       "owner": "argus",
@@ -550,6 +565,17 @@
       "due": "2026-06-29",
       "notes": "Complete. Report at team/reports/pipeline/2026-06-29.md. Verdict: GREEN — third GREEN in four audits. Independently re-derived the twelfth-consecutive-silent-day claim (cursors.json all-empty, inbox empty beyond .gitkeep, queue.json updatedAt still 2026-06-27T09:00:00Z, all four items pending). Recomputed all four queue-item ages from raw createdAt and matched Hemera's 17/12/11/2 exactly — no recurrence of the 06-22/06-27 id-slug arithmetic-error pattern, two clean days running. Checked the escalation-bar claim against the calendar's own 'Next Check-in Points' text directly: only July 1 and August 1 remain live, neither today, claim holds. Stress-tested Hemera's W28-gap-extension hold decision against the arc doc's own dates, not her summary of them: confirmed W28 closes July 13 (arc doc header), today is genuinely W27's opening day (June 29-July 5 per the same doc), gap math (July 25 minus July 13 = 12 days) checks out, and 'decide by July 5' is concrete/falsifiable, not vague — ties to a real mechanical trigger (Nyx needs direction the week of July 6). Flagged one thing for the record, not a task: the 'no new information' reasoning will need honest re-litigating if July 5 arrives and still nothing has changed. Independently re-verified Theia's Cold Storage claim against src/data/beats.ts myself (no audioFile field, same placeholder section as Nightshade) — second consecutive week confirmed directly, not taken on repetition. Re-verified Homerun reversibility with an independent glob (third independent check today, after Hemera's and Nyx's, all three converging): zero render/export/edit-decision files anywhere, task still doing. Schema sweep clean: 44 unique task ids, no duplicates, no premature status changes; queue.json append-only respected; agents.json correctly stale pending Mnemosyne; overlay.json valid, no id collisions. Filed zero new tasks — fifth time in fifteen audits. Flagged for ISΛRK directly (not a task): the W28-gap decision is a self-set Hemera checkpoint (July 5) worth weighing in on now if he has a cadence preference, cheaper than reacting later.",
       "links": ["team/reports/q3-2026-release-calendar.md", "team/drafts/content/switch-prerelease-arc-w25-w28.md", "src/data/beats.ts", "team/reports/pipeline/2026-06-29.md"]
+    },
+    {
+      "id": "t-argus-pipeline-audit-0630",
+      "title": "Sixteenth Argus pipeline health audit",
+      "owner": "argus",
+      "status": "done",
+      "createdBy": "hemera",
+      "createdAt": "2026-06-30T09:00:00Z",
+      "due": "2026-06-30",
+      "notes": "Complete. Report at team/reports/pipeline/2026-06-30.md. Verdict: GREEN — fourth GREEN in five audits. Independently re-verified the thirteenth-consecutive-silent-day claim (cursors.json all-empty, inbox empty beyond .gitkeep, queue.json updatedAt still 2026-06-27T09:00:00Z, all four items pending). Recomputed all four queue ages from raw createdAt: 18/13/12/3 — matched Hemera's stated numbers exactly, third clean day running on createdAt-anchoring method. Verified the 2026-06-30 calendar entry against source files (silence claim, queue ages, escalation-bar check, July 1 framing, W28 hold arithmetic) — all accurate. os-rem-vl-chorus-jul1 confirmed genuinely new today, correctly needed, accurately framed. All five overlay reminders refreshed accurately, no id collisions. Homerun reversibility confirmed independently (zero render/export files, no team/drafts/uploads/homerun/ directory). Main procedural finding: t-hemera-standup-0630 is a redundant task — Hemera filed a task summarizing her own standup, with no precedent in fifteen prior standups, duplicating content already in the calendar entry, overlay note, and meeting record. Schema-conformant, not a rule violation, cost is low since it's a single done entry — ruling is no corrective task, standing recommendation to not repeat the pattern. Also named the W27 X collab-story post inconsistency (inline copy only, not queued, unlike W25/W26) — defensible given queue stagnation, no task filed. Schema sweep: 47 unique task ids (46 at yesterday's close plus today's new t-hemera-standup-0630 and this task), no duplicates, queue.json append-only respected, agents.json correctly stale, library/beats.json unchanged (nineteenth consecutive day of zero intake). Filed zero new tasks — sixth time in sixteen audits.",
+      "links": ["team/reports/pipeline/2026-06-30.md", "team/os/overlay.json", "team/reports/q3-2026-release-calendar.md"]
     }
   ]
 }

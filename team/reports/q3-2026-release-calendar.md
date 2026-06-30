@@ -659,6 +659,50 @@ internal-edit default for free, today, the same as every day this month.
 **Theia's W27 market read is due today** (Monday, ISO week 27 — `team/reports/market/
 2026-W26.md` is the last one on file, dated 2026-06-22). Handed to Theia this run.
 
+**2026-06-30 — thirteenth consecutive silent day. Tuesday, W27. July 1 flagged explicitly: Virtual Love chorus status check is tomorrow.**
+Jun 18 through 30, thirteen days, zero commits and zero user input — confirmed directly:
+`cursors.json` still all-empty (`discord: {}`, `imap.lastUid: 0`, `copyparty.seenShas: []`),
+`team/inbox/` has nothing beyond `audio/.gitkeep`, `approvals/queue.json` `updatedAt`
+still `2026-06-27T09:00:00Z`, all four items still `pending`, untouched since June 27.
+Checked today's date against this section's literal text: the next two dated checkpoints
+are July 1 and August 1 — neither has arrived yet. No fallback is newly taking effect.
+No wall is being crossed. Per the standing policy's part 2, today does not escalate on
+its own terms.
+
+**Today's queue ages, all four, recomputed from real `createdAt`:**
+- `ap-2026-06-19-switch-upload` (`createdAt` 2026-06-12T12:30:00Z) — **18 days old.**
+- `ap-2026-06-17-switch-w25-collab-story` (`createdAt` 2026-06-17T09:00:00Z) — **13 days old.**
+- `ap-2026-06-18-switch-w26-x-post` (`createdAt` 2026-06-18T11:00:00Z) — **12 days old.**
+- `ap-2026-06-27-switch-upload-replan` (`createdAt` 2026-06-27T09:00:00Z) — **3 days old.**
+
+**July 1 is tomorrow — flagged explicitly, not manufactured as urgency.** The Q3
+calendar names July 1 as the Virtual Love chorus status check. This is a check-in point
+only: is the chorus done, in progress, or unknown? The real cliff is August 1 — if a mix
+is not received by then, the track moves to Q4. July 1 is not a fallback-activation date
+and does not itself trigger anything. Naming it here and in the overlay so ISΛRK sees it
+coming with one day of notice, not zero.
+
+**W28-gap decision (`t-switch-arc-w28-gap-extension`) — held again, 5 days to
+Hemera's own July 5 checkpoint.** No new information since yesterday's filing. The gap
+(July 14–25) does not open until W28 closes July 13 — still two full weeks out. Holding
+is still the right call for the same stated reason: calling a real creative-cadence
+decision on one more silent day with zero new information is manufacturing progress, not
+making a better decision. The July 5 checkpoint is concrete, falsifiable, and tied to a
+real mechanical trigger (Nyx needs direction the week of July 6). Five days remain on
+that self-set clock.
+
+**Homerun — re-verified directly, not assumed unchanged.** No `team/drafts/uploads/homerun/`
+directory exists anywhere in the repo. Repo-wide glob for
+`**/*.{mp4,mov,wav,aif,aiff,mkv,prproj,fcpxml,drp,edl}` returns zero hits. `t-homerun-
+video-decision` is still `doing`, not `review`. None of the three 2026-06-21
+production-start triggers have fired. The reversibility window is unchanged and still
+genuinely open.
+
+- **July 1: Virtual Love chorus status check — TOMORROW.** Status check only; no fallback
+  fires on July 1 itself.
+- August 1: Virtual Love mix received or track moves to Q4.
+- July 5 (Hemera self-set): W28-gap content-plan decision due.
+
 ---
 
 _This calendar is a working draft. Dates are proposals, not announcements. Nothing
