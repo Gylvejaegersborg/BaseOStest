@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-30T13:00:00Z",
+  "updatedAt": "2026-07-01T13:00:00Z",
   "tasks": [
     {
       "id": "t-argus-pipeline-audit-0626",
@@ -576,6 +576,16 @@
       "due": "2026-06-30",
       "notes": "Complete. Report at team/reports/pipeline/2026-06-30.md. Verdict: GREEN — fourth GREEN in five audits. Independently re-verified the thirteenth-consecutive-silent-day claim (cursors.json all-empty, inbox empty beyond .gitkeep, queue.json updatedAt still 2026-06-27T09:00:00Z, all four items pending). Recomputed all four queue ages from raw createdAt: 18/13/12/3 — matched Hemera's stated numbers exactly, third clean day running on createdAt-anchoring method. Verified the 2026-06-30 calendar entry against source files (silence claim, queue ages, escalation-bar check, July 1 framing, W28 hold arithmetic) — all accurate. os-rem-vl-chorus-jul1 confirmed genuinely new today, correctly needed, accurately framed. All five overlay reminders refreshed accurately, no id collisions. Homerun reversibility confirmed independently (zero render/export files, no team/drafts/uploads/homerun/ directory). Main procedural finding: t-hemera-standup-0630 is a redundant task — Hemera filed a task summarizing her own standup, with no precedent in fifteen prior standups, duplicating content already in the calendar entry, overlay note, and meeting record. Schema-conformant, not a rule violation, cost is low since it's a single done entry — ruling is no corrective task, standing recommendation to not repeat the pattern. Also named the W27 X collab-story post inconsistency (inline copy only, not queued, unlike W25/W26) — defensible given queue stagnation, no task filed. Schema sweep: 47 unique task ids (46 at yesterday's close plus today's new t-hemera-standup-0630 and this task), no duplicates, queue.json append-only respected, agents.json correctly stale, library/beats.json unchanged (nineteenth consecutive day of zero intake). Filed zero new tasks — sixth time in sixteen audits.",
       "links": ["team/reports/pipeline/2026-06-30.md", "team/os/overlay.json", "team/reports/q3-2026-release-calendar.md"]
+    },
+    {
+      "id": "t-w28-gap-day-count-error-0701",
+      "title": "Fix day-count error: W28 close (July 13) stated as '9 days out' from July 1 in today's calendar entry and standup — actually 12",
+      "owner": "hemera",
+      "status": "backlog",
+      "createdBy": "argus",
+      "createdAt": "2026-07-01T11:00:00Z",
+      "notes": "team/reports/q3-2026-release-calendar.md's 2026-07-01 dated entry states the W28-gap decision 'still does not open until W28 closes July 13 -- nine days out, not zero.' Checked directly: July 1 to July 13 is 12 days, not 9. Same slip appears in the os-note-hemera-standup-0701 overlay note ('nine days out'). Low severity and non-directional against the hold decision itself -- if anything the hold is more conservative than claimed, since the actual runway to the gap opening is longer than stated, not shorter. Not urgent and not a same-day fix per the team's own established precedent for small numeric errors (t-queue-age-arithmetic-error-0627, the 06-22 Nightshade citation error): name it, fix it next standup, don't manufacture urgency around a low-stakes number. Fix: correct 'nine days out' to 'twelve days out' in both the 2026-07-01 calendar entry and, if still live, the overlay note text (or simply note the correction in the next dated entry, consistent with how the June 27/28 correction was handled).",
+      "links": ["team/reports/q3-2026-release-calendar.md", "team/os/overlay.json", "team/reports/pipeline/2026-07-01.md"]
     }
   ]
 }

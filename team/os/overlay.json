@@ -1,6 +1,14 @@
 {
-  "updatedAt": "2026-06-30T11:00:00Z",
+  "updatedAt": "2026-07-01T09:00:00Z",
   "notes": [
+    {
+      "id": "os-note-hemera-standup-0701",
+      "title": "Fourteenth silent day — July 1 arrived, Virtual Love chorus check has nothing to report",
+      "folder": "Team",
+      "tags": ["switch", "virtual-love", "hemera", "policy"],
+      "updated": "2026-07-01T09:00:00Z",
+      "body": "**Checked before writing this, same as every day: `cursors.json` still all-empty (`discord: {}`, `imap.lastUid: 0`, `copyparty.seenShas: []`), `team/inbox/` has nothing beyond `audio/.gitkeep`, `approvals/queue.json` `updatedAt` still `2026-06-27T09:00:00Z`, all four items still `pending`, untouched since June 27. Fourteen consecutive silent days now (Jun 18–Jul 1).**\n\n**1. Queue ages today, all four, recomputed from real `createdAt`:**\n- `ap-2026-06-19-switch-upload` (createdAt June 12) — **19 days old.**\n- `ap-2026-06-17-switch-w25-collab-story` (createdAt June 17) — **14 days old.**\n- `ap-2026-06-18-switch-w26-x-post` (createdAt June 18) — **13 days old.**\n- `ap-2026-06-27-switch-upload-replan` (createdAt June 27) — **4 days old.**\n\n**2. July 1 is today — the Virtual Love chorus status check. Reporting this plainly: no status has arrived.** I checked `team/state/cursors.json` and `team/inbox/` myself before writing this, not on yesterday's word — both are exactly as empty as every day since June 18. This is a check-in point the calendar named on 2026-06-27, not a fallback-activation date and not a wall. Nothing changes about Virtual Love's September 5 target or its real cliff today. The real cliff stays August 1 — chorus not done by then, track moves to Q4. I'm not inventing urgency beyond what today's checkpoint actually is: a scheduled ask that came back silent, same as every other ask this month.\n\n**3. W28-gap decision (`t-switch-arc-w28-gap-extension`) — held again, 4 days to my own July 5 checkpoint.** Checked directly: nothing new has arrived since yesterday, and the actual gap (July 14–25) doesn't open until W28 closes July 13 — nine days out. My checkpoint is 4 days out, not 0. I'm not deciding this today just because the date is getting closer on the calendar page — the test is whether anything changed or the runway ran out, and neither is true. It will be true by July 5 regardless of new information, and I'll decide then, not before.\n\n**4. Homerun — re-verified directly against the repo this run, not carried over from yesterday's finding.** Ran two fresh globs myself: `team/drafts/uploads/homerun/**` (zero files, directory doesn't exist) and a repo-wide sweep for `**/*.{mp4,mov,mkv,wav,aif,aiff,prproj,fcpxml,drp,edl,xml}` (zero hits). `t-homerun-video-decision` is still `doing`. None of the three production-start triggers have fired. Reversibility is unchanged and still genuinely open.\n\n**5. No new Nyx handoff today.** Checked for genuinely unblocked scope and found none beyond what's already in review — not manufacturing a handoff to look busy.\n\n**What I need from you, plainly, unchanged:** beat store URL, publish time for July 25, a decision on the queue (approve `ap-2026-06-27-switch-upload-replan`, reject the stale `ap-2026-06-19-switch-upload`), and — new today — a one-line Virtual Love chorus status: done, in progress, or unknown timeline. Free to say any time before August 1.\n\nFull detail: `team/reports/q3-2026-release-calendar.md`."
+    },
     {
       "id": "os-note-argus-pipeline-0630",
       "title": "Pipeline Health — Jun 30 — GREEN (one process finding, zero defects, chorus check tomorrow)",
@@ -200,14 +208,14 @@
       "title": "Switch: beat store URL + publish time still needed — now for July 25, not July 18. Four approvals pending, two on the same package.",
       "dayOffset": 0,
       "time": 9.5,
-      "notes": "Thirteenth consecutive silent day (Jun 18-30). June 27 — the calendar's own named wall — fired three days ago. Switch's target moved from July 18 to July 25 by default on June 27; see that day's standup note for the full reasoning. Today's actual ages for all four pending queue items, recomputed from real createdAt: ap-2026-06-19-switch-upload 18 days (createdAt June 12), ap-2026-06-17-switch-w25-collab-story 13 days (createdAt June 17), ap-2026-06-18-switch-w26-x-post 12 days (createdAt June 18), ap-2026-06-27-switch-upload-replan 3 days (createdAt June 27). If you approve a Switch upload, approve the replan entry and reject the original — both target the same package, only the date framing differs."
+      "notes": "Fourteenth consecutive silent day (Jun 18-Jul 1). June 27 — the calendar's own named wall — fired four days ago. Switch's target moved from July 18 to July 25 by default on June 27; see that day's standup note for the full reasoning. Today's actual ages for all four pending queue items, recomputed from real createdAt: ap-2026-06-19-switch-upload 19 days (createdAt June 12), ap-2026-06-17-switch-w25-collab-story 14 days (createdAt June 17), ap-2026-06-18-switch-w26-x-post 13 days (createdAt June 18), ap-2026-06-27-switch-upload-replan 4 days (createdAt June 27). If you approve a Switch upload, approve the replan entry and reject the original — both target the same package, only the date framing differs."
     },
     {
       "id": "os-rem-vl-chorus-jul1",
-      "title": "Virtual Love chorus status check — due July 1 (tomorrow). Status check only, not a fallback date.",
+      "title": "Virtual Love chorus status check — today, July 1. No status received. Status check only, not a fallback date.",
       "dayOffset": 0,
       "time": 9.5,
-      "notes": "The Q3 calendar names July 1 as the Virtual Love chorus status check. This is a check-in point only — not a fallback-activation date. The real cliff is August 1: if a mix is not received by then, the track moves to Q4. The ask tomorrow is simple: where is the chorus? A quick status update is all that's needed. No creative pressure being added beyond what the calendar already states."
+      "notes": "The Q3 calendar names July 1 as the Virtual Love chorus status check. Today is that date, and no status has arrived — checked cursors.json and team/inbox/ directly, both genuinely empty. This is a check-in point only — not a fallback-activation date. The real cliff is August 1: if a mix is not received by then, the track moves to Q4. The ask is simple and still open: where is the chorus? A quick status update is all that's needed, any time before August 1. No creative pressure being added beyond what the calendar already states."
     },
     {
       "id": "os-rem-homerun-video-jun19",

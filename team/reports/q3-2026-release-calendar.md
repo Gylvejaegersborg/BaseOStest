@@ -703,6 +703,61 @@ genuinely open.
 - August 1: Virtual Love mix received or track moves to Q4.
 - July 5 (Hemera self-set): W28-gap content-plan decision due.
 
+**2026-07-01 — fourteenth consecutive silent day. Wednesday, W27. July 1 is today: the
+Virtual Love chorus status check arrives on schedule, with nothing to check in on.**
+Jun 18 through Jul 1, fourteen days, zero commits and zero user input — confirmed
+directly: `cursors.json` still all-empty (`discord: {}`, `imap.lastUid: 0`,
+`copyparty.seenShas: []`), `team/inbox/` has nothing beyond `audio/.gitkeep`,
+`approvals/queue.json` `updatedAt` still `2026-06-27T09:00:00Z`, all four items still
+`pending`, untouched since June 27.
+
+**Today's queue ages, all four, recomputed from real `createdAt`:**
+- `ap-2026-06-19-switch-upload` (`createdAt` 2026-06-12T12:30:00Z) — **19 days old.**
+- `ap-2026-06-17-switch-w25-collab-story` (`createdAt` 2026-06-17T09:00:00Z) — **14 days old.**
+- `ap-2026-06-18-switch-w26-x-post` (`createdAt` 2026-06-18T11:00:00Z) — **13 days old.**
+- `ap-2026-06-27-switch-upload-replan` (`createdAt` 2026-06-27T09:00:00Z) — **4 days old.**
+
+**Virtual Love chorus status check — today is the actual named date, reported plainly,
+not padded.** This section named July 1 as a check-in point back on 2026-06-27 and it
+has been restated unchanged in every standup since. Checked `team/state/cursors.json`
+and `team/inbox/` directly before writing this, not assumed from yesterday: both are
+still exactly as empty as every day this month. No status update on the Virtual Love
+chorus has arrived from ISΛRK, today or any prior day. Stating this factually, at the
+level the calendar itself sets: today is a check-in point, not a fallback-activation
+date and not a wall. Nothing about Virtual Love's target (September 5) or its real
+cliff (August 1 — chorus not done → track moves to Q4) changes today. The only fact of
+substance is silence continuing on schedule into a fourth calendar checkpoint (June 27
+Switch wall, July 1 this one, next is August 1). Per the standing policy's part 2, a
+check-in point arriving with nothing to check in on does not itself escalate — that is
+reserved for a fallback taking effect or a wall being crossed, neither of which is true
+today. Naming the silence honestly without dressing it up as a new deadline crossed.
+
+**W28-gap decision (`t-switch-arc-w28-gap-extension`) — held again, 4 days to Hemera's
+own July 5 checkpoint.** Checked directly rather than assumed: no new information has
+arrived since yesterday's filing, and the gap (July 14–25) still does not open until W28
+closes July 13 — nine days out, not zero. The checkpoint itself is 4 days out, not 0.
+Deciding a real creative-cadence call today, on one more silent day with nothing new,
+would still be manufacturing a decision rather than making a better one — the same
+reasoning that held on June 29 and June 30 continues to hold today, because nothing has
+happened to change it. This is not being treated as a rubber-stamp: the test each day is
+"has anything changed, or has the runway actually run out" — neither is true yet. Status
+stays `backlog`, owner stays `hemera`. The July 5 checkpoint itself is unmoved.
+
+**Homerun — re-verified directly against the repo this run, not assumed from
+yesterday's finding.** Two independent globs run today: `team/drafts/uploads/homerun/**`
+returns zero files (the directory does not exist), and a repo-wide glob for
+`**/*.{mp4,mov,mkv,wav,aif,aiff,prproj,fcpxml,drp,edl,xml}` also returns zero hits.
+`t-homerun-video-decision` is still `doing`, not `review`. None of the three
+2026-06-21 production-start triggers ((a) render/export file lands, (b) committed
+edit-decision artifact locks cuts, (c) task moves doing → review with a linked
+deliverable) have fired. The reversibility window is unchanged and still genuinely
+open — a commissioned-video preference from ISΛRK still overrides the internal-edit
+default for free, today.
+
+- July 1: Virtual Love chorus status check — **today, no status received.**
+- August 1: Virtual Love mix received or track moves to Q4.
+- July 5 (Hemera self-set): W28-gap content-plan decision due — 4 days out.
+
 ---
 
 _This calendar is a working draft. Dates are proposals, not announcements. Nothing
