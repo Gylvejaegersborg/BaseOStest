@@ -735,7 +735,10 @@ today. Naming the silence honestly without dressing it up as a new deadline cros
 **W28-gap decision (`t-switch-arc-w28-gap-extension`) — held again, 4 days to Hemera's
 own July 5 checkpoint.** Checked directly rather than assumed: no new information has
 arrived since yesterday's filing, and the gap (July 14–25) still does not open until W28
-closes July 13 — nine days out, not zero. The checkpoint itself is 4 days out, not 0.
+closes July 13 — twelve days out, not zero (corrected 2026-07-02: originally stated as
+"nine days out" here, an arithmetic error — July 1 to July 13 is 12 days, not 9; see
+`t-w28-gap-day-count-error-0701` and the 2026-07-02 entry below for the fix). The
+checkpoint itself is 4 days out, not 0.
 Deciding a real creative-cadence call today, on one more silent day with nothing new,
 would still be manufacturing a decision rather than making a better one — the same
 reasoning that held on June 29 and June 30 continues to hold today, because nothing has
@@ -757,6 +760,72 @@ default for free, today.
 - July 1: Virtual Love chorus status check — **today, no status received.**
 - August 1: Virtual Love mix received or track moves to Q4.
 - July 5 (Hemera self-set): W28-gap content-plan decision due — 4 days out.
+
+**2026-07-02 — fifteenth consecutive silent day. Thursday, W27. Correction owed from
+yesterday, one hold-decision restated as second-to-last, Homerun and Virtual Love
+unchanged.** Jun 18 through Jul 2, fifteen days, zero commits and zero user input —
+confirmed directly: `cursors.json` still all-empty (`discord: {}`, `imap.lastUid: 0`,
+`copyparty.seenShas: []`), `team/inbox/` has nothing beyond `audio/.gitkeep`,
+`approvals/queue.json` `updatedAt` still `2026-06-27T09:00:00Z`, all four items still
+`pending`, untouched since June 27.
+
+**Today's queue ages, all four, recomputed from real `createdAt`:**
+- `ap-2026-06-19-switch-upload` (`createdAt` 2026-06-12T12:30:00Z) — **20 days old.**
+- `ap-2026-06-17-switch-w25-collab-story` (`createdAt` 2026-06-17T09:00:00Z) — **15
+  days old.**
+- `ap-2026-06-18-switch-w26-x-post` (`createdAt` 2026-06-18T11:00:00Z) — **14 days
+  old.**
+- `ap-2026-06-27-switch-upload-replan` (`createdAt` 2026-06-27T09:00:00Z) — **5 days
+  old.**
+
+**Correction owed from yesterday (`t-w28-gap-day-count-error-0701`), fixed today per
+this team's own precedent for small numeric errors — named, fixed the next standup,
+not same-day.** Yesterday's 2026-07-01 entry above and the `os-note-hemera-standup-0701`
+overlay note both stated the W28 close (July 13) was "nine days out" from July 1. Wrong:
+July 1 to July 13 is **12 days**, not 9. Corrected in place in the 2026-07-01 entry above
+(the "nine days out" text now reads "twelve days out"). Non-directional against the hold
+decision — the actual runway was longer than stated, not shorter, so if anything the hold
+was more conservative than claimed, never less. Same class of error as
+`t-queue-age-arithmetic-error-0627` (the June 27/28 correction) — a wrong number sitting
+inside an otherwise-correct call, not a wrong call.
+
+**W28-gap decision (`t-switch-arc-w28-gap-extension`) — held again, 3 days to Hemera's
+own July 5 checkpoint. This is the last or second-to-last hold before the call actually
+gets made.** Checked directly rather than assumed: no new information has arrived since
+July 1, and the gap (July 14–25) still does not open until W28 closes July 13 — 11 days
+out from today, not zero. The self-set checkpoint itself is **3 days out.** Nothing has
+changed to justify deciding today over holding one more time — same test as every prior
+day: has anything changed, or has the runway actually run out. Neither is true yet. But
+saying plainly what's different about today's hold versus June 29/30/July 1's: the
+checkpoint is close enough now that today's hold is either the last one or the
+second-to-last one. By July 5, this gets decided regardless of whether new information
+arrives — that is not being restated as a soft aspiration, it is the actual commitment
+made on June 29 and it is now 3 days from being tested for real. Status stays `backlog`,
+owner stays `hemera`.
+
+**Homerun — re-verified directly against the repo this run, not assumed from
+yesterday's finding.** Two independent globs run today: `**/homerun/**` (zero files —
+`team/drafts/uploads/homerun/` does not exist) and `**/*homerun*` repo-wide, which
+returns exactly two files — `public/beats/audio/homerun.mp3` (the finished master) and
+`team/drafts/content/homerun-internal-edit-brief.md` (the production brief, no
+committed cuts). Zero render/export/edit-decision artifacts anywhere. `t-homerun-
+video-decision` is still `doing`, not `review`. None of the three 2026-06-21
+production-start triggers ((a) render/export file lands, (b) committed edit-decision
+artifact locks cuts, (c) task moves doing → review with a linked deliverable) have
+fired. The reversibility window is unchanged and still genuinely open — a
+commissioned-video preference from ISΛRK still overrides the internal-edit default for
+free, today, twelve days after the default took effect.
+
+**Virtual Love — nothing new to report.** July 1's chorus status check came back
+silent, as recorded yesterday; that was a check-in only, not a fallback, and nothing
+about today changes that framing. The real cliff stays **August 1** — chorus not done
+by then, track moves to Q4. No new checkpoint falls between July 1 and August 1, so
+there is nothing further to check today beyond confirming the target (September 5) and
+the cliff (August 1) are both unchanged.
+
+- July 5 (Hemera self-set): W28-gap content-plan decision due — **3 days out, last or
+  second-to-last hold.**
+- August 1: Virtual Love mix received or track moves to Q4.
 
 ---
 

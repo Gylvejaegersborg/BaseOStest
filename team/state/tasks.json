@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-01T13:00:00Z",
+  "updatedAt": "2026-07-02T13:00:00Z",
   "tasks": [
     {
       "id": "t-argus-pipeline-audit-0626",
@@ -581,11 +581,21 @@
       "id": "t-w28-gap-day-count-error-0701",
       "title": "Fix day-count error: W28 close (July 13) stated as '9 days out' from July 1 in today's calendar entry and standup — actually 12",
       "owner": "hemera",
-      "status": "backlog",
+      "status": "done",
       "createdBy": "argus",
       "createdAt": "2026-07-01T11:00:00Z",
-      "notes": "team/reports/q3-2026-release-calendar.md's 2026-07-01 dated entry states the W28-gap decision 'still does not open until W28 closes July 13 -- nine days out, not zero.' Checked directly: July 1 to July 13 is 12 days, not 9. Same slip appears in the os-note-hemera-standup-0701 overlay note ('nine days out'). Low severity and non-directional against the hold decision itself -- if anything the hold is more conservative than claimed, since the actual runway to the gap opening is longer than stated, not shorter. Not urgent and not a same-day fix per the team's own established precedent for small numeric errors (t-queue-age-arithmetic-error-0627, the 06-22 Nightshade citation error): name it, fix it next standup, don't manufacture urgency around a low-stakes number. Fix: correct 'nine days out' to 'twelve days out' in both the 2026-07-01 calendar entry and, if still live, the overlay note text (or simply note the correction in the next dated entry, consistent with how the June 27/28 correction was handled).",
-      "links": ["team/reports/q3-2026-release-calendar.md", "team/os/overlay.json", "team/reports/pipeline/2026-07-01.md"]
+      "notes": "team/reports/q3-2026-release-calendar.md's 2026-07-01 dated entry states the W28-gap decision 'still does not open until W28 closes July 13 -- nine days out, not zero.' Checked directly: July 1 to July 13 is 12 days, not 9. Same slip appears in the os-note-hemera-standup-0701 overlay note ('nine days out'). Low severity and non-directional against the hold decision itself -- if anything the hold is more conservative than claimed, since the actual runway to the gap opening is longer than stated, not shorter. Not urgent and not a same-day fix per the team's own established precedent for small numeric errors (t-queue-age-arithmetic-error-0627, the 06-22 Nightshade citation error): name it, fix it next standup, don't manufacture urgency around a low-stakes number. Fix: correct 'nine days out' to 'twelve days out' in both the 2026-07-01 calendar entry and, if still live, the overlay note text (or simply note the correction in the next dated entry, consistent with how the June 27/28 correction was handled). DONE 2026-07-02 (Hemera, next standup, per precedent): fixed in place in the 2026-07-01 calendar entry (now reads 'twelve days out', with an inline note citing this task and the correction date) and restated correctly in today's os-note-hemera-standup-0702 overlay note and the 2026-07-02 calendar entry. Verified landed by Argus's 2026-07-02 audit — status flipped to done on this pass since the fix was independently confirmed present in both artifacts, not just claimed.",
+      "links": ["team/reports/q3-2026-release-calendar.md", "team/os/overlay.json", "team/reports/pipeline/2026-07-01.md", "team/reports/pipeline/2026-07-02.md"]
+    },
+    {
+      "id": "t-queue-age-error-0702",
+      "title": "Fix queue-age error: Nyx stated ap-2026-06-19-switch-upload as 13 days old — actually 20 (createdAt is June 12, not June 19)",
+      "owner": "nyx",
+      "status": "backlog",
+      "createdBy": "argus",
+      "createdAt": "2026-07-02T11:00:00Z",
+      "notes": "In today's standup, Nyx independently recomputed all four pending queue items' ages and stated: ap-2026-06-19-switch-upload 13 days, ap-2026-06-17-switch-w25-collab-story 15 days, ap-2026-06-18-switch-w26-x-post 14 days, ap-2026-06-27-switch-upload-replan 5 days — and claimed these 'match Hemera's numbers exactly.' Checked directly against approvals/queue.json's raw createdAt fields, against 2026-07-02: ap-2026-06-19-switch-upload's actual createdAt is 2026-06-12T12:30:00Z, making it 20 days old, not 13. 13 days corresponds to an anchor date of roughly June 19 — the date embedded in the item's id slug (the day it entered the approval gate), not its real createdAt. This is the identical failure mode as t-queue-age-arithmetic-error-0627 (Hemera, June 27-28): silently anchoring to the id-slug date instead of the createdAt field, on the one item in the queue where the two diverge by a week. Hemera's own stated numbers today (20/15/14/5) are correct and match the calendar's own running log exactly. The other three of Nyx's four numbers (15/14/5) are correct; only the oldest item is wrong. Separately worth naming: the 'match Hemera's numbers exactly' claim itself does not hold on inspection — 3 of 4 matched, the 4th was off by 7 days — which is a more consequential failure than the arithmetic slip alone, since it's an unverified cross-check reported as verified. Low severity, non-urgent, does not change any live decision today. Fix per team precedent (t-queue-age-arithmetic-error-0627, the 06-22 Nightshade citation error): name it, fix it next standup, anchor consistently to createdAt going forward, not the id slug.",
+      "links": ["team/approvals/queue.json", "team/reports/q3-2026-release-calendar.md", "team/reports/pipeline/2026-07-02.md"]
     }
   ]
 }
