@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Pause, Swords } from 'lucide-react'
+import { Pause, Swords, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { colOf, rowOf } from '../features/sudoku/engine/grid'
 import {
@@ -26,7 +26,12 @@ import { useSudokuStats } from '../features/sudoku/state/useSudokuStats'
 
 type Mode = 'classic' | 'samurai'
 
-export function Sudoku() {
+interface SudokuProps {
+  /** Present when launched as a fullscreen Lab app — renders a close button and Escape closes it. */
+  onClose?: () => void
+}
+
+export function Sudoku({ onClose }: SudokuProps = {}) {
   const [mode, setMode] = useState<Mode>('classic')
   const game = useSudokuGame('easy')
   const samurai = useSamuraiGame('easy')
@@ -54,6 +59,17 @@ export function Sudoku() {
       setSamuraiSummaryOpen(true)
     }
   }, [samurai.summary])
+
+  // Escape closes the app when launched fullscreen from the Lab — unless a summary
+  // modal is up, in which case its own Escape handler should close that first.
+  useEffect(() => {
+    if (!onClose) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !summaryOpen && !samuraiSummaryOpen) onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose, summaryOpen, samuraiSummaryOpen])
 
   // Record a finished round once, and surface the report.
   useEffect(() => {
@@ -135,7 +151,12 @@ export function Sudoku() {
   const highlights = useMemo(() => new Set(game.hint?.highlights ?? []), [game.hint])
 
   return (
-    <div className="h-full overflow-y-auto bg-claude-bg font-sans text-claude-ink">
+    <div
+      className={cn(
+        'overflow-y-auto bg-claude-bg font-sans text-claude-ink',
+        onClose ? 'fixed inset-0 z-[60]' : 'h-full',
+      )}
+    >
       <div className="mx-auto max-w-5xl px-4 py-6 lg:px-8">
         <header className="mb-6 flex items-start justify-between gap-3">
           <div>
@@ -146,18 +167,30 @@ export function Sudoku() {
                 : 'Five overlapping 9x9 grids sharing four corner boxes. Solve all five as one connected puzzle.'}
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => setMode((m) => (m === 'classic' ? 'samurai' : 'classic'))}
-            className={cn(
-              'flex shrink-0 items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-colors',
-              mode === 'samurai'
-                ? 'border-claude-clay bg-claude-clay text-claude-surface'
-                : 'border-claude-line bg-claude-surface text-claude-ink hover:border-claude-clay hover:bg-claude-clay-soft/40',
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setMode((m) => (m === 'classic' ? 'samurai' : 'classic'))}
+              className={cn(
+                'flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-colors',
+                mode === 'samurai'
+                  ? 'border-claude-clay bg-claude-clay text-claude-surface'
+                  : 'border-claude-line bg-claude-surface text-claude-ink hover:border-claude-clay hover:bg-claude-clay-soft/40',
+              )}
+            >
+              <Swords size={15} /> {mode === 'classic' ? 'Samurai mode' : 'Classic mode'}
+            </button>
+            {onClose && (
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close Sudoku"
+                className="flex items-center justify-center rounded-md border border-claude-line bg-claude-surface p-1.5 text-claude-ink-2 transition-colors hover:border-claude-clay hover:text-claude-ink"
+              >
+                <X size={18} />
+              </button>
             )}
-          >
-            <Swords size={15} /> {mode === 'classic' ? 'Samurai mode' : 'Classic mode'}
-          </button>
+          </div>
         </header>
 
         {mode === 'classic' ? (
