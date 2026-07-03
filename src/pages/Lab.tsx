@@ -1,5 +1,5 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
-import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe, Gauge, Music2, Download, Workflow } from 'lucide-react'
+import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe, Gauge, Music2, Download, Workflow, Grid3x3 } from 'lucide-react'
 import { LAB_MODULES, type LabModule } from '@/data/labs'
 import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
 import { Panel } from '@/components/ui/Panel'
@@ -54,6 +54,7 @@ export function Lab() {
   const [pipelineOpen, setPipelineOpen] = useState(false)
   const [ytdlpOpen, setYtdlpOpen] = useState(false)
   const [n8nOpen, setN8nOpen] = useState(false)
+  const [sudokuOpen, setSudokuOpen] = useState(false)
   const isDesktop = useIsDesktop()
   // Agents can add or update lab module cards (status/description) via the overlay.
   const overlay = useOsOverlay()
@@ -65,37 +66,49 @@ export function Lab() {
     if (!isDesktop) setMobileOpen(true)
   }
 
-  const isSudoku = selected.id === 'sudoku'
-
   return (
     <div className="flex h-full">
-      {/* When Sudoku is open on desktop, shrink the grid to a sidebar */}
-      <div className={cn('min-w-0 overflow-y-auto p-4 sm:p-6', isSudoku && isDesktop ? 'w-[260px] shrink-0 border-r border-line' : 'flex-1')}>
+      <div className="min-w-0 flex-1 overflow-y-auto p-4 sm:p-6">
         <div className="mb-5">
           <h1 className="font-display text-2xl tracking-wider text-text">LAB</h1>
           <p className="text-xs text-dim">Pages and apps you have built. Preview, launch and poke them.</p>
         </div>
-        <div className={cn('grid gap-3', isSudoku && isDesktop ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3')}>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {labModules.map((m) => (
             <ModuleCard key={m.id} mod={m} active={m.id === selectedId} onClick={() => openModule(m.id)} />
           ))}
         </div>
       </div>
 
-      {/* Desktop: Sudoku fills remaining space */}
-      {isSudoku && isDesktop && (
-        <div className="flex min-w-0 flex-1 overflow-hidden">
-          <Suspense fallback={<div className="flex h-full w-full items-center justify-center text-xs text-dim">Loading…</div>}>
-            <SudokuPage />
-          </Suspense>
-        </div>
-      )}
+      {/* Desktop: persistent detail rail */}
+      <aside className="hidden w-[380px] shrink-0 flex-col gap-3 overflow-y-auto border-l border-line bg-panel/30 p-3 lg:flex">
+        <ModuleDetail
+          mod={selected}
+          onOpenStore={() => setStoreOpen(true)}
+          onOpenDB={() => setDbOpen(true)}
+          onOpenDiscord={() => setDiscordOpen(true)}
+          onOpenShortcuts={() => setShortcutsOpen(true)}
+          onOpenArtist={() => setArtistOpen(true)}
+          onOpenTracker={() => setTrackerOpen(true)}
+          onOpenPipeline={() => setPipelineOpen(true)}
+          onOpenYtDlp={() => setYtdlpOpen(true)}
+          onOpenN8n={() => setN8nOpen(true)}
+          onOpenSudoku={() => setSudokuOpen(true)}
+        />
+      </aside>
 
-      {/* Desktop: persistent detail rail (non-Sudoku) */}
-      {!isSudoku && (
-        <aside className="hidden w-[380px] shrink-0 flex-col gap-3 overflow-y-auto border-l border-line bg-panel/30 p-3 lg:flex">
+      {/* Mobile: detail opens in a modal */}
+      <Modal
+        open={mobileOpen && !isDesktop}
+        onClose={() => setMobileOpen(false)}
+        title={selected.name}
+        code={selected.kind}
+        accent={STATUS_COLOR[selected.status]}
+      >
+        <div className="flex flex-col gap-3">
           <ModuleDetail
             mod={selected}
+            embedded
             onOpenStore={() => setStoreOpen(true)}
             onOpenDB={() => setDbOpen(true)}
             onOpenDiscord={() => setDiscordOpen(true)}
@@ -105,42 +118,9 @@ export function Lab() {
             onOpenPipeline={() => setPipelineOpen(true)}
             onOpenYtDlp={() => setYtdlpOpen(true)}
             onOpenN8n={() => setN8nOpen(true)}
+            onOpenSudoku={() => setSudokuOpen(true)}
           />
-        </aside>
-      )}
-
-      {/* Mobile: detail opens in a modal */}
-      <Modal
-        open={mobileOpen && !isDesktop}
-        onClose={() => setMobileOpen(false)}
-        title={selected.name}
-        code={selected.kind}
-        accent={STATUS_COLOR[selected.status]}
-        width={isSudoku ? 800 : 520}
-      >
-        {isSudoku ? (
-          <div className="h-[70dvh] overflow-hidden">
-            <Suspense fallback={<div className="flex h-full items-center justify-center text-xs text-dim">Loading…</div>}>
-              <SudokuPage />
-            </Suspense>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            <ModuleDetail
-              mod={selected}
-              embedded
-              onOpenStore={() => setStoreOpen(true)}
-              onOpenDB={() => setDbOpen(true)}
-              onOpenDiscord={() => setDiscordOpen(true)}
-              onOpenShortcuts={() => setShortcutsOpen(true)}
-              onOpenArtist={() => setArtistOpen(true)}
-              onOpenTracker={() => setTrackerOpen(true)}
-              onOpenPipeline={() => setPipelineOpen(true)}
-              onOpenYtDlp={() => setYtdlpOpen(true)}
-            onOpenN8n={() => setN8nOpen(true)}
-            />
-          </div>
-        )}
+        </div>
       </Modal>
 
       {storeOpen && (
@@ -203,6 +183,12 @@ export function Lab() {
           <N8nPage open onClose={() => setN8nOpen(false)} />
         </Suspense>
       )}
+
+      {sudokuOpen && (
+        <Suspense fallback={null}>
+          <SudokuPage onClose={() => setSudokuOpen(false)} />
+        </Suspense>
+      )}
     </div>
   )
 }
@@ -219,6 +205,7 @@ function ModuleDetail({
   onOpenPipeline,
   onOpenYtDlp,
   onOpenN8n,
+  onOpenSudoku,
 }: {
   mod: LabModule
   embedded?: boolean
@@ -231,6 +218,7 @@ function ModuleDetail({
   onOpenPipeline?: () => void
   onOpenYtDlp?: () => void
   onOpenN8n?: () => void
+  onOpenSudoku?: () => void
 }) {
   return (
     <>
@@ -314,6 +302,14 @@ function ModuleDetail({
             className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
           >
             Open Dashboard <Workflow size={13} />
+          </button>
+        )}
+        {mod.id === 'sudoku' && onOpenSudoku && (
+          <button
+            onClick={onOpenSudoku}
+            className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
+          >
+            Open Sudoku <Grid3x3 size={13} />
           </button>
         )}
         {mod.url && (
