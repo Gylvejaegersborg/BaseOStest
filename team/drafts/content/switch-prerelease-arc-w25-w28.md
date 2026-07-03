@@ -27,6 +27,11 @@ on 2026-06-22"), and the historical `drafted`/`updated` headers above, none of w
 claims. Flagged, not fixed here: the W25–W28 week windows are still anchored to the original July
 18 math and have not been re-extended to span the gap to July 25 — see the flag at the bottom of
 this document.
+**updated:** Nyx · 2026-07-03 — scoped the W28 → July 25 gap bridge per Hemera's 2026-07-03
+decision (`t-switch-arc-w28-gap-extension`, due 2026-07-08): a new **"gap bridge — July 14-25"**
+section is added below, between W28 and the open-blockers summary. Two touchpoints only, per the
+explicit decision — a countdown-sticker beat and one reshare, NOT a full new content week. See
+that section for what's scoped today vs. still open.
 
 ---
 
@@ -242,6 +247,92 @@ energy spikes) and should flag the most probable candidate with a confidence not
 
 ---
 
+### gap bridge — July 14–25 · "holding the line"
+
+**status: scoped, not fully built.** Handed to Nyx 2026-07-03 (`t-switch-arc-w28-gap-extension`),
+due 2026-07-08. This section covers what's decided and roughly how it lands; exact copy/asset
+finalization is the remaining work before the due date.
+
+**why this section exists:** W28 closes July 13 under the arc's original 4-week build (anchored to
+the July 18 target). Switch's release moved to July 25 on 2026-06-27 (ten consecutive silent days,
+see the calendar's Switch section), opening a 12-day stretch — July 14 to July 25 — with no named
+week, theme, or posting cadence. Hemera decided 2026-07-03, after four held checkpoints (06-29
+through 07-02) with no new information: **extend with a light bridge, not a full new content
+week.** No W29. No new production scope. Two touchpoints, full stop — the reasoning against a
+full week is Theia's W27 market read (no strong case either way for a dedicated final-stretch
+push, execution capacity already stretched across two blocked packages) plus the plain fact that
+a gap week invented from nothing isn't a market signal, it's busywork.
+
+**theme (light):** not a new theme in the sense W25–W28 each got one. this is the arc's own
+"drop-week buffer" concept (already named for July 14–17 in the original build) stretched across
+the full 12 days instead of 4 — holding presence, not escalating it. no new visual identity, no
+new copy voice — same restraint as every other week in this arc.
+
+**touchpoint 1 — countdown-sticker beat**
+- format: IG story, native countdown sticker set to the July 25 publish time (still [TBD] —
+  same blocker as W27/W28's countdown and CTA posts; this is not a new blocker, it's the
+  existing one carried forward across a longer window)
+- visual: static cover art background (from `art-prompt.md`), same palette discipline as the
+  rest of the arc — no new art direction needed, reuses the existing asset
+- text on the sticker card: `Switch — ISΛRK × 10k.emraan`
+- **rough timing: post once, mid-gap — around July 19-20** (roughly the midpoint of the 12-day
+  span, far enough past W28's close to feel like a fresh beat rather than a repeat of W28's own
+  countdown post, far enough ahead of July 25 that the sticker's countdown still reads as
+  building tension rather than arriving late). exact day is flexible; the constraint is "once,
+  roughly mid-gap," not a fixed date — final placement can move a day or two either way once the
+  publish time itself is confirmed.
+- this is the same mechanic Theia's W27 report flagged as a cheap bridge option (an execution
+  note from that report, not a market finding — stated as such there and here)
+- **what's still open:** the July 25 publish time (blocks the sticker's actual countdown value,
+  same as everywhere else in the arc it's needed) and confirming this doesn't collide with
+  whatever W28 itself ends up posting in its own countdown beats (W28's own two X posts and
+  countdown framing already exist above — this touchpoint is additive, not a replacement)
+
+**touchpoint 2 — reshare of the strongest existing collab asset**
+- **asset chosen: the W25 collab-story X post** — `two producers. one 186 bpm idea. ISΛRK ×
+  10k.emraan — Switch, july 25.` (`switch-w25-collab-story-prompt.md`, queued as
+  `ap-2026-06-17-switch-w25-collab-story`)
+- **why this one, not the W27 collab graphic:** the W27 graphic is a spec, not a finished asset —
+  it still needs to be designed or generated (`switch-w27-collab-graphic-prompt.md`), which is
+  real production work the "no new production scope" constraint rules out for a gap-bridge item.
+  the W25 collab-story copy is already finished, already fact-checked (BPM/key/date, no
+  hook-moment or store-URL dependency), and already sitting in the approval queue — reshare is
+  the correct verb here, not "produce." it's also the piece Theia's original W25 read named as
+  the thesis the whole campaign should return to ("earned story, use it as the content spine"),
+  which makes it the substantively strongest candidate on top of being the cheapest.
+- mechanic: repost/reshare the same X post (or, if it was never actually published because the
+  cadence question — `t-cadence-decision-w25-x-post` — is still unresolved, this becomes its
+  first posting, framed as a late-arc callback rather than a rerun)
+- caption treatment for the reshare: minimal addition acknowledging the callback, e.g.
+  `still true. Switch — july 25.` appended or as a quote-post, rather than a bare identical
+  repost — keeps it from reading like a scheduling error
+- **rough timing: once, late in the gap — around July 23-24**, directly ahead of release, so the
+  collab framing is the last beat landed before the drop itself lands (bookending the arc: collab
+  story opens W25, collab story closes the gap)
+- **what's still open:** whether `ap-2026-06-17-switch-w25-collab-story` gets actioned (approved/
+  rejected) before this reshare date — if it's still pending and un-posted by late July, this
+  touchpoint's framing shifts from "reshare" to "first posting, timed as a callback," per the note
+  above. This is not a new approval item on its own; if it needs one, it will be the existing
+  `ap-2026-06-17-switch-w25-collab-story` entry actioned, not a fresh queue entry — no new
+  approval-gated action is being invented for a plain reshare of already-queued copy.
+
+**explicitly not in scope for this bridge (do not read as an oversight):**
+- no new hook clips, no new graphics, no new production of any kind
+- no W29 theme, no new posting cadence beyond these two touchpoints
+- no SoundCloud/YouTube activity — those channels stay on the W28/upload-package schedule
+- no change to W28's own content (above) — this section is additive, sitting after it, not a
+  revision of it
+
+**still open before this can move from "scoped" to "built":** finalize exact post dates once the
+July 25 publish time lands (both touchpoints currently target a rough window, not a fixed day);
+confirm the reshare framing (repost vs. first posting) once the W25 cadence decision resolves one
+way or the other; write the actual reshare caption as a finished, approval-ready piece (the
+sketch above is directional, not final copy) if this needs to be queued ahead of the gap window
+opening. Due 2026-07-08 — this is the scoping pass; the remaining work is finishing the copy and
+locking the two dates, not re-deciding the shape of the bridge itself.
+
+---
+
 ## open blockers summary
 
 | blocker | blocks | owner |
@@ -290,10 +381,11 @@ energy spikes) and should flag the most probable candidate with a confidence not
 | W26 (Jun 22–28) | process | 2 posts | 1 snippet | 1 post |
 | W27 (Jun 29–Jul 5) | collab | 3 posts | 1 YT community | 1 post |
 | W28 (Jul 6–13) | imminent | 3–4 posts | 1 SC + 1 YT community | 1–2 posts |
+| gap bridge (Jul 14–25) | holding the line | 1 IG story (countdown sticker) | — | 1 reshare |
 
 ---
 
-## flagged, not fixed here: W28 → July 25 gap (2026-06-28, Nyx)
+## flagged, not fixed here: W28 → July 25 gap (2026-06-28, Nyx) — RESOLVED IN SHAPE 2026-07-03
 
 this arc was built backward from the original July 18 target: W25 opens June 15, W28
 closes July 13, and July 14–17 was named explicitly as drop-week buffer. Switch's target
@@ -311,6 +403,17 @@ not a find-and-replace, and it's a bigger lift than today's date-text sweep
 as its own open item (`t-switch-arc-w28-gap-extension`) so it has an owner and doesn't
 quietly vanish between the date fix looking complete and the actual week-by-week gap
 still existing.
+
+**2026-07-03 (Nyx):** the shape of this gap is now decided and scoped — see the **"gap
+bridge — July 14–25"** section above, between W28 and the open-blockers summary. Hemera
+decided (2026-07-03, `t-switch-arc-w28-gap-extension`) on a light two-touchpoint bridge,
+not a full W29: a countdown-sticker beat (~July 19-20) and a reshare of the W25
+collab-story X post (~July 23-24). This flag is resolved in shape — the structural hole
+has a plan now — but not resolved in full: exact dates depend on the still-outstanding
+July 25 publish time, and the reshare's exact caption/framing depends on the still-open
+W25 cadence decision (`t-cadence-decision-w25-x-post`). Due 2026-07-08 for the remaining
+finishing work. Leaving this historical flag in place rather than deleting it, since it's
+the record of why the bridge section exists.
 
 ---
 

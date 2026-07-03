@@ -827,6 +827,76 @@ the cliff (August 1) are both unchanged.
   second-to-last hold.**
 - August 1: Virtual Love mix received or track moves to Q4.
 
+**2026-07-03 — sixteenth consecutive silent day. Thursday, W27. The W28-gap decision is
+made today, two days ahead of the self-set July 5 checkpoint — not held a fifth time.**
+Jun 18 through Jul 3, sixteen days, zero commits and zero user input — confirmed
+directly: `cursors.json` still all-empty (`discord: {}`, `imap.lastUid: 0`,
+`copyparty.seenShas: []`), `team/inbox/` has nothing beyond `audio/.gitkeep`,
+`approvals/queue.json` `updatedAt` still `2026-06-27T09:00:00Z`, all four items still
+`pending`, untouched since June 27.
+
+**Today's queue ages, all four, recomputed from real `createdAt`:**
+- `ap-2026-06-19-switch-upload` (`createdAt` 2026-06-12T12:30:00Z) — **21 days old.**
+- `ap-2026-06-17-switch-w25-collab-story` (`createdAt` 2026-06-17T09:00:00Z) — **16
+  days old.**
+- `ap-2026-06-18-switch-w26-x-post` (`createdAt` 2026-06-18T11:00:00Z) — **15 days
+  old.**
+- `ap-2026-06-27-switch-upload-replan` (`createdAt` 2026-06-27T09:00:00Z) — **6 days
+  old.**
+
+**The W28-gap decision (`t-switch-arc-w28-gap-extension`) — decided today, not held a
+fifth time.** Checked directly before deciding: no new information has arrived across
+four consecutive holds (06-29, 06-30, 07-01, 07-02). The self-set July 5 checkpoint was
+2 days out today. Reasoning for deciding now rather than waiting the remaining two days:
+waiting would not change any fact on the ground — the same "nothing new" condition that
+justified every prior hold would still be true on July 4 and July 5, so the two-day wait
+buys nothing but risk (if July 4 is also silent, the decision either gets made under the
+exact same information-free conditions two days later, or the checkpoint itself slips
+past Nyx's real need-by date, the week of July 6). Four consecutive holds on zero new
+information is the point where discipline becomes inertia; calling it two days early is
+the more defensible move, not less.
+
+**Decision: extend the arc with a light bridge across July 14-25, not a full new content
+week and not a deliberate silence.** Two options were rejected: (a) a full W29 —
+invents new production scope with no market grounding (Theia's 2026-06-29 W27 report
+found no strong case either way for a dedicated final-stretch push, and flagged that
+execution capacity is already carrying two blocked packages) and no signal justifying
+new asset production for a gap week; (b) total dead air for 12 days immediately before
+the quarter's anchor release — a risk this team has already named and never disputed.
+The middle path taken: extend the arc's own existing "drop-week buffer" concept (already
+named for July 14-17 in the original structure) across the full July 14-25 span with
+1-2 low-production touchpoints only — a countdown-sticker beat (the cheap bridge
+mechanic Theia's W27 report surfaced) and one reshare of the strongest existing asset
+(the ISΛRK × 10k.emraan collab framing, per the W25-W27 market thesis) — no new original
+content required. This keeps the collab spine visible without manufacturing busywork or
+new dependencies Nyx doesn't have capacity for. Execution handed to Nyx: scope the
+countdown-sticker cadence, pick the reshare asset, write the new "gap" section into
+`switch-prerelease-arc-w25-w28.md`, due 2026-07-08. Task moved: owner hemera → nyx,
+status backlog → doing. Full task detail in `team/state/tasks.json`.
+
+**Homerun — re-verified directly against the repo this run.** Two independent globs:
+`**/homerun/**` (zero files — `team/drafts/uploads/homerun/` does not exist) and
+`**/*homerun*` repo-wide (exactly two files — `public/beats/audio/homerun.mp3`, the
+finished master, and `team/drafts/content/homerun-internal-edit-brief.md`, the brief;
+no committed cuts). A separate repo-wide glob for
+`**/*.{mp4,mov,mkv,wav,aif,aiff,prproj,fcpxml,drp,edl,xml}` also returns zero hits.
+`t-homerun-video-decision` is still `doing`, not `review`. None of the three
+2026-06-21 production-start triggers have fired. The reversibility window is unchanged
+and still genuinely open — a commissioned-video preference from ISΛRK still overrides
+the internal-edit default for free, today, thirteen days after the default took effect.
+
+**Virtual Love — nothing new to report.** No status has arrived since the July 1
+check-in came back silent. The real cliff stays **August 1** — chorus not done by then,
+track moves to Q4. September 5 target and August 1 cliff both unchanged.
+
+**Standing user-blocked items, confirmed still open, not re-litigated today:**
+`t-homerun-art-verification`, `t-cadence-decision-w25-x-post`,
+`t-retroactive-intake-path`, `t-intake-channels` — all still `backlog`, owner `user`,
+zero notes added since filed.
+
+- August 1: Virtual Love mix received or track moves to Q4.
+- July 8: Nyx's W28-gap bridge content due (countdown-sticker cadence + reshare pick).
+
 ---
 
 _This calendar is a working draft. Dates are proposals, not announcements. Nothing
