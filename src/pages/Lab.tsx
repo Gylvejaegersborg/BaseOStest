@@ -1,5 +1,5 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
-import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe, Gauge, Music2, Download, Workflow, Grid3x3 } from 'lucide-react'
+import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe, Gauge, Music2, Download, Workflow, Grid3x3, Film } from 'lucide-react'
 import { LAB_MODULES, type LabModule } from '@/data/labs'
 import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
 import { Panel } from '@/components/ui/Panel'
@@ -39,6 +39,9 @@ const YtDlpPage = lazy(() =>
 const N8nPage = lazy(() =>
   import('@/features/n8n/N8nPage').then((m) => ({ default: m.N8nPage })),
 )
+const ReelroomPage = lazy(() =>
+  import('@/features/reelroom/ReelroomPage').then((m) => ({ default: m.ReelroomPage })),
+)
 
 const STATUS_COLOR = { live: '#46d369', staging: '#f0a020', local: '#36e0c8' } as const
 
@@ -55,6 +58,7 @@ export function Lab() {
   const [ytdlpOpen, setYtdlpOpen] = useState(false)
   const [n8nOpen, setN8nOpen] = useState(false)
   const [sudokuOpen, setSudokuOpen] = useState(false)
+  const [reelroomOpen, setReelroomOpen] = useState(false)
   const isDesktop = useIsDesktop()
   // Agents can add or update lab module cards (status/description) via the overlay.
   const overlay = useOsOverlay()
@@ -94,6 +98,7 @@ export function Lab() {
           onOpenYtDlp={() => setYtdlpOpen(true)}
           onOpenN8n={() => setN8nOpen(true)}
           onOpenSudoku={() => setSudokuOpen(true)}
+          onOpenReelroom={() => setReelroomOpen(true)}
         />
       </aside>
 
@@ -119,6 +124,7 @@ export function Lab() {
             onOpenYtDlp={() => setYtdlpOpen(true)}
             onOpenN8n={() => setN8nOpen(true)}
             onOpenSudoku={() => setSudokuOpen(true)}
+            onOpenReelroom={() => setReelroomOpen(true)}
           />
         </div>
       </Modal>
@@ -189,6 +195,12 @@ export function Lab() {
           <SudokuPage onClose={() => setSudokuOpen(false)} />
         </Suspense>
       )}
+
+      {reelroomOpen && (
+        <Suspense fallback={null}>
+          <ReelroomPage open onClose={() => setReelroomOpen(false)} />
+        </Suspense>
+      )}
     </div>
   )
 }
@@ -206,6 +218,7 @@ function ModuleDetail({
   onOpenYtDlp,
   onOpenN8n,
   onOpenSudoku,
+  onOpenReelroom,
 }: {
   mod: LabModule
   embedded?: boolean
@@ -219,6 +232,7 @@ function ModuleDetail({
   onOpenYtDlp?: () => void
   onOpenN8n?: () => void
   onOpenSudoku?: () => void
+  onOpenReelroom?: () => void
 }) {
   return (
     <>
@@ -310,6 +324,14 @@ function ModuleDetail({
             className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
           >
             Open Sudoku <Grid3x3 size={13} />
+          </button>
+        )}
+        {mod.id === 'reelroom' && onOpenReelroom && (
+          <button
+            onClick={onOpenReelroom}
+            className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
+          >
+            Open Reelroom <Film size={13} />
           </button>
         )}
         {mod.url && (

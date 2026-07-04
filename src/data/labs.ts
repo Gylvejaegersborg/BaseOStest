@@ -95,6 +95,15 @@ export const LAB_MODULES: LabModule[] = [
     stack: ['React', 'TypeScript', 'yt-dlp'],
   },
   {
+    id: 'reelroom',
+    name: 'Reelroom',
+    kind: 'Client delivery',
+    status: 'local',
+    description:
+      'Branded video-gallery wrapper for freelance videographers — client-facing delivery, no raw Drive links. Weekend build; full app (Vite/React + Node/Express + SQLite) lives in the standalone repo.',
+    stack: ['React', 'TypeScript'],
+  },
+  {
     id: 'sudoku',
     name: 'Sudoku',
     kind: 'Mini-game',
