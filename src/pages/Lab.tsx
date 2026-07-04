@@ -1,5 +1,5 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
-import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe, Gauge, Music2, Download, Workflow, Grid3x3, Film } from 'lucide-react'
+import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe, Gauge, Music2, Download, Workflow, Grid3x3, Film, Anchor } from 'lucide-react'
 import { LAB_MODULES, type LabModule } from '@/data/labs'
 import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
 import { Panel } from '@/components/ui/Panel'
@@ -42,6 +42,9 @@ const N8nPage = lazy(() =>
 const ReelroomPage = lazy(() =>
   import('@/features/reelroom/ReelroomPage').then((m) => ({ default: m.ReelroomPage })),
 )
+const TidewriterPage = lazy(() =>
+  import('@/features/tidewriter/TidewriterPage').then((m) => ({ default: m.TidewriterPage })),
+)
 
 const STATUS_COLOR = { live: '#46d369', staging: '#f0a020', local: '#36e0c8' } as const
 
@@ -59,6 +62,7 @@ export function Lab() {
   const [n8nOpen, setN8nOpen] = useState(false)
   const [sudokuOpen, setSudokuOpen] = useState(false)
   const [reelroomOpen, setReelroomOpen] = useState(false)
+  const [tidewriterOpen, setTidewriterOpen] = useState(false)
   const isDesktop = useIsDesktop()
   // Agents can add or update lab module cards (status/description) via the overlay.
   const overlay = useOsOverlay()
@@ -99,6 +103,7 @@ export function Lab() {
           onOpenN8n={() => setN8nOpen(true)}
           onOpenSudoku={() => setSudokuOpen(true)}
           onOpenReelroom={() => setReelroomOpen(true)}
+          onOpenTidewriter={() => setTidewriterOpen(true)}
         />
       </aside>
 
@@ -125,6 +130,7 @@ export function Lab() {
             onOpenN8n={() => setN8nOpen(true)}
             onOpenSudoku={() => setSudokuOpen(true)}
             onOpenReelroom={() => setReelroomOpen(true)}
+            onOpenTidewriter={() => setTidewriterOpen(true)}
           />
         </div>
       </Modal>
@@ -201,6 +207,12 @@ export function Lab() {
           <ReelroomPage open onClose={() => setReelroomOpen(false)} />
         </Suspense>
       )}
+
+      {tidewriterOpen && (
+        <Suspense fallback={null}>
+          <TidewriterPage open onClose={() => setTidewriterOpen(false)} />
+        </Suspense>
+      )}
     </div>
   )
 }
@@ -219,6 +231,7 @@ function ModuleDetail({
   onOpenN8n,
   onOpenSudoku,
   onOpenReelroom,
+  onOpenTidewriter,
 }: {
   mod: LabModule
   embedded?: boolean
@@ -233,6 +246,7 @@ function ModuleDetail({
   onOpenN8n?: () => void
   onOpenSudoku?: () => void
   onOpenReelroom?: () => void
+  onOpenTidewriter?: () => void
 }) {
   return (
     <>
@@ -332,6 +346,14 @@ function ModuleDetail({
             className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
           >
             Open Reelroom <Film size={13} />
+          </button>
+        )}
+        {mod.id === 'tidewriter' && onOpenTidewriter && (
+          <button
+            onClick={onOpenTidewriter}
+            className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
+          >
+            Open Tidewriter <Anchor size={13} />
           </button>
         )}
         {mod.url && (

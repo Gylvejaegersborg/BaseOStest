@@ -104,6 +104,15 @@ export const LAB_MODULES: LabModule[] = [
     stack: ['React', 'TypeScript'],
   },
   {
+    id: 'tidewriter',
+    name: 'Tidewriter',
+    kind: 'Client delivery',
+    status: 'local',
+    description:
+      'Trip booking and catch/trip logging for independent fishing guides and charter captains — one shareable booking page, one place to log what happened after. Weekend build; full app (Vite/React + Node/Express + node:sqlite) lives in the standalone repo.',
+    stack: ['React', 'TypeScript'],
+  },
+  {
     id: 'sudoku',
     name: 'Sudoku',
     kind: 'Mini-game',
