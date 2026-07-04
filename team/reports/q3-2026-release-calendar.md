@@ -897,6 +897,48 @@ zero notes added since filed.
 - August 1: Virtual Love mix received or track moves to Q4.
 - July 8: Nyx's W28-gap bridge content due (countdown-sticker cadence + reshare pick).
 
+**2026-07-04 — seventeenth consecutive silent day. Saturday, quiet hold, nothing new.**
+Jun 18 through Jul 4, seventeen days, zero commits and zero user input — confirmed
+directly: `cursors.json` still all-empty, `team/inbox/` has nothing beyond
+`audio/.gitkeep`, `approvals/queue.json` `updatedAt` still `2026-06-27T09:00:00Z`, all
+four items still `pending`, untouched since June 27.
+
+**Today's queue ages, all four, recomputed from real `createdAt`:**
+- `ap-2026-06-19-switch-upload` (`createdAt` 2026-06-12T12:30:00Z) — **22 days old.**
+- `ap-2026-06-17-switch-w25-collab-story` (`createdAt` 2026-06-17T09:00:00Z) — **17
+  days old.**
+- `ap-2026-06-18-switch-w26-x-post` (`createdAt` 2026-06-18T11:00:00Z) — **16 days
+  old.**
+- `ap-2026-06-27-switch-upload-replan` (`createdAt` 2026-06-27T09:00:00Z) — **7 days
+  old.**
+
+No new checkpoint lands today — July 1 already passed silent, August 1 is the next real
+cliff. No fallback fires today, no wall is crossed today. Per the standing policy's part
+2, today does not escalate on its own terms; saying so plainly rather than manufacturing
+urgency for a quiet Saturday.
+
+**W28-gap bridge (`t-switch-arc-w28-gap-extension`)** stays `review`, Nyx's scoping from
+07-03 is in place and unchanged; full build still due July 8, no update expected before
+then.
+
+**Homerun — re-verified directly against the repo this run, independent glob.** Same
+result as every prior check: `**/*homerun*` repo-wide returns exactly two files (the
+finished master, the production brief), zero render/export/edit-decision files anywhere,
+`team/drafts/uploads/homerun/` does not exist. `t-homerun-video-decision` still `doing`.
+None of the three production-start triggers have fired. Reversibility unchanged, now
+fourteen days after the default took effect.
+
+**Virtual Love — nothing new.** No status since the July 1 check-in came back silent.
+Real cliff stays August 1.
+
+**Housekeeping:** closed the process half of `t-w25-cadence-reminder-staleness-0703`
+today — swept both overlay reminders that cite queue ages in the same edit pass rather
+than one at a time, per the standing practice Argus/Mnemosyne recommended on 07-03.
+
+- Monday, July 6 (ISO week 28): Theia's next market read due.
+- July 8: Nyx's W28-gap bridge content due.
+- August 1: Virtual Love mix received or track moves to Q4.
+
 ---
 
 _This calendar is a working draft. Dates are proposals, not announcements. Nothing
