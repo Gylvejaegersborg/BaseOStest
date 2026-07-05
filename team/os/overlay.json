@@ -1,6 +1,14 @@
 {
-  "updatedAt": "2026-07-04T09:00:00Z",
+  "updatedAt": "2026-07-05T09:00:00Z",
   "notes": [
+    {
+      "id": "os-note-hemera-standup-0705",
+      "title": "Eighteenth silent day — Sunday, W27's last day. Nothing new; no checkpoint fires today.",
+      "folder": "Team",
+      "tags": ["switch", "homerun", "virtual-love", "hemera", "policy"],
+      "updated": "2026-07-05T09:00:00Z",
+      "body": "**Checked before writing this, same as every day: `team/state/cursors.json` still all-empty (`discord: {}`, `imap.lastUid: 0`, `copyparty.seenShas: []`), `team/inbox/` has nothing beyond `audio/.gitkeep`, `approvals/queue.json` `updatedAt` still `2026-06-27T09:00:00Z`, all four items still `pending`, `createdAt` fields unchanged. Eighteen consecutive silent days now (Jun 18-Jul 5).**\n\n**1. Queue ages today, all four, recomputed from real `createdAt` against 2026-07-05:**\n- `ap-2026-06-19-switch-upload` (createdAt June 12) — **23 days old.**\n- `ap-2026-06-17-switch-w25-collab-story` (createdAt June 17) — **18 days old.**\n- `ap-2026-06-18-switch-w26-x-post` (createdAt June 18) — **17 days old.**\n- `ap-2026-06-27-switch-upload-replan` (createdAt June 27) — **8 days old.**\n\n**2. No checkpoint fires today.** The next dated checkpoints are Monday July 6 (Theia's W28 market read), July 8 (Nyx's W28-gap bridge full build), and August 1 (Virtual Love mix cliff) — none is today. No fallback newly takes effect, no wall is crossed. Per the standing policy's part 2, today does not escalate on its own terms.\n\n**3. W28-gap bridge (`t-switch-arc-w28-gap-extension`) stays `review`, owner Nyx, full build due July 8.** Nyx has a standing action item from yesterday to write `switch-w28-gap-reshare-copy.md` today, both framing variants pre-written, ready once `t-cadence-decision-w25-x-post` resolves — her lane, noting it's on the board, not doing it here.\n\n**4. Homerun — re-verified directly against the repo this run.** Fresh globs: `**/*homerun*` (exactly two files — the finished master and the production brief, no committed cuts) and `team/drafts/uploads/homerun/**` (zero files, directory doesn't exist). None of the three production-start triggers have fired. `t-homerun-video-decision` still `doing`, fully reversible, fifteen days after the default took effect.\n\n**5. Virtual Love — nothing new.** No status since the July 1 check-in came back silent. Real cliff stays August 1.\n\n**6. No new task handoffs today.** Checked for genuinely unblocked scope beyond what's already assigned — found none; not manufacturing work to look busy on a quiet Sunday.\n\n**7. Standing, unchanged, still yours:** Homerun art verification, W25/W26 cadence call, retroactive intake path, Discord intake channels.\n\n**Monday, July 6 (ISO week 28):** Theia's next market read is due; W28-gap full build due two days later on July 8.\n\n**What I need from you, plainly, unchanged:** beat store URL, publish time for July 25, a decision on the queue (approve `ap-2026-06-27-switch-upload-replan`, reject the stale `ap-2026-06-19-switch-upload`), and a one-line Virtual Love chorus status. Nothing here is more urgent today than yesterday — just older.\n\nFull detail: `team/reports/q3-2026-release-calendar.md`."
+    },
     {
       "id": "os-note-hemera-standup-0704",
       "title": "Seventeenth silent day — Saturday, quiet hold. Nothing new; W28-gap bridge build due Monday.",
@@ -232,7 +240,7 @@
       "title": "Switch: beat store URL + publish time still needed — now for July 25, not July 18. Four approvals pending, two on the same package.",
       "dayOffset": 0,
       "time": 9.5,
-      "notes": "Seventeenth consecutive silent day (Jun 18-Jul 4). June 27 — the calendar's own named wall — fired seven days ago. Switch's target moved from July 18 to July 25 by default on June 27; see that day's standup note for the full reasoning. Today's actual ages for all four pending queue items, recomputed from real createdAt: ap-2026-06-19-switch-upload 22 days (createdAt June 12), ap-2026-06-17-switch-w25-collab-story 17 days (createdAt June 17), ap-2026-06-18-switch-w26-x-post 16 days (createdAt June 18), ap-2026-06-27-switch-upload-replan 7 days (createdAt June 27). If you approve a Switch upload, approve the replan entry and reject the original — both target the same package, only the date framing differs."
+      "notes": "Eighteenth consecutive silent day (Jun 18-Jul 5). June 27 — the calendar's own named wall — fired eight days ago. Switch's target moved from July 18 to July 25 by default on June 27; see that day's standup note for the full reasoning. Today's actual ages for all four pending queue items, recomputed from real createdAt: ap-2026-06-19-switch-upload 23 days (createdAt June 12), ap-2026-06-17-switch-w25-collab-story 18 days (createdAt June 17), ap-2026-06-18-switch-w26-x-post 17 days (createdAt June 18), ap-2026-06-27-switch-upload-replan 8 days (createdAt June 27). If you approve a Switch upload, approve the replan entry and reject the original — both target the same package, only the date framing differs."
     },
     {
       "id": "os-rem-vl-chorus-jul1",
@@ -250,10 +258,10 @@
     },
     {
       "id": "os-rem-w25-cadence-decision",
-      "title": "W25 closed without a cadence call — still your call, now into W27",
+      "title": "W25 closed without a cadence call — still your call, now into W28",
       "dayOffset": 0,
       "time": 10.0,
-      "notes": "W25's posting window closed June 21 with the question still unanswered — that's the window closing on schedule, not the question getting resolved. W26 has now also closed (June 28) with the same non-answer. W27 ('collab') closes tomorrow, July 5. Nyx's collab-story X post (ap-2026-06-17-switch-w25-collab-story, pending, now 17 days old) and the arc's planned marker post for W25 never got a run/swap/hold call from you. Nothing was published, nothing was withdrawn. Carried by default, not by decision — still a thirty-second answer whenever you get to it. (Swept 2026-07-04 by Hemera alongside the other queue-age reminder in this same refresh pass, per the standing-practice half of t-w25-cadence-reminder-staleness-0703 — going forward, whichever reminder gets touched on a given day, every overlay item citing a queue age gets checked in the same pass, not one at a time.)"
+      "notes": "W25's posting window closed June 21 with the question still unanswered — that's the window closing on schedule, not the question getting resolved. W26 has closed (June 28), and W27 ('collab') closes today, July 5, with the same non-answer; W28 opens tomorrow. Nyx's collab-story X post (ap-2026-06-17-switch-w25-collab-story, pending, now 18 days old) and the arc's planned marker post for W25 never got a run/swap/hold call from you. Nothing was published, nothing was withdrawn. Carried by default, not by decision — still a thirty-second answer whenever you get to it. (Swept 2026-07-05 by Hemera alongside the other queue-age reminder in this same refresh pass, per the standing practice adopted 2026-07-04 on t-w25-cadence-reminder-staleness-0703 — every overlay item citing a queue age gets checked in the same pass, not one at a time.)"
     },
     {
       "id": "os-rem-switch-w26-snippet-export",

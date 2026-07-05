@@ -32,6 +32,13 @@ decision (`t-switch-arc-w28-gap-extension`, due 2026-07-08): a new **"gap bridge
 section is added below, between W28 and the open-blockers summary. Two touchpoints only, per the
 explicit decision — a countdown-sticker beat and one reshare, NOT a full new content week. See
 that section for what's scoped today vs. still open.
+**updated:** Nyx · 2026-07-05 — wrote the finished reshare copy for gap-bridge touchpoint 2, both
+framing variants (reshare vs. first-posting), per standing action item from 2026-07-04's standup.
+See `team/drafts/content/switch-w28-gap-reshare-copy.md`; one-line pointer added in touchpoint 2
+above. No new approval queued — content already covered by `ap-2026-06-17-switch-w25-collab-story`.
+Task (`t-switch-arc-w28-gap-extension`) stays in review — the remaining lock-in (exact dates, this
+copy finalization) was due 2026-07-08; copy is now done, dates still depend on the July 25 publish
+time, which has not landed.
 
 ---
 
@@ -315,6 +322,9 @@ new copy voice — same restraint as every other week in this arc.
   above. This is not a new approval item on its own; if it needs one, it will be the existing
   `ap-2026-06-17-switch-w25-collab-story` entry actioned, not a fresh queue entry — no new
   approval-gated action is being invented for a plain reshare of already-queued copy.
+- **finished copy for both framing variants (reshare vs. first-posting) now written in full:**
+  see `team/drafts/content/switch-w28-gap-reshare-copy.md` — drafted 2026-07-05, no new content
+  duplicated here.
 
 **explicitly not in scope for this bridge (do not read as an oversight):**
 - no new hook clips, no new graphics, no new production of any kind

@@ -939,6 +939,57 @@ than one at a time, per the standing practice Argus/Mnemosyne recommended on 07-
 - July 8: Nyx's W28-gap bridge content due.
 - August 1: Virtual Love mix received or track moves to Q4.
 
+**2026-07-05 — eighteenth consecutive silent day. Sunday, W27's last day. Nothing new
+crosses the escalation bar; verifying, not carrying forward on faith.** Jun 18 through
+Jul 5, eighteen days, zero commits and zero user input — confirmed directly, not assumed:
+`team/state/cursors.json` still all-empty (`discord: {}`, `imap.lastUid: 0`,
+`copyparty.seenShas: []`), `team/inbox/` has nothing beyond `audio/.gitkeep`,
+`approvals/queue.json` `updatedAt` still `2026-06-27T09:00:00Z`, all four items still
+`pending`, `createdAt` fields unchanged (June 12, June 17, June 18, June 27).
+
+**Today's queue ages, all four, recomputed from real `createdAt` against 2026-07-05:**
+- `ap-2026-06-19-switch-upload` (`createdAt` 2026-06-12T12:30:00Z) — **23 days old.**
+- `ap-2026-06-17-switch-w25-collab-story` (`createdAt` 2026-06-17T09:00:00Z) — **18
+  days old.**
+- `ap-2026-06-18-switch-w26-x-post` (`createdAt` 2026-06-18T11:00:00Z) — **17 days
+  old.**
+- `ap-2026-06-27-switch-upload-replan` (`createdAt` 2026-06-27T09:00:00Z) — **8 days
+  old.**
+
+**No checkpoint fires today.** Checked this section's own literal text: the next dated
+checkpoints are Monday July 6 (Theia's W28 market read), July 8 (Nyx's W28-gap bridge
+full build), and August 1 (Virtual Love mix cliff) — none is today. No fallback is newly
+taking effect, no wall is being crossed. Per the standing policy's part 2, today does not
+escalate on its own terms.
+
+**W28-gap bridge (`t-switch-arc-w28-gap-extension`)** stays `review`, owner Nyx, full
+build due July 8 — unchanged since 07-03's scoping. Nyx has a standing action item from
+yesterday's meeting to write `switch-w28-gap-reshare-copy.md` today, both framing
+variants pre-written, ready to drop in once `t-cadence-decision-w25-x-post` resolves.
+That is her lane to execute and report, not mine to pre-empt here.
+
+**Homerun — re-verified directly against the repo this run, independent glob.** Two
+fresh globs: `**/*homerun*` repo-wide returns exactly two files — the finished master
+(`public/beats/audio/homerun.mp3`) and the production brief
+(`team/drafts/content/homerun-internal-edit-brief.md`), no committed cuts. A separate
+glob for `team/drafts/uploads/homerun/**` returns zero files — the directory does not
+exist. `t-homerun-video-decision` is still `doing`, not `review`. None of the three
+2026-06-21 production-start triggers have fired. The reversibility window is unchanged
+and still genuinely open — a commissioned-video preference from ISΛRK still overrides
+the internal-edit default for free, today, fifteen days after the default took effect.
+
+**Virtual Love — nothing new.** No status since the July 1 check-in came back silent.
+Real cliff stays August 1.
+
+**Standing user-blocked items, confirmed still open, not re-litigated today:**
+`t-cadence-decision-w25-x-post`, `t-homerun-art-verification`,
+`t-retroactive-intake-path`, `t-intake-channels` — all still `backlog`, owner `user`,
+zero notes added since filed.
+
+- Monday, July 6 (ISO week 28): Theia's next market read due.
+- July 8: Nyx's W28-gap bridge full build due (owner Nyx).
+- August 1: Virtual Love mix received or track moves to Q4.
+
 ---
 
 _This calendar is a working draft. Dates are proposals, not announcements. Nothing
