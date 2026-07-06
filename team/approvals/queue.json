@@ -58,6 +58,16 @@
       "draftedBy": "hemera",
       "createdAt": "2026-06-27T09:00:00Z",
       "status": "pending"
+    },
+    {
+      "id": "ap-2026-07-06-collab-confirm-10k-emraan",
+      "type": "booking_reply",
+      "title": "Confirmation check — 10k.emraan collab credit on Switch",
+      "summary": "Approving this queues a short outreach message asking 10k.emraan to confirm the co-producer credit on Switch (billing/split/name-as-it-should-appear) before the July 25 release. This is NOT a reply to any inbound message — I checked my own lane (team/reports/contacts.md does not exist as a file, team/inbox/ has no records, cursors.json is fully empty across discord/imap/copyparty) and found zero record anywhere in booking/outreach history of contact with '10k.emraan.' The name appears only in content/copy/metadata (arc doc, captions, catalog artist field, this queue's own ap-2026-06-19 and ap-2026-06-17 summaries) — never in a message, reply, or logged correspondence. I have no contact address/handle on file for this person, so this draft cannot actually be sent as-is; it needs ISΛRK to either supply a channel or confirm the agreement already happened off-record (DM, call, in-person) so we can just log it instead. Recommend resolving this before the W25/W28 collab-story posts and the gap-reshare copy go out, since content built on an unconfirmed premise compounds the longer it runs unaddressed.",
+      "draftPaths": ["team/drafts/booking/collab-confirm-10k-emraan.md"],
+      "draftedBy": "hermes",
+      "createdAt": "2026-07-06T09:00:00Z",
+      "status": "pending"
     }
   ]
 }

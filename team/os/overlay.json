@@ -1,6 +1,22 @@
 {
-  "updatedAt": "2026-07-05T09:00:00Z",
+  "updatedAt": "2026-07-06T11:00:00Z",
   "notes": [
+    {
+      "id": "os-note-argus-pipeline-0706",
+      "title": "Pipeline Health — Jul 6 — YELLOW (a stale status framing caught, real 10k.emraan verification work started)",
+      "folder": "Team",
+      "tags": ["pipeline", "argus", "switch", "urgent"],
+      "updated": "2026-07-06T11:00:00Z",
+      "body": "**Verdict: YELLOW.** First non-GREEN in five audits — busier run than the recent quiet Sundays (new draft, new queue entry, new market report, a live discrepancy question), and one real thing surfaced under that load.\n\n**All the numbers check out.** Nineteenth consecutive silent day confirmed independently. All four pre-existing queue ages (24/9/19/18 days) recomputed by hand from raw `createdAt`, matched exactly. The new fifth queue entry (`ap-2026-07-06-collab-confirm-10k-emraan`, Hermes) is schema-valid, genuinely new, correctly `pending`.\n\n**The one real finding: `t-switch-arc-w28-gap-extension`'s status has been mis-described as 'doing' in today's calendar-sourced retelling — it's actually `review`, owner `nyx`, unchanged since July 3.** Hemera flagged her own uncertainty on this rather than asserting it as fact, which is the correct behavior and why this is a YELLOW with a clean fix rather than a cover-up. Root cause: the July 3 calendar entry never restates that same day's later `doing` → `review` move, even though `tasks.json`'s own notes field records it correctly. Filed `t-w28-gap-status-narrative-fix` (hemera) to add the missing line.\n\n**Good news underneath the numbers: the 10k.emraan collab-credit gap — asserted in content since June, never confirmed anywhere — is finally being worked, not just narrated.** Hermes checked his own lane properly (grepped repo-wide, found zero booking records, wrote the team's first-ever `team/reports/contacts.md` entry), drafted a confirmation-check message, and correctly flagged it can't be sent as-is — no contact channel on file. Theia independently re-verified the same finding with a wider grep and correctly called it a booking question, not a market one. Both agree: this needs ISΛRK's hand, either a contact channel or confirmation the deal happened off-record.\n\nFull report: `team/reports/pipeline/2026-07-06.md`.\n\n**For ISΛRK directly:** the 10k.emraan credit needs your input to actually close — give Hermes a channel to reach this person, or tell us the agreement already happened off-record and we'll log it instead. It's been asserted in every piece of Switch content since June with nothing behind it. Separately, unchanged: beat store URL, July 25 publish time, and a decision on a now five-item approval queue (oldest 24 days)."
+    },
+    {
+      "id": "os-note-theia-market-w28",
+      "title": "W28 market read: gap-bridge call still sound; 10k.emraan collab unverified anywhere in the repo",
+      "folder": "Team",
+      "tags": ["theia", "market", "switch", "collab"],
+      "updated": "2026-07-06T09:00:00Z",
+      "body": "**Full report: `team/reports/market/2026-W28.md`.**\n\n**1. The July 3 gap-bridge decision (light bridge: countdown sticker + one reshare, July 14-25) still checks out against what I can see this week.** No market case for scaling it up to a full new content week — the cheap, low-production shape is the right call given no verified pattern favors a dedicated final-stretch push over steady low-volume cadence for an indie producer at this scale.\n\n**2. Important: I independently re-checked the ISΛRK × 10k.emraan collaboration and it is unverified.** I grepped the whole repo, not just `team/` — every hit (draft copy, the arc doc, `src/data/beats.ts`'s `artist` field, `src/data/library.ts` catalog entries) is the name appearing *inside* content or metadata. There is no message, booking record, or confirmation anywhere that the collab is actually locked with the person. This is not a market question — it's a booking/coordination one. I'm flagging it directly here because the whole W25-W28 content arc's collab framing rests on it, and I don't have visibility to resolve it myself.\n\nNo new tasks filed this week — both findings are read/flag work on existing decisions, not new initiatives."
+    },
     {
       "id": "os-note-hemera-standup-0705",
       "title": "Eighteenth silent day — Sunday, W27's last day. Nothing new; no checkpoint fires today.",

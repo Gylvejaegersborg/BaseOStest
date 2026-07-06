@@ -1,20 +1,20 @@
 {
-  "updatedAt": "2026-07-05T13:00:00Z",
+  "updatedAt": "2026-07-06T13:00:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "Eighteenth consecutive silent day confirmed directly (cursors.json all-empty, inbox empty, queue.json unchanged). Recomputed all four queue ages from real createdAt (23/18/17/8). Confirmed no checkpoint fires today — next dates Jul 6, Jul 8, Aug 1. Re-verified Homerun reversibility (2 files, zero render/export). Dated calendar entry + overlay note written, no new task handoffs.",
-      "lastActive": "2026-07-05T09:00:00Z"
+      "task": "Nineteenth consecutive silent day confirmed (cursors.json/inbox/queue.json). Recomputed all four queue ages from real createdAt (24/9/19/18). Corrected her own draft agenda — the W28-gap three-way choice was already decided 2026-07-03, not open today. Asked Theia to confirm the gap-bridge call and name the 10k.emraan coordination status plainly. Flagged her own uncertainty on t-switch-arc-w28-gap-extension's real status rather than asserting it — Argus confirmed it's review/nyx, not doing; owns t-w28-gap-status-narrative-fix (calendar-text correction).",
+      "lastActive": "2026-07-06T09:00:00Z"
     },
     {
       "id": "aether",
       "name": "Aether",
       "role": "A&R · Sound",
       "status": "idle",
-      "task": "No items — no new intake, cursors.json all-empty. Still locked out of Switch hook-moment analysis pending t-retroactive-intake-path.",
+      "task": "No items — no new intake, cursors.json confirmed empty.",
       "lastActive": "2026-07-03T09:00:00Z"
     },
     {
@@ -22,40 +22,40 @@
       "name": "Nyx",
       "role": "Execution · Content",
       "status": "idle",
-      "task": "Wrote team/drafts/content/switch-w28-gap-reshare-copy.md — both framing variants (reshare vs. first-posting) complete, copy verbatim from switch-w25-collab-story-prompt.md, dependency correctly two-part. Linked pointer into arc doc, no duplication, no new queue entry. t-switch-arc-w28-gap-extension stays review, due Jul 8.",
-      "lastActive": "2026-07-05T09:30:00Z"
+      "task": "Confirmed switch-w28-gap-reshare-copy.md still stands, nothing degraded. Said full lock-in on t-switch-arc-w28-gap-extension by its Jul 8 due date is NOT achievable — two real dependencies unresolved; recommended it stay in review past Jul 8 rather than force a close. Re-verified t-switch-upload-package/t-switch-prerelease-arc as correctly blocked, not stalled. On 10k.emraan: her copy never asserts 'confirmed,' only credits by name per the catalog's artist field — declined to add a caveat, called it Hermes's verification call. No file edits; recommendations only.",
+      "lastActive": "2026-07-06T09:30:00Z"
     },
     {
       "id": "hermes",
       "name": "Hermes",
       "role": "Booking · Outreach",
       "status": "idle",
-      "task": "No items — no booking/collab messages today, cursors.json/inbox empty. t-intake-channels unchanged.",
-      "lastActive": "2026-07-03T09:00:00Z"
+      "task": "No new inbound, but active on Hemera's specific ask: grepped repo-wide for 10k.emraan/emraan (35 hits, all content/metadata, zero booking/contact records). Created team/reports/contacts.md (first-ever entry). Verdict: fully unconfirmed collab, real gap. Drafted team/drafts/booking/collab-confirm-10k-emraan.md (flags no contact channel on file) and queued ap-2026-07-06-collab-confirm-10k-emraan (pending). Called urgency 'about right, maybe slightly late' given 19 days to Jul 25. Recommended a task (owner user) to confirm the agreement or supply a contact channel before Jul 23-24.",
+      "lastActive": "2026-07-06T09:00:00Z"
     },
     {
       "id": "mnemosyne",
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "idle",
-      "task": "2026-07-05 meeting record closed. Cross-checked Hemera's and Nyx's writes and Argus's audit directly against tasks.json/agents.json/overlay.json/queue.json — all confirmed accurate, no schema drift. Dated note added to t-switch-arc-w28-gap-extension. Refreshed agents.json for all seven agents.",
-      "lastActive": "2026-07-05T13:00:00Z"
+      "task": "2026-07-06 meeting record closed. Verified Argus's t-w28-gap-status-narrative-fix write was present and correctly formed. Added t-w28-market-report (theia, done) to tasks.json per the W25/W27 pattern. Refreshed agents.json for all seven agents, reflecting Hermes's genuine activity today (not a normal silent-day idle). Confirmed overlay.json consistent — Theia's and Argus's notes both present, no id collisions, updatedAt already current.",
+      "lastActive": "2026-07-06T13:00:00Z"
     },
     {
       "id": "theia",
       "name": "Theia",
       "role": "Market · Research",
       "status": "idle",
-      "task": "No items — Sunday, not her Monday cadence, no market item on agenda. Last active 2026-06-29 (filed W27 market read).",
-      "lastActive": "2026-06-29T09:00:00Z"
+      "task": "Confirmed the Jul 3 gap-bridge decision still holds — no market case for scaling up. Independently re-verified the 10k.emraan gap repo-wide (wider than Hemera's team/-scoped search): every hit is name-in-content, never a confirmation record. Named this a Hermes/booking question explicitly, not market. Zero new task handoffs. No genuine new trend signal — same watch items as W25-W27. Wrote team/reports/market/2026-W28.md, added os-note-theia-market-w28.",
+      "lastActive": "2026-07-06T09:00:00Z"
     },
     {
       "id": "argus",
       "name": "Argus",
       "role": "Oversight · Pipeline",
       "status": "idle",
-      "task": "Twenty-first pipeline audit complete (team/reports/pipeline/2026-07-05.md). Verdict: GREEN. Independently recomputed silence count and all four queue ages, matched exactly — seventh consecutive clean day on createdAt-anchoring. Read Nyx's new reshare-copy file in full, confirmed both variants genuine and verbatim-matched. Filed zero new tasks; flagged one thing to watch (not a task) re: Variant B firing if the original W25 post is still pending in late July.",
-      "lastActive": "2026-07-05T11:00:00Z"
+      "task": "Twenty-second pipeline audit complete (team/reports/pipeline/2026-07-06.md). Verdict: YELLOW — first non-GREEN in five audits. Root-caused t-switch-arc-w28-gap-extension's mis-described status (calendar narrative said 'doing,' tasks.json says 'review/nyx') to the Jul 3 calendar entry never restating the same-day doing→review move. Called it the system self-correcting, not a failure. Independently verified Hermes's and Nyx's claims and Theia's report. Filed and applied t-w28-gap-status-narrative-fix (owner hemera) directly to tasks.json. Full schema sweep otherwise clean.",
+      "lastActive": "2026-07-06T11:00:00Z"
     }
   ]
 }
