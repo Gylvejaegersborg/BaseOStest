@@ -1,5 +1,5 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
-import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe, Gauge, Music2, Download, Workflow, Grid3x3, Film, Anchor } from 'lucide-react'
+import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe, Gauge, Music2, Download, Workflow, Grid3x3, Film, Anchor, ClipboardCheck, Scissors, Stethoscope } from 'lucide-react'
 import { LAB_MODULES, type LabModule } from '@/data/labs'
 import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
 import { Panel } from '@/components/ui/Panel'
@@ -45,6 +45,15 @@ const ReelroomPage = lazy(() =>
 const TidewriterPage = lazy(() =>
   import('@/features/tidewriter/TidewriterPage').then((m) => ({ default: m.TidewriterPage })),
 )
+const ClearscopePage = lazy(() =>
+  import('@/features/clearscope/ClearscopePage').then((m) => ({ default: m.ClearscopePage })),
+)
+const PalettePage = lazy(() =>
+  import('@/features/palette/PalettePage').then((m) => ({ default: m.PalettePage })),
+)
+const RecalloPage = lazy(() =>
+  import('@/features/recallo/RecalloPage').then((m) => ({ default: m.RecalloPage })),
+)
 
 const STATUS_COLOR = { live: '#46d369', staging: '#f0a020', local: '#36e0c8' } as const
 
@@ -63,6 +72,9 @@ export function Lab() {
   const [sudokuOpen, setSudokuOpen] = useState(false)
   const [reelroomOpen, setReelroomOpen] = useState(false)
   const [tidewriterOpen, setTidewriterOpen] = useState(false)
+  const [clearscopeOpen, setClearscopeOpen] = useState(false)
+  const [paletteOpen, setPaletteOpen] = useState(false)
+  const [recalloOpen, setRecalloOpen] = useState(false)
   const isDesktop = useIsDesktop()
   // Agents can add or update lab module cards (status/description) via the overlay.
   const overlay = useOsOverlay()
@@ -104,6 +116,9 @@ export function Lab() {
           onOpenSudoku={() => setSudokuOpen(true)}
           onOpenReelroom={() => setReelroomOpen(true)}
           onOpenTidewriter={() => setTidewriterOpen(true)}
+          onOpenClearscope={() => setClearscopeOpen(true)}
+          onOpenPalette={() => setPaletteOpen(true)}
+          onOpenRecallo={() => setRecalloOpen(true)}
         />
       </aside>
 
@@ -131,6 +146,9 @@ export function Lab() {
             onOpenSudoku={() => setSudokuOpen(true)}
             onOpenReelroom={() => setReelroomOpen(true)}
             onOpenTidewriter={() => setTidewriterOpen(true)}
+            onOpenClearscope={() => setClearscopeOpen(true)}
+            onOpenPalette={() => setPaletteOpen(true)}
+            onOpenRecallo={() => setRecalloOpen(true)}
           />
         </div>
       </Modal>
@@ -213,6 +231,24 @@ export function Lab() {
           <TidewriterPage open onClose={() => setTidewriterOpen(false)} />
         </Suspense>
       )}
+
+      {clearscopeOpen && (
+        <Suspense fallback={null}>
+          <ClearscopePage open onClose={() => setClearscopeOpen(false)} />
+        </Suspense>
+      )}
+
+      {paletteOpen && (
+        <Suspense fallback={null}>
+          <PalettePage open onClose={() => setPaletteOpen(false)} />
+        </Suspense>
+      )}
+
+      {recalloOpen && (
+        <Suspense fallback={null}>
+          <RecalloPage open onClose={() => setRecalloOpen(false)} />
+        </Suspense>
+      )}
     </div>
   )
 }
@@ -232,6 +268,9 @@ function ModuleDetail({
   onOpenSudoku,
   onOpenReelroom,
   onOpenTidewriter,
+  onOpenClearscope,
+  onOpenPalette,
+  onOpenRecallo,
 }: {
   mod: LabModule
   embedded?: boolean
@@ -247,6 +286,9 @@ function ModuleDetail({
   onOpenSudoku?: () => void
   onOpenReelroom?: () => void
   onOpenTidewriter?: () => void
+  onOpenClearscope?: () => void
+  onOpenPalette?: () => void
+  onOpenRecallo?: () => void
 }) {
   return (
     <>
@@ -354,6 +396,30 @@ function ModuleDetail({
             className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
           >
             Open Tidewriter <Anchor size={13} />
+          </button>
+        )}
+        {mod.id === 'clearscope' && onOpenClearscope && (
+          <button
+            onClick={onOpenClearscope}
+            className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
+          >
+            Open Clearscope <ClipboardCheck size={13} />
+          </button>
+        )}
+        {mod.id === 'palette' && onOpenPalette && (
+          <button
+            onClick={onOpenPalette}
+            className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
+          >
+            Open Palette <Scissors size={13} />
+          </button>
+        )}
+        {mod.id === 'recallo' && onOpenRecallo && (
+          <button
+            onClick={onOpenRecallo}
+            className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
+          >
+            Open Recallo <Stethoscope size={13} />
           </button>
         )}
         {mod.url && (

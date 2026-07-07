@@ -113,6 +113,33 @@ export const LAB_MODULES: LabModule[] = [
     stack: ['React', 'TypeScript'],
   },
   {
+    id: 'clearscope',
+    name: 'Clearscope',
+    kind: 'Client delivery',
+    status: 'local',
+    description:
+      'Booking and report generation for independent home inspectors — a shareable booking page plus a checklist-driven inspection report clients can view without logging in. Weekend build; full app (Vite/React + Node/Express + node:sqlite) lives in the standalone repo.',
+    stack: ['React', 'TypeScript'],
+  },
+  {
+    id: 'palette',
+    name: 'Palette',
+    kind: 'Client delivery',
+    status: 'local',
+    description:
+      'Client preference and visit history tracking for independent stylists — no booking, just the formula/technique/notes memory a booking tool doesn’t give you. No client-facing page at all. Weekend build; full app (Vite/React + Node/Express + node:sqlite) lives in the standalone repo.',
+    stack: ['React', 'TypeScript'],
+  },
+  {
+    id: 'recallo',
+    name: 'Recallo',
+    kind: 'Client delivery',
+    status: 'local',
+    description:
+      'An overdue-recall list for dental practices — add patients with a last-visit date and recall interval, Recallo sorts who’s overdue and who’s due soon for front-desk staff to call. Deliberately no automated patient messaging. Weekend build; full app (Vite/React + Node/Express + node:sqlite) lives in the standalone repo.',
+    stack: ['React', 'TypeScript'],
+  },
+  {
     id: 'sudoku',
     name: 'Sudoku',
     kind: 'Mini-game',
