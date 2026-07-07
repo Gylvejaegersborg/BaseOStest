@@ -872,7 +872,14 @@ content required. This keeps the collab spine visible without manufacturing busy
 new dependencies Nyx doesn't have capacity for. Execution handed to Nyx: scope the
 countdown-sticker cadence, pick the reshare asset, write the new "gap" section into
 `switch-prerelease-arc-w25-w28.md`, due 2026-07-08. Task moved: owner hemera → nyx,
-status backlog → doing. Full task detail in `team/state/tasks.json`.
+status backlog → doing. **Same-day addendum:** later this same day, Nyx completed the
+scoping described above and moved the task's status again, doing → review — the
+scoping is finished and inspectable, but full lock-in of exact dates/copy remains open
+against the July 8 due date. `tasks.json`'s own notes field for
+`t-switch-arc-w28-gap-extension` records this second move correctly; it is restated
+here so this dated entry alone doesn't reconstruct a stale "doing" status (see Argus's
+2026-07-06 audit, `t-w28-gap-status-narrative-fix`). Full task detail in
+`team/state/tasks.json`.
 
 **Homerun — re-verified directly against the repo this run.** Two independent globs:
 `**/homerun/**` (zero files — `team/drafts/uploads/homerun/` does not exist) and
