@@ -997,6 +997,81 @@ zero notes added since filed.
 - July 8: Nyx's W28-gap bridge full build due (owner Nyx).
 - August 1: Virtual Love mix received or track moves to Q4.
 
+**2026-07-08 — twenty-first consecutive silent day. Wednesday, W28. The W28-gap
+bridge task hits its own due date today and stays in `review`, by design — plus a
+process gap found: no dated entries were ever written here for July 6 or July 7.**
+Jun 18 through Jul 8, twenty-one days, zero commits and zero user input — confirmed
+directly: `cursors.json` still all-empty (`discord: {}`, `imap.lastUid: 0`,
+`copyparty.seenShas: []`), `team/inbox/` has nothing beyond `audio/.gitkeep`.
+
+**First, naming the gap plainly rather than papering over it.** This file's own log
+jumps straight from the 2026-07-05 entry above to this one — no 2026-07-06 or
+2026-07-07 dated entry exists anywhere in this document, even though both days' overlay
+standup notes (`os-note-theia-market-w28`, `os-note-argus-pipeline-0706`,
+`os-note-hemera-standup-0707`, `os-note-argus-pipeline-0707`) each point back here with
+"Full detail: `team/reports/q3-2026-release-calendar.md`" as if a same-day entry were
+waiting. It wasn't written. Real work did happen on both days — Theia's W28 market read
+(`team/reports/market/2026-W28.md`), the queue-header staleness fix Mnemosyne made on
+07-07, and Hermes's first `team/reports/contacts.md` entry plus the 10k.emraan
+confirmation-check draft on 07-06 — but none of it was logged into this specific
+calendar file's day-by-day record. Not backfilling invented July 6/7 entries now: writing
+retroactive "on this day" text for two days I didn't actually log at the time risks
+misstating what was known when, which is worse than admitting the gap. Filing this as a
+task for Mnemosyne to track at meeting close so it doesn't just quietly recur.
+
+**Today's queue ages, all five, recomputed from real `createdAt`:**
+- `ap-2026-06-19-switch-upload` (`createdAt` 2026-06-12T12:30:00Z) — **26 days old**,
+  stale, still worded for July 18 — recommend reject if the user acts on the queue.
+- `ap-2026-06-17-switch-w25-collab-story` (`createdAt` 2026-06-17T09:00:00Z) — **21
+  days old.**
+- `ap-2026-06-18-switch-w26-x-post` (`createdAt` 2026-06-18T11:00:00Z) — **20 days
+  old.**
+- `ap-2026-06-27-switch-upload-replan` (`createdAt` 2026-06-27T09:00:00Z) — **11 days
+  old**, current package, targets July 25.
+- `ap-2026-07-06-collab-confirm-10k-emraan` (`createdAt` 2026-07-06T09:00:00Z) — **2
+  days old**, still blocked — no contact channel for 10k.emraan on file.
+
+**`t-switch-arc-w28-gap-extension` is due today, July 8 — it stays `review`, past its
+own due date, exactly as flagged yesterday, not force-closed.** Nyx's 2026-07-05 note
+named two real dependencies keeping full lock-in open: (a) `t-cadence-decision-w25-
+x-post` resolving — still open, unresolved since June 17, unchanged today; (b) whether
+`ap-2026-06-17-switch-w25-collab-story` actually publishes by roughly July 23-24 —
+cannot be known yet, since the item itself is still `pending` in the approval queue.
+Nothing has changed on either dependency since yesterday: no market signal, no user
+input arrived overnight. So today's status is the honest continuation of what was
+already named, not a new problem discovered today — the task stays in `review` past its
+due date by design. The two finished pieces of this task (the countdown-sticker story
+timing, and both reshare-copy variants in `team/drafts/content/switch-w28-gap-reshare-
+copy.md`) remain real, inspectable progress regardless of the remaining lock-in gap.
+
+**Today is not Monday — no new market read is due.** Theia's last filed report is
+2026-W28 (dated 2026-07-06); nothing has surfaced since that would justify reopening it
+before the next Monday cycle. No new inbox records landed, so Aether has no new items
+to interpret either. Recording both plainly as "no items," not manufacturing a turn for
+either agent.
+
+**Homerun — re-verified directly against the repo this run.** Fresh repo-wide glob for
+video/render/export extensions (`**/*.{mp4,mov,mkv,wav,aif,aiff,prproj,fcpxml,drp,edl}`)
+and `team/drafts/uploads/homerun/**`: zero hits both ways, same as every prior check.
+`t-homerun-video-decision` stays `doing`, not `review`. None of the three production-
+start triggers have fired. The reversibility window is unchanged and still genuinely
+open — a commissioned-video preference from ISΛRK still overrides the internal-edit
+default for free, today.
+
+**10k.emraan collab confirmation stays the single most consequential open item.**
+Two days old in the queue now and compounding — Hermes still has no contact channel on
+file for this person, and the gap-bridge reshare leaning on the credit is drafted for
+roughly July 23-24, about two weeks out.
+
+**Standing user-blocked items, confirmed still open, not re-litigated today:**
+`t-cadence-decision-w25-x-post`, `t-homerun-art-verification`,
+`t-retroactive-intake-path`, `t-intake-channels` — all still `backlog`, owner `user`,
+zero notes added since filed.
+
+- August 1: Virtual Love mix received or track moves to Q4.
+- Ongoing: 10k.emraan collab confirmation — no channel on file, no fixed deadline but
+  compounding with every silent day against the ~July 23-24 reshare window.
+
 ---
 
 _This calendar is a working draft. Dates are proposals, not announcements. Nothing
