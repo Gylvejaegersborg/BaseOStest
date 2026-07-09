@@ -1,20 +1,20 @@
 {
-  "updatedAt": "2026-07-08T13:00:00Z",
+  "updatedAt": "2026-07-09T13:00:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "Twenty-first consecutive silent day confirmed (cursors.json/inbox/queue.json). Recomputed all five queue ages from real createdAt (26/21/20/11/2). Confirmed t-switch-arc-w28-gap-extension stays in review past its July 8 due date, by design — not force-closed. New finding: team/reports/q3-2026-release-calendar.md had no dated entries for July 6/7 — named the gap plainly (did not backfill invented text), wrote the 2026-07-08 dated entry, and flagged it for a task. Now owns t-calendar-footer-pointer-convention (Argus's filing) to state the footer-pointer rule and fix two inaccurate 07-06/07-07 footers.",
-      "lastActive": "2026-07-08T09:00:00Z"
+      "task": "Confirmed 22nd consecutive silent day, recomputed all five queue ages (27/22/21/12/3). Audited t-store-discoverability-audit (backlog→review), handed the fix to Nyx. Closed t-calendar-footer-pointer-convention: wrote standing-policy part 6, fixed 2 of 4 flagged footers, left 2 as historical snapshots.",
+      "lastActive": "2026-07-09T09:00:00Z"
     },
     {
       "id": "aether",
       "name": "Aether",
       "role": "A&R · Sound",
       "status": "idle",
-      "task": "No items — no new intake, cursors.json confirmed empty. Skipped by Hemera correctly (recorded as 'no items,' not invented).",
+      "task": "No items — no new intake, cursors.json confirmed empty. Correctly recorded as 'no items,' not invented.",
       "lastActive": "2026-07-03T09:00:00Z"
     },
     {
@@ -22,24 +22,24 @@
       "name": "Nyx",
       "role": "Execution · Content",
       "status": "idle",
-      "task": "Independently re-verified t-switch-arc-w28-gap-extension is status review, due today, last touched 2026-07-05; both blocking dependencies (t-cadence-decision-w25-x-post, ap-2026-06-17-switch-w25-collab-story) still unmoved. Found nothing genuinely new/unblocked to pull forward — declined to manufacture busywork. Wrote nothing today.",
-      "lastActive": "2026-07-08T09:00:00Z"
+      "task": "Independently re-verified t-switch-arc-w28-gap-extension dependencies unmoved. Completed t-store-discoverability-audit-fix-nyx same-day, 2 days ahead of due date: wrote store-seo-tag-description-rewrites.md and switch-store-listing-copy-spec.md, flagged the Beat schema description/tags gap and the 5-of-7-tracks-no-audio caveat.",
+      "lastActive": "2026-07-09T09:00:00Z"
     },
     {
       "id": "hermes",
       "name": "Hermes",
       "role": "Booking · Outreach",
       "status": "idle",
-      "task": "Independently re-verified nothing changed on the 10k.emraan blocker; ap-2026-07-06-collab-confirm-10k-emraan still pending, 2 days old. Recomputed 17 days out to July 25. Restated the ask (contact channel or off-record confirmation from ISΛRK). Wrote nothing today.",
-      "lastActive": "2026-07-08T09:00:00Z"
+      "task": "Independently re-verified the 10k.emraan blocker unchanged, 3 days old. Sharpened the ask to two one-line answers ISΛRK can give; flagged the draft's 'contact unknown' frontmatter blocks dispatch even if approved as-is. Wrote nothing today.",
+      "lastActive": "2026-07-09T09:00:00Z"
     },
     {
       "id": "mnemosyne",
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "idle",
-      "task": "2026-07-08 meeting record closed. Verified Argus's t-calendar-footer-pointer-convention filing directly, confirmed 2026-07-08 calendar entry present and honest about the July 6/7 gap, confirmed overlay.json's two new notes are schema-valid with no id collisions, confirmed queue.json's five ages and header match, confirmed 55 unique task ids. Refreshed agents.json for all seven agents.",
-      "lastActive": "2026-07-08T13:00:00Z"
+      "task": "2026-07-09 meeting record closed. Fixed the duplicate task-id defect Argus filed: merged/deleted the stale t-store-discoverability-audit backlog copy, confirmed exactly one match remains by grep, closed the filing task. Full schema sweep: 58 unique task ids, all JSON valid. Refreshed agents.json for all seven agents.",
+      "lastActive": "2026-07-09T13:00:00Z"
     },
     {
       "id": "theia",
@@ -54,8 +54,8 @@
       "name": "Argus",
       "role": "Oversight · Pipeline",
       "status": "idle",
-      "task": "Twenty-fourth pipeline audit complete (team/reports/pipeline/2026-07-08.md). Verdict: GREEN. Independently re-derived silence count and all five queue ages, matched Hemera exactly. Investigated Hemera's calendar-gap finding and narrowed the diagnosis to a footer-pointer convention gap, filing t-calendar-footer-pointer-convention (owner hemera). Self-reported that his own 2026-07-07 claim of bumping queue.json's header never actually landed — Mnemosyne caught and fixed it last meeting. Full schema sweep clean: 55 unique task ids, queue.json append-only respected, overlay.json valid no collisions.",
-      "lastActive": "2026-07-08T11:00:00Z"
+      "task": "25th pipeline audit complete (team/reports/pipeline/2026-07-09.md). Verdict: GREEN — fifth in six audits. Found first literal duplicate-id violation in 25 audits (t-store-discoverability-audit twice in tasks.json), filed to Mnemosyne. Filed t-beat-schema-description-tags-decision for ISΛRK re: Nyx's schema gap.",
+      "lastActive": "2026-07-09T11:00:00Z"
     }
   ]
 }

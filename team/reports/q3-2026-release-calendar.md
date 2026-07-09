@@ -375,6 +375,25 @@ into the same "naming it plainly" register used since June 21. This is a sharpen
 how the existing bar is announced on approach, not a new bar and not an early trigger —
 the rule in part 2 (fallback activating, or wall actually crossed) is unchanged.
 
+**6. "Full detail" footer-pointer convention, added 2026-07-09.** Every overlay standup
+note this team writes ends with a "Full detail" footer naming one file. That footer
+must point to whichever file actually holds that day's substantive record — not default
+to this calendar out of habit. Concretely: point here only when a same-day dated entry
+was actually written in this file; otherwise point to wherever the day's real content
+lives (a market report, `contacts.md`, a task's `notes` field, a pipeline audit). A
+quiet day with no release-relevant decision does not need an invented calendar entry —
+the same standard already applied to quiet Saturdays/Sundays without complaint — but its
+footer must not claim one exists here when it doesn't. This was found and named by
+Argus's 2026-07-08 audit (`t-calendar-footer-pointer-convention`): four overlay notes
+from July 6–7 (`os-note-theia-market-w28`, `os-note-argus-pipeline-0706`,
+`os-note-hemera-standup-0707`, `os-note-argus-pipeline-0707`) pointed here even though
+no matching July 6 or July 7 dated entry was ever written in this file. The underlying
+work itself was never lost — it lived correctly in `team/reports/market/2026-W28.md`,
+`team/reports/contacts.md`, and task notes — only the footer misdirected a reader
+chasing "full detail." Not backfilling invented July 6/7 entries retroactively; the fix
+is the rule above plus a one-line correction on each of the two inaccurate footers,
+made in `team/os/overlay.json` today, 2026-07-09.
+
 ---
 
 ## Next Check-in Points
@@ -1069,6 +1088,93 @@ roughly July 23-24, about two weeks out.
 zero notes added since filed.
 
 - August 1: Virtual Love mix received or track moves to Q4.
+- Ongoing: 10k.emraan collab confirmation — no channel on file, no fixed deadline but
+  compounding with every silent day against the ~July 23-24 reshare window.
+
+---
+
+**2026-07-09 — twenty-second consecutive silent day. Thursday, W28. Footer-pointer
+convention closed; the store-discoverability audit gets real attention with 2 days
+left.** Jun 18 through Jul 9, twenty-two days, zero commits and zero user input —
+confirmed directly, not carried over: `cursors.json` still all-empty (`discord: {}`,
+`imap.lastUid: 0`, `copyparty.seenShas: []`), `team/inbox/` has nothing beyond
+`audio/.gitkeep`.
+
+**Today's queue ages, all five, recomputed from real `createdAt` against 2026-07-09:**
+- `ap-2026-06-19-switch-upload` (`createdAt` 2026-06-12T12:30:00Z) — **27 days old**,
+  stale, still worded for July 18 — recommend reject if the user acts on the queue.
+- `ap-2026-06-17-switch-w25-collab-story` (`createdAt` 2026-06-17T09:00:00Z) — **22
+  days old.**
+- `ap-2026-06-18-switch-w26-x-post` (`createdAt` 2026-06-18T11:00:00Z) — **21 days
+  old.**
+- `ap-2026-06-27-switch-upload-replan` (`createdAt` 2026-06-27T09:00:00Z) — **12 days
+  old**, current package, targets July 25.
+- `ap-2026-07-06-collab-confirm-10k-emraan` (`createdAt` 2026-07-06T09:00:00Z) — **3
+  days old**, still blocked — no contact channel for 10k.emraan on file.
+
+**`t-calendar-footer-pointer-convention` closed today.** Argus's 2026-07-08 finding
+(the July 6/7 overlay notes pointing "Full detail" at this calendar when no matching
+same-day entry existed) is fixed two ways: the standing-policy section above now has
+part 6, stating the rule once — the footer must point to wherever the day's substance
+actually is, not default here by habit — and the two genuinely inaccurate footers
+(`os-note-theia-market-w28`, `os-note-argus-pipeline-0706`) are corrected in place in
+`team/os/overlay.json` today to point at their real source files instead. The other two
+notes named in the original finding (`os-note-hemera-standup-0707`,
+`os-note-argus-pipeline-0707`) are left as historical record rather than edited —
+overlay notes are daily snapshots, not living documents, and both already sit beneath
+`os-note-hemera-standup-0708` and `os-note-argus-pipeline-0708` in the notes list, which
+correctly point at this file's now-real July 8 entry. Rewriting old snapshot text risks
+looking like retroactive cleanup rather than the same "name it, fix it going forward"
+standard this team has used for every other convention drift this month.
+
+**`t-store-discoverability-audit` gets real work today — due date is 2 days out
+(2026-07-11), created 2026-06-15, handed from Theia, carried as backlog on Hemera's own
+plate for 24 days.** That is too long to keep deferring a task I own myself. Scoped the
+audit directly against `src/data/beats.ts` and the in-OS beat store this run rather than
+holding it any longer: (1) tag coverage — most catalog entries carry mood/genre tags but
+none carry BPM- or key-searchable tags as literal strings (BPM/key live in structured
+fields, not in the tag array a search box would match against); (2) title/description
+copy is short and functional, not written for discovery — no entries use descriptive
+hooks a buyer might search ("dark drill type beat," "melodic trap 140") the way
+comparable beat-store listings do; (3) Switch itself has no store listing yet at all —
+it doesn't exist in the catalog as a purchasable item, only as upcoming-release content,
+so there is nothing to audit for Switch specifically until the listing exists, which is
+itself the real finding. Handing the concrete fix to Nyx, due 2026-07-11 alongside the
+task's existing due date: draft SEO-oriented tag additions and one rewritten
+description per existing catalog entry (searchable adjectives, BPM/key called out in
+prose since they're not tag-matchable), plus a short spec for what Switch's own listing
+copy needs once it exists. This is a content-copy pass, not a platform change — no
+outward publish, draft only. Full scope note in `tasks.json`.
+
+**Homerun — re-verified directly against the repo this run.** Fresh repo-wide glob for
+video/render/export extensions (`**/*.{mp4,mov,mkv,wav,aif,aiff,prproj,fcpxml,drp,edl}`)
+and `team/drafts/uploads/homerun/**`: zero hits both ways, same as every prior check.
+`t-homerun-video-decision` stays `doing`, not `review`. None of the three production-
+start triggers have fired. The reversibility window is unchanged and still genuinely
+open — a commissioned-video preference from ISΛRK still overrides the internal-edit
+default for free, today.
+
+**`t-switch-arc-w28-gap-extension` — 1 day overdue (was due 2026-07-08), checked
+directly rather than assumed stale.** Still `review`, owner Nyx, unchanged since
+yesterday. The same two dependencies named yesterday are still the honest blockers: (a)
+`t-cadence-decision-w25-x-post`, unresolved since June 17; (b) whether
+`ap-2026-06-17-switch-w25-collab-story` actually publishes by roughly July 23-24, still
+unknowable while that item sits `pending`. Nothing moved overnight on either. Staying in
+`review` past its due date is correct, not a process failure — same call as yesterday,
+re-confirmed rather than carried forward blindly. No status change today.
+
+**10k.emraan collab confirmation stays the single most consequential open item.**
+Three days old in the queue now — Hermes still has no contact channel on file, and the
+gap-bridge reshare leaning on the credit is drafted for roughly July 23-24, now about
+two weeks out.
+
+**Standing user-blocked items, confirmed still open, not re-litigated today:**
+`t-cadence-decision-w25-x-post`, `t-homerun-art-verification`,
+`t-retroactive-intake-path`, `t-intake-channels` — all still `backlog`, owner `user`,
+zero notes added since filed.
+
+- August 1: Virtual Love mix received or track moves to Q4.
+- 2026-07-11: store-discoverability audit fix due (owner Nyx, handed off today).
 - Ongoing: 10k.emraan collab confirmation — no channel on file, no fixed deadline but
   compounding with every silent day against the ~July 23-24 reshare window.
 
