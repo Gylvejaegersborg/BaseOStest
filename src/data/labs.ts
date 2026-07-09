@@ -140,6 +140,15 @@ export const LAB_MODULES: LabModule[] = [
     stack: ['React', 'TypeScript'],
   },
   {
+    id: 'signly',
+    name: 'Signly',
+    kind: 'Client delivery',
+    status: 'local',
+    description:
+      'A deliberately simple, no-frills branded email signature generator for small teams — set the brand once, add team members, copy each one’s signature into their email client. No banners, no analytics. Weekend build; full app (Vite/React + Node/Express + node:sqlite) lives in the standalone repo.',
+    stack: ['React', 'TypeScript'],
+  },
+  {
     id: 'sudoku',
     name: 'Sudoku',
     kind: 'Mini-game',

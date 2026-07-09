@@ -1,5 +1,5 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
-import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe, Gauge, Music2, Download, Workflow, Grid3x3, Film, Anchor, ClipboardCheck, Scissors, Stethoscope } from 'lucide-react'
+import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe, Gauge, Music2, Download, Workflow, Grid3x3, Film, Anchor, ClipboardCheck, Scissors, Stethoscope, Signature } from 'lucide-react'
 import { LAB_MODULES, type LabModule } from '@/data/labs'
 import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
 import { Panel } from '@/components/ui/Panel'
@@ -54,6 +54,9 @@ const PalettePage = lazy(() =>
 const RecalloPage = lazy(() =>
   import('@/features/recallo/RecalloPage').then((m) => ({ default: m.RecalloPage })),
 )
+const SignlyPage = lazy(() =>
+  import('@/features/signly/SignlyPage').then((m) => ({ default: m.SignlyPage })),
+)
 
 const STATUS_COLOR = { live: '#46d369', staging: '#f0a020', local: '#36e0c8' } as const
 
@@ -75,6 +78,7 @@ export function Lab() {
   const [clearscopeOpen, setClearscopeOpen] = useState(false)
   const [paletteOpen, setPaletteOpen] = useState(false)
   const [recalloOpen, setRecalloOpen] = useState(false)
+  const [signlyOpen, setSignlyOpen] = useState(false)
   const isDesktop = useIsDesktop()
   // Agents can add or update lab module cards (status/description) via the overlay.
   const overlay = useOsOverlay()
@@ -119,6 +123,7 @@ export function Lab() {
           onOpenClearscope={() => setClearscopeOpen(true)}
           onOpenPalette={() => setPaletteOpen(true)}
           onOpenRecallo={() => setRecalloOpen(true)}
+          onOpenSignly={() => setSignlyOpen(true)}
         />
       </aside>
 
@@ -149,6 +154,7 @@ export function Lab() {
             onOpenClearscope={() => setClearscopeOpen(true)}
             onOpenPalette={() => setPaletteOpen(true)}
             onOpenRecallo={() => setRecalloOpen(true)}
+            onOpenSignly={() => setSignlyOpen(true)}
           />
         </div>
       </Modal>
@@ -249,6 +255,12 @@ export function Lab() {
           <RecalloPage open onClose={() => setRecalloOpen(false)} />
         </Suspense>
       )}
+
+      {signlyOpen && (
+        <Suspense fallback={null}>
+          <SignlyPage open onClose={() => setSignlyOpen(false)} />
+        </Suspense>
+      )}
     </div>
   )
 }
@@ -271,6 +283,7 @@ function ModuleDetail({
   onOpenClearscope,
   onOpenPalette,
   onOpenRecallo,
+  onOpenSignly,
 }: {
   mod: LabModule
   embedded?: boolean
@@ -289,6 +302,7 @@ function ModuleDetail({
   onOpenClearscope?: () => void
   onOpenPalette?: () => void
   onOpenRecallo?: () => void
+  onOpenSignly?: () => void
 }) {
   return (
     <>
@@ -420,6 +434,14 @@ function ModuleDetail({
             className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
           >
             Open Recallo <Stethoscope size={13} />
+          </button>
+        )}
+        {mod.id === 'signly' && onOpenSignly && (
+          <button
+            onClick={onOpenSignly}
+            className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
+          >
+            Open Signly <Signature size={13} />
           </button>
         )}
         {mod.url && (
