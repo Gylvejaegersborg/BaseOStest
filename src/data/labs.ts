@@ -95,6 +95,60 @@ export const LAB_MODULES: LabModule[] = [
     stack: ['React', 'TypeScript', 'yt-dlp'],
   },
   {
+    id: 'reelroom',
+    name: 'Reelroom',
+    kind: 'Client delivery',
+    status: 'local',
+    description:
+      'Branded video-gallery wrapper for freelance videographers — client-facing delivery, no raw Drive links. Weekend build; full app (Vite/React + Node/Express + SQLite) lives in the standalone repo.',
+    stack: ['React', 'TypeScript'],
+  },
+  {
+    id: 'tidewriter',
+    name: 'Tidewriter',
+    kind: 'Client delivery',
+    status: 'local',
+    description:
+      'Trip booking and catch/trip logging for independent fishing guides and charter captains — one shareable booking page, one place to log what happened after. Weekend build; full app (Vite/React + Node/Express + node:sqlite) lives in the standalone repo.',
+    stack: ['React', 'TypeScript'],
+  },
+  {
+    id: 'clearscope',
+    name: 'Clearscope',
+    kind: 'Client delivery',
+    status: 'local',
+    description:
+      'Booking and report generation for independent home inspectors — a shareable booking page plus a checklist-driven inspection report clients can view without logging in. Weekend build; full app (Vite/React + Node/Express + node:sqlite) lives in the standalone repo.',
+    stack: ['React', 'TypeScript'],
+  },
+  {
+    id: 'palette',
+    name: 'Palette',
+    kind: 'Client delivery',
+    status: 'local',
+    description:
+      'Client preference and visit history tracking for independent stylists — no booking, just the formula/technique/notes memory a booking tool doesn’t give you. No client-facing page at all. Weekend build; full app (Vite/React + Node/Express + node:sqlite) lives in the standalone repo.',
+    stack: ['React', 'TypeScript'],
+  },
+  {
+    id: 'recallo',
+    name: 'Recallo',
+    kind: 'Client delivery',
+    status: 'local',
+    description:
+      'An overdue-recall list for dental practices — add patients with a last-visit date and recall interval, Recallo sorts who’s overdue and who’s due soon for front-desk staff to call. Deliberately no automated patient messaging. Weekend build; full app (Vite/React + Node/Express + node:sqlite) lives in the standalone repo.',
+    stack: ['React', 'TypeScript'],
+  },
+  {
+    id: 'signly',
+    name: 'Signly',
+    kind: 'Client delivery',
+    status: 'local',
+    description:
+      'A deliberately simple, no-frills branded email signature generator for small teams — set the brand once, add team members, copy each one’s signature into their email client. No banners, no analytics. Weekend build; full app (Vite/React + Node/Express + node:sqlite) lives in the standalone repo.',
+    stack: ['React', 'TypeScript'],
+  },
+  {
     id: 'sudoku',
     name: 'Sudoku',
     kind: 'Mini-game',
