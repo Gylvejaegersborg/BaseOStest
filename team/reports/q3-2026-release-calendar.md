@@ -1180,5 +1180,87 @@ zero notes added since filed.
 
 ---
 
+**2026-07-10 — twenty-third consecutive silent day. Friday, W28. Two review-stage
+tasks due tomorrow; the Beat-schema decision is now the newest open item, not the
+oldest.** Jun 18 through Jul 10, twenty-three days, zero commits and zero user input —
+verified directly, not carried over: `cursors.json` still all-empty (`discord: {}`,
+`imap.lastUid: 0`, `copyparty.seenShas: []`), `team/inbox/` has nothing beyond
+`audio/.gitkeep`.
+
+**Today's queue ages, all five, recomputed from real `createdAt` against 2026-07-10:**
+- `ap-2026-06-19-switch-upload` (`createdAt` 2026-06-12T12:30:00Z) — **28 days old**,
+  stale, still worded for July 18 — recommend reject if the user acts on the queue.
+- `ap-2026-06-17-switch-w25-collab-story` (`createdAt` 2026-06-17T09:00:00Z) — **23
+  days old.**
+- `ap-2026-06-18-switch-w26-x-post` (`createdAt` 2026-06-18T11:00:00Z) — **22 days
+  old.**
+- `ap-2026-06-27-switch-upload-replan` (`createdAt` 2026-06-27T09:00:00Z) — **13 days
+  old**, current package, targets July 25.
+- `ap-2026-07-06-collab-confirm-10k-emraan` (`createdAt` 2026-07-06T09:00:00Z) — **4
+  days old**, still blocked — no contact channel for 10k.emraan on file.
+
+**`t-store-discoverability-audit` (owner Hemera) and `t-store-discoverability-audit-
+fix-nyx` (owner Nyx) both due tomorrow, 2026-07-11 — checked both directly in
+`tasks.json`, not assumed on track.** Both are `review`, not `backlog` or `doing`, and
+both carry same-day-complete notes from 2026-07-09: Hemera's diagnosis (tag/description
+gaps, no Switch listing yet) and Nyx's two deliverables
+(`team/drafts/content/store-seo-tag-description-rewrites.md`,
+`team/drafts/content/switch-store-listing-copy-spec.md`), both landed 2 days ahead of
+the due date. The actual content work behind both tasks is done. What is genuinely
+still open is not content — it's the schema decision Nyx's own deliverable surfaced
+(`t-beat-schema-description-tags-decision`, owner user, filed yesterday): Nyx's copy
+assumes a `description` field and a `tags` field on `Beat` that do not exist in
+`src/data/beats.ts` today. Closing either review task tomorrow doesn't require that
+decision to land first — the drafts are real, reviewed, and complete as content
+artifacts — but the copy has nowhere to go live until the schema question is answered.
+Recommendation: close both tasks tomorrow as `done` on the strength of the finished
+diagnosis and drafts, and let `t-beat-schema-description-tags-decision` carry forward
+on its own as the actual open dependency, rather than holding two finished review tasks
+open waiting on a decision that isn't theirs to make. Nothing further is needed from me
+on either task before tomorrow.
+
+**`t-beat-schema-description-tags-decision` (owner user, filed 2026-07-09 by Argus) is
+now 1 day old — flagging it plainly as still open, not attempting to resolve it here.**
+This needs either a user decision on how Beat's schema should carry description/tags
+copy, or a `src/` change — both outside a team run's lane per CLAUDE.md. Three options
+remain on the table as Argus framed them: add `description`/`tags` fields to the `Beat`
+interface (a real `src/` change), fold the tag lists into an expanded `mood` array
+instead, or park the copy in a separate store-content file the UI reads from. No
+attempt made here to pick one — that call needs ISΛRK or a non-team-run pass, and
+picking it unilaterally in a team run would be out of bounds.
+
+**Homerun — re-verified directly against the repo this run.** Fresh repo-wide glob for
+video/render/export extensions (`**/*.{mp4,mov,mkv,wav,aif,aiff,prproj,fcpxml,drp,edl}`)
+and `team/drafts/uploads/homerun/**`: zero hits both ways, same as every prior check.
+`t-homerun-video-decision` stays `doing`, not `review`. None of the three production-
+start triggers have fired. The reversibility window is unchanged and still genuinely
+open — a commissioned-video preference from ISΛRK still overrides the internal-edit
+default for free, today.
+
+**10k.emraan collab confirmation stays the single most consequential open item.** Four
+days old in the queue now — Hermes still has no contact channel on file, and the
+gap-bridge reshare leaning on the credit is drafted for roughly July 23-24, now under
+two weeks out.
+
+**Standing user-blocked items, confirmed still open, not re-litigated today:**
+`t-cadence-decision-w25-x-post`, `t-homerun-art-verification`,
+`t-retroactive-intake-path`, `t-intake-channels` — all still `backlog`, owner `user`,
+zero notes added since filed.
+
+**Today is Friday, not Monday — no new Theia market read is due; her last one (2026-W28,
+filed 2026-07-06) has nothing new to warrant reopening.** No new intake landed either,
+so Aether has no items to interpret. Recording both as "no items," not manufacturing
+turns for either.
+
+- 2026-07-11: store-discoverability audit and its Nyx fix both due — content work
+  complete, recommend closing both `done` tomorrow regardless of the schema decision.
+- August 1: Virtual Love mix received or track moves to Q4.
+- Ongoing: 10k.emraan collab confirmation — no channel on file, no fixed deadline but
+  compounding with every silent day against the ~July 23-24 reshare window.
+- Ongoing: `t-beat-schema-description-tags-decision` — 1 day old, needs a user call or
+  a `src/` change before Nyx's finished store-SEO copy has anywhere to land.
+
+---
+
 _This calendar is a working draft. Dates are proposals, not announcements. Nothing
 here is outward-facing until the relevant upload package is approved and published._
