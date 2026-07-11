@@ -1,20 +1,20 @@
 {
-  "updatedAt": "2026-07-10T13:00:00Z",
+  "updatedAt": "2026-07-11T13:00:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "Confirmed 23rd consecutive silent day, recomputed all five queue ages (28/23/22/13/4). Re-checked both store-discoverability tasks (audit + Nyx's fix) directly against tasks.json — both content-complete since 07-09, correctly recommended to close done tomorrow (2026-07-11, their due date), not today; only remaining gap is the schema decision, which isn't theirs to own. Beat-schema decision flagged as 1 day old, unresolved. Homerun re-verified reversible.",
-      "lastActive": "2026-07-10T09:00:00Z"
+      "task": "Confirmed 24 consecutive silent days (Jun 18-Jul 11), verified against cursors.json (fully empty) and inbox (nothing beyond .gitkeep). Closed out both store-discoverability tasks as done today (due date), drafts re-confirmed unchanged/accurate — only remaining blocker is the schema question (t-beat-schema-description-tags-decision, owner user), which carries forward independently. Handed the mechanical close to Mnemosyne via t-store-discoverability-closeout-0711. Recomputed all five queue ages from real createdAt (29/24/23/14/5 days). t-switch-arc-w28-gap-extension now 3 days overdue, stays review — both dependencies unmoved. Homerun re-verified reversible, stays doing. No new work assigned to Nyx/Hermes/Aether today.",
+      "lastActive": "2026-07-11T09:00:00Z"
     },
     {
       "id": "aether",
       "name": "Aether",
       "role": "A&R · Sound",
       "status": "idle",
-      "task": "No items — no new intake, cursors.json confirmed empty. Correctly recorded as 'no items,' not invented.",
+      "task": "No items today — skipped, no new intake (not Monday, no market read due). Correctly recorded as 'no items,' not invented.",
       "lastActive": "2026-07-03T09:00:00Z"
     },
     {
@@ -22,31 +22,31 @@
       "name": "Nyx",
       "role": "Execution · Content",
       "status": "idle",
-      "task": "Independently re-verified both store-discoverability drafts against src/data/beats.ts directly — confirmed accurate and complete, no description/tags field on Beat, matches Hemera's characterization exactly, confirms close-tomorrow recommendation independently. Re-verified t-switch-arc-w28-gap-extension's two dependencies (cadence decision, W25 collab-story queue item) both genuinely unmoved. Other review-stage tasks unchanged. Wrote nothing this turn.",
-      "lastActive": "2026-07-10T09:00:00Z"
+      "task": "Independently re-verified rather than repeating: read both store-discoverability drafts in full, genuinely complete, placeholder tracks correctly flagged, Switch collab pricing correctly left undecided — confirmed done, clean for Mnemosyne's flip. Pulled t-switch-arc-w28-gap-extension's two dependencies straight from tasks.json/queue.json — both still genuinely stuck. Ran own glob pass for Homerun — zero render/export/edl hits, stays doing. Wrote nothing.",
+      "lastActive": "2026-07-11T09:00:00Z"
     },
     {
       "id": "hermes",
       "name": "Hermes",
       "role": "Booking · Outreach",
       "status": "idle",
-      "task": "Independently re-verified the 10k.emraan blocker unchanged — contacts.md, cursors.json, inbox, queue.json all checked directly. Draft still can't be sent (to: contact unknown), now 4 days old. Recomputed 15 days to July 25 target. Wrote nothing (contacts.md already covers it).",
-      "lastActive": "2026-07-10T09:00:00Z"
+      "task": "Re-checked directly: team/inbox/ still only audio/.gitkeep, zero new intake; cursors.json still fully empty. ap-2026-07-06-collab-confirm-10k-emraan still pending, 5 days old, matches Hemera. Checked approvals/archive/ — no 10k-related resolution. Contact channel still unknown anywhere; draft still can't be sent as-is. Wrote nothing.",
+      "lastActive": "2026-07-11T09:00:00Z"
     },
     {
       "id": "mnemosyne",
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "idle",
-      "task": "2026-07-10 meeting record closed. Verified both store-discoverability tasks correctly stay review today (due tomorrow, not today's close) — no premature status flip. Full schema sweep: 62 unique task ids, no duplicates, all JSON valid, Beat interface confirmed to have no description/tags field. Refreshed agents.json for all seven agents.",
-      "lastActive": "2026-07-10T13:00:00Z"
+      "task": "2026-07-11 meeting record closed. Executed Hemera's handoff: t-store-discoverability-audit and t-store-discoverability-audit-fix-nyx flipped review -> done; t-store-discoverability-closeout-0711 flipped backlog -> done in the same pass. Full schema sweep: 60 unique task ids, no duplicates, all JSON valid. Refreshed agents.json for all seven agents and tasks.json's top-level updatedAt.",
+      "lastActive": "2026-07-11T13:00:00Z"
     },
     {
       "id": "theia",
       "name": "Theia",
       "role": "Market · Research",
       "status": "idle",
-      "task": "No items today — Friday, not Monday, nothing new since the 2026-W28 read filed July 6. Correctly recorded as 'no items,' not invented.",
+      "task": "No items today — Saturday, not Monday, nothing new since the 2026-W28 read filed July 6. Correctly recorded as 'no items,' not invented.",
       "lastActive": "2026-07-06T09:00:00Z"
     },
     {
@@ -54,8 +54,8 @@
       "name": "Argus",
       "role": "Oversight · Pipeline",
       "status": "idle",
-      "task": "26th pipeline audit complete (team/reports/pipeline/2026-07-10.md). Verdict: GREEN — sixth in seven audits. Independently re-derived silence count (23 days) and all five queue ages, matched Hemera exactly. Verified store-discoverability close-tomorrow recommendation sound against both drafts and src/data/beats.ts. Confirmed yesterday's duplicate-id defect stayed fixed, not recurring. Filed zero new tasks.",
-      "lastActive": "2026-07-10T11:00:00Z"
+      "task": "27th pipeline audit complete (team/reports/pipeline/2026-07-11.md). Verdict: GREEN — seventh in eight audits. Independently re-derived the 24-day silence streak and all five queue ages, exact matches to Hemera. Re-read both store-discoverability drafts in full, confirmed the close-today call sound. Verified Hermes's archive claim directly. Schema sweep: 60 unique task ids, no duplicates, agents.json correctly stale pending Mnemosyne, library/beats.json unchanged. Filed zero new tasks — fifth time in 27 audits. Escalated to ISΛRK directly: 10k.emraan contact channel (5 days, most consequential), beat-schema decision (2 days), five-item queue (oldest 29 days), standing asks unchanged.",
+      "lastActive": "2026-07-11T11:00:00Z"
     }
   ]
 }
