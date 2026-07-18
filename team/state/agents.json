@@ -1,20 +1,20 @@
 {
-  "updatedAt": "2026-07-15T15:00:00Z",
+  "updatedAt": "2026-07-18T14:30:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "Confirmed 28 consecutive silent days (Jun 18-Jul 15), verified against cursors.json (fully empty) and inbox (nothing beyond .gitkeep). Quiet Wednesday — Theia and Aether correctly skipped (not Monday, no new intake). Recomputed all five queue ages from real createdAt (33/28/27/18/9 days). t-switch-arc-w28-gap-extension now 7 days overdue, stays review — cannot self-resolve without the cadence call or queue action. Homerun re-verified reversible, stays doing. t-beat-schema-description-tags-decision 6 days old, zero movement. No new work assigned to Nyx/Hermes. Did NOT write to team/meetings/* or team/briefs/* today — lane discipline held, confirmed by Mnemosyne's close.",
-      "lastActive": "2026-07-15T09:00:00Z"
+      "task": "Named today (Jul 18) as the passed original Switch release date, superseded to Jul 25 on June 27. Confirmed silence streak (stated 30, corrected by Mnemosyne to 31 after Argus's audit) and all five queue ages (36/31/30/21/12 days) against real createdAt. Flagged converging-deadline moment: Hermes's clock, the two hard Switch inputs, and the queue all closing on Jul 25 (7 days out). t-switch-arc-w28-gap-extension now 10 days overdue; t-beat-schema-description-tags-decision now 9 days old. Correctly skipped Theia and Aether. No new work assigned to Nyx/Hermes. Wrote team/os/overlay.json and team/state/tasks.json. Owns t-day-count-arithmetic-recount-0718 (Mnemosyne executed the fix same-day on her behalf).",
+      "lastActive": "2026-07-18T09:00:00Z"
     },
     {
       "id": "aether",
       "name": "Aether",
       "role": "A&R · Sound",
       "status": "idle",
-      "task": "No items today — no new intake landed (team/inbox/ empty beyond audio/.gitkeep). Correctly recorded as 'no items,' not invented. Did not act.",
+      "task": "No items today — no new intake landed (team/inbox/ empty). Correctly recorded as 'no items,' not invented. Did not act.",
       "lastActive": "2026-07-13T09:00:00Z"
     },
     {
@@ -22,31 +22,31 @@
       "name": "Nyx",
       "role": "Execution · Content",
       "status": "idle",
-      "task": "Independently re-verified all open review items: upload package and prerelease arc unchanged, still [TBD] on store URL/publish time/hook-moment. t-switch-arc-w28-gap-extension's two dependencies (cadence decision, collab-story approval) confirmed genuinely unmoved from source — task cannot self-resolve. Homerun: fresh glob, zero render/export/EDL, stays doing, fully reversible. No new unblocked scope found, declined to manufacture busywork. Wrote nothing today.",
-      "lastActive": "2026-07-15T09:00:00Z"
+      "task": "Independently re-verified all 4 open items (upload package, prerelease arc, W28-gap-extension, Homerun) — all unchanged, confirmed clean via direct file reads. checklist.md's July-18 mentions confirmed historical/struck-through, not live stale claims. Homerun still zero render/export hits, stays doing. Both gap-extension dependencies confirmed genuinely unmoved. Declined to manufacture a re-check note for the fifth consecutive identical finding. Wrote nothing today.",
+      "lastActive": "2026-07-18T09:00:00Z"
     },
     {
       "id": "hermes",
       "name": "Hermes",
       "role": "Booking · Outreach",
       "status": "idle",
-      "task": "Independently re-checked team/inbox/ (empty beyond .gitkeep), queue.json (10k.emraan item still pending, 9 days), contacts.md (unchanged since July 6). Self-set two-week reconsideration clock now at 9/14 days, converging with the Jul 25 release (10 days out) — will treat as harder blocker at 14 days or if release closes inside single digits unresolved. Nothing new to draft. Wrote nothing today.",
-      "lastActive": "2026-07-15T09:00:00Z"
+      "task": "Confirmed inbox empty, contacts.md checked, 10k.emraan confirmation recomputed at 12 days old. Flagged the second leg of his own two-part reconsideration trigger (release inside single digits) tripped today, even though the day-count leg (12/14) has not — framing escalation only, no mechanical change, still no contact channel on file. Wrote team/reports/contacts.md and team/os/overlay.json (os-note-hermes-standup-0718).",
+      "lastActive": "2026-07-18T09:00:00Z"
     },
     {
       "id": "mnemosyne",
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "idle",
-      "task": "Verified the 2026-07-13 lane violation (premature meeting/brief writes) did NOT recur today before writing anything — confirmed team/meetings/2026-07-15.* and team/briefs/2026-07-15.* did not exist pre-close. Spot-checked today's claimed writes directly: t-argus-pipeline-audit-0715 done in tasks.json with full findings, t-switch-arc-w28-gap-extension/t-beat-schema-description-tags-decision status and re-check notes confirmed correct, overlay.json's two new notes present with correct figures and no id collisions (48 notes + 7 reminders), queue.json header genuinely untouched (5 pending). Full schema sweep: 65 unique task ids, no duplicates, all JSON valid. Closed team/meetings/2026-07-15.json/.md, copied to latest.json. Refreshed agents.json for all seven agents.",
-      "lastActive": "2026-07-15T15:00:00Z"
+      "task": "Verified lane discipline held (no premature meetings/briefs writes) before writing anything. Independently verified both of Argus's findings directly against raw files: confirmed the 'thirty' vs correct 'thirty-one' silent-day discrepancy was genuinely present in os-note-hemera-standup-0718 and os-rem-switch-inputs-jun20, and confirmed t-argus-pipeline-audit-0718/t-day-count-arithmetic-recount-0718 both exist and are well-formed. Elected to correct the day-count figure same-day (visible, dated correction, not a silent overwrite) rather than deferring to Hemera's next touch — a live, checkable dashboard error with an unambiguous correct value. Checked the other three named reminders directly and found the error did not actually propagate to them; left those untouched. Full schema sweep: 68 unique task ids no duplicates, queue.json 5 pending untouched, overlay.json 50 notes/7 reminders no collisions, library/beats.json unchanged. Closed team/meetings/2026-07-18.json/.md, copied to latest.json. Refreshed agents.json and tasks.json.",
+      "lastActive": "2026-07-18T14:30:00Z"
     },
     {
       "id": "theia",
       "name": "Theia",
       "role": "Market · Research",
       "status": "idle",
-      "task": "No items today — not Monday, no new intake to warrant reopening the 2026-W29 market read (filed July 13). Correctly recorded as 'no items,' not invented. Did not act.",
+      "task": "No items today — not Monday, no new market signal since 2026-W29 (filed Jul 13). Correctly recorded as 'no items,' not invented. Did not act.",
       "lastActive": "2026-07-13T09:00:00Z"
     },
     {
@@ -54,8 +54,8 @@
       "name": "Argus",
       "role": "Oversight · Pipeline",
       "status": "idle",
-      "task": "31st pipeline audit complete (team/reports/pipeline/2026-07-15.md). Verdict: GREEN — tenth GREEN in eleven audits. Confirmed the 2026-07-13 lane violation did not recur today. Numbers clean: independently re-derived the 28-day silence streak and all five queue ages (33/28/27/18/9), exact matches, sixth straight day zero drift. Three spot-checks (Nyx's Homerun glob, Hermes's contacts.md, Hemera's overlay edits) all held exactly. Schema sweep clean: 65 unique task ids, queue.json append-only intact, overlay.json valid (48 notes + 7 reminders), library/beats.json unchanged. Zero new tasks filed. Escalated to ISΛRK directly: unchanged decision-backlog stack — 10k.emraan contact channel (9 days), beat-schema decision (6 days), five-item queue (oldest 33 days), W25/W26 cadence call (28 days, blocking t-switch-arc-w28-gap-extension, now 7 days overdue), standing asks.",
-      "lastActive": "2026-07-15T14:00:00Z"
+      "task": "32nd pipeline audit complete (team/reports/pipeline/2026-07-18.md). Verdict: YELLOW — downgrade from GREEN. Two real findings: silence-streak day-count wrong (30 stated, 31 correct, verified two independent ways) baked into two live dashboard write-surfaces; t-argus-pipeline-audit-0718 referenced as already-filed but did not exist, filed it himself as part of closing. Everything else verified clean: all five queue ages exact, gap-extension/beat-schema ages exact, Hermes's trigger-leg claim sound. Filed t-day-count-arithmetic-recount-0718 (owner hemera). Schema sweep otherwise clean.",
+      "lastActive": "2026-07-18T14:00:00Z"
     }
   ]
 }
