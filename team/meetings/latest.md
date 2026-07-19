@@ -1,0 +1,49 @@
+# ISΛRK Team Standup — 2026-07-19 (Sunday)
+
+## Agenda
+- Recompute every headline number fresh from raw files after yesterday's YELLOW arithmetic-slip audit
+- 10k.emraan collab-credit confirmation status
+- Hermes's two-part reconsideration trigger — release-distance leg vs day-count leg
+- Open Switch/Homerun items re-verification (upload package, prerelease arc, W28-gap extension, Homerun video decision)
+- Argus's 33rd pipeline audit
+- Mnemosyne close
+
+## Transcript
+
+### Hemera
+Opened by recomputing every headline number fresh from raw files (given yesterday's YELLOW audit was an arithmetic slip): 32 consecutive silent days (Jun 18–Jul 19, verified against cursors.json fully empty + team/inbox/ empty); queue ages ap-2026-06-19-switch-upload 37d, ap-2026-06-17-switch-w25-collab-story 32d, ap-2026-06-18-switch-w26-x-post 31d, ap-2026-06-27-switch-upload-replan 22d, ap-2026-07-06-collab-confirm-10k-emraan 13d; t-switch-arc-w28-gap-extension 11 days overdue (due Jul 8); t-beat-schema-description-tags-decision 10 days old (created Jul 9); noted Hermes's release-distance trigger leg tripped (July 25 is 6 days out) while his day-count leg sits at 13/14. Stated plainly nothing is genuinely new today — pure passage-of-time arithmetic. Correctly skipped Theia (not Monday) and Aether (inbox empty) with reasoning given. No new task assignments/handoffs. Wrote no files (judged no dashboard figure was stale as of this morning).
+
+### Hermes
+Independently re-verified the 10k.emraan item (queue.json createdAt 2026-07-06T09:00:00Z, still pending, 13 days old — matches Hemera) and confirmed no contact channel has appeared (contacts.md, team/inbox/*.json both checked fresh). Precisely distinguished that only the release-distance leg of his two-part trigger has tripped (6 days out), not the day-count leg (13/14, not yet 14) — declined to round up to "fully tripped." Flagged that the day-count leg will hit 14/14 tomorrow (July 20). Stated nothing changes mechanically today regardless, since no contact channel exists to send the drafted confirmation to. Wrote no files.
+
+### Nyx
+Re-verified all four open items directly against source (t-switch-upload-package via metadata.json — still targetReleaseDate 2026-07-25, no store URL; t-switch-prerelease-arc via the arc doc's log — last entry still 2026-07-05; t-switch-arc-w28-gap-extension — now 11 days overdue, gap-bridge section unchanged; t-homerun-video-decision via the brief and a fresh glob for render/export files under team/drafts/uploads/homerun/ — none found, still pre-production, no cover art file found anywhere in repo). Confirmed all four genuinely unchanged. Wrote no files.
+
+### Theia
+skipped — not Monday (weekly market slot only), no new market-moving signal since 2026-W29 (filed Jul 13). No items.
+
+### Aether
+skipped — team/inbox/ confirmed empty via fresh glob. No items.
+
+### Argus
+33rd pipeline audit, verdict **GREEN**. Independently re-derived: 32 silent days (exact match), all five queue ages exact match (37/32/31/22/13), both task-age figures exact match (11 days overdue / 10 days old), Hermes's trigger-leg framing arithmetically correct and consistent across his turn/contacts.md/Hemera's note (no drift), Theia/Aether skips justified. Flagged (not a task) that ap-2026-06-19-switch-upload's real createdAt is June 12 despite the id slug saying "06-19" — a slug-vs-field trap worth naming so nobody computes its age from the slug by mistake. Schema sweep clean: 68 unique task ids no duplicates, queue append-only intact (still 5 pending, header unmoved since Jul 6), overlay.json valid (52 notes, 7 reminders, no collisions), library/beats.json unchanged. Confirmed via glob that no team/meetings/2026-07-19.* or team/briefs/2026-07-19.* existed yet at audit time, so nobody's "wrote nothing" claim is contradicted. Zero new tasks filed — clean day, didn't manufacture one. One flag for ISΛRK directly (not a task): Hermes's day-count leg hits 14/14 tomorrow (Jul 20) — once both legs are tripped it stops being "framing only" and becomes a real harder blocker per his own rule; worth having an answer ready before then. Report at team/reports/pipeline/2026-07-19.md.
+
+### Mnemosyne
+Lane-discipline check performed first: confirmed via Glob that team/meetings/2026-07-19.* and team/briefs/2026-07-19.* did not exist prior to this close, and no earlier turn wrote to either path — no repeat of the 07-13 premature-write violation. Cross-checked Argus's headline figures against team/reports/pipeline/2026-07-19.md directly: 32 silent days, all five queue ages (37/32/31/22/13), both task ages (11 days overdue, 10 days old), and Hermes's two-leg trigger math all reproduce exactly — no drift found between the report and the transcript. Confirmed overlay.json is genuinely still current: 52 notes / 7 reminders, all figures dated 2026-07-18 remain arithmetically valid one day later only insofar as no note asserts a day-count that needed bumping today — checked directly, none do (the two day-count-bearing notes from 07-18 state figures as of that date's timestamp, not as evergreen text) — judged no dashboard write needed today since nothing materially new happened and no live figure is wrong. Full schema sweep before closing: tasks.json 68 entries pre-close, no duplicate ids; approvals/queue.json confirmed still exactly 5 pending, header untouched at 2026-07-06T09:00:00Z; overlay.json confirmed valid, 52 unique notes + 7 unique reminders, no id collisions; library/beats.json unchanged (zero beats), consistent with 32 days of zero intake. Filed t-argus-pipeline-audit-0719 (owner argus, done) recording the 33rd audit's GREEN verdict and the slug-vs-field flag. Did not touch any open user-blocked task (gap-extension, beat-schema decision, upload package, prerelease arc, Homerun decision) — all independently re-verified unchanged by Nyx/Hemera today, re-checking them again here would be busywork, not archive work. Closing the ledger: writing meetings/2026-07-19.json, meetings/2026-07-19.md, copying to meetings/latest.json and latest.md. Refreshing agents.json for all seven agents.
+
+## Decisions
+- Argus's 33rd pipeline audit verdict: GREEN — eleventh GREEN in twelve audits, all headline figures independently re-derived and exact, no schema drift, no stray writes.
+- No new decisions on the standing backlog today — 10k.emraan contact channel, beat store URL/publish time, five-item approval queue, beat-schema fields, and W25/W26 cadence call all remain open, awaiting ISΛRK input.
+- No changes made to team/os/overlay.json today — nothing materially new happened (pure day-count arithmetic), all dashboard figures already correct as of yesterday's fix, no stale figure found on inspection.
+
+## Handoffs
+None today.
+
+## Action Items
+- ISΛRK: Hermes's day-count leg (10k.emraan confirmation) hits 14/14 tomorrow, 2026-07-20 — once both his release-distance leg (already tripped, 6 days out) and day-count leg are live simultaneously, this stops being framing-only and becomes a real harder blocker per his own rule. Worth having an answer ready before then.
+- ISΛRK: confirm the 10k.emraan collab or supply Hermes a contact channel — 13 days old, no channel on file
+- ISΛRK: supply beat store URL and firm July 25 publish time — blocks Switch upload package finalization
+- ISΛRK: act on the five-item approval queue — approve ap-2026-06-27-switch-upload-replan (July 25, current) and reject ap-2026-06-19-switch-upload (37 days old, still incorrectly states July 18) if approving the replan
+- ISΛRK: decide the beat-schema question (description/tags fields on Beat, expanded mood array, or separate store-content file) — 10 days old, still cheap
+- ISΛRK: make the W25/W26 X-post cadence call (t-cadence-decision-w25-x-post) — 32 days open, no hard wall, directly blocking t-switch-arc-w28-gap-extension which is now 11 days overdue
+- Standing infra asks unchanged: Homerun art verification, retroactive intake path decision, Discord intake channels (DISCORD_INTAKE_CHANNELS + DISCORD_BOT_TOKEN)
