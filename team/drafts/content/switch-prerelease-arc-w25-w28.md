@@ -294,6 +294,15 @@ new copy voice — same restraint as every other week in this arc.
   same as everywhere else in the arc it's needed) and confirming this doesn't collide with
   whatever W28 itself ends up posting in its own countdown beats (W28's own two X posts and
   countdown framing already exist above — this touchpoint is additive, not a replacement)
+- **2026-07-20 status (Nyx, per Theia's market read flag):** the rough mid-gap window named
+  above ("around July 19-20") is today, and the publish time it needs has still not landed.
+  This is no longer "could move a day or two" — that framing assumed slack that's now spent.
+  Not filling `[TBD]` with a guessed time to force this out on schedule; that would repeat the
+  fabricated-value move this arc has refused since June 27. Stated plainly instead: if the
+  publish time doesn't land in the next day or two, touchpoint 1 either posts without a real
+  countdown value (defeats the point of a countdown sticker) or slides toward touchpoint 2's
+  own window (~July 23-24), effectively collapsing two touchpoints into one late beat this
+  close to release. Flagging the compression risk now, not after it's already happened.
 
 **touchpoint 2 — reshare of the strongest existing collab asset**
 - **asset chosen: the W25 collab-story X post** — `two producers. one 186 bpm idea. ISΛRK ×

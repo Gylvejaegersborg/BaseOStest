@@ -1,6 +1,14 @@
 {
-  "updatedAt": "2026-07-18T14:30:00Z",
+  "updatedAt": "2026-07-20T15:00:00Z",
   "notes": [
+    {
+      "id": "os-note-theia-market-w30",
+      "title": "Market pulse — W30: nothing sourced adds to 10k.emraan's urgency beyond the calendar itself; gap-bridge plan holds, one timing risk flagged",
+      "folder": "Team",
+      "tags": ["market", "theia", "switch", "10k-emraan"],
+      "updated": "2026-07-20T13:30:00Z",
+      "body": "**Full read: `team/reports/market/2026-W30.md`. Hemera asked two specific things this week — answering both directly, not padding with a third finding.**\n\n**1. Is there anything sourced (not invented) bearing on 10k.emraan's urgency now that both of Hermes's trigger legs are live (14/14 days, 5 days from release)? No.** I have zero external signal on this specific collaborator to report — no name/handle appears anywhere outside content/metadata in this repo, confirmed again by a repo-wide grep. The urgency is real and correctly named by Hermes; it comes from the calendar, not from anything my market lane can add evidence for or against. This stays a booking/outreach resolution now escalated to ISΛRK directly — not something my read moves forward.\n\n**2. Does the gap-bridge plan (countdown-sticker + reshare, July 14-25) still hold? Yes — no market case to scale it up or down.** Re-checked the arc doc and checklist directly: the light-bridge shape's original reasoning (no verified case for a bigger final-stretch push; avoid dead air without inventing new production) is unchanged. One real timing flag, not a plan change: touchpoint 1's rough window (~July 19-20) is landing on or past today with its input (July 25 publish time) still `[TBD]` — worth Hemera/Nyx's attention as a live scheduling risk now, not just an aging one.\n\n**No new genuine market/trend signal this week — third consecutive honest 'no', said plainly rather than padded.**\n\nZero new tasks filed to Hemera — both items already have clear owners (Hermes/ISΛRK on the collab confirmation, Hemera/Nyx on the bridge timing); filing a duplicate would misattribute the work."
+    },
     {
       "id": "os-note-hermes-standup-0718",
       "title": "10k.emraan: one leg of my own two-part trigger fired today — release is inside single digits, not just the day-count",
@@ -428,10 +436,10 @@
     },
     {
       "id": "os-rem-10k-emraan-confirm",
-      "title": "10k.emraan collab: 12 of Hermes's 14-day clock elapsed — 2 days from his own harder-blocker threshold, converging on Jul 25",
+      "title": "10k.emraan collab: BOTH of Hermes's trigger legs now tripped (14/14 days, 5 days to Jul 25 release) — live blocker, needs you today",
       "dayOffset": 0,
       "time": 9.0,
-      "notes": "Now 12 days old (createdAt July 6) and still the top open item, still no contact channel on file: every mention of the ISΛRK x 10k.emraan collaboration in the repo — catalog artist field, captions, the pre-release arc doc, the W28 gap-bridge reshare copy — is name-in-content. There is no message, contact record, or confirmation anywhere that this collab is actually agreed. Hermes drafted an outreach ask (team/drafts/booking/collab-confirm-10k-emraan.md, queued as ap-2026-07-06-collab-confirm-10k-emraan) but cannot send it — no contact address or handle on file. Two ways to close this: tell the team the agreement already happened off-record (DM, call, in person) so Hermes can log it in team/reports/contacts.md, or supply a channel so he can actually ask. Hermes's own self-set 14-day reconsideration clock is now at 12/14 days — 2 days from his stated harder-blocker threshold, which lands inside the same week as the July 25 release itself. This is now a converging-deadline item, not just an aging one."
+      "notes": "Mnemosyne update 2026-07-20: figure corrected from '12 of 14' to reflect today's actual state — do not read this as a fresh escalation, it is the same clock reaching its own pre-announced threshold. Now 14 days old (createdAt July 6) and still the top open item, still no contact channel on file: every mention of the ISΛRK x 10k.emraan collaboration in the repo — catalog artist field, captions, the pre-release arc doc, the W28 gap-bridge reshare copy — is name-in-content. There is no message, contact record, or confirmation anywhere that this collab is actually agreed. Hermes drafted an outreach ask (team/drafts/booking/collab-confirm-10k-emraan.md, queued as ap-2026-07-06-collab-confirm-10k-emraan) but cannot send it — no contact address or handle on file. Two ways to close this: tell the team the agreement already happened off-record (DM, call, in person) so Hermes can log it in team/reports/contacts.md, or supply a channel so he can actually ask. Hermes's own self-set 14-day reconsideration clock is now at 14/14 — fully tripped — simultaneously with the release-distance leg (July 25 is 5 days out). Both legs live at once for the first time today. Nothing sends automatically and nothing changes mechanically without your input; this is a live blocker now, not a watch item."
     },
     {
       "id": "os-rem-vl-chorus-jul1",

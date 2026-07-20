@@ -65,3 +65,53 @@ that fact applied to my own item specifically, using my own previously-stated tr
 
 **Status unchanged: unconfirmed / outreach drafted, not sent. Still needs ISΛRK to
 supply a channel or confirm the agreement happened off-record.**
+
+---
+
+**2026-07-20 update (Hermes) — both trigger legs now true simultaneously.**
+Re-verified independently at today's standup, not taking Hemera's or Theia's word alone:
+- `ap-2026-07-06-collab-confirm-10k-emraan.createdAt` = `2026-07-06T09:00:00Z` in
+  `team/approvals/queue.json`, status still `pending`. Today, 2026-07-20, is day 14 exactly.
+  Day-count leg: **tripped** (met, not rounded up — it is genuinely at the line I set).
+- Release target July 25 (per the draft body and `ap-2026-06-27-switch-upload-replan`) is
+  5 days out. Release-distance leg (single digits): **tripped**, and has been since 07-19.
+- `team/inbox/*.json` — still zero files. `team/state/cursors.json` — discord/imap/copyparty
+  still all empty. No contact channel for 10k.emraan exists anywhere in this repo, in any
+  agent's lane, today or ever.
+- The draft itself, `team/drafts/booking/collab-confirm-10k-emraan.md`, still carries
+  `to: "10k.emraan (contact unknown...)"`. Reviewed it for a content update and made none —
+  the body's claims (credited since June, targeting July 25, asking for confirm-or-flag) are
+  all still accurate as written on 07-06; there is nothing stale in it to fix. It remains
+  exactly as unsendable today as it was two weeks ago, for the same reason: no address.
+
+Both legs I named on 07-06 are, as of today, true at the same time. Per my own rule, that
+is the threshold where this stops being "framing only."
+
+**What that concretely changes:** nothing mechanical. I still cannot send this — there is
+no channel on file, this is a team run with no external calls regardless, and nothing is
+queued to send without an address to put in `to:`. The approval entry stays `pending`, the
+draft stays unsent, the credit stays unconfirmed. No new action is mine to take that wasn't
+already available to me on day 1.
+
+**What it does change is how I'm obligated to describe it.** Up through yesterday I held
+the line that 13/14 days and 6-days-to-release was "approaching," not "tripped," because
+rounding up would have been me manufacturing urgency I hadn't actually measured yet. That
+discipline was the point — it's what makes today's statement mean something. Today both
+numbers are the numbers I said would matter, not numbers I'm choosing to treat as close
+enough. So: this is now a live, fully-tripped blocker on schedule, not a watch item. If
+Switch publishes on July 25 with the "ISΛRK × 10k.emraan" credit still live in copy and
+catalog, it publishes with a collaborator credit that has never been confirmed in any
+record this team has access to, and the team has now run out of the runway it set for
+itself to resolve that before crunch. That is a statement about severity, not a new fact —
+the underlying fact (no channel, no confirmation) hasn't moved since 07-06.
+
+**Still not mine to solve.** I don't have a channel to invent, and manufacturing one (a
+guessed email, a DM handle pulled from nowhere) would be worse than the current honest gap
+— it risks sending nothing, or worse, sending to the wrong person under ISΛRK's name. This
+needs ISΛRK directly: either supply a real channel so the drafted message in
+`collab-confirm-10k-emraan.md` can actually go out, or confirm the credit was agreed
+off-record so Hermes can log it here as resolved and close `ap-2026-07-06-collab-confirm-10k-emraan`
+without ever sending anything.
+
+**Status: blocker, fully tripped as of today, 2026-07-20. Unconfirmed / outreach drafted,
+not sent. Awaiting ISΛRK — channel or off-record confirmation.**
