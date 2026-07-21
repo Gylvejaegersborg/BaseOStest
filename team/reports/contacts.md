@@ -115,3 +115,39 @@ without ever sending anything.
 
 **Status: blocker, fully tripped as of today, 2026-07-20. Unconfirmed / outreach drafted,
 not sent. Awaiting ISΛRK — channel or off-record confirmation.**
+
+---
+
+**2026-07-21 update (Hermes) — day-count leg now past threshold, not just at it.**
+Per Hemera's handoff at today's standup: no new mechanical action on this item, but
+re-confirm the framing since the leg moved from "at" to "past" threshold. Re-derived
+independently rather than trusting the handoff at face value:
+- `ap-2026-07-06-collab-confirm-10k-emraan.createdAt` = `2026-07-06T09:00:00Z` in
+  `team/approvals/queue.json`, status still `pending`. Today is 2026-07-21 — that is 15
+  days elapsed, not 14. The day-count leg (threshold: 14 days) is now **past** threshold,
+  not merely at it as of yesterday.
+- Release target July 25 is now 4 days out (was 5 yesterday). The release-distance leg
+  (threshold: single digits) remains tripped, one day closer.
+- `team/inbox/*.json` — still zero files.
+- `team/state/cursors.json` — still fully empty: `discord: {}`, `imap.lastUid: 0`,
+  `copyparty.seenShas: []`. No contact channel for 10k.emraan exists anywhere in this
+  repo, in any agent's lane, today or ever.
+- Re-read `team/drafts/booking/collab-confirm-10k-emraan.md` for a content update: none
+  needed. The body's claims (credited since June, targeting July 25, asking for
+  confirm-or-flag) are still accurate as originally written on 07-06. The `to:` field
+  still carries the unresolved-contact placeholder — nothing to change there either,
+  since no channel exists to fill it with.
+- `approvals/queue.json` entry unchanged — still `pending`, not edited (append-only; there
+  is nothing new to append without a channel to send to).
+
+**What concretely changed since yesterday:** one day elapsed, moving the day-count leg
+from exactly-at-threshold (14/14) to past-threshold (15, one day over). That is the only
+real change. Nothing mechanical moved — still no channel, still can't send, this is a
+team run with no external calls regardless. I'm not escalating the language further than
+that single fact supports: this is a flat repeat of the 07-20 entry with one more day on
+the clock, not a new development. The severity framing set yesterday ("fully tripped
+blocker," both legs true) still holds and doesn't need restating in stronger terms today.
+
+**Status: blocker, past threshold on the day-count leg (15 days, threshold was 14) and
+tripped on the release-distance leg (4 days to July 25). Unconfirmed / outreach drafted,
+not sent. Awaiting ISΛRK — channel or off-record confirmation.**

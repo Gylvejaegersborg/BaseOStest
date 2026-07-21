@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-20T15:00:00Z",
+  "updatedAt": "2026-07-21T15:00:00Z",
   "notes": [
     {
       "id": "os-note-theia-market-w30",
@@ -436,10 +436,10 @@
     },
     {
       "id": "os-rem-10k-emraan-confirm",
-      "title": "10k.emraan collab: BOTH of Hermes's trigger legs now tripped (14/14 days, 5 days to Jul 25 release) — live blocker, needs you today",
+      "title": "10k.emraan collab: day-count leg now PAST threshold (15/14 days), 4 days to Jul 25 release — live blocker, needs you today",
       "dayOffset": 0,
       "time": 9.0,
-      "notes": "Mnemosyne update 2026-07-20: figure corrected from '12 of 14' to reflect today's actual state — do not read this as a fresh escalation, it is the same clock reaching its own pre-announced threshold. Now 14 days old (createdAt July 6) and still the top open item, still no contact channel on file: every mention of the ISΛRK x 10k.emraan collaboration in the repo — catalog artist field, captions, the pre-release arc doc, the W28 gap-bridge reshare copy — is name-in-content. There is no message, contact record, or confirmation anywhere that this collab is actually agreed. Hermes drafted an outreach ask (team/drafts/booking/collab-confirm-10k-emraan.md, queued as ap-2026-07-06-collab-confirm-10k-emraan) but cannot send it — no contact address or handle on file. Two ways to close this: tell the team the agreement already happened off-record (DM, call, in person) so Hermes can log it in team/reports/contacts.md, or supply a channel so he can actually ask. Hermes's own self-set 14-day reconsideration clock is now at 14/14 — fully tripped — simultaneously with the release-distance leg (July 25 is 5 days out). Both legs live at once for the first time today. Nothing sends automatically and nothing changes mechanically without your input; this is a live blocker now, not a watch item."
+      "notes": "Mnemosyne update 2026-07-21: figure updated from '14/14, 5 days to release' (yesterday) to today's actual state — this is the same live blocker restated with today's numbers, not a fresh escalation. Now 15 days old (createdAt July 6), one day past Hermes's own pre-announced 14-day reconsideration threshold, and still no contact channel on file: every mention of the ISΛRK x 10k.emraan collaboration in the repo — catalog artist field, captions, the pre-release arc doc, the W28 gap-bridge reshare copy — is name-in-content. There is no message, contact record, or confirmation anywhere that this collab is actually agreed. Hermes drafted an outreach ask (team/drafts/booking/collab-confirm-10k-emraan.md, queued as ap-2026-07-06-collab-confirm-10k-emraan) but cannot send it — no contact address or handle on file. Two ways to close this: tell the team the agreement already happened off-record (DM, call, in person) so Hermes can log it in team/reports/contacts.md, or supply a channel so he can actually ask. Release-distance leg: July 25 is now 4 days out. Both legs have been live simultaneously since 07-20; today's change is the day-count leg crossing from at-threshold to past-threshold. Nothing sends automatically and nothing changes mechanically without your input; this remains a live blocker, not a watch item."
     },
     {
       "id": "os-rem-vl-chorus-jul1",

@@ -39,6 +39,12 @@ above. No new approval queued — content already covered by `ap-2026-06-17-swit
 Task (`t-switch-arc-w28-gap-extension`) stays in review — the remaining lock-in (exact dates, this
 copy finalization) was due 2026-07-08; copy is now done, dates still depend on the July 25 publish
 time, which has not landed.
+**updated:** Nyx · 2026-07-21 — per Hemera's handoff: the gap-bridge section's touchpoint 1 now
+records, as a materialized fact rather than a risk, that its ~July 19-20 window closed unused
+(publish time still `[TBD]` in `checklist.md`, beat store URL still `[TBD]` in `description.md`,
+re-verified directly) and has compressed into touchpoint 2's ~July 23-24 window. No publish time
+or beat store URL invented to force a late standalone post. See the dated note inside the gap
+bridge section below.
 
 ---
 
@@ -303,6 +309,20 @@ new copy voice — same restraint as every other week in this arc.
   countdown value (defeats the point of a countdown sticker) or slides toward touchpoint 2's
   own window (~July 23-24), effectively collapsing two touchpoints into one late beat this
   close to release. Flagging the compression risk now, not after it's already happened.
+- **2026-07-21 status (Nyx, per Hemera's handoff): the ~July 19-20 window has closed, unused.**
+  Re-verified directly against source before writing this, not taken on Hemera's word:
+  `checklist.md` still shows the publish time as `[TBD]` (row ~62) and `description.md` still
+  shows the beat store URL as `[TBD]` (line 19) — neither input has landed. The compression
+  risk named yesterday is no longer a risk; it is what happened. Touchpoint 1 as a standalone
+  post is functionally dead — the mid-gap window it was scoped for is gone, and there is no
+  countdown value left to build a sticker post around at this point in the calendar. Touchpoint
+  1 has compressed into touchpoint 2's window (~July 23-24): whatever ships in that window now
+  carries both jobs — the countdown-sticker beat and the collab-story reshare — rather than
+  landing as two separate touchpoints. This is recorded as a materialized fact, not a forecast.
+  No publish time is being invented to force a late touchpoint-1 post out on its own; no beat
+  store URL is being invented either. If the July 25 publish time lands before ~July 23-24, the
+  single compressed post in touchpoint 2's window can still carry a real countdown value inside
+  it — that is now the only path back to a countdown element existing in this bridge at all.
 
 **touchpoint 2 — reshare of the strongest existing collab asset**
 - **asset chosen: the W25 collab-story X post** — `two producers. one 186 bpm idea. ISΛRK ×
