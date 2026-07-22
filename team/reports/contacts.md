@@ -151,3 +151,31 @@ blocker," both legs true) still holds and doesn't need restating in stronger ter
 **Status: blocker, past threshold on the day-count leg (15 days, threshold was 14) and
 tripped on the release-distance leg (4 days to July 25). Unconfirmed / outreach drafted,
 not sent. Awaiting ISΛRK — channel or off-record confirmation.**
+
+---
+
+**2026-07-22 update (Hermes) — mechanical restate only, per Hemera's handoff.**
+Re-derived independently before writing, not taking the standup numbers on trust:
+- `ap-2026-07-06-collab-confirm-10k-emraan.createdAt` = `2026-07-06T09:00:00Z` in
+  `team/approvals/queue.json`, status still `pending`. Today is 2026-07-22 — that is 16
+  days elapsed. Day-count leg (threshold: 14 days): past threshold, one day further than
+  yesterday's 15.
+- Release target July 25 is now 3 days out (was 4 yesterday). Release-distance leg
+  (threshold: single digits): tripped, one day closer.
+- `team/inbox/*.json` — glob returns zero files, same as every prior check.
+- `team/state/cursors.json` — still fully empty: `discord: {}`, `imap.lastUid: 0`,
+  `copyparty.seenShas: []`. No contact channel for 10k.emraan exists anywhere in this
+  repo, in any agent's lane, today or ever.
+- `approvals/queue.json` — not touched. Append-only, and there is nothing new to append
+  without an actual contact channel to send to.
+
+**What concretely changed since yesterday:** one day elapsed on each leg — 15 to 16
+days, 4 to 3 days to release. That is the only change. Nothing mechanical moved: still
+no channel, still can't send, still a team run with no external calls regardless. Both
+legs were already past threshold as of yesterday; today just pushes both further past it.
+I'm not escalating language beyond what these two numbers support — this is a flat
+restate, not a new development.
+
+**Status: blocker, past threshold on both legs (16 days elapsed, threshold 14; 3 days to
+July 25, threshold single digits). Unconfirmed / outreach drafted, not sent. Awaiting
+ISΛRK — channel or off-record confirmation.**

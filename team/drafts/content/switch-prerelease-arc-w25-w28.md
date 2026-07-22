@@ -45,6 +45,11 @@ records, as a materialized fact rather than a risk, that its ~July 19-20 window 
 re-verified directly) and has compressed into touchpoint 2's ~July 23-24 window. No publish time
 or beat store URL invented to force a late standalone post. See the dated note inside the gap
 bridge section below.
+**updated:** Nyx · 2026-07-22 — per Hemera's handoff: recorded an explicit three-path decision
+plan for touchpoint 2 (real countdown / reshare-only fallback / explicit lapse), due end of day
+2026-07-23, with a named recommended fallback (reshare-only, no invented values). `[TBD]` status
+of publish time and store URL re-verified directly against `checklist.md`/`description.md`
+before writing — unchanged. See the dated note inside the gap bridge section below.
 
 ---
 
@@ -354,6 +359,41 @@ new copy voice — same restraint as every other week in this arc.
 - **finished copy for both framing variants (reshare vs. first-posting) now written in full:**
   see `team/drafts/content/switch-w28-gap-reshare-copy.md` — drafted 2026-07-05, no new content
   duplicated here.
+
+**2026-07-22 status (Nyx, per Hemera's handoff): explicit decision plan recorded for this
+  window, due 2026-07-23.** Re-verified directly, not on anyone's word: `checklist.md` row
+  ~62 still reads `[TBD — confirm time, suggest 12:00 UTC]`; `description.md` line 19 still
+  reads `[TBD — insert beat store URL, e.g. https://isark.beats/switch]`. Touchpoint 1 died
+  unused in its own window last week (see the 2026-07-21 note above) and compressed into this
+  one — this window is now the last chance in the arc for any countdown element at all before
+  the drop. That makes an explicit call here non-optional; recording it now rather than after
+  the window closes:
+
+  - **path 1 — real countdown, if the July 25 publish time lands by ~July 23:** post the
+    compressed touchpoint (collab-story reshare/first-posting per whichever of Variant A/B
+    from `switch-w28-gap-reshare-copy.md` applies) with a countdown value folded in — e.g. a
+    day-count line or IG story sticker set to the real time, riding on the same post rather
+    than as a separate touchpoint-1 revival (there's no calendar room left for two beats).
+    this is the only path in the entire bridge that gets a countdown element into the arc at
+    all — recorded here so the option is visibly live, not buried.
+  - **path 2 — reshare-only, no countdown, if the publish time has not landed by ~July 23-24:**
+    post Variant A or B exactly as already drafted, with no countdown value attached. this is
+    my recommended fallback if inputs are still silent when the window opens: the copy is
+    already finished, fact-checked, needs nothing that's currently missing, and still lands
+    the collab-story bookend two days out from the drop. no fabricated time gets inserted to
+    force path 1 — if the input isn't there, path 2 is not a failure state, it is the
+    designed fallback.
+  - **path 3 — explicit lapse:** if ISΛRK/Hemera decide the reshare itself shouldn't fire in
+    this window either (e.g. the 10k.emraan credit-confirmation blocker in
+    `ap-2026-07-06-collab-confirm-10k-emraan` is judged to make any collab-forward post
+    premature), that's a valid call too — but it needs to be made explicitly and recorded
+    here, not arrived at by the window quietly closing the way touchpoint 1's did.
+
+  Nyx is not picking between these three — publish time, and whether the credit question
+  blocks posting, are ISΛRK/Hemera calls, not mine to make unilaterally. What's recorded here
+  is that the options are named, the fallback (path 2) is ready to execute with zero new
+  inputs the moment the window opens, and silence between now and end of day 2026-07-23 is
+  the one outcome this note is written to prevent.
 
 **explicitly not in scope for this bridge (do not read as an oversight):**
 - no new hook clips, no new graphics, no new production of any kind

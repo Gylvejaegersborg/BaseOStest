@@ -1,13 +1,13 @@
 {
-  "updatedAt": "2026-07-21T15:00:00Z",
+  "updatedAt": "2026-07-22T15:00:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "Re-derived 34 silent days, five queue ages (39/34/33/24/15), gap-extension 13 days overdue, beat-schema 12 days old. Restated 10k.emraan as a live blocker now past-threshold on the day-count leg (15/14), 4 days to release. Named gap-bridge touchpoint 1's window as fully passed and handed Nyx a doc update to record the materialized compression into touchpoint 2. Handed Hermes a re-confirm of the 15/14 framing. Wrote no files herself.",
-      "lastActive": "2026-07-21T09:00:00Z"
+      "task": "Re-derived 35 silent days, five queue ages (40/35/34/25/16), gap-extension 14 days overdue, beat-schema 13 days old. Restated 10k.emraan as past-threshold on both legs (16/14 days, 3 days to release). Named gap-bridge touchpoint 2's window (~Jul 23-24) as imminent and the last remaining chance for a countdown element in the arc. Handed Nyx an explicit-decision task for touchpoint 2 (due tomorrow) and Hermes a mechanical contacts.md restate. Wrote no files herself.",
+      "lastActive": "2026-07-22T09:00:00Z"
     },
     {
       "id": "aether",
@@ -22,31 +22,31 @@
       "name": "Nyx",
       "role": "Execution · Content",
       "status": "idle",
-      "task": "Edited switch-prerelease-arc-w25-w28.md to record gap-bridge touchpoint 1's window as materialized-closed-unused, compressed into touchpoint 2's ~July 23-24 window — no fabricated publish-time or store-URL value. Spot-checked all five Switch upload package files, still correctly July-25-dated. Confirmed gap-extension and Homerun items unchanged. No task-board or approval-queue changes.",
-      "lastActive": "2026-07-21T09:00:00Z"
+      "task": "Confirmed checklist.md/description.md still show [TBD] for publish time/store URL. Recorded a three-path decision plan for gap-bridge touchpoint 2 in switch-prerelease-arc-w25-w28.md (real countdown / reshare-only fallback / explicit lapse), recommended fallback path 2, declined to pick unilaterally. Spot-checked beats.ts — no switch entry, expected pre-release. No task-board or approval-queue changes.",
+      "lastActive": "2026-07-22T09:00:00Z"
     },
     {
       "id": "hermes",
       "name": "Hermes",
       "role": "Booking · Outreach",
       "status": "idle",
-      "task": "Independently re-derived the 10k.emraan collab confirmation's day-count leg (15 days, past the 14-day threshold) and release-distance leg (4 days to July 25). Confirmed zero contact channel exists. Appended a dated 2026-07-21 entry to contacts.md restating the numbers plainly, declined to escalate language beyond what one elapsed day supports. Did not touch approvals/queue.json.",
-      "lastActive": "2026-07-21T09:00:00Z"
+      "task": "Independently re-derived the 10k.emraan collab confirmation's day-count leg (16 days, past the 14-day threshold) and release-distance leg (3 days to July 25). Confirmed zero contact channel exists. Appended a dated 2026-07-22 entry to contacts.md restating the numbers plainly, no escalation beyond what one elapsed day supports. Did not touch approvals/queue.json.",
+      "lastActive": "2026-07-22T09:00:00Z"
     },
     {
       "id": "mnemosyne",
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "idle",
-      "task": "Verified lane discipline held. Cross-checked Argus's headline figures against team/reports/pipeline/2026-07-21.md — all exact, including an independent re-verification of his task-id recount (70 unique ids, no duplicates) — his method fully held up this time, no repeat of yesterday's miscount. Corrected the stale 10k.emraan overlay reminder to reflect today's past-threshold framing. Filed t-argus-pipeline-audit-0721 (done). Closed team/meetings/2026-07-21.json/.md, copied to latest.json/.md. Refreshed agents.json and tasks.json.",
-      "lastActive": "2026-07-21T15:00:00Z"
+      "task": "Verified lane discipline held. Cross-checked Argus's headline figures against team/reports/pipeline/2026-07-22.md — all exact, including an independent re-derivation of the 35-day silence count, all five queue ages, and the 71-unique-task-id count. Refreshed the 10k.emraan overlay reminder to 16/14 days, 3 days to release; added a new gap-bridge touchpoint-2 reminder surfacing Nyx's three-path plan. Filed t-argus-pipeline-audit-0722 (done). Closed team/meetings/2026-07-22.json/.md, copied to latest.json/.md. Refreshed agents.json and tasks.json.",
+      "lastActive": "2026-07-22T15:00:00Z"
     },
     {
       "id": "theia",
       "name": "Theia",
       "role": "Market · Research",
       "status": "idle",
-      "task": "Skipped — Tuesday, no new market item on the agenda, no file newer than 2026-W30 needed. No items.",
+      "task": "Skipped — Wednesday, not her Monday cadence day, no new market item on the agenda. No items.",
       "lastActive": "2026-07-20T09:00:00Z"
     },
     {
@@ -54,8 +54,8 @@
       "name": "Argus",
       "role": "Oversight · Pipeline",
       "status": "idle",
-      "task": "35th pipeline audit complete (team/reports/pipeline/2026-07-21.md). Verdict: GREEN — thirteenth GREEN in fourteen audits. All headline figures independently re-derived and exact. Ran a method check on yesterday's flagged miscount: two independent counting methods both gave 70 unique task ids, no duplicates — corrected method held up, verified independently by Mnemosyne at close. Zero new tasks filed by Argus himself. One flag for ISΛRK: 10k.emraan blocker crossed from at-threshold to past-threshold, 4 days to release.",
-      "lastActive": "2026-07-21T14:00:00Z"
+      "task": "36th pipeline audit complete (team/reports/pipeline/2026-07-22.md). Verdict: GREEN — fourteenth GREEN in fifteen audits. All headline figures independently re-derived and exact; spot-checked Hermes's and Nyx's claims directly against raw files, both held. Named the [TBD] placeholders' six-plus-day survival under time pressure as the pipeline's honesty discipline holding. Zero new tasks filed by Argus himself.",
+      "lastActive": "2026-07-22T14:00:00Z"
     }
   ]
 }

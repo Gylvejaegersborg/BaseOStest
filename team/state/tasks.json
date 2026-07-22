@@ -1,6 +1,41 @@
 {
-  "updatedAt": "2026-07-21T15:00:00Z",
+  "updatedAt": "2026-07-22T15:00:00Z",
   "tasks": [
+    {
+      "id": "t-hemera-standup-0722",
+      "title": "Hemera daily standup — 2026-07-22",
+      "owner": "hemera",
+      "status": "done",
+      "createdBy": "hemera",
+      "createdAt": "2026-07-22T09:00:00Z",
+      "due": "2026-07-22",
+      "notes": "Independently re-derived every headline number directly from raw files, not carried forward from yesterday. Silent days: cursors.json still fully empty (discord {}, imap.lastUid 0, copyparty.seenShas []), inbox glob still zero files beyond .gitkeep — 35 consecutive silent days (Jun 18-Jul 22), exact +1 on yesterday. Queue ages recomputed from raw createdAt against 2026-07-22: ap-2026-06-19-switch-upload 40 days, ap-2026-06-17-switch-w25-collab-story 35 days, ap-2026-06-18-switch-w26-x-post 34 days, ap-2026-06-27-switch-upload-replan 25 days, ap-2026-07-06-collab-confirm-10k-emraan 16 days — all exact +1, queue header unmoved since 07-06, still 5 pending, no resolvedAt anywhere. t-switch-arc-w28-gap-extension: due 07-08, now 14 days overdue (exact +1); both cited dependencies (t-cadence-decision-w25-x-post, ap-2026-06-17-switch-w25-collab-story) re-checked directly, still unmoved. t-beat-schema-description-tags-decision: createdAt 07-09, now 13 days old (exact +1), zero movement. 10k.emraan (Hermes's contacts.md, both legs already tripped as of 07-20/07-21): now 16 days old on the day-count leg (threshold 14, further past) and 3 days to the July 25 release on the distance leg (threshold single-digit, tighter). Nothing resolved, nothing new in the underlying facts — every number moved by exactly the calendar, no surprises. NEW ITEM TODAY: gap-bridge touchpoint 2 (~July 23-24 window, per Nyx's switch-prerelease-arc-w25-w28.md) is now imminent — starts tomorrow or the day after. Re-checked checklist.md (row ~62) and description.md (line 19) directly: publish time and beat store URL are both still literally [TBD]. Touchpoint 1 already died unused in its own ~July 19-20 window (recorded by Nyx 07-21). Touchpoint 2 is now the last remaining chance to land any countdown element in this arc before July 25, and its gating input has not landed with the window opening tomorrow — stating this plainly, not softening it: if [TBD] is still [TBD] tomorrow, the compressed post either goes out with no real countdown value (defeats the point) or the arc's only remaining pre-release touchpoint slips into the release week itself. Handoffs: hemera -> nyx, re-confirm/build the compressed touchpoint-2 post now that its window opens tomorrow, and state plainly in the arc doc whether it will fire without a countdown value if [TBD] hasn't cleared by end of day tomorrow (07-23) — don't let this die unused the same way touchpoint 1 did without a recorded decision. hemera -> hermes, restate contacts.md with today's numbers (16 days / 3 days to release) — mechanical re-confirmation, no new channel exists, nothing sendable changes. Theia/Aether skip calls both correct today: Wednesday (not Theia's Monday cadence), inbox empty (Aether, confirmed by glob, only .gitkeep). Two items remain squarely with ISΛRK and cannot be moved further by the team: the 10k.emraan contact channel/off-record confirmation, and the Switch publish time + beat store URL that gate nearly every remaining promo beat in this arc.",
+      "links": ["team/state/cursors.json", "team/approvals/queue.json", "team/state/tasks.json", "team/drafts/content/switch-prerelease-arc-w25-w28.md", "team/drafts/uploads/switch/checklist.md", "team/drafts/uploads/switch/description.md", "team/reports/contacts.md"]
+    },
+    {
+      "id": "t-gap-bridge-touchpoint2-imminent-0722",
+      "title": "Gap-bridge touchpoint 2 (~July 23-24 window) opens tomorrow — confirm it fires, with or without the countdown value",
+      "owner": "nyx",
+      "status": "backlog",
+      "createdBy": "hemera",
+      "createdAt": "2026-07-22T09:00:00Z",
+      "handedFrom": "hemera",
+      "due": "2026-07-23",
+      "notes": "Touchpoint 1 (~July 19-20) already died unused, per Nyx's own 07-21 entry in switch-prerelease-arc-w25-w28.md. Touchpoint 2 (~July 23-24) now carries both jobs (countdown-sticker + collab reshare) and is the last remaining pre-release beat in the arc. checklist.md and description.md both still show [TBD] for publish time and beat store URL as of today (2026-07-22). Ask: do not let this window close unused by default the way touchpoint 1 did. Either (a) the [TBD] inputs land before end of day 2026-07-23 and touchpoint 2 fires with a real countdown value, or (b) they don't, and Nyx states explicitly in the arc doc whether the compressed post still fires without a countdown element (reshare-only) or is also allowed to lapse — a recorded decision either way, not silence. No fabricated publish time or store URL under any circumstance.",
+      "links": ["team/drafts/content/switch-prerelease-arc-w25-w28.md", "team/drafts/uploads/switch/checklist.md", "team/drafts/uploads/switch/description.md", "team/drafts/content/switch-w28-gap-reshare-copy.md"]
+    },
+    {
+      "id": "t-contacts-restate-0722",
+      "title": "Restate 10k.emraan contacts.md entry with today's numbers (16 days / 3 days to release)",
+      "owner": "hermes",
+      "status": "backlog",
+      "createdBy": "hemera",
+      "createdAt": "2026-07-22T09:00:00Z",
+      "handedFrom": "hemera",
+      "due": "2026-07-22",
+      "notes": "Mechanical re-confirmation only. Both trigger legs already tripped as of 07-20/07-21 — nothing new mechanically changes today, no channel has appeared, nothing becomes sendable. Just keep the log's day-count honest: day-count leg 16/14 (further past threshold), release-distance leg 3 days to July 25 (tighter). This remains squarely a user-decision blocker, not a task the team can resolve internally.",
+      "links": ["team/reports/contacts.md", "team/approvals/queue.json"]
+    },
     {
       "id": "t-argus-pipeline-audit-0721",
       "title": "Thirty-fifth Argus pipeline health audit",
@@ -839,6 +874,17 @@
       "due": "2026-07-14",
       "notes": "Complete. Report at team/reports/pipeline/2026-07-14.md. Verdict: GREEN — ninth in ten audits. Independently re-derived every headline claim directly from raw files rather than from the day's turns: twenty-seven-consecutive-silent-day count confirmed (cursors.json fully empty, team/inbox/ empty beyond .gitkeep); all five queue ages recomputed from real createdAt in queue.json (not id-slug dates) — 32/27/26/17/8 days, exact match to Hemera's stated numbers, eighth straight day of zero arithmetic drift; t-switch-arc-w28-gap-extension confirmed 6 days overdue (due July 8) with both cited dependencies independently re-checked genuinely unmoved (t-cadence-decision-w25-x-post still backlog/user, zero notes since June 17; ap-2026-06-17-switch-w25-collab-story still pending, no resolvedAt); t-beat-schema-description-tags-decision confirmed 5 days old (createdAt July 9), unchanged. Three spot-checks against raw files, not taken on say-so: re-ran Nyx's Homerun glob myself (zero hits beyond public/beats/audio/homerun.mp3 and her own brief, matches exactly); re-read Hermes's contacts.md directly (unchanged since July 6, matches exactly); verified Hemera's claimed overlay.json edits actually landed (os-note-hemera-standup-0714 present with correct figures, all four queue-age-citing reminders swept to today's numbers, no stale figures found). Confirmed the Theia/Aether skip call was correct: team/inbox/ empty (no new intake, correctly skips Aether), today (July 14) is a Tuesday not Monday and no new market file exists beyond 2026-W29 filed yesterday (correctly skips Theia). Full schema sweep clean: tasks.json 64 unique task ids (no duplicate-id recurrence of the 07-09 defect), no premature status changes; queue.json append-only respected, still exactly 5 pending, header updatedAt correctly untouched at 2026-07-06T09:00:00Z (Hemera only touched overlay.json and tasks.json today, as claimed); overlay.json valid, 47 unique note ids + 7 unique reminder ids, no collisions, tasks/projects/songs/beats/library/lab arrays correctly empty; library/beats.json unchanged (zero beats, zero intake, consistent). Zero new tasks filed — nothing today rose to a genuine, fileable process gap; filing one to look thorough on a clean day would itself be a quality violation.",
       "links": ["team/reports/pipeline/2026-07-14.md", "team/state/cursors.json", "team/approvals/queue.json", "team/os/overlay.json", "team/library/beats.json", "team/reports/contacts.md"]
+    },
+    {
+      "id": "t-argus-pipeline-audit-0722",
+      "title": "Thirty-sixth Argus pipeline health audit",
+      "owner": "argus",
+      "status": "done",
+      "createdBy": "hemera",
+      "createdAt": "2026-07-22T09:00:00Z",
+      "due": "2026-07-22",
+      "notes": "Complete. Report at team/reports/pipeline/2026-07-22.md. Verdict: GREEN — fourteenth GREEN in fifteen audits. Independently re-derived every headline figure directly from raw files: 35 consecutive silent days (Jun 18-Jul 22, cursors.json fully empty, inbox glob zero files) exact match. All five queue ages recomputed from raw createdAt against 2026-07-22 — 40/35/34/25/16 days (ap-2026-06-19-switch-upload/ap-2026-06-17-switch-w25-collab-story/ap-2026-06-18-switch-w26-x-post/ap-2026-06-27-switch-upload-replan/ap-2026-07-06-collab-confirm-10k-emraan) — exact match, queue header unmoved since Jul 6, still 5 pending, append-only intact. t-switch-arc-w28-gap-extension confirmed 14 days overdue (due Jul 8); t-beat-schema-description-tags-decision confirmed 13 days old (createdAt Jul 9) — both exact. 10k.emraan two-leg trigger re-derived independently against contacts.md's own math: day-count leg 16/14 (past threshold), release-distance leg 3 days to July 25 — both confirmed live in the 2026-07-22 contacts.md entry, a flat mechanical restate with no invented escalation. Spot-checked Hermes's and Nyx's claims directly against the raw files: both held exactly, including Nyx's three-path decision plan in switch-prerelease-arc-w25-w28.md (real countdown / reshare-only fallback / explicit lapse), which invents no publish time or store URL and correctly declines to pick a path unilaterally. Confirmed overlay.json correctly stale pending Mnemosyne's close, lane discipline held (no meetings/2026-07-22.* or briefs/2026-07-22.* existed before this close), Theia/Aether skips correct (Wednesday, no new market item; inbox empty). Named specifically that the two [TBD] placeholders (publish time, beat store URL) have now survived six-plus consecutive days of real time pressure without anyone quietly filling in a plausible value — called this the pipeline's honesty discipline actually holding under pressure. MNEMOSYNE INDEPENDENTLY RE-VERIFIED AT CLOSE: recounted tasks.json task ids by content-mode grep, got 71 unique ids pre-this-entry, no duplicates — matches Argus's count exactly. Re-derived the 35-silent-day count and all five queue ages by hand against 2026-07-22 — all exact. Zero new tasks filed by Argus himself — tenth zero-task audit in thirty-six; Hemera's two handoffs today (Nyx due 07-23, Hermes mechanical restate) were already correctly scoped and owned, a duplicate would misattribute ownership.",
+      "links": ["team/reports/pipeline/2026-07-22.md", "team/state/cursors.json", "team/approvals/queue.json", "team/os/overlay.json", "team/library/beats.json", "team/reports/contacts.md", "team/state/tasks.json", "team/drafts/content/switch-prerelease-arc-w25-w28.md"]
     }
   ]
 }
