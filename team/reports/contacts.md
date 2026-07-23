@@ -179,3 +179,48 @@ restate, not a new development.
 **Status: blocker, past threshold on both legs (16 days elapsed, threshold 14; 3 days to
 July 25, threshold single digits). Unconfirmed / outreach drafted, not sent. Awaiting
 ISΛRK — channel or off-record confirmation.**
+
+---
+
+**2026-07-23 update (Hermes) — mechanical restate only, per Hemera's handoff.**
+Re-derived independently before writing, not taking the standup numbers on trust:
+- `ap-2026-07-06-collab-confirm-10k-emraan.createdAt` = `2026-07-06T09:00:00Z` in
+  `team/approvals/queue.json`, status still `pending`. Today is 2026-07-23 — that is 17
+  days elapsed. Day-count leg (threshold: 14 days): past threshold, one day further than
+  yesterday's 16.
+- Release target July 25 is now 2 days out (was 3 yesterday). Release-distance leg
+  (threshold: single digits): tripped, one day closer, now at its tightest point yet.
+- `team/inbox/*.json` — glob returns zero files, same as every prior check.
+- `team/state/cursors.json` — still fully empty: `discord: {}`, `imap.lastUid: 0`,
+  `copyparty.seenShas: []`. No contact channel for 10k.emraan exists anywhere in this
+  repo, in any agent's lane, today or ever.
+- `approvals/queue.json` — not touched. Append-only, and there is nothing new to append
+  without an actual contact channel to send to.
+
+**What concretely changed since yesterday:** one day elapsed on each leg — 16 to 17
+days, 3 to 2 days to release. That is the only change. Nothing mechanical moved: still
+no channel, still can't send, still a team run with no external calls regardless. Both
+legs were already past threshold as of yesterday; today just pushes both further past it.
+I'm not escalating language beyond what these two numbers support — this is a flat
+restate, not a new development.
+
+**On today's gap-bridge touchpoint-2 post decision (Hemera's call, not mine).** Hemera
+fired the reshare-only post today on the reasoning that this credit gap doesn't block it
+specifically, since "ISΛRK x 10k.emraan" is already live elsewhere in the pipeline
+(queued W25 collab-story approval, catalog artist field). Speaking from the vantage point
+of the person who has tracked this exact gap for 17 days: the reasoning holds up, but on
+narrower grounds than "doesn't block it" implies. It's true this specific post adds no
+*new* incremental exposure — the claim is already sitting live in two other places I've
+been logging since day one, both still `pending`/unconfirmed in the same way. A reshare of
+an existing claim doesn't make an unconfirmed fact more or less confirmed. But I'd flag the
+framing, not the decision: "doesn't block" is accurate only because the exposure damage, if
+any, was already priced in by the earlier pending items, not because this touchpoint is
+somehow lower-risk on its own merits. If those earlier items get approved and published
+before this gap resolves, this post is exposed exactly as much as they are — it's riding on
+their coattails, not independently clean. I have no new fact that changes the underlying
+math: 2 days to release, 17 days unconfirmed, still no channel to close it myself. Not my
+call to make or unmake; noting it plainly as asked.
+
+**Status: blocker, past threshold on both legs (17 days elapsed, threshold 14; 2 days to
+July 25, threshold single digits — tightest point yet). Unconfirmed / outreach drafted,
+not sent. Awaiting ISΛRK — channel or off-record confirmation.**

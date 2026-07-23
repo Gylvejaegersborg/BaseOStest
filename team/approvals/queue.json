@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-06T09:00:00Z",
+  "updatedAt": "2026-07-23T09:00:00Z",
   "items": [
     {
       "id": "ap-2026-06-19-switch-upload",
@@ -67,6 +67,19 @@
       "draftPaths": ["team/drafts/booking/collab-confirm-10k-emraan.md"],
       "draftedBy": "hermes",
       "createdAt": "2026-07-06T09:00:00Z",
+      "status": "pending"
+    },
+    {
+      "id": "ap-2026-07-23-switch-gap-touchpoint2-reshare",
+      "type": "social_post",
+      "title": "Switch gap-bridge touchpoint 2 — collab-story post, Variant B (standalone framing)",
+      "summary": "Approving this posts the gap-bridge touchpoint 2 piece from team/drafts/content/switch-w28-gap-reshare-copy.md as a single standalone X post, exactly as pre-drafted: 'two producers. one 186 bpm idea. ISΛRK × 10k.emraan — Switch, july 25.' Variant B applies, not Variant A, because ap-2026-06-17-switch-w25-collab-story (the original W25 collab-story post this would otherwise reshare/quote) is still pending/unpublished as of this run — verified directly against its status field before drafting this entry. Per Variant B's own instruction, no 'still true' callback line is used since there is no prior published post for it to refer back to; this is the collab-story line's first real posting, timed late in the arc (~July 23-24, two days ahead of the July 25 release) as a pre-drop closer rather than a W25 opener. No link, no hashtags, no beat store URL, no publish-time claim anywhere in the copy — both remain [TBD] in checklist.md and description.md, re-verified fresh today (2026-07-23), and are not being fabricated to force a countdown element into this post (path 2 of the three-path decision plan Hemera recorded 2026-07-22, not path 1). This is reshare-only per Hemera's 2026-07-23 standup decision: she judged the open 10k.emraan credit-confirmation question (ap-2026-07-06-collab-confirm-10k-emraan) does not block this specific post, since the identical collab claim is already live and unblocked elsewhere in the pipeline (the queued W25 post itself, and the catalog artist field). This entry does not supersede or resolve ap-2026-06-17-switch-w25-collab-story — that item stays pending independently; if it is later approved and published, this post has already run as the de facto first posting, and Variant A's reshare framing described in switch-w28-gap-reshare-copy.md would no longer apply retroactively.",
+      "draftPaths": [
+        "team/drafts/content/switch-w28-gap-reshare-copy.md",
+        "team/drafts/content/switch-prerelease-arc-w25-w28.md"
+      ],
+      "draftedBy": "nyx",
+      "createdAt": "2026-07-23T09:00:00Z",
       "status": "pending"
     }
   ]

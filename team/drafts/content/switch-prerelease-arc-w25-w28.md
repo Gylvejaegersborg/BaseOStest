@@ -50,6 +50,11 @@ plan for touchpoint 2 (real countdown / reshare-only fallback / explicit lapse),
 2026-07-23, with a named recommended fallback (reshare-only, no invented values). `[TBD]` status
 of publish time and store URL re-verified directly against `checklist.md`/`description.md`
 before writing — unchanged. See the dated note inside the gap bridge section below.
+**updated:** Nyx · 2026-07-23 — per Hemera's standup decision: touchpoint 2 fired today,
+reshare-only (path 2). `ap-2026-06-17-switch-w25-collab-story` confirmed still `pending`, so
+Variant B (standalone framing, no "still true" callback) applies, not Variant A. Queued as
+`ap-2026-07-23-switch-gap-touchpoint2-reshare` in `approvals/queue.json`. No new copy written,
+no fabricated time or URL. See the dated note inside the gap bridge section below.
 
 ---
 
@@ -395,6 +400,36 @@ new copy voice — same restraint as every other week in this arc.
   inputs the moment the window opens, and silence between now and end of day 2026-07-23 is
   the one outcome this note is written to prevent.
 
+**2026-07-23 status (Nyx, per Hemera's standup handoff): touchpoint 2 fired today, reshare-only
+  (path 2).** Hemera made the call herself rather than leaving it a third open item: publish
+  time and beat store URL are still `[TBD]` (re-verified directly against `checklist.md` row
+  ~62 and `description.md` line 19 before writing this), so path 1 (real countdown) stays off
+  the table — nothing invented to force it. She also judged path 3 (explicit lapse) doesn't
+  apply here: the 10k.emraan credit-confirmation question (`ap-2026-07-06-collab-confirm-10k-
+  emraan`) is real but doesn't block this specific post, since the identical "ISΛRK × 10k.emraan"
+  claim is already live and unblocked elsewhere in the pipeline (the queued W25 collab-story
+  post itself, and the catalog artist field) — singling out this one post as more cautious than
+  the rest of the pipeline would be inconsistent, not careful.
+
+  **Which variant: checked `ap-2026-06-17-switch-w25-collab-story`'s status directly, not
+  assumed. It is still `pending`** — the original W25 collab-story post has not published.
+  Per the dependency note at the top of `switch-w28-gap-reshare-copy.md` and touchpoint 2's own
+  framing above, that means **Variant B (standalone/first-posting framing) is the one that
+  applies, not Variant A.** No "still true" callback line is used — there is no prior published
+  post for it to refer back to; using it anyway would read as a factual error, not a callback,
+  exactly as Variant B's own posting note warns. The post is the original line standing alone:
+  `two producers. one 186 bpm idea. ISΛRK × 10k.emraan — Switch, july 25.`
+
+  Used exactly as pre-drafted 2026-07-05 — no new production, no new copy written today, no
+  fabricated time or URL. Queued for approval as `ap-2026-07-23-switch-gap-touchpoint2-reshare`
+  in `approvals/queue.json` (type `social_post`, status `pending`). This is a new, separate
+  approval entry from `ap-2026-06-17-switch-w25-collab-story` — that original entry stays
+  pending, untouched, independently of this one; if it's later approved and published, this
+  post will already have run as the de facto first posting of the line, and Variant A's reshare
+  framing would no longer retroactively apply. Touchpoint 1 (countdown-sticker) stays dead per
+  the 2026-07-21 note — no countdown element rides on this post; this is reshare/first-posting
+  only, per path 2.
+
 **explicitly not in scope for this bridge (do not read as an oversight):**
 - no new hook clips, no new graphics, no new production of any kind
 - no W29 theme, no new posting cadence beyond these two touchpoints
@@ -460,7 +495,7 @@ locking the two dates, not re-deciding the shape of the bridge itself.
 | W26 (Jun 22–28) | process | 2 posts | 1 snippet | 1 post |
 | W27 (Jun 29–Jul 5) | collab | 3 posts | 1 YT community | 1 post |
 | W28 (Jul 6–13) | imminent | 3–4 posts | 1 SC + 1 YT community | 1–2 posts |
-| gap bridge (Jul 14–25) | holding the line | 1 IG story (countdown sticker) | — | 1 reshare |
+| gap bridge (Jul 14–25) | holding the line | 1 IG story (countdown sticker — died unused, 07-21) | — | 1 post, fired 07-23 (Variant B, queued `ap-2026-07-23-switch-gap-touchpoint2-reshare`) |
 
 ---
 
