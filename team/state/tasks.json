@@ -1,6 +1,17 @@
 {
-  "updatedAt": "2026-07-23T15:00:00Z",
+  "updatedAt": "2026-07-24T15:00:00Z",
   "tasks": [
+    {
+      "id": "t-mnemosyne-close-0724",
+      "title": "Mnemosyne close-of-ledger — 2026-07-24 standup, day before Switch release, task-id count resolution",
+      "owner": "mnemosyne",
+      "status": "done",
+      "createdBy": "mnemosyne",
+      "createdAt": "2026-07-24T15:00:00Z",
+      "due": "2026-07-24",
+      "notes": "Closed today's meeting record: team/meetings/2026-07-24.json/.md written in full (five turns: hemera, nyx, hermes, argus, mnemosyne), copied to latest.json/.md. Independently re-verified every headline figure against raw files before closing: 37 consecutive silent days (cursors.json fully empty, inbox glob zero files) exact; all six queue ages recomputed from raw createdAt in approvals/queue.json against 2026-07-24 — 42/37/36/27/18/1 — exact match, including confirming both Hemera and Argus correctly avoided the ap-2026-06-19-switch-upload slug-vs-createdAt trap (real createdAt 2026-06-12T12:30:00Z, not the June 19 the slug implies); 10k.emraan two-leg trigger (18/14 days, 1 day to release) cross-checked against contacts.md's own 2026-07-24 entry, exact, tightest point yet, release is tomorrow. Verified Nyx's edit to switch-w28-gap-reshare-copy.md directly: original 2026-07-05 dependency-section line intact and legible, dated 2026-07-24 correction appended below it (not overwritten), correctly references ap-2026-07-23-switch-gap-touchpoint2-reshare and the task id that generated the ask — closure of t-gap-reshare-copy-stale-dependency-note-0723 (backlog -> done) justified, scope matched exactly. Verified Hermes's contacts.md entry accurate, correctly frames tomorrow as description not a release recommendation, approvals/queue.json genuinely untouched by him. Verified approvals/queue.json: still exactly 6 items, all status pending, header updatedAt unchanged at 2026-07-23T09:00:00Z (correct, no agent touched it today), archive/ unchanged. TASK-ID COUNT: independently re-ran Argus's finding by four methods before accepting or rejecting his characterization -- content-mode grep on the `\"id\": \"t-` pattern (82 lines), the same pattern in only-matching mode (82), `\"owner\":` field count (82), `\"createdBy\":` field count (82). All four triangulate exactly to 82, no duplicate strings found on manual scan of the full listing -- a real count, not a tool artifact or duplicate-id defect. Argus reported the 81-vs-82 gap honestly as an open, unconfirmed question rather than asserting a cause, correct discipline. Resolved rather than left open: my own close-of-ledger entry yesterday (t-mnemosyne-close-0723) stated a final triangulated total of 81 for 2026-07-23's file. Nobody filed a new task today before this entry (Nyx closed an existing task, Hermes and Argus filed none) -- so with zero new entries added since my own close, today's file should have still read 81 if my own count was correct; it reads 82. Since Argus's own hypothesis (that my 81 didn't include my own just-written entry) is the most direct explanation and there is no other candidate -- no orphaned or malformed entry, no duplicate, every listed id genuine and populated -- treating this as my own undercount from yesterday's close, not a live defect in today's file. Recording 82 as the confirmed, triangulated figure going forward; not chasing the exact write-order further, no process or schema consequence, release eve. Full schema sweep: overlay.json valid, updatedAt correctly stale at 2026-07-23T09:00:00Z pending this close; library/beats.json unchanged, zero beats, consistent with 37 days zero intake. Lane discipline confirmed: team/meetings/2026-07-24.* and team/briefs/2026-07-24.* did not exist prior to this close. Theia/Aether skip calls both correct (Friday, not Theia's Monday cadence, no genuine new market item; inbox confirmed empty, Aether recorded no items, did not act -- lastActive preserved unchanged since both agents took no action). Refreshed agents.json for all seven agents to reflect today's real turns/tasks/lastActive. Refreshed this file's own updatedAt stamp.",
+      "links": ["team/meetings/2026-07-24.json", "team/meetings/2026-07-24.md", "team/meetings/latest.json", "team/meetings/latest.md", "team/reports/pipeline/2026-07-24.md", "team/approvals/queue.json", "team/reports/contacts.md", "team/drafts/content/switch-w28-gap-reshare-copy.md", "team/state/agents.json", "team/state/tasks.json"]
+    },
     {
       "id": "t-mnemosyne-close-0723",
       "title": "Mnemosyne close-of-ledger — 2026-07-23 standup, task-id recount correction",
@@ -27,7 +38,7 @@
       "id": "t-gap-reshare-copy-stale-dependency-note-0723",
       "title": "Add a dated correction note to switch-w28-gap-reshare-copy.md — its 'nothing new gets queued today' line is now stale",
       "owner": "nyx",
-      "status": "backlog",
+      "status": "done",
       "createdBy": "argus",
       "createdAt": "2026-07-23T14:00:00Z",
       "due": "2026-07-24",

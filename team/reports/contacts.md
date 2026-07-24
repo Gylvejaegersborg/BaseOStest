@@ -224,3 +224,46 @@ call to make or unmake; noting it plainly as asked.
 **Status: blocker, past threshold on both legs (17 days elapsed, threshold 14; 2 days to
 July 25, threshold single digits — tightest point yet). Unconfirmed / outreach drafted,
 not sent. Awaiting ISΛRK — channel or off-record confirmation.**
+
+---
+
+**2026-07-24 update (Hermes) — mechanical restate only, per Hemera's handoff. Day before release.**
+Re-derived independently before writing, not taking the standup numbers on trust:
+- `ap-2026-07-06-collab-confirm-10k-emraan.createdAt` = `2026-07-06T09:00:00Z` in
+  `team/approvals/queue.json`, status still `pending`. Today is 2026-07-24 — that is 18
+  days elapsed. Day-count leg (threshold: 14 days): past threshold, 4 days further than
+  the line, one day further than yesterday's 17.
+- Release target July 25 is now 1 day out (was 2 yesterday). Release-distance leg
+  (threshold: single digits): tripped, at its tightest point yet — tomorrow is the date
+  itself.
+- `team/inbox/*.json` — glob returns zero files, same as every prior check.
+- `team/state/cursors.json` — still fully empty: `discord: {}`, `imap.lastUid: 0`,
+  `copyparty.seenShas: []`. No contact channel for 10k.emraan exists anywhere in this
+  repo, in any agent's lane, today or ever.
+- Re-read `team/drafts/booking/collab-confirm-10k-emraan.md` — unchanged, still carries
+  the unresolved-contact placeholder in `to:`. Nothing to update; nothing new to say in
+  the body that wasn't true on 07-06.
+- `approvals/queue.json` — not touched. Append-only, and there is nothing new to append
+  without an actual contact channel to send to.
+
+**What concretely changed since yesterday:** one day elapsed on each leg — 17 to 18
+days, 2 to 1 day to release. That is the only change. Nothing mechanical moved: still
+no channel, still can't send, still a team run with no external calls regardless.
+
+**On timing.** This is the day before Switch publishes. I set the release-distance leg
+of my own trigger specifically to anticipate this wall, and tomorrow is that wall,
+not a projection of it. Stating that plainly, not manufacturing anything beyond it: the
+two real numbers are 18 days elapsed against a 14-day threshold, and 1 day to a release
+date that was always going to arrive whether or not this resolved first. The options
+have not changed and aren't mine to add to — supply a channel so the drafted message can
+go out, or confirm the credit was agreed off-record so I can log it here as resolved and
+close `ap-2026-07-06-collab-confirm-10k-emraan` without ever sending anything. Absent
+either, Switch publishes tomorrow with the "ISΛRK × 10k.emraan" credit live in copy and
+catalog and still unconfirmed in any record this team has access to. That is a
+description of where things stand, not a recommendation on the release itself — the
+publish decision belongs to `ap-2026-06-27-switch-upload-replan` and is not mine to make
+or block.
+
+**Status: blocker, past threshold on both legs (18 days elapsed, threshold 14; 1 day to
+July 25, threshold single digits — tightest point yet, release is tomorrow). Unconfirmed
+/ outreach drafted, not sent. Awaiting ISΛRK — channel or off-record confirmation.**

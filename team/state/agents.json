@@ -1,13 +1,13 @@
 {
-  "updatedAt": "2026-07-23T15:00:00Z",
+  "updatedAt": "2026-07-24T15:00:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "Re-derived 36 silent days, six queue ages (41/36/35/26/17/0), gap-extension 15 days overdue, beat-schema 14 days old. Restated 10k.emraan as 17/14 days past threshold, 2 days to release. Made the call to fire gap-bridge touchpoint 2 today as reshare-only — real-countdown path dead ([TBD] unfilled), credit uncertainty doesn't specifically block this post since the same claim is already live elsewhere in the pipeline. Handed Nyx the fire instruction and Hermes a mechanical contacts.md restate. Wrote no files herself beyond overlay notes/reminder.",
-      "lastActive": "2026-07-23T09:00:00Z"
+      "task": "Re-derived 37 silent days, six queue ages (42/37/36/27/18/1), correctly avoided the ap-2026-06-19 slug-vs-createdAt trap. Restated 10k.emraan as 18/14 days past threshold, 1 day to release — most acute point yet, release tomorrow. Made no new discretionary call on the credit confirmation (unlike yesterday's reshare call) — no channel to invent, stays with ISΛRK. Set agenda: credit confirmation, Switch [TBD] inputs, queue triage (recommend reject ap-2026-06-19-switch-upload), Nyx's due-today task, gap-bridge approval pending. Handed Nyx the close instruction, Hermes a mechanical contacts.md restate, Mnemosyne the release-is-tomorrow framing for the brief. Wrote no files herself beyond her spoken turn.",
+      "lastActive": "2026-07-24T09:00:00Z"
     },
     {
       "id": "aether",
@@ -22,31 +22,31 @@
       "name": "Nyx",
       "role": "Execution · Content",
       "status": "idle",
-      "task": "Fired gap-bridge touchpoint 2 per Hemera's 2026-07-23 handoff: reshare-only, Variant B (standalone framing — ap-2026-06-17-switch-w25-collab-story confirmed still pending, so no 'still true' callback). Queued ap-2026-07-23-switch-gap-touchpoint2-reshare in approvals/queue.json, schema-clean, no fabricated time/URL. Closed t-switch-arc-w28-gap-extension (review → done). New: fix the stale 'nothing new gets queued today' line in switch-w28-gap-reshare-copy.md, flagged by Argus, due 2026-07-24.",
-      "lastActive": "2026-07-23T09:00:00Z"
+      "task": "Closed t-gap-reshare-copy-stale-dependency-note-0723 (backlog → done): added a dated 2026-07-24 correction note under the original 2026-07-05 line in switch-w28-gap-reshare-copy.md's dependency section, referencing ap-2026-07-23-switch-gap-touchpoint2-reshare. Original line left intact, not overwritten. Stated the [TBD] beat-store-URL/publish-time gap is genuinely user-blocked; all non-dependent content work is finished. Did not touch approvals/queue.json.",
+      "lastActive": "2026-07-24T09:00:00Z"
     },
     {
       "id": "hermes",
       "name": "Hermes",
       "role": "Booking · Outreach",
       "status": "idle",
-      "task": "Independently re-derived the 10k.emraan collab confirmation's day-count leg (17 days, past the 14-day threshold) and release-distance leg (2 days to July 25, tightest yet). Confirmed zero contact channel exists. Appended a dated 2026-07-23 entry to contacts.md restating the numbers plainly and flagged a genuine caveat on Hemera's reasoning ('riding on their coattails' — this post's safety is contingent on the other two pending items not being approved first). Did not touch approvals/queue.json.",
-      "lastActive": "2026-07-23T09:00:00Z"
+      "task": "Independently re-derived the 10k.emraan collab confirmation's day-count leg (18 days, 4 past the 14-day threshold) and release-distance leg (1 day to July 25, tightest point yet — tomorrow is the wall). Appended a dated 2026-07-24 entry to contacts.md framed as description, not a call on whether the release proceeds. Confirmed zero contact channel exists anywhere, cursors.json still fully empty. Did not touch approvals/queue.json.",
+      "lastActive": "2026-07-24T09:00:00Z"
     },
     {
       "id": "mnemosyne",
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "idle",
-      "task": "Verified lane discipline held. Cross-checked Argus's headline figures against team/reports/pipeline/2026-07-23.md — silence streak, six queue ages, 10k.emraan two-leg trigger, and gap-extension closure all exact. Independent task-id recount found a real discrepancy: 81 unique task ids by three triangulated field counts (id/owner/createdBy), not Argus's stated 74 — no duplicates, his arithmetic (71+3) undercounted today's actual 5 new entries and the file's true total. Closed team/meetings/2026-07-23.json/.md, copied to latest.json/.md. Refreshed agents.json and tasks.json.",
-      "lastActive": "2026-07-23T15:00:00Z"
+      "task": "Verified lane discipline held. Cross-checked Argus's headline figures against team/reports/pipeline/2026-07-24.md — silence streak, six queue ages, 10k.emraan two-leg trigger, and Nyx's/Hermes's edits all exact. Independently re-ran the task-id count by four methods, confirmed 82 (not Argus's unconfirmed-question framing of 81-vs-82) — resolved as most likely Mnemosyne's own undercount at yesterday's close (her entry probably postdated her cited recount), not a live defect. Closed team/meetings/2026-07-24.json/.md, copied to latest.json/.md. Refreshed agents.json and tasks.json.",
+      "lastActive": "2026-07-24T15:00:00Z"
     },
     {
       "id": "theia",
       "name": "Theia",
       "role": "Market · Research",
       "status": "idle",
-      "task": "Skipped — Thursday, not her Monday cadence day, no new market item on the agenda. No items.",
+      "task": "Skipped — Friday, not her Monday cadence day, no new market item on the agenda. No items, correct call.",
       "lastActive": "2026-07-20T09:00:00Z"
     },
     {
@@ -54,8 +54,8 @@
       "name": "Argus",
       "role": "Oversight · Pipeline",
       "status": "idle",
-      "task": "37th pipeline audit complete (team/reports/pipeline/2026-07-23.md). Verdict: GREEN — fifteenth GREEN in sixteen audits. Independently re-derived every headline figure and confirmed exact; verified Nyx's Variant B choice and the new approval entry's schema/fabrication cleanliness directly. Assessed Hemera's strategic call and Hermes's caveat in depth — judged the decision made transparently, not a quiet resolution of the escalated blocker. Filed t-gap-reshare-copy-stale-dependency-note-0723 (nyx). Stated task-id count as 74 — corrected by Mnemosyne's independent recount to 81 at close.",
-      "lastActive": "2026-07-23T14:00:00Z"
+      "task": "38th pipeline audit complete (team/reports/pipeline/2026-07-24.md). Verdict: GREEN — sixteenth GREEN in seventeen audits. Independently re-derived every headline figure and confirmed exact, including the ap-2026-06-19 slug-trap. Verified Nyx's and Hermes's edits directly. Judged the 10k.emraan blocker handling honest under maximum deadline pressure — no fabrication by anyone. Rigorous 4-method recount found 82 unique task ids vs. Mnemosyne's stated 81 at yesterday's close; reported the gap honestly as unconfirmed rather than asserting a cause, filed no task on it. Filed zero new tasks today.",
+      "lastActive": "2026-07-24T14:00:00Z"
     }
   ]
 }

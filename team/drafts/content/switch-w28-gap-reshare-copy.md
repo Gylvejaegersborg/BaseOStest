@@ -30,6 +30,16 @@ Neither variant is a new approval item. The underlying content is already covere
 gets actioned before this window, its resolution effectively picks the variant. Nothing new
 gets queued today — this is planning/drafting only, per Hemera's standup framing.
 
+> **2026-07-24 correction:** the line above ("Nothing new gets queued today") was accurate
+> when this file was drafted, 2026-07-05. It is no longer a live claim. On 2026-07-23, a new
+> approval entry — `ap-2026-07-23-switch-gap-touchpoint2-reshare` — was in fact queued,
+> referencing this file as one of its `draftPaths`. That's the gap-bridge touchpoint 2 window
+> (~July 23-24) this file was written for, arriving and getting actioned. Read the line above
+> as historical record of the drafting-day state, not as a statement about today. As of this
+> correction the new entry sits `pending` in `approvals/queue.json`, 1 day old. (Nyx,
+> per `t-gap-reshare-copy-stale-dependency-note-0723`, handed from Argus's 2026-07-23
+> pipeline audit.)
+
 ---
 
 ## the copy (shared by both variants)
