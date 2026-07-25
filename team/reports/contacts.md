@@ -267,3 +267,54 @@ or block.
 **Status: blocker, past threshold on both legs (18 days elapsed, threshold 14; 1 day to
 July 25, threshold single digits — tightest point yet, release is tomorrow). Unconfirmed
 / outreach drafted, not sent. Awaiting ISΛRK — channel or off-record confirmation.**
+
+---
+
+**2026-07-25 update (Hermes) — mechanical restate only, per Hemera's handoff. Release day itself.**
+Re-derived independently before writing, not adding 1 to yesterday's numbers on trust:
+- `ap-2026-07-06-collab-confirm-10k-emraan.createdAt` = `2026-07-06T09:00:00Z` in
+  `team/approvals/queue.json`, status still `pending`. Today is 2026-07-25 — that is 19
+  days elapsed. Day-count leg (threshold: 14 days): past threshold, 5 days further than
+  the line, one day further than yesterday's 18.
+- Release target July 25 is today. Release-distance leg (threshold: single digits):
+  0 days to release — the distance this leg was measuring has run out. There is no
+  "tomorrow" left for it to count down to.
+- `team/inbox/*.json` — glob returns zero files, same as every prior check.
+- `team/state/cursors.json` — still fully empty: `discord: {}`, `imap.lastUid: 0`,
+  `copyparty.seenShas: []`. No contact channel for 10k.emraan exists anywhere in this
+  repo, in any agent's lane, today or ever.
+- Re-read `team/drafts/booking/collab-confirm-10k-emraan.md` — unchanged, still carries
+  the unresolved-contact placeholder in `to:`. Nothing to update; nothing new to say in
+  the body that wasn't true on 07-06.
+- `approvals/queue.json` — not touched, and does not need to be. It's append-only by
+  contract (README: agents may only append `pending` items; status transitions belong to
+  the `team-publish` workflow), and there is still no contact channel to send to, so
+  there is nothing new to append. `ap-2026-07-06-collab-confirm-10k-emraan` stays exactly
+  as it's been since 07-06: `pending`, unsent, unresolved.
+
+**What concretely changed since yesterday:** one day elapsed on the day-count leg (18 to
+19), and the release-distance leg went from 1 day to 0 — today is the date itself, not a
+projection of it. That's the only change. Nothing mechanical moved: still no channel,
+still can't send, still a team run with no external calls regardless.
+
+**On timing.** This is the day I named as the wall on 07-24, and it has arrived. The
+release-distance leg of my own trigger was built to measure days remaining to July 25;
+that quantity is now zero, which means the leg has nothing further to measure — it isn't
+"more tripped" today than yesterday, its runway has simply run out entirely. I'm not
+manufacturing a new tier of urgency beyond that fact: the two real numbers are 19 days
+elapsed against a 14-day threshold, and 0 days to a release date that has now arrived
+regardless of whether this resolved first. The options have not changed and aren't mine
+to add a third to: supply a channel so the drafted message in
+`collab-confirm-10k-emraan.md` can actually go out, or confirm the credit was agreed
+off-record so I can log it here as resolved and close
+`ap-2026-07-06-collab-confirm-10k-emraan` without ever sending anything. Absent either,
+whatever ships today under the Switch release carries the "ISΛRK × 10k.emraan" credit
+live in copy and catalog, still unconfirmed in any record this team has access to. That
+is a description of where things stand, not a recommendation on whether the release
+proceeds — that call belongs to `ap-2026-06-27-switch-upload-replan` and is ISΛRK's, not
+mine.
+
+**Status: blocker, past threshold on the day-count leg (19 days elapsed, threshold 14);
+release-distance leg at 0 days — today is July 25 itself, the measured runway is spent.
+Unconfirmed / outreach drafted, not sent. Awaiting ISΛRK — channel or off-record
+confirmation.**
