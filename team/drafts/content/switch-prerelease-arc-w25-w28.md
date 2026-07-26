@@ -55,6 +55,23 @@ reshare-only (path 2). `ap-2026-06-17-switch-w25-collab-story` confirmed still `
 Variant B (standalone framing, no "still true" callback) applies, not Variant A. Queued as
 `ap-2026-07-23-switch-gap-touchpoint2-reshare` in `approvals/queue.json`. No new copy written,
 no fabricated time or URL. See the dated note inside the gap bridge section below.
+**updated:** Nyx · 2026-07-26 — per Hemera's handoff (day after the target release date):
+re-verified directly, not assumed — `checklist.md` row ~62 (publish time) and
+`description.md` line 19 (beat store URL) both still read `[TBD]`; `src/data/beats.ts`
+line 128 still reads `artist: 'ISΛRK × 10k.emraan'`, unchanged. This document's every
+"before July 25" / "drops july 25" / countdown framing throughout W25–W28 and the gap
+bridge was written when July 25 was a future date; it is now the day after. Recording
+this once, plainly, rather than rewriting every instance: every embedded copy line that
+reads "07.25" as a forward-looking date (captions, story stickers, the arc-at-a-glance
+table) is historical intent as drafted, not a live claim that the drop happened on that
+date — this repo cannot confirm or deny whether ISΛRK completed the manual upload
+himself outside of it, per Hemera's standup framing today. No line is being edited to
+say "released" or "dropped" — that would assert something unverifiable. Content-queue
+state itself needs no change: no new approval item, no edit to `approvals/queue.json`
+(not mine to touch), no fabricated URL or time inserted anywhere. If the gating inputs
+land, the existing queued items (`ap-2026-06-19-switch-upload`,
+`ap-2026-06-27-switch-upload-replan`) are still the correct vehicles — nothing here is
+blocked on this doc, only on the same two inputs named since June.
 
 ---
 

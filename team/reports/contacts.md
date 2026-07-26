@@ -318,3 +318,75 @@ mine.
 release-distance leg at 0 days — today is July 25 itself, the measured runway is spent.
 Unconfirmed / outreach drafted, not sent. Awaiting ISΛRK — channel or off-record
 confirmation.**
+
+---
+
+**2026-07-26 update (Hermes) — day after release; retiring the release-distance leg's
+countdown framing, restating with today's numbers.**
+Re-derived independently before writing, not carrying forward yesterday's numbers on trust:
+- `ap-2026-07-06-collab-confirm-10k-emraan.createdAt` = `2026-07-06T09:00:00Z` in
+  `team/approvals/queue.json`, status still `pending`. Today is 2026-07-26. Counting from
+  July 6 to July 26: that is 20 days elapsed. Day-count leg (threshold: 14 days): past
+  threshold, 6 days further than the line, one day further than yesterday's 19.
+- Release target July 25 was yesterday. Today, July 26, that date is in the past, not the
+  present or the future. Release-distance leg (threshold: single digits, measuring "days
+  until July 25"): I said yesterday its runway had run out at 0. Today there's no longer a
+  0 to report — the quantity it was built to measure ("days remaining until July 25") no
+  longer has a valid value, since the reference point is behind us, not ahead. I could
+  force a negative number ("-1 days to release") but that would misstate what the leg was
+  ever tracking; it was never designed as a "days since" counter, and repurposing it as one
+  now would look precise while actually being a different measurement wearing the old
+  label. Hemera suggested retiring the countdown framing at today's standup. I agree, on my
+  own reasoning, not just hers: a leg whose entire job was counting down to a date has
+  nothing left to count down to once that date has passed, and the honest move is to say so
+  plainly rather than keep producing a number (0, or a manufactured negative) that implies
+  the leg is still doing the job it was built for. So as of today, I'm retiring the
+  release-distance leg's countdown language. It served its purpose — it correctly predicted
+  and tracked the run-up to a wall, and that wall arrived, unresolved. It doesn't get a
+  successor metric from me today; if a new time-based framing is needed later, it should be
+  named fresh against whatever the next real reference point is (e.g., a re-upload date, a
+  distribution date), not inherited from this one by default.
+- `team/inbox/*.json` — glob returns zero files, same as every prior check.
+- `team/state/cursors.json` — still fully empty: `discord: {}`, `imap.lastUid: 0`,
+  `copyparty.seenShas: []`. No contact channel for 10k.emraan exists anywhere in this
+  repo, in any agent's lane, today or ever.
+- Re-read `team/drafts/booking/collab-confirm-10k-emraan.md` — unchanged, still carries
+  the unresolved-contact placeholder in `to:`. Nothing to update; the body's claims
+  (credited since June, targeting July 25, asking for confirm-or-flag) are historically
+  accurate as written — I'm not rewriting them to erase the fact that July 25 has now
+  passed, since the draft is a record of what was asked and when, not a live status line.
+- `approvals/queue.json` — not touched. Append-only, and there is still no contact channel
+  to send to, so there is nothing new to append. `ap-2026-07-06-collab-confirm-10k-emraan`
+  stays exactly as it's been since 07-06: `pending`, unsent, unresolved.
+
+**What concretely changed since yesterday:** one day elapsed on the day-count leg (19 to
+20), and the release-distance leg changed in *kind*, not just number — it stopped being a
+countdown and became a fact about a missed date. Nothing mechanical moved: still no
+channel, still can't send, still a team run with no external calls regardless.
+
+**Is this now a different kind of problem than "watch and restate"? Yes, and I'll say
+plainly what kind.** Through July 25 this was, correctly, a countdown to a decision point —
+every entry above was building toward the question "will this resolve before the date
+arrives." That question has now been answered by default: no. It didn't resolve before the
+date. Whatever happened yesterday around the Switch release — and I want to be precise about
+the limits of what I can see: this is a no-external-calls team run, so I cannot confirm or
+deny whether ISΛRK actually carried out the manual upload steps in checklist.md, only that
+no src/ or server/ commits and no queue resolution show it happened from inside this repo —
+either way, the credit question wasn't settled first. So the honest description of today's
+problem is no longer "a blocker approaching a deadline." It's "an unconfirmed credit claim
+that has now outlived the deadline it was raised against, with the same two resolution paths
+open as on day one and no new information narrowing them." That's a real shift, but I want to
+be equally clear about what it is *not*: it is not evidence anything went wrong with
+10k.emraan specifically, it is not proof the release did or didn't ship with the credit live,
+and it is not grounds for me to escalate tone beyond what's checkable. The facts I can stand
+behind are: 20 days elapsed against a 14-day threshold I set myself, one missed decision
+point, zero new information, and still no channel to act on this even if I wanted to. The
+open question for the team now is less "when will this trip" (it already has, twice over)
+and more "does this still matter now that the date it was gating has passed" — and that's a
+call for Hemera/ISΛRK on how to route it next, not one I'm making unilaterally by downgrading
+or dropping it myself.
+
+**Status: blocker, day-count leg 20 days elapsed (threshold 14, six days past); release-
+distance leg's countdown framing retired as of today — July 25 has passed with the credit
+still unconfirmed. Unconfirmed / outreach drafted, not sent. Awaiting ISΛRK — channel or
+off-record confirmation.**
