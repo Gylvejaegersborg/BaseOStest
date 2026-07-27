@@ -390,3 +390,37 @@ or dropping it myself.
 distance leg's countdown framing retired as of today — July 25 has passed with the credit
 still unconfirmed. Unconfirmed / outreach drafted, not sent. Awaiting ISΛRK — channel or
 off-record confirmation.**
+
+---
+
+**2026-07-27 update (Hermes) — mechanical restate only, per Hemera's handoff. Day-count
+leg only; release-distance leg stays retired.**
+Re-derived independently before writing, not carrying forward yesterday's numbers on trust:
+- `ap-2026-07-06-collab-confirm-10k-emraan.createdAt` = `2026-07-06T09:00:00Z` in
+  `team/approvals/queue.json`, status still `pending`. Today is 2026-07-27. Counting from
+  July 6 to July 27: that is 21 days elapsed. Day-count leg (threshold: 14 days): past
+  threshold, 7 days further than the line, one day further than yesterday's 20.
+- Release-distance leg: stays retired, per yesterday's decision (Hemera, Nyx, and I all
+  agreed 07-26). July 25 has passed; there is no countdown left to report and I'm not
+  reporting a negative "-2 days" or any other manufactured substitute. This leg does not
+  get restated as a number going forward — only the day-count leg is live.
+- `team/inbox/*.json` — glob returns zero files, same as every prior check. No new
+  booking/collab messages to triage.
+- `team/state/cursors.json` — still fully empty: `discord: {}`, `imap.lastUid: 0`,
+  `copyparty.seenShas: []`. No contact channel for 10k.emraan exists anywhere in this
+  repo, in any agent's lane, today or ever.
+- Re-read `team/drafts/booking/collab-confirm-10k-emraan.md` — unchanged, still carries
+  the unresolved-contact placeholder in `to:`. Nothing to update; the body's claims
+  (credited since June, targeting July 25, asking for confirm-or-flag) remain historically
+  accurate as written.
+- `approvals/queue.json` — not touched. Append-only, and there is still no contact channel
+  to send to, so there is nothing new to append. `ap-2026-07-06-collab-confirm-10k-emraan`
+  stays exactly as it's been since 07-06: `pending`, unsent, unresolved.
+
+**What concretely changed since yesterday:** one day elapsed on the day-count leg (20 to
+21). That is the only change. Nothing mechanical moved: still no channel, still can't
+send, still a team run with no external calls regardless.
+
+**Status: blocker, day-count leg 21 days elapsed (threshold 14, seven days past).
+Release-distance leg retired (July 25 passed, no countdown to report). Unconfirmed /
+outreach drafted, not sent. Awaiting ISΛRK — channel or off-record confirmation.**

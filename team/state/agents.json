@@ -1,13 +1,13 @@
 {
-  "updatedAt": "2026-07-26T15:00:00Z",
+  "updatedAt": "2026-07-27T15:00:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "Re-derived 39 silent days, six queue ages (44/39/38/29/20/3), day after target release date. Both blockers confirmed still open ([TBD] markers, beats.ts artist field). Stated plainly the repo cannot confirm or deny the manual upload steps (no-external-calls run) — named the limit, drew no conclusion. Judged the 10k.emraan release-distance leg had changed in kind (date passed) and recommended retiring its countdown framing. Closed t-contacts-restate-0725 (work done 07-25, status had lagged) — this later turned out to have appended a duplicate rather than editing in place; Mnemosyne fixed it at close. Handed Hermes a mechanical contacts.md restate, Nyx a content-state confirm, Mnemosyne the day-after framing.",
-      "lastActive": "2026-07-26T09:00:00Z"
+      "task": "Re-derived 40 silent days, six queue ages (45/40/39/30/21/4). Both blockers confirmed still open ([TBD] markers, beats.ts artist field unchanged). 10k.emraan day-count leg 21/14 (7 past); release-distance leg stays retired per 07-26 decision. Flagged t-contacts-restate-0726 (Hermes) as one day overdue rather than letting it season into a second status-flip-lag case. Handed Hermes the restate-plus-overdue-clear, Nyx a no-new-content confirm, Mnemosyne the overdue-handoff framing for the brief.",
+      "lastActive": "2026-07-27T09:00:00Z"
     },
     {
       "id": "aether",
@@ -22,7 +22,7 @@
       "name": "Nyx",
       "role": "Execution · Content",
       "status": "idle",
-      "task": "Independently re-verified both [TBD] inputs and beats.ts field unchanged, queue.json untouched. Read the touchpoint-2 reshare entry in full, found it internally consistent. Appended a dated 2026-07-26 correction to switch-prerelease-arc-w25-w28.md noting its 'before July 25' framing is now historical — did not rewrite embedded post copy or invent any value. No fabrication.",
+      "task": "No new content fire today per Hemera's handoff — Switch [TBD] inputs unchanged since 07-26. No items, correctly not manufacturing work.",
       "lastActive": "2026-07-26T09:00:00Z"
     },
     {
@@ -30,32 +30,32 @@
       "name": "Hermes",
       "role": "Booking · Outreach",
       "status": "idle",
-      "task": "Independently re-derived the 10k.emraan day-count leg (20 days, 6 past the 14-day threshold). Reasoned independently (own logic, not deferring to Hemera) that reporting a negative release-distance figure would misstate precision the leg never had — retired that leg's countdown framing on his own stated grounds. Reframed the blocker as an unconfirmed credit claim that has outlived its own deadline. Appended a dated 2026-07-26 entry to contacts.md. Did not touch approvals/queue.json.",
-      "lastActive": "2026-07-26T09:00:00Z"
+      "task": "Verified 10k.emraan at 21 days (7 past the 14-day threshold) directly against queue.json. Confirmed inbox still empty. Appended dated 2026-07-27 entry to contacts.md. Cleared the overdue t-contacts-restate-0726 by editing it in place to done — verified no duplicate reintroduced (grep confirms -0725/-0726/-0727 each appear exactly once). Filed and closed t-contacts-restate-0727 same-turn.",
+      "lastActive": "2026-07-27T09:00:00Z"
     },
     {
       "id": "mnemosyne",
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "idle",
-      "task": "Verified lane discipline held and every headline figure exact against source (39 silent days; six queue ages 44/39/38/29/20/3; both [TBD] markers literal; beats.ts unchanged). Confirmed Argus's duplicate-id finding genuine by direct grep: t-contacts-restate-0725 existed twice. FIXED: kept the done copy (Hemera's closure addendum preserved verbatim), appended a dated in-place correction note, deleted the stale backlog duplicate. Closed t-tasks-json-duplicate-id-contacts-restate-0725. Re-ran the four-method task-id count after the fix: all four agree at exactly 90 (91 before the fix) — closes the loop on the 86-vs-80 discrepancy from 07-25 and today's duplicate in one motion. Closed team/meetings/2026-07-26.json/.md, copied to latest.json/.md. Refreshed agents.json and tasks.json.",
-      "lastActive": "2026-07-26T15:00:00Z"
+      "task": "Verified every headline figure exact against source (40 silent days; six queue ages 45/40/39/30/21/4; both [TBD] markers literal; beats.ts unchanged). Verified Hermes's overdue-fix on t-contacts-restate-0726 held (no duplicate). Independently resolved the task-count question by five methods: true count is 95 (before this close's additions), not Argus's reported 90 — his report's own line-number citation was internally inconsistent with the file's real structure, indicating a truncated/incomplete read. Closed t-task-count-delta-tracking-defect as resolved-not-a-defect (the delta was untrackable only because the numerator was wrong) and filed t-argus-task-count-method-reliability (owner argus) naming the real pattern: three wrong snapshot counts in three audits (07-23, 07-25, 07-27). Closed team/meetings/2026-07-27.json/.md, copied to latest.json/.md. Refreshed agents.json and tasks.json.",
+      "lastActive": "2026-07-27T15:00:00Z"
     },
     {
       "id": "theia",
       "name": "Theia",
       "role": "Market · Research",
       "status": "idle",
-      "task": "Skipped — Sunday, not her Monday cadence day, no new market item on the agenda. No items, correct call.",
-      "lastActive": "2026-07-20T09:00:00Z"
+      "task": "Monday cadence. Wrote team/reports/market/2026-W31.md — first read landing inside release week. Confirmed gap-bridge touchpoint 1 dead, touchpoint 2 fired (pending). No new sourced market signal (fourth consecutive honest 'no'). Filed t-w31-post-publish-credit-edit-hedge (backlog, owner hemera) and closed t-w31-market-report same-turn.",
+      "lastActive": "2026-07-27T09:00:00Z"
     },
     {
       "id": "argus",
       "name": "Argus",
       "role": "Oversight · Pipeline",
       "status": "idle",
-      "task": "40th pipeline audit complete (team/reports/pipeline/2026-07-26.md). Verdict: GREEN — eighteenth GREEN in nineteen audits. Independently re-derived silence streak, six queue ages, and both [TBD] checks, all exact. Judged the countdown-leg-retirement handling honest and non-performative across Hemera, Nyx, and Hermes — no contradictions found. Recounted tasks.json by four methods, found a genuine duplicate task id (t-contacts-restate-0725, appearing twice with different statuses) caused by an append instead of an in-place edit. Filed t-tasks-json-duplicate-id-contacts-restate-0725 (owner mnemosyne) — fixed same-day at Mnemosyne's close.",
-      "lastActive": "2026-07-26T14:00:00Z"
+      "task": "41st pipeline audit complete (team/reports/pipeline/2026-07-27.md). Verdict: GREEN. Independently re-derived silence streak, six queue ages, both [TBD] checks, all exact. Verified the overdue-fix pattern held on its second real test (t-contacts-restate-0726, no duplicate). Reported tasks.json holding 90 unique ids via four methods and flagged an unreconciled task-count delta — Mnemosyne's close found this was a miscount (true count 95, not 90), the third such instance (07-23, 07-25, 07-27); replacement task t-argus-task-count-method-reliability filed against him at close.",
+      "lastActive": "2026-07-27T14:00:00Z"
     }
   ]
 }
