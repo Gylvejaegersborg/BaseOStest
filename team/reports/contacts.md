@@ -424,3 +424,38 @@ send, still a team run with no external calls regardless.
 **Status: blocker, day-count leg 21 days elapsed (threshold 14, seven days past).
 Release-distance leg retired (July 25 passed, no countdown to report). Unconfirmed /
 outreach drafted, not sent. Awaiting ISΛRK — channel or off-record confirmation.**
+
+---
+
+**2026-07-28 update (Hermes) — mechanical restate only, per Hemera's handoff. Day-count
+leg only; release-distance leg stays retired.**
+Re-derived independently before writing, not carrying forward yesterday's numbers on trust:
+- `ap-2026-07-06-collab-confirm-10k-emraan.createdAt` = `2026-07-06T09:00:00Z` in
+  `team/approvals/queue.json`, status still `pending` — checked directly against the raw
+  file, not the standup summary. Today is 2026-07-28. Counting from July 6 to July 28:
+  that is 22 days elapsed. Day-count leg (threshold: 14 days): past threshold, 8 days
+  further than the line, one day further than yesterday's 21.
+- Release-distance leg: stays retired, per the 07-26 team decision (Hemera, Nyx, Hermes).
+  July 25 has passed; there is no countdown left to report and I am not reporting a
+  manufactured negative number in its place. This leg does not get restated as a number
+  going forward — only the day-count leg is live.
+- `team/inbox/*.json` — glob returns zero files, same as every prior check. No new
+  booking/collab messages to triage.
+- `team/state/cursors.json` — re-checked directly: still fully empty, `discord: {}`,
+  `imap.lastUid: 0`, `copyparty.seenShas: []`. No contact channel for 10k.emraan exists
+  anywhere in this repo, in any agent's lane, today or ever.
+- `team/drafts/booking/collab-confirm-10k-emraan.md` — not re-read for content changes
+  today; nothing in the prior 21 daily checks has found anything stale in it, and no new
+  fact exists to update it against.
+- `approvals/queue.json` — not touched. Append-only, and there is still no contact
+  channel to send to, so there is nothing new to append.
+  `ap-2026-07-06-collab-confirm-10k-emraan` stays exactly as it's been since 07-06:
+  `pending`, unsent, unresolved.
+
+**What concretely changed since yesterday:** one day elapsed on the day-count leg (21 to
+22). That is the only change. Nothing mechanical moved: no channel has appeared, nothing
+becomes sendable, still a team run with no external calls regardless.
+
+**Status: blocker, day-count leg 22 days elapsed (threshold 14, eight days past).
+Release-distance leg retired (July 25 passed, no countdown to report). Unconfirmed /
+outreach drafted, not sent. Awaiting ISΛRK — channel or off-record confirmation.**

@@ -216,3 +216,32 @@ cannot be un-spent. The `[TBD]` placeholders below (beat store URL, publish time
 upload` stays `pending`; this checklist update does not change its approval status,
 only the target-date framing it should now be read against (see Hemera's standup turn,
 2026-06-27, on whether the queue summary itself needs a parallel correction).
+
+---
+
+**2026-07-28 addition (Hemera) — post-publish credit-edit hedge, per
+`t-w31-post-publish-credit-edit-hedge` (filed by Theia, 07-27).** Acting on this today
+rather than leaving it in backlog with no note. Three-plus weeks into the 10k.emraan
+credit-confirmation question (`ap-2026-07-06-collab-confirm-10k-emraan`, still `pending`,
+21 days old as of yesterday's contacts.md restate) with no contact channel found anywhere
+in this repo, and now three days past the July 25 target, it is plausible — not certain,
+not being treated as decided — that if/when this package's remaining [TBD] inputs (beat
+store URL, publish time, both still unfilled above and in `description.md`) eventually
+clear and this actually uploads, the "ISΛRK × 10k.emraan" credit line in `description.md`
+and the title formula in section 5 above may still be unconfirmed at that moment.
+Recording the hedge once, at the point of use, rather than as an abstract policy
+elsewhere:
+
+- Both SoundCloud and YouTube permit metadata (title/description) edits after a track is
+  live. Whoever executes this upload (most likely Nyx, per this package's own drafting
+  credit) should treat the credit line as **provisionally editable post-publish, not
+  final**, if upload proceeds before `ap-2026-07-06-collab-confirm-10k-emraan` resolves.
+- Concretely: if this checklist is actually run before that approval resolves, add a
+  one-line internal note at upload time (not public-facing copy) flagging that the
+  credit is pending confirmation, so a same-day edit is not a surprise if the
+  collaborator's status changes shortly after go-live.
+- This changes nothing today: the [TBD] inputs are still unfilled, no upload is
+  currently proceeding, and this hedge is not yet invoked. It is filed here, at the
+  checklist itself, so it is not lost between now and whenever the inputs do clear.
+- This does not resolve, bypass, or substitute for the underlying credit-confirmation
+  blocker, which stays with Hermes/ISΛRK exactly as before.

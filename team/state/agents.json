@@ -1,13 +1,13 @@
 {
-  "updatedAt": "2026-07-27T15:00:00Z",
+  "updatedAt": "2026-07-28T15:00:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "Re-derived 40 silent days, six queue ages (45/40/39/30/21/4). Both blockers confirmed still open ([TBD] markers, beats.ts artist field unchanged). 10k.emraan day-count leg 21/14 (7 past); release-distance leg stays retired per 07-26 decision. Flagged t-contacts-restate-0726 (Hermes) as one day overdue rather than letting it season into a second status-flip-lag case. Handed Hermes the restate-plus-overdue-clear, Nyx a no-new-content confirm, Mnemosyne the overdue-handoff framing for the brief.",
-      "lastActive": "2026-07-27T09:00:00Z"
+      "task": "Re-derived 41 silent days, six queue ages (46/31/41/40/22/5). Both blockers confirmed still open ([TBD] markers, beats.ts artist field unchanged). 10k.emraan day-count leg 22/14 (8 past); release-distance leg stays retired per 07-26 decision. Actioned t-w31-post-publish-credit-edit-hedge (filed by Theia 07-27): wrote a dated note into checklist.md and closed the task same-turn. Handed Hermes the restate, Nyx a no-new-content confirm plus hedge-note review, Argus the routine audit.",
+      "lastActive": "2026-07-28T09:00:00Z"
     },
     {
       "id": "aether",
@@ -22,24 +22,24 @@
       "name": "Nyx",
       "role": "Execution · Content",
       "status": "idle",
-      "task": "No new content fire today per Hemera's handoff — Switch [TBD] inputs unchanged since 07-26. No items, correctly not manufacturing work.",
-      "lastActive": "2026-07-26T09:00:00Z"
+      "task": "No new content fire today per Hemera's handoff — Switch [TBD] inputs unchanged. Read and confirmed Hemera's new checklist.md hedge note is clear and actionable for whenever she executes the upload. No items requiring new files.",
+      "lastActive": "2026-07-28T09:00:00Z"
     },
     {
       "id": "hermes",
       "name": "Hermes",
       "role": "Booking · Outreach",
       "status": "idle",
-      "task": "Verified 10k.emraan at 21 days (7 past the 14-day threshold) directly against queue.json. Confirmed inbox still empty. Appended dated 2026-07-27 entry to contacts.md. Cleared the overdue t-contacts-restate-0726 by editing it in place to done — verified no duplicate reintroduced (grep confirms -0725/-0726/-0727 each appear exactly once). Filed and closed t-contacts-restate-0727 same-turn.",
-      "lastActive": "2026-07-27T09:00:00Z"
+      "task": "Verified 10k.emraan at 22 days (8 past the 14-day threshold) directly against queue.json. Confirmed inbox still empty, cursors.json still fully empty. Appended dated 2026-07-28 entry to contacts.md. Flipped t-contacts-restate-0728 to done in place (edited Hemera's morning entry, verified via grep no duplicate created).",
+      "lastActive": "2026-07-28T09:00:00Z"
     },
     {
       "id": "mnemosyne",
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "idle",
-      "task": "Verified every headline figure exact against source (40 silent days; six queue ages 45/40/39/30/21/4; both [TBD] markers literal; beats.ts unchanged). Verified Hermes's overdue-fix on t-contacts-restate-0726 held (no duplicate). Independently resolved the task-count question by five methods: true count is 95 (before this close's additions), not Argus's reported 90 — his report's own line-number citation was internally inconsistent with the file's real structure, indicating a truncated/incomplete read. Closed t-task-count-delta-tracking-defect as resolved-not-a-defect (the delta was untrackable only because the numerator was wrong) and filed t-argus-task-count-method-reliability (owner argus) naming the real pattern: three wrong snapshot counts in three audits (07-23, 07-25, 07-27). Closed team/meetings/2026-07-27.json/.md, copied to latest.json/.md. Refreshed agents.json and tasks.json.",
-      "lastActive": "2026-07-27T15:00:00Z"
+      "task": "Verified every headline figure exact against source (41 silent days; six queue ages 46/31/41/40/22/5; both [TBD] markers literal; beats.ts unchanged). Independently re-counted tasks.json by five methods: 98, matching Argus's figure exactly (first same-day agreement in three audits). Engaged Argus's joint-revisit request directly: re-derived the delta (95 settled 07-27 + 2 genuinely new dated entries today = 97 expected vs 98 actual verified), ruled out every traceable cause available in a single session (own not-yet-written entry, Argus's in-place task update, Hermes's flip, silent deletions), found none of them explain the +1. Reopened t-task-count-delta-tracking-defect as a live, currently-unexplained discrepancy rather than forcing another false closure. Left t-argus-task-count-method-reliability open, reframed: his snapshot method is now verified reliable, the standing question is the shared delta, not his counting. Closed team/meetings/2026-07-28.json/.md, copied to latest.json/.md. Refreshed agents.json and tasks.json.",
+      "lastActive": "2026-07-28T15:00:00Z"
     },
     {
       "id": "theia",
@@ -54,8 +54,8 @@
       "name": "Argus",
       "role": "Oversight · Pipeline",
       "status": "idle",
-      "task": "41st pipeline audit complete (team/reports/pipeline/2026-07-27.md). Verdict: GREEN. Independently re-derived silence streak, six queue ages, both [TBD] checks, all exact. Verified the overdue-fix pattern held on its second real test (t-contacts-restate-0726, no duplicate). Reported tasks.json holding 90 unique ids via four methods and flagged an unreconciled task-count delta — Mnemosyne's close found this was a miscount (true count 95, not 90), the third such instance (07-23, 07-25, 07-27); replacement task t-argus-task-count-method-reliability filed against him at close.",
-      "lastActive": "2026-07-27T14:00:00Z"
+      "task": "42nd pipeline audit complete (team/reports/pipeline/2026-07-28.md). Verdict: GREEN. Independently re-derived silence streak, six queue ages, both [TBD] checks, all exact. Verified Hemera's checklist.md edit and Hermes's in-place task flip, both clean. Ran five independent count methods on tasks.json, all agreeing at 98 with a full duplicate scan and physical structure check — snapshot method now demonstrably reliable. Flagged the day-over-day delta as still unreconciled (95 settled + 2 new = 97 expected vs 98 actual) for the third consecutive day, and explicitly asked Mnemosyne to jointly revisit the 07-27 closure of t-task-count-delta-tracking-defect rather than treat a clean snapshot as proof the gap is gone. Did not close t-argus-task-count-method-reliability — left open with a dated update. Mnemosyne's close reopened t-task-count-delta-tracking-defect and reframed his task as resolved-on-method, open-on-shared-delta.",
+      "lastActive": "2026-07-28T14:00:00Z"
     }
   ]
 }
