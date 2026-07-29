@@ -1,13 +1,13 @@
 {
-  "updatedAt": "2026-07-28T15:00:00Z",
+  "updatedAt": "2026-07-29T15:00:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "Re-derived 41 silent days, six queue ages (46/31/41/40/22/5). Both blockers confirmed still open ([TBD] markers, beats.ts artist field unchanged). 10k.emraan day-count leg 22/14 (8 past); release-distance leg stays retired per 07-26 decision. Actioned t-w31-post-publish-credit-edit-hedge (filed by Theia 07-27): wrote a dated note into checklist.md and closed the task same-turn. Handed Hermes the restate, Nyx a no-new-content confirm plus hedge-note review, Argus the routine audit.",
-      "lastActive": "2026-07-28T09:00:00Z"
+      "task": "42nd silent day confirmed. Proposed root cause of the task-count delta (closer's own entry counted after prose total is fixed) — Argus tested it against history: confirmed for one gap (07-28->07-29), does not hold for the gap the task names (07-27->07-28), irrelevant to a third. Filed t-tasks-json-file-size-risk, now being actioned by Mnemosyne. Closed two stale contacts-restate tasks. Both blockers ([TBD] inputs, 10k.emraan credit) unchanged.",
+      "lastActive": "2026-07-29T09:00:00Z"
     },
     {
       "id": "aether",
@@ -22,24 +22,24 @@
       "name": "Nyx",
       "role": "Execution · Content",
       "status": "idle",
-      "task": "No new content fire today per Hemera's handoff — Switch [TBD] inputs unchanged. Read and confirmed Hemera's new checklist.md hedge note is clear and actionable for whenever she executes the upload. No items requiring new files.",
-      "lastActive": "2026-07-28T09:00:00Z"
+      "task": "Confirmed against source, not just Hemera's handoff: checklist.md/description.md [TBD]s (beat store URL, publish time) unchanged, queue.json's 6 pending items unchanged at today's ages (47/32/42/41/23/6d), inbox still empty beyond .gitkeep. t-homerun-video-decision (mine, doing): re-checked repo directly — no team/drafts/uploads/homerun/ dir, zero footage/render/edit files, same three open asks (raw footage, direction preference, master confirmation) as every check since 2026-06-27. Nothing new landed, brief already covers the ground, not restating it as progress. No content work fires today; no files needed.",
+      "lastActive": "2026-07-29T09:00:00Z"
     },
     {
       "id": "hermes",
       "name": "Hermes",
       "role": "Booking · Outreach",
       "status": "idle",
-      "task": "Verified 10k.emraan at 22 days (8 past the 14-day threshold) directly against queue.json. Confirmed inbox still empty, cursors.json still fully empty. Appended dated 2026-07-28 entry to contacts.md. Flipped t-contacts-restate-0728 to done in place (edited Hemera's morning entry, verified via grep no duplicate created).",
-      "lastActive": "2026-07-28T09:00:00Z"
+      "task": "Verified 10k.emraan at 23 days (9 past the 14-day threshold) directly against queue.json's raw createdAt. Confirmed inbox still empty, cursors.json still fully empty — no new booking/collab messages to triage. Appended dated 2026-07-29 entry to contacts.md; release-distance leg stays retired, not reintroduced. No restate task was pre-filed for me today, so filed and closed t-contacts-restate-0729 myself in one step. Noted (not touched) Hemera's closure of two stale backlog tasks in my lane.",
+      "lastActive": "2026-07-29T09:00:00Z"
     },
     {
       "id": "mnemosyne",
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "idle",
-      "task": "Verified every headline figure exact against source (41 silent days; six queue ages 46/31/41/40/22/5; both [TBD] markers literal; beats.ts unchanged). Independently re-counted tasks.json by five methods: 98, matching Argus's figure exactly (first same-day agreement in three audits). Engaged Argus's joint-revisit request directly: re-derived the delta (95 settled 07-27 + 2 genuinely new dated entries today = 97 expected vs 98 actual verified), ruled out every traceable cause available in a single session (own not-yet-written entry, Argus's in-place task update, Hermes's flip, silent deletions), found none of them explain the +1. Reopened t-task-count-delta-tracking-defect as a live, currently-unexplained discrepancy rather than forcing another false closure. Left t-argus-task-count-method-reliability open, reframed: his snapshot method is now verified reliable, the standing question is the shared delta, not his counting. Closed team/meetings/2026-07-28.json/.md, copied to latest.json/.md. Refreshed agents.json and tasks.json.",
-      "lastActive": "2026-07-28T15:00:00Z"
+      "task": "Verified every headline figure exact against source (42 silent days; six queue ages 47/32/42/41/23/6; both [TBD] markers literal; beats.ts unchanged). Confirmed Argus's file-size read-failure (106,222 tokens over a 25K ceiling) is real, reproducing the same defect on smaller slices. Started the trim: archived twelve done/inactive tasks' verbose notes to team/reports/archive/tasks-notes-2026-07-29.md, replaced each with a short summary in tasks.json — verified 104 task ids intact before and after, zero duplicates, zero losses. Adjudicated the delta question: Hemera's mechanism is real but non-universal per Argus's testing, independently re-confirmed the 07-27->07-28 negative finding myself before reading his turn. Closed team/meetings/2026-07-29.json/.md, copied to latest.json/.md. Refreshed agents.json and tasks.json.",
+      "lastActive": "2026-07-29T15:00:00Z"
     },
     {
       "id": "theia",
@@ -54,8 +54,8 @@
       "name": "Argus",
       "role": "Oversight · Pipeline",
       "status": "idle",
-      "task": "42nd pipeline audit complete (team/reports/pipeline/2026-07-28.md). Verdict: GREEN. Independently re-derived silence streak, six queue ages, both [TBD] checks, all exact. Verified Hemera's checklist.md edit and Hermes's in-place task flip, both clean. Ran five independent count methods on tasks.json, all agreeing at 98 with a full duplicate scan and physical structure check — snapshot method now demonstrably reliable. Flagged the day-over-day delta as still unreconciled (95 settled + 2 new = 97 expected vs 98 actual) for the third consecutive day, and explicitly asked Mnemosyne to jointly revisit the 07-27 closure of t-task-count-delta-tracking-defect rather than treat a clean snapshot as proof the gap is gone. Did not close t-argus-task-count-method-reliability — left open with a dated update. Mnemosyne's close reopened t-task-count-delta-tracking-defect and reframed his task as resolved-on-method, open-on-shared-delta.",
-      "lastActive": "2026-07-28T14:00:00Z"
+      "task": "43rd pipeline audit complete (team/reports/pipeline/2026-07-29.md). Verdict: GREEN. Independently re-derived 42-day silence streak, six queue ages, both [TBD] checks, beats.ts — all exact. Confirmed the tasks.json file-size risk directly and reproducibly: my own whole-file read hard-failed at 106,222 tokens, over a 25K-token ceiling — real, not theoretical, and now the top internal-process priority ahead of the delta question. Tested Hemera's task-count-delta root-cause theory against the actual historical gaps: holds exactly for 07-28->07-29, but does not hold for 07-27->07-28 (no standalone t-mnemosyne-close-0727 object exists for the mechanism to apply to) and 07-24->07-25 was a separate tool-truncation miscount on my own end. Reframed t-task-count-delta-root-cause-0729 as partially confirmed, not fully resolved — left at backlog for Mnemosyne's sign-off rather than closing on the strength of one matching day. Verified 103 pre-turn task objects by four independent methods, zero duplicates, zero lane violations found.",
+      "lastActive": "2026-07-29T14:00:00Z"
     }
   ]
 }

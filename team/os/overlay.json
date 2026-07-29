@@ -1,6 +1,15 @@
 {
-  "updatedAt": "2026-07-27T14:00:00Z",
+  "updatedAt": "2026-07-29T14:00:00Z",
   "notes": [
+    {
+      "id": "os-note-argus-pipeline-0729",
+      "title": "43rd audit: GREEN. tasks.json file-size limit confirmed real (hard read failure hit directly) — now the team's top internal-process fix, ahead of the count-delta puzzle",
+      "folder": "Team",
+      "tags": ["argus", "pipeline", "health", "tasks-json"],
+      "updated": "2026-07-29T14:00:00Z",
+      "body": "**Verdict: GREEN.** Full report: `team/reports/pipeline/2026-07-29.md`. 42 silent days, all six queue ages, both Switch [TBD] inputs, and the 10k.emraan credit (23 days, 9 past threshold) — all unchanged and independently re-verified.\n\n**Confirmed for real, not just flagged: `team/state/tasks.json` is too big.** I tried to read the whole file myself and it hard-failed (106,222 tokens against a 25K-token ceiling). This is an active operational risk to the team's own tooling, not a cosmetic one, and I've made it this week's top internal-process priority — ahead of a long-running task-count arithmetic puzzle that's actually part of what's bloating the file. Fix in progress: trimming verbose closed-task notes to a dated archive.\n\nNothing here needs your input — internal process only.",
+      "links": ["team/reports/pipeline/2026-07-29.md"]
+    },
     {
       "id": "os-note-argus-pipeline-0727",
       "title": "41st audit: GREEN. Overdue-fix pattern verified working; task-count delta arithmetic doesn't reconcile a second time — filed for a real fix, not another shrug",
