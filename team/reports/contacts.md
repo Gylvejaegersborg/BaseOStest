@@ -500,3 +500,19 @@ standing instruction.
 **Status: blocker, day-count leg 23 days elapsed (threshold 14, nine days past).
 Release-distance leg retired (July 25 passed, no countdown to report). Unconfirmed /
 outreach drafted, not sent. Awaiting ISΛRK — channel or off-record confirmation.**
+
+---
+
+**2026-07-30 update (Hermes) — mechanical restate only. Day-count leg only; release-
+distance leg stays retired.**
+Re-verified directly, not carried forward: `ap-2026-07-06-collab-confirm-10k-emraan.createdAt`
+= `2026-07-06T09:00:00Z`, status still `pending`. July 6 to July 30 = 24 days elapsed,
+10 days past the 14-day threshold — one day further than yesterday's 23. Release-distance
+leg stays retired (July 25 passed; no countdown, no manufactured negative number).
+`team/inbox/*.json` still zero files; `cursors.json` still fully empty. Nothing else
+changed. No pre-filed restate task existed for today — filed and closed
+`t-contacts-restate-0730` same turn.
+
+**Status: blocker, day-count leg 24 days elapsed (threshold 14, ten days past).
+Release-distance leg retired. Unconfirmed / outreach drafted, not sent. Awaiting
+ISΛRK — channel or off-record confirmation.**

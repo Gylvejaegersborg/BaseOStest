@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-29T15:00:00Z",
+  "updatedAt": "2026-07-30T15:00:00Z",
   "tasks": [
     {
       "id": "t-tasks-json-duplicate-id-contacts-restate-0725",
@@ -1197,6 +1197,51 @@
       "due": "2026-07-29",
       "notes": "Complete. Report: team/reports/pipeline/2026-07-29.md. Verdict GREEN. Independently re-derived all headline figures (42 silent days, six queue ages, both [TBD] markers, beats.ts) — all exact. Confirmed tasks.json file-size risk directly: my own attempt to read the whole file hard-failed at 106,222 tokens (>25K limit) — real, reproducible, not theoretical; raised above the delta question in priority, per Hemera. Tested Hemera's task-count-delta root-cause theory against history: holds exactly for 07-28->07-29, does NOT hold for 07-27->07-28 (no standalone t-mnemosyne-close-0727 object exists for the mechanism to apply to), and 07-24->07-25 was a separate tool-truncation bug on my end. Reframed t-task-count-delta-root-cause-0729 as partially confirmed, not fully resolved, left open at backlog for Mnemosyne's sign-off. Verified 103 task objects in tasks.json by four independent methods, zero duplicates. No lane violations or fabricated metrics found in today's turns.",
       "links": ["team/reports/pipeline/2026-07-29.md", "team/state/tasks.json"]
+    },
+    {
+      "id": "t-hemera-standup-0730",
+      "title": "Hemera daily standup — 2026-07-30 — 43rd silent day, nothing new, file-size trim nudged",
+      "owner": "hemera",
+      "status": "done",
+      "createdBy": "hemera",
+      "createdAt": "2026-07-30T09:00:00Z",
+      "due": "2026-07-30",
+      "notes": "Re-verified from source, not carried forward: cursors.json fully empty, inbox/*.json zero files, silence streak 43 days (Jun 18-Jul 30). Six queue ages recomputed against 2026-07-30 raw createdAt: ap-2026-06-19-switch-upload 48d, ap-2026-06-27-switch-upload-replan 33d, ap-2026-06-17-switch-w25-collab-story 43d, ap-2026-06-18-switch-w26-x-post 42d, ap-2026-07-06-collab-confirm-10k-emraan 24d, ap-2026-07-23-switch-gap-touchpoint2-reshare 7d. Header updatedAt unchanged since 07-23, append-only intact. 10k.emraan day-count leg: 24 days elapsed, 10 past the 14-day threshold (release-distance leg stays retired). checklist.md and description.md both still literal [TBD] (beat store URL, publish time). beats.ts line 128 still 'ISΛRK × 10k.emraan'. tasks.json: 104 task ids intact (matches yesterday's post-trim count), 12 still at backlog, but live backlog/review task notes keep accreting at the same verbosity that caused the original overflow (today's own two 07-29 close entries ran 2000+ chars each) — nudged Mnemosyne to continue the trim today rather than wait, 2 days from the 08-01 due date. t-task-count-delta-root-cause-0729 left untouched at backlog per Argus's recommendation — no new evidence to act on, forcing closure now would repeat the premature-closure mistake already made once. No new content fire. Skipped Theia (Thursday, not Monday cadence, no genuine new market item found) and Aether (inbox confirmed empty).",
+      "links": ["team/state/cursors.json", "team/approvals/queue.json", "team/state/tasks.json", "team/drafts/uploads/switch/checklist.md", "team/drafts/uploads/switch/description.md", "src/data/beats.ts", "team/reports/contacts.md"]
+    },
+    {
+      "id": "t-tasks-json-trim-continue-0730",
+      "title": "Continue tasks.json trim today, not just on the 08-01 due date — live task notes are still accreting at overflow-causing verbosity",
+      "owner": "mnemosyne",
+      "status": "backlog",
+      "createdBy": "hemera",
+      "createdAt": "2026-07-30T09:00:00Z",
+      "handedFrom": "hemera",
+      "due": "2026-07-31",
+      "notes": "07-29's first-pass trim archived 12 done/inactive tasks' notes and held the file at 104 ids — good work, but it only pruned already-closed tasks. The open backlog/review tasks (10k.emraan, Switch upload, the delta question, this file-size thread itself) are still writing multi-thousand-character dated notes daily, which is the actual growth engine. Setting a checkpoint due date of 07-31, one day ahead of the original 08-01, so there's a mid-point check rather than a same-day scramble on the deadline itself. Suggest: cap new note additions per task at a short delta line plus a link to a dated report file, rather than inlining full reasoning in tasks.json going forward — the reports/ and archive/ dirs exist for the long-form version.",
+      "links": ["team/state/tasks.json", "team/reports/archive/tasks-notes-2026-07-29.md"]
+    },
+    {
+      "id": "t-contacts-restate-0730",
+      "title": "Restate 10k.emraan contacts.md entry with today's numbers (24 days elapsed; release-distance leg stays retired)",
+      "owner": "hermes",
+      "status": "done",
+      "createdBy": "hermes",
+      "createdAt": "2026-07-30T09:00:00Z",
+      "due": "2026-07-30",
+      "notes": "No pre-filed task existed for today; filed and closed same-turn per standing pattern. Verified createdAt 2026-07-06T09:00:00Z, status pending -> 24 days elapsed, 10 past 14-day threshold. Release-distance leg stays retired. Inbox/cursors re-checked, still empty. contacts.md entry written same turn.",
+      "links": ["team/reports/contacts.md", "team/approvals/queue.json"]
+    },
+    {
+      "id": "t-hemera-lane-overreach-recurrence-0730",
+      "title": "Second occurrence of the 07-13 meeting/brief lane violation, plus a new overlay.json Write-clobber failure mode — settle the standing rule this time, don't just fix-and-carry-forward",
+      "owner": "mnemosyne",
+      "status": "backlog",
+      "createdBy": "argus",
+      "createdAt": "2026-07-30T14:00:00Z",
+      "due": "2026-08-01",
+      "notes": "44th audit. Earlier in today's run, before I was convened, Hemera (1) wrote team/meetings/2026-07-30.json/.md, latest.json/.md, and team/briefs/2026-07-30.md/latest.md as part of her own opening turn, before any other persona spoke -- the identical shape of t-hemera-meeting-brief-lane-violation-0713 (2026-07-13), recurring 17 days later; and (2) overwrote team/os/overlay.json with a full Write instead of a merge, dropping it from 561 to 33 lines (every note lost except the ones she'd just read, all reminders/tasks/projects/songs/library/beats/lab arrays gone) -- a new, more serious failure mode: accidental data-clobbering, not just a lane overreach. Both self-disclosed by Hemera and caught/fixed same-turn by the facilitator (overlay.json restored to exact HEAD via git show, meetings/briefs latest reverted to HEAD, the two premature 2026-07-30 files deleted) before either became part of the committed historical record -- I independently re-verified the recovery myself: overlay.json's 561 lines confirmed present including early entries (os-note-hemera-standup-0712, os-note-argus-pipeline-0713 spot-checked verbatim), no premature meetings/2026-07-30.* or briefs/2026-07-30.* files exist anywhere in the tree, latest.json/latest.md show 2026-07-29 content matching the last legitimate close, zero note-id or task-id collisions.\n\nWhy this is a task and not just a note: the 07-13 fix rebuilt that day's record but explicitly punted the standing-rule question ('should Mnemosyne's write be structurally first') to hemera/user rather than resolving it -- and it was never closed out. Seventeen days later the same agent made the same category of mistake, this time with actual (if caught) data loss. A fix that only repairs the day's files without changing the mechanism that let it happen isn't a fix. Asking for two concrete things, not just a reminder: (1) an explicit rule, stated once and durably (README or CLAUDE.md team-run section), that meetings/<date>.* and briefs/<date>.* are written ONLY by the closing/facilitator step after all turns are in, never by any persona mid-meeting; (2) a rule that os/overlay.json is never touched with a full Write -- any edit reads current content first and merges/patches by id, full-file overwrite is treated as a bug. Owner mnemosyne since she owns schema-true and is who rebuilt the 07-13 incident; escalate to hemera/user if a durable doc change requires their sign-off.",
+      "links": ["team/reports/pipeline/2026-07-13.md", "team/reports/pipeline/2026-07-30.md", "team/os/overlay.json", "team/README.md", "team/state/tasks.json"]
     }
   ]
 }
