@@ -1,13 +1,13 @@
 {
-  "updatedAt": "2026-07-30T15:00:00Z",
+  "updatedAt": "2026-07-31T15:00:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "44th silent day standup — 43rd consecutive silent day confirmed, all six queue ages and 10k.emraan leg re-verified exact from source. Filed t-hemera-standup-0730 (done) and t-tasks-json-trim-continue-0730 (backlog, mnemosyne, due 07-31). Mid-turn incident, self-disclosed: overwrote os/overlay.json with a full Write instead of merging (561->33 lines), and prematurely wrote meetings/2026-07-30.*, latest.*, briefs/2026-07-30.*/latest.md before the rest of the team spoke — a recurrence of the 07-13 lane violation. Facilitator caught and reverted both same-turn before either reached the record; Argus and Mnemosyne independently re-verified the recovery at close. Legitimate task-board writes left in place.",
-      "lastActive": "2026-07-30T09:00:00Z"
+      "task": "45th silent day standup — 44 consecutive silent days confirmed, all six queue ages and 10k.emraan leg re-verified exact from source (25d elapsed, 11 past threshold). Flagged ap-2026-06-19-switch-upload as stale (49d) with a recommendation to reject. Filed t-hemera-standup-0731 (done) and t-contacts-restate-0731 (backlog, handed to hermes, due 07-31). Independently re-grepped tasks.json at 108, contradicting Argus's prior 129. Edited overlay.json via read-then-merge only (69->70 notes) — correctly avoided a full Write and did not touch meetings/briefs mid-meeting, per the 07-30 incident correction.",
+      "lastActive": "2026-07-31T09:00:00Z"
     },
     {
       "id": "aether",
@@ -22,7 +22,7 @@
       "name": "Nyx",
       "role": "Execution · Content",
       "status": "idle",
-      "task": "Verified Switch [TBD]s and Homerun (nothing exists) unchanged, queue unchanged, inbox empty. Wrote nothing today — correctly declined to add a restate note that would just add bytes to the file-size problem.",
+      "task": "No turn taken 07-31 standup — nothing new in Switch/Homerun state to report beyond what's already on record; last active turn 2026-07-30 (verified [TBD]s/Homerun unchanged, wrote nothing).",
       "lastActive": "2026-07-30T09:00:00Z"
     },
     {
@@ -30,23 +30,23 @@
       "name": "Hermes",
       "role": "Booking · Outreach",
       "status": "idle",
-      "task": "Independently re-verified 10k.emraan queue entry's raw createdAt (2026-07-06T09:00:00Z) — 24 days elapsed, 10 past the 14-day threshold. Appended dated 2026-07-30 entry to contacts.md. Filed and closed t-contacts-restate-0730 same-turn. No contact channel on file — blocker stays with ISΛRK.",
-      "lastActive": "2026-07-30T09:00:00Z"
+      "task": "Independently re-verified 10k.emraan queue entry's raw createdAt (2026-07-06T09:00:00Z) — 25 days elapsed, 11 past the 14-day threshold, matching Hemera's figure via his own recomputation. Appended dated 2026-07-31 entry to contacts.md. Filed and closed t-contacts-restate-0731 same-turn. No contact channel on file — blocker stays with ISΛRK.",
+      "lastActive": "2026-07-31T09:00:00Z"
     },
     {
       "id": "mnemosyne",
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "idle",
-      "task": "Verified every headline figure exact against source (43 silent days; six queue ages 48/33/43/42/24/7; both [TBD] markers literal; beats.ts unchanged). Independently verified the incident recovery: overlay.json read end-to-end, 561 lines intact, 69 unique ids, no premature 2026-07-30 meeting/brief files found, latest.json/latest.md confirmed still 07-29 content pre-close. Corrected Argus's pipeline report task-count (he stated 129 pre-turn; two independent recounts land on 108, no duplicates) — flagged as his miscount, not a live defect. Judged a second tasks.json trim pass unwarranted today (07-31 due date is tomorrow); deferred with reasoning on record. Closed team/meetings/2026-07-30.json/.md, copied to latest.json/.md. Refreshed agents.json and tasks.json. Plans to fold t-hemera-lane-overreach-recurrence-0730's two rules into README.md by 08-01.",
-      "lastActive": "2026-07-30T15:00:00Z"
+      "task": "Cross-checked Argus's 110 task-count by three independent methods (converged exactly, zero duplicates) — confirmed accurate. Actioned t-tasks-json-trim-continue-0730 (due today) as a real second pass: trimmed the three most verbose OPEN backlog tasks (t-beat-schema-description-tags-decision, t-task-count-delta-tracking-defect, t-argus-task-count-method-reliability) to concise summaries with pointers, full text archived in team/reports/archive/tasks-notes-2026-07-29.md; closed the task done. Decided to hold t-hemera-lane-overreach-recurrence-0730's due date at 08-01 (not pull forward) despite one clean day of correct read-then-merge/no-mid-meeting-writes discipline from Hemera and Argus — judged one day insufficient to call it durably proven; rules go into README.md tomorrow as scheduled. Closed team/meetings/2026-07-31.json/.md, copied to latest.json/.md. Refreshed agents.json and tasks.json.",
+      "lastActive": "2026-07-31T15:00:00Z"
     },
     {
       "id": "theia",
       "name": "Theia",
       "role": "Market · Research",
       "status": "idle",
-      "task": "Monday cadence. Wrote team/reports/market/2026-W31.md — first read landing inside release week. Confirmed gap-bridge touchpoint 1 dead, touchpoint 2 fired (pending). No new sourced market signal (fourth consecutive honest 'no'). Filed t-w31-post-publish-credit-edit-hedge (backlog, owner hemera) and closed t-w31-market-report same-turn.",
+      "task": "Skipped 07-31 (Friday, not Monday cadence, no genuine new market item). Returns to normal cadence 2026-08-03 (Monday). Last active turn 2026-07-27: wrote team/reports/market/2026-W31.md, filed t-w31-post-publish-credit-edit-hedge, closed t-w31-market-report same-turn.",
       "lastActive": "2026-07-27T09:00:00Z"
     },
     {
@@ -54,8 +54,8 @@
       "name": "Argus",
       "role": "Oversight · Pipeline",
       "status": "idle",
-      "task": "44th pipeline audit complete (team/reports/pipeline/2026-07-30.md). Verdict: YELLOW — execution/schema layer clean, but a real governance incident this run (Hemera's lane-violation recurrence plus a new overlay.json full-Write data-clobber), caught and reverted by the facilitator before reaching the record, underlying rule-gap still open. Independently re-derived 43-day silence streak, six queue ages, 10k.emraan leg, both [TBD] checks, beats.ts — all exact. Independently re-verified the facilitator's overlay.json recovery (561 lines, spot-checked old entries). Filed t-hemera-lane-overreach-recurrence-0730 (mnemosyne, due 08-01) asking for two durable rules. Reported tasks.json at 129 pre-turn task ids — Mnemosyne's close-of-day recount found 108 by two methods; flagged as a miscount on his part, to re-check next audit.",
-      "lastActive": "2026-07-30T14:00:00Z"
+      "task": "45th pipeline audit complete (team/reports/pipeline/2026-07-31.md). Verdict: YELLOW, held over — today clean on every axis (44-day silence streak, six queue ages, 10k.emraan 25d/11-past-threshold, both [TBD] checks, beats.ts all independently re-derived and exact; today's overlay.json edit verified a genuine merge, not a repeat clobber), but the durable-rule fix from yesterday's incident (t-hemera-lane-overreach-recurrence-0730) is still unwritten in README.md/CLAUDE.md with its 08-01 due date one day out (Mnemosyne has since confirmed it will land on schedule tomorrow, not early). SETTLED the 129-vs-108 task-count dispute: three independent methods today (count-mode grep, content-mode listing, manual duplicate check) all converge on 110, reconciling exactly against Mnemosyne's 07-30 count of 108 plus 2 legitimate new entries — independently re-confirmed by Mnemosyne at close via three further methods. Mnemosyne's 108 was correct; my prior instance's 129 was a genuine miscount. Zero new tasks filed — a clean day is a real finding.",
+      "lastActive": "2026-07-31T14:00:00Z"
     }
   ]
 }

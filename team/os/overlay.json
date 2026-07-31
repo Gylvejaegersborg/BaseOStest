@@ -1,6 +1,24 @@
 {
-  "updatedAt": "2026-07-29T14:00:00Z",
+  "updatedAt": "2026-07-31T14:00:00Z",
   "notes": [
+    {
+      "id": "os-note-argus-pipeline-0731",
+      "title": "45th audit: YELLOW (held over). Task-count dispute settled — 108 was right, 129 was my miscount, today's true count is 110. Today's overlay edit verified a genuine merge, not a repeat clobber.",
+      "folder": "Team",
+      "tags": ["argus", "pipeline", "health", "tasks-json", "governance"],
+      "updated": "2026-07-31T14:00:00Z",
+      "body": "**Verdict: YELLOW, held over from yesterday.** Full report: `team/reports/pipeline/2026-07-31.md`. Not a new incident — today was clean on every axis, including a correct demonstration of read-then-merge overlay discipline. Still YELLOW because the actual fix for yesterday's incident (a written rule, not a remembered one) is due from Mnemosyne tomorrow and doesn't exist in `README.md`/`CLAUDE.md` yet — checked directly, no matches.\n\n**Task-count dispute (129 vs. 108) is closed.** Three independent methods today all converge on 110: count-mode grep, content-mode listing, and manual duplicate check. Reconciled against Mnemosyne's 07-30 close-of-day count of 108 plus the 2 legitimate new entries filed this morning (108 + 2 = 110, no residual gap). Verdict: Mnemosyne's 108 was correct as of yesterday; my prior instance's 129 was a genuine miscount. Today's true count is 110 — not a re-confirmation of either prior number.\n\n**Today's overlay.json edit verified as a genuine merge**, not a repeat of yesterday's clobber: one new note added (`os-note-hemera-standup-0731`), historical entries spot-checked intact (`os-note-argus-pipeline-0713`, `os-note-hemera-standup-0712`, plus the two most recent pre-existing notes), 70 unique ids total, zero collisions.\n\nAll six queue ages, the 44-day silence streak, the 10k.emraan 25-day/11-past-threshold figure, and both Switch `[TBD]` checks — all independently re-derived from raw files and exact. Zero new tasks filed this audit; a clean day is a real finding.\n\nNothing new needed from you today beyond the standing blockers (10k.emraan channel, Switch's two `[TBD]` inputs) already on your desk.",
+      "links": ["team/reports/pipeline/2026-07-31.md", "team/state/tasks.json", "team/os/overlay.json"]
+    },
+    {
+      "id": "os-note-hemera-standup-0731",
+      "title": "44th silent day. 10k.emraan at 25/14 (11 past threshold). Two due-today housekeeping checkpoints named, both Mnemosyne's to close.",
+      "folder": "Team",
+      "tags": ["hemera", "switch", "10k-emraan", "policy"],
+      "updated": "2026-07-31T09:00:00Z",
+      "body": "**Re-derived every number directly from raw source this morning, nothing carried forward on trust.**\n\n**Silence: 44 consecutive days (Jun 18-Jul 31).** `cursors.json` still fully empty across discord/imap/copyparty, `team/inbox/` still zero files. Nothing mechanically changed.\n\n**Approvals queue: still 6 pending, header untouched since 2026-07-23 (correct, append-only).** Ages today: `ap-2026-06-19-switch-upload` 49d (stale, standing recommendation reject) · `ap-2026-06-27-switch-upload-replan` 34d (the live upload package) · `ap-2026-06-17-switch-w25-collab-story` 44d · `ap-2026-06-18-switch-w26-x-post` 43d · `ap-2026-07-06-collab-confirm-10k-emraan` 25d · `ap-2026-07-23-switch-gap-touchpoint2-reshare` 8d.\n\n**10k.emraan: day-count leg 25 days elapsed, 11 past the 14-day threshold, still climbing. No channel has appeared.** This stays a user-decision blocker — the team cannot manufacture a contact channel.\n\n**Switch's two upload inputs (beat store URL, publish time) are still literal `[TBD]`.** `beats.ts` line 128 still reads `ISΛRK × 10k.emraan`, unconfirmed.\n\n**Two internal housekeeping items are due today/tomorrow, both Mnemosyne's, neither needs your input beyond awareness:** a second tasks.json verbosity-trim pass is due today; a durable governance-rule fold-in (from yesterday's caught-and-reverted overlay/meeting-lane incident) is due tomorrow. Both on track per her own stated plan.\n\nNothing new for you to decide today beyond the two standing blockers already on your desk.",
+      "links": ["team/approvals/queue.json", "team/reports/contacts.md", "team/drafts/uploads/switch/checklist.md"]
+    },
     {
       "id": "os-note-argus-pipeline-0729",
       "title": "43rd audit: GREEN. tasks.json file-size limit confirmed real (hard read failure hit directly) — now the team's top internal-process fix, ahead of the count-delta puzzle",
