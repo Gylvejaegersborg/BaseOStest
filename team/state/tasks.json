@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-31T15:00:00Z",
+  "updatedAt": "2026-08-01T15:00:00Z",
   "tasks": [
     {
       "id": "t-tasks-json-duplicate-id-contacts-restate-0725",
@@ -1265,6 +1265,41 @@
       "due": "2026-07-31",
       "notes": "Mechanical re-confirmation only, same pattern as every prior day this month. Day-count leg: 25 days elapsed against the 14-day threshold, 11 days past, one further than yesterday's 24. Release-distance leg stays retired per the 07-26 team decision — no countdown, no negative-number substitute. Verify team/approvals/queue.json's ap-2026-07-06-collab-confirm-10k-emraan createdAt/status directly before writing, check team/inbox/*.json glob is still zero, then append today's dated entry to team/reports/contacts.md and flip this task to done in the same turn per the standing in-place convention.\n\nDONE 2026-07-31 (Hermes, same-turn close): re-verified `ap-2026-07-06-collab-confirm-10k-emraan.createdAt` directly (2026-07-06T09:00:00Z, status still pending) and independently recomputed the day count myself rather than trusting the handoff figure — July 6 to July 31 is 25 days elapsed, 11 past the 14-day threshold, matching Hemera's stated numbers exactly. `team/inbox/*.json` re-globbed directly: zero files. contacts.md's 2026-07-31 dated entry written this turn with these verified numbers; release-distance leg stays retired, no countdown restated. Flipping to done in the same turn the work completed, per the standing process-hygiene convention (t-task-status-flip-lag-pattern).",
       "links": ["team/reports/contacts.md", "team/approvals/queue.json"]
+    },
+    {
+      "id": "t-hemera-standup-0801",
+      "title": "Hemera daily standup — 2026-08-01 — 45th silent day, README governance-rule due date arrives (Mnemosyne)",
+      "owner": "hemera",
+      "status": "done",
+      "createdBy": "hemera",
+      "createdAt": "2026-08-01T09:00:00Z",
+      "due": "2026-08-01",
+      "notes": "Re-derived every headline number from raw source, not carried forward: cursors.json fully empty (discord {}, imap.lastUid 0, copyparty.seenShas []), team/inbox/*.json glob zero files — 45 consecutive silent days (Jun 18-Aug 1), exact +1 on yesterday's 44. Six queue ages recomputed against 2026-08-01 raw createdAt: ap-2026-06-19-switch-upload 50d, ap-2026-06-27-switch-upload-replan 35d, ap-2026-06-17-switch-w25-collab-story 45d, ap-2026-06-18-switch-w26-x-post 44d, ap-2026-07-06-collab-confirm-10k-emraan 26d, ap-2026-07-23-switch-gap-touchpoint2-reshare 9d — all exact +1, header updatedAt still 2026-07-23, still 6 pending, append-only intact. 10k.emraan day-count leg: 26 days elapsed, 12 past the 14-day threshold (release-distance leg stays retired, July 25 has passed and is now moot). Switch's two [TBD] inputs (beat store URL, publish time) re-checked directly in checklist.md/description.md — both still literal. src/data/beats.ts line 128 re-checked directly — still 'ISΛRK × 10k.emraan', unconfirmed. Task count independently re-verified at exactly 110 unique ids by count-mode grep plus a full content-mode id listing (manually scanned for duplicates, none found) — matches Argus's and Mnemosyne's 07-31 settled figure exactly, unchanged since yesterday (no new entries filed yet today at time of this count). Flagged plainly at standup: today is the due date Mnemosyne herself set on 07-31 for folding the two durable governance rules (overlay.json always read-then-merge, never full-Write; meetings/briefs written only by the closing step) into team/README.md, following the 07-30 lane-overreach incident and two subsequent clean days (07-30 recovery, 07-31 second clean day). This is Mnemosyne's task to action at close, not mine — named it as today's headline item, did not write to README.md myself. No new work for Nyx: the [TBD] blockers are unchanged so there is nothing fresh to draft. No new discretionary strategy call this turn: both live blockers (10k.emraan credit, Switch [TBD] inputs) remain squarely user-decision items the team cannot manufacture. Wrote this task entry and one merged (read-then-merge, not full-Write) overlay.json note only — did not touch meetings/briefs, per the standing incident correction. Skipped Theia (Saturday, not Monday cadence, no genuine new market item) and Aether (inbox confirmed empty by glob). Handoffs: hemera -> hermes (restate contacts.md with today's numbers, 26 days elapsed), hemera -> mnemosyne (action the README governance-rule fold-in today, per her own 07-31 due date; also close today's standup task and write meetings/briefs at close), hemera -> argus (re-verify README actually contains the rule text before calling this GREEN, don't take a status-line mention as proof).",
+      "links": ["team/state/cursors.json", "team/approvals/queue.json", "team/state/tasks.json", "team/drafts/uploads/switch/checklist.md", "team/drafts/uploads/switch/description.md", "src/data/beats.ts", "team/reports/contacts.md", "team/os/overlay.json", "team/README.md", "team/meetings/2026-07-31.md", "team/reports/pipeline/2026-07-31.md"]
+    },
+    {
+      "id": "t-contacts-restate-0801",
+      "title": "Restate 10k.emraan contacts.md entry with today's numbers (26 days elapsed; release-distance leg stays retired)",
+      "owner": "hermes",
+      "status": "done",
+      "createdBy": "hemera",
+      "createdAt": "2026-08-01T09:00:00Z",
+      "handedFrom": "hemera",
+      "due": "2026-08-01",
+      "notes": "Mechanical re-confirmation only, same pattern as every prior day since 07-06. Day-count leg: 26 days elapsed against the 14-day threshold, 12 days past, one further than yesterday's 25. Release-distance leg stays retired per the 07-26 team decision — no countdown, no negative-number substitute. Verify team/approvals/queue.json's ap-2026-07-06-collab-confirm-10k-emraan createdAt/status directly before writing (do not trust the handoff figure), check team/inbox/*.json glob is still zero, then append today's dated entry to team/reports/contacts.md and flip this task to done in the same turn per the standing in-place convention (t-task-status-flip-lag-pattern).\n\nDONE 2026-08-01 (Hermes, same-turn close): re-verified `ap-2026-07-06-collab-confirm-10k-emraan.createdAt` directly against the raw queue.json (2026-07-06T09:00:00Z, status still pending) and independently recomputed the day count myself rather than trusting the handoff figure — July 6 to August 1 is 26 days elapsed, 12 past the 14-day threshold, matching Hemera's stated numbers exactly. `team/inbox/*.json` re-globbed directly: zero files, nothing new to triage. contacts.md's 2026-08-01 dated entry written this turn with these verified numbers; release-distance leg stays retired, no countdown restated. Flipping to done in the same turn the work completed, per the standing process-hygiene convention (t-task-status-flip-lag-pattern).",
+      "links": ["team/reports/contacts.md", "team/approvals/queue.json"]
+    },
+    {
+      "id": "t-hemera-readme-governance-rule-duedate-0801",
+      "title": "README governance-rule fold-in due today — Mnemosyne to write both durable rules from the 07-30 incident into team/README.md",
+      "owner": "mnemosyne",
+      "status": "done",
+      "createdBy": "hemera",
+      "createdAt": "2026-08-01T09:00:00Z",
+      "handedFrom": "hemera",
+      "due": "2026-08-01",
+      "notes": "Flagged at today's standup, not actioned by Hemera (out of lane — README.md is Mnemosyne's to edit for schema/process truth). Mnemosyne set this due date herself on 07-31, holding it rather than pulling it forward, wanting a second clean day of read-then-merge/no-mid-meeting-writes discipline before calling it durable. 07-30 (recovery) and 07-31 (second clean day) both checked clean by Argus's audits. Today is the scheduled date: fold the two rules into team/README.md — (1) team/os/overlay.json must always be edited via read-then-merge, never a full Write; (2) team/meetings/* and team/briefs/* must only be written by the closing step (Mnemosyne), never mid-meeting by other agents. Argus's 45th audit (07-31, YELLOW) held its verdict specifically pending this. Expect Argus to verify the rule text actually exists in README.md at his next audit before upgrading the verdict — a status-line mention is not sufficient proof.\n\nDONE 2026-08-01 (Mnemosyne, close): added a new '## Governance rules (binding — added 2026-08-01)' section to team/README.md via Edit (not a full Write), placed after the approvals/queue.json contract section (end of file). Contains exactly the two rules asked for, each as a numbered, enforceable statement, with one short paragraph grounding both in the 2026-07-30 incident (overlay.json full-Write clobber 561->33 lines; meetings/briefs written mid-meeting before other personas spoke) so future readers know why the rule exists without the section reading as narrative. Verified by direct re-read after the edit: the section is present, unambiguous, and does not touch or reorder any other part of the file. Argus's next (47th) audit is the one that determines whether this satisfies his YELLOW-hold condition — not asserting that myself.",
+      "links": ["team/README.md", "team/reports/pipeline/2026-07-31.md", "team/reports/pipeline/2026-08-01.md", "team/meetings/2026-08-01.md"]
     }
   ]
 }

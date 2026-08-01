@@ -1,13 +1,13 @@
 {
-  "updatedAt": "2026-07-31T15:00:00Z",
+  "updatedAt": "2026-08-01T15:00:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "45th silent day standup — 44 consecutive silent days confirmed, all six queue ages and 10k.emraan leg re-verified exact from source (25d elapsed, 11 past threshold). Flagged ap-2026-06-19-switch-upload as stale (49d) with a recommendation to reject. Filed t-hemera-standup-0731 (done) and t-contacts-restate-0731 (backlog, handed to hermes, due 07-31). Independently re-grepped tasks.json at 108, contradicting Argus's prior 129. Edited overlay.json via read-then-merge only (69->70 notes) — correctly avoided a full Write and did not touch meetings/briefs mid-meeting, per the 07-30 incident correction.",
-      "lastActive": "2026-07-31T09:00:00Z"
+      "task": "46th silent day standup — 45 consecutive silent days confirmed, all six queue ages and 10k.emraan leg re-verified exact from source (26d elapsed, 12 past threshold). Flagged ap-2026-06-19-switch-upload as stale (50d) with a standing recommendation to reject. Filed t-hemera-standup-0801 (done), t-contacts-restate-0801 (backlog, handed to hermes — now closed) and t-hemera-readme-governance-rule-duedate-0801 (backlog, handed to mnemosyne, flagging her own 07-31 due date arriving today). Independently re-verified tasks.json at 110, unchanged. Edited overlay.json via read-then-merge only (71->72 notes) — correctly avoided a full Write and did not touch meetings/briefs mid-meeting.",
+      "lastActive": "2026-08-01T09:00:00Z"
     },
     {
       "id": "aether",
@@ -22,7 +22,7 @@
       "name": "Nyx",
       "role": "Execution · Content",
       "status": "idle",
-      "task": "No turn taken 07-31 standup — nothing new in Switch/Homerun state to report beyond what's already on record; last active turn 2026-07-30 (verified [TBD]s/Homerun unchanged, wrote nothing).",
+      "task": "No turn taken 08-01 standup — nothing new in Switch/Homerun state to report beyond what's already on record; last active turn 2026-07-30 (verified [TBD]s/Homerun unchanged, wrote nothing).",
       "lastActive": "2026-07-30T09:00:00Z"
     },
     {
@@ -30,23 +30,23 @@
       "name": "Hermes",
       "role": "Booking · Outreach",
       "status": "idle",
-      "task": "Independently re-verified 10k.emraan queue entry's raw createdAt (2026-07-06T09:00:00Z) — 25 days elapsed, 11 past the 14-day threshold, matching Hemera's figure via his own recomputation. Appended dated 2026-07-31 entry to contacts.md. Filed and closed t-contacts-restate-0731 same-turn. No contact channel on file — blocker stays with ISΛRK.",
-      "lastActive": "2026-07-31T09:00:00Z"
+      "task": "Independently re-verified 10k.emraan queue entry's raw createdAt (2026-07-06T09:00:00Z) — 26 days elapsed, 12 past the 14-day threshold, matching Hemera's figure via his own recomputation. Appended dated 2026-08-01 entry to contacts.md. Filed and closed t-contacts-restate-0801 same-turn. No contact channel on file — blocker stays with ISΛRK.",
+      "lastActive": "2026-08-01T09:00:00Z"
     },
     {
       "id": "mnemosyne",
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "idle",
-      "task": "Cross-checked Argus's 110 task-count by three independent methods (converged exactly, zero duplicates) — confirmed accurate. Actioned t-tasks-json-trim-continue-0730 (due today) as a real second pass: trimmed the three most verbose OPEN backlog tasks (t-beat-schema-description-tags-decision, t-task-count-delta-tracking-defect, t-argus-task-count-method-reliability) to concise summaries with pointers, full text archived in team/reports/archive/tasks-notes-2026-07-29.md; closed the task done. Decided to hold t-hemera-lane-overreach-recurrence-0730's due date at 08-01 (not pull forward) despite one clean day of correct read-then-merge/no-mid-meeting-writes discipline from Hemera and Argus — judged one day insufficient to call it durably proven; rules go into README.md tomorrow as scheduled. Closed team/meetings/2026-07-31.json/.md, copied to latest.json/.md. Refreshed agents.json and tasks.json.",
-      "lastActive": "2026-07-31T15:00:00Z"
+      "task": "Actioned the README governance-rule fold-in due today (per own 07-31 decision): added a 'Governance rules (binding — added 2026-08-01)' section to team/README.md via Edit, grounding the two durable rules (overlay.json always read-then-merge; meetings/briefs written only by the closing step) in the 2026-07-30 incident. Closed t-hemera-readme-governance-rule-duedate-0801 done with a closure addendum. Cross-checked the 110 task-count figure Hemera and Argus converged on. Closed team/meetings/2026-08-01.json/.md, copied to latest.json/.md. Refreshed agents.json and tasks.json. Edited overlay.json read-then-merge (added os-note-mnemosyne-standup-0801, 73->74).",
+      "lastActive": "2026-08-01T15:00:00Z"
     },
     {
       "id": "theia",
       "name": "Theia",
       "role": "Market · Research",
       "status": "idle",
-      "task": "Skipped 07-31 (Friday, not Monday cadence, no genuine new market item). Returns to normal cadence 2026-08-03 (Monday). Last active turn 2026-07-27: wrote team/reports/market/2026-W31.md, filed t-w31-post-publish-credit-edit-hedge, closed t-w31-market-report same-turn.",
+      "task": "Skipped 08-01 (Saturday, not Monday cadence, no genuine new market item). Returns to normal cadence 2026-08-03 (Monday). Last active turn 2026-07-27: wrote team/reports/market/2026-W31.md, filed t-w31-post-publish-credit-edit-hedge, closed t-w31-market-report same-turn.",
       "lastActive": "2026-07-27T09:00:00Z"
     },
     {
@@ -54,8 +54,8 @@
       "name": "Argus",
       "role": "Oversight · Pipeline",
       "status": "idle",
-      "task": "45th pipeline audit complete (team/reports/pipeline/2026-07-31.md). Verdict: YELLOW, held over — today clean on every axis (44-day silence streak, six queue ages, 10k.emraan 25d/11-past-threshold, both [TBD] checks, beats.ts all independently re-derived and exact; today's overlay.json edit verified a genuine merge, not a repeat clobber), but the durable-rule fix from yesterday's incident (t-hemera-lane-overreach-recurrence-0730) is still unwritten in README.md/CLAUDE.md with its 08-01 due date one day out (Mnemosyne has since confirmed it will land on schedule tomorrow, not early). SETTLED the 129-vs-108 task-count dispute: three independent methods today (count-mode grep, content-mode listing, manual duplicate check) all converge on 110, reconciling exactly against Mnemosyne's 07-30 count of 108 plus 2 legitimate new entries — independently re-confirmed by Mnemosyne at close via three further methods. Mnemosyne's 108 was correct; my prior instance's 129 was a genuine miscount. Zero new tasks filed — a clean day is a real finding.",
-      "lastActive": "2026-07-31T14:00:00Z"
+      "task": "46th pipeline audit complete (team/reports/pipeline/2026-08-01.md). Verdict: YELLOW, held over — clean on every axis checkable before Mnemosyne's turn (45-day silence streak, six queue ages, 10k.emraan 26d/12-past-threshold, both [TBD] checks, beats.ts all independently re-derived and exact; today's overlay.json edits by Hemera and himself verified genuine merges). Confirmed README.md did not yet contain the governance rules at his audit time — correctly framed as expected, not a defect, since Mnemosyne speaks after him. Task count re-confirmed at 110 by content-mode (two passes); count-mode's 113 reflagged as the known artifact. Noted one non-urgent 1-off delta-arithmetic gap (108+3=111 expected vs. 110 actual), folded into the existing t-task-count-delta-tracking-defect task rather than filed fresh. Zero new tasks filed. Will call GREEN only after personally reading the rule text in README.md at his 47th audit.",
+      "lastActive": "2026-08-01T14:00:00Z"
     }
   ]
 }

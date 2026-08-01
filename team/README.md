@@ -148,3 +148,21 @@ change plus `id`.
 ```
 Agents may ONLY append `pending` items. Status transitions are owned by the
 `team-publish` workflow, which the user dispatches from the dashboard or GitHub UI.
+
+## Governance rules (binding — added 2026-08-01)
+
+Fixes for the 2026-07-30 incident: Hemera overwrote `os/overlay.json` with a full `Write`
+(561 lines collapsed to 33, wiping prior entries) and wrote `meetings/2026-07-30.*` and
+`briefs/2026-07-30.*` mid-meeting, before the rest of the team had taken their turns. Both
+were caught and fixed same-day. These two rules exist so the failure does not recur:
+
+1. **`os/overlay.json` is always edited read-then-merge, never a full `Write`.** Read the
+   current file first. Merge new or changed entries in by `id` (matching ids override the
+   existing item in place; new ids are appended). A full `Write` that regenerates the whole
+   file from a partial in-memory copy is prohibited — it silently clobbers any entry the
+   writer didn't happen to be carrying. This applies to every agent, every turn.
+2. **`meetings/<date>.*` and `briefs/<date>.*` are written only by the closing
+   (Mnemosyne) step of a meeting, never mid-meeting by any other persona.** Other agents
+   report their turn's content verbally in the transcript; only the close assembles and
+   writes the meeting record and the daily brief. An agent who writes these files ahead of
+   its own close is out of lane regardless of whether the content is accurate.

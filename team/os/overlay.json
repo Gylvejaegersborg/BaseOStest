@@ -1,6 +1,33 @@
 {
-  "updatedAt": "2026-07-31T14:00:00Z",
+  "updatedAt": "2026-08-01T15:00:00Z",
   "notes": [
+    {
+      "id": "os-note-mnemosyne-standup-0801",
+      "title": "README governance-rule fold-in actioned — two durable rules now written, close-of-day complete",
+      "folder": "Team",
+      "tags": ["mnemosyne", "governance", "readme", "close"],
+      "updated": "2026-08-01T15:00:00Z",
+      "body": "Folded both durable rules from the 2026-07-30 incident into `team/README.md` under a new \"Governance rules (binding — added 2026-08-01)\" section, via Edit (not a full Write): (1) `os/overlay.json` always read-then-merge, never a full Write; (2) `meetings/<date>.*` and `briefs/<date>.*` written only by the closing (Mnemosyne) step, never mid-meeting. Grounded in the 07-30 incident (overlay clobbered 561→33 lines, meeting/brief files written prematurely) without turning the rule into narrative. Closed `t-hemera-readme-governance-rule-duedate-0801` done. Argus's 46th audit held YELLOW pending this text landing — his 47th audit is the next check.\n\nTask count: 110 unique ids, independently spot-checked, matches Hemera/Hermes/Argus's converged figure. Closed today's meeting record (`meetings/2026-08-01.json`/`.md`, copied to `latest.*`), refreshed `agents.json` for all seven agents and `tasks.json`'s top-level `updatedAt`. This overlay.json note added via read-then-merge, per the rule just written.",
+      "links": ["team/README.md", "team/state/tasks.json", "team/meetings/2026-08-01.md"]
+    },
+    {
+      "id": "os-note-argus-pipeline-0801",
+      "title": "46th audit: YELLOW held over, on schedule not a defect — README rule fix isn't Mnemosyne's turn yet. Both today's writes verified genuine.",
+      "folder": "Team",
+      "tags": ["argus", "pipeline", "health", "governance", "tasks-json"],
+      "updated": "2026-08-01T14:00:00Z",
+      "body": "**Verdict: YELLOW, held over.** Full report: `team/reports/pipeline/2026-08-01.md`. Not a fresh problem — every number today is clean (11th straight exact re-derivation), and both writes made before my turn are genuine, not rubber-stamped: Hemera's overlay.json edit is a real merge (72 unique ids, zero collisions, historical entries intact), Hermes's contacts.md write is a correct append with the day-count leg re-verified at 26 days/12 past threshold. `README.md` still doesn't contain the two durable governance rules due today — checked directly, no matches — but that's expected at this point in the meeting: Mnemosyne owns that fix and hasn't spoken yet. Named plainly, not scored as a defect. I'll verify the rule text actually exists at my next audit before considering GREEN.\n\n**Task count: 110, confirmed by two independent content-mode passes, zero duplicates.** Count-mode's 113 is the same known grep-mode artifact flagged since 07-20. One open thread: a one-entry day-over-day delta-arithmetic gap (108 baseline + 3 new entries should read 111, actual is 110) — routed to Mnemosyne's existing `t-task-count-delta-tracking-defect` rather than filed as a new task, since it's the same root cause already being tracked.\n\nZero new tasks filed this audit. Nothing new needed from you beyond the standing blockers (10k.emraan channel, Switch's two [TBD] inputs) already on your desk.",
+      "links": ["team/reports/pipeline/2026-08-01.md", "team/README.md", "team/state/tasks.json", "team/os/overlay.json"]
+    },
+    {
+      "id": "os-note-hemera-standup-0801",
+      "title": "45th silent day. 10k.emraan at 26/14 (12 past threshold). Today is the README governance-rule due date (Mnemosyne).",
+      "folder": "Team",
+      "tags": ["hemera", "switch", "10k-emraan", "policy", "governance"],
+      "updated": "2026-08-01T09:00:00Z",
+      "body": "**Re-derived every number directly from raw source this morning, nothing carried forward on trust.**\n\n**Silence: 45 consecutive days (Jun 18-Aug 1).** `cursors.json` still fully empty across discord/imap/copyparty, `team/inbox/` still zero files. Nothing mechanically changed.\n\n**Approvals queue: still 6 pending, header untouched since 2026-07-23 (correct, append-only).** Ages today: `ap-2026-06-19-switch-upload` 50d (stale, standing recommendation reject) · `ap-2026-06-27-switch-upload-replan` 35d (the live upload package) · `ap-2026-06-17-switch-w25-collab-story` 45d · `ap-2026-06-18-switch-w26-x-post` 44d · `ap-2026-07-06-collab-confirm-10k-emraan` 26d · `ap-2026-07-23-switch-gap-touchpoint2-reshare` 9d.\n\n**10k.emraan: day-count leg 26 days elapsed, 12 past the 14-day threshold, still climbing. No channel has appeared.** This stays a user-decision blocker — the team cannot manufacture a contact channel.\n\n**Switch's two upload inputs (beat store URL, publish time) are still literal `[TBD]`.** `beats.ts` line 128 still reads `ISΛRK × 10k.emraan`, unconfirmed.\n\n**Today is the due date Mnemosyne set on 07-31 for folding two durable governance rules into `team/README.md`:** overlay.json edits must always be read-then-merge, never a full Write; `team/meetings/*` and `team/briefs/*` are written only by the closing step, never mid-meeting. This follows the 07-30 incident and two subsequent clean days. Argus's 45th audit (07-31) held its verdict at YELLOW specifically pending this. Not mine to write — Mnemosyne's to action at close today.\n\n**Task count independently re-verified: 110 unique ids, unchanged since yesterday.**\n\nNothing new for you to decide today beyond the two standing blockers already on your desk.",
+      "links": ["team/approvals/queue.json", "team/reports/contacts.md", "team/drafts/uploads/switch/checklist.md", "team/README.md"]
+    },
     {
       "id": "os-note-argus-pipeline-0731",
       "title": "45th audit: YELLOW (held over). Task-count dispute settled — 108 was right, 129 was my miscount, today's true count is 110. Today's overlay edit verified a genuine merge, not a repeat clobber.",

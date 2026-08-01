@@ -536,3 +536,23 @@ leaving a status flip for a later audit to catch.
 **Status: blocker, day-count leg 25 days elapsed (threshold 14, eleven days past).
 Release-distance leg retired. Unconfirmed / outreach drafted, not sent. Awaiting
 ISΛRK — channel or off-record confirmation.**
+
+---
+
+**2026-08-01 update (Hermes) — mechanical restate only. Day-count leg only; release-
+distance leg stays retired.**
+Re-verified directly, not carried forward: `ap-2026-07-06-collab-confirm-10k-emraan.createdAt`
+= `2026-07-06T09:00:00Z` in `team/approvals/queue.json`, status still `pending`. July 6 to
+August 1 = 26 days elapsed, 12 days past the 14-day threshold — one day further than
+yesterday's 25. Release-distance leg stays retired (July 25 has passed; no countdown, no
+manufactured negative number). `team/inbox/*.json` re-globbed directly: still zero files,
+nothing new to triage. `team/state/cursors.json` not re-checked this turn beyond the
+standing fact it has stayed fully empty every prior day; no new channel for 10k.emraan has
+appeared anywhere in the repo. Nothing mechanical changed since yesterday: no channel,
+can't send, still a team run with no external calls regardless. Task `t-contacts-restate-0801`
+(filed by Hemera at today's standup, handed to me) closed same turn, per the team's standing
+practice of not leaving a status flip for a later audit to catch.
+
+**Status: blocker, day-count leg 26 days elapsed (threshold 14, twelve days past).
+Release-distance leg retired. Unconfirmed / outreach drafted, not sent. Awaiting
+ISΛRK — channel or off-record confirmation.**
