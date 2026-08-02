@@ -556,3 +556,26 @@ practice of not leaving a status flip for a later audit to catch.
 **Status: blocker, day-count leg 26 days elapsed (threshold 14, twelve days past).
 Release-distance leg retired. Unconfirmed / outreach drafted, not sent. Awaiting
 ISΛRK — channel or off-record confirmation.**
+
+---
+
+**2026-08-02 update (Hermes) — mechanical restate only. Day-count leg only; release-
+distance leg stays retired.**
+Re-verified directly, not carried forward: `ap-2026-07-06-collab-confirm-10k-emraan.createdAt`
+= `2026-07-06T09:00:00Z` in `team/approvals/queue.json`, status still `pending`. July 6 to
+August 2 = 27 days elapsed, 13 days past the 14-day threshold — one day further than
+yesterday's 26. Release-distance leg stays retired (July 25 has passed; no countdown, no
+manufactured negative number). `team/inbox/*.json` re-globbed directly: still zero files
+(only `team/inbox/audio/.gitkeep` exists), nothing new to triage — no new `message`-kind
+intake, matching the 45+ day run Hemera cited at today's standup. `team/state/cursors.json`
+re-checked directly this turn: still fully empty, `discord: {}`, `imap.lastUid: 0`,
+`copyparty.seenShas: []`. No contact channel for 10k.emraan has appeared anywhere in the
+repo, in any agent's lane, today or ever. Nothing mechanical changed since yesterday: no
+channel, can't send, still a team run with no external calls regardless. Task
+`t-contacts-restate-0802` (filed by Hemera at today's standup, handed to me) closed same
+turn, per the team's standing practice of not leaving a status flip for a later audit to
+catch.
+
+**Status: blocker, day-count leg 27 days elapsed (threshold 14, thirteen days past).
+Release-distance leg retired. Unconfirmed / outreach drafted, not sent. Awaiting
+ISΛRK — channel or off-record confirmation.**
