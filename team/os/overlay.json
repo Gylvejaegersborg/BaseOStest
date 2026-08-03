@@ -1,6 +1,33 @@
 {
-  "updatedAt": "2026-08-02T15:00:00Z",
+  "updatedAt": "2026-08-03T14:00:00Z",
   "notes": [
+    {
+      "id": "os-note-argus-pipeline-0803",
+      "title": "48th audit: GREEN. All six headline figures exact, task count reconciles at 120, no lane violations. Caught and corrected my own near-miss before publishing.",
+      "folder": "Team",
+      "tags": ["argus", "pipeline", "health", "tasks-json"],
+      "updated": "2026-08-03T14:00:00Z",
+      "body": "**Verdict: GREEN.** Full report: `team/reports/pipeline/2026-08-03.md`. All six recurring headline figures re-derived exact from raw source (47 silent days, six queue ages 52/47/46/37/28/11, 10k.emraan 28d/2x-threshold). Task count: **120**, both count-mode and content-mode converge, arithmetic reconciles in full from my own 47th audit's settled 115 baseline (115 + Argus's correction task + Mnemosyne's close = 117 end-of-08-02, + 3 net-new today = 120). Verified `t-contacts-restate-0803` specifically: single edited object, closure appended in place, no duplicate.\n\n**Worth naming plainly: I nearly mis-stated today's count myself.** A first-pass file read silently truncated before the true end of the task list, and I initially drafted this section around a wrong figure (118, not 120). Caught it before writing anything down by re-running the check with an explicit offset. No wrong number was published, but this is live evidence that `t-argus-task-count-method-reliability` (open, mine, snapshot half judged resolved 07-31) shouldn't be treated as permanently solved after a good streak — I'm keeping it open and re-testing every audit.\n\n**Lane discipline intact:** README unchanged since 08-01, no meetings/briefs written out of turn, all of today's overlay.json and tasks.json edits verified as genuine read-then-merge / in-place closures, zero clobbering.\n\n**Process check:** `t-task-count-delta-tracking-defect` (Mnemosyne, due 2026-08-07) is on schedule, four days out — nothing overdue, no escalation needed today.\n\nNothing new needed from ISΛRK beyond the standing blockers (10k.emraan channel — note Theia's separate one-month marker lands Thursday 08-06 — and Switch's two [TBD] inputs) already on his desk.",
+      "links": ["team/reports/pipeline/2026-08-03.md", "team/state/tasks.json", "team/README.md"]
+    },
+    {
+      "id": "os-note-theia-market-w32",
+      "title": "Market pulse — W32: 10k.emraan at 28/31 days (one-month mark lands 08-06, not yet crossed); no upload activity visible; credit hedge actioned but untested; no new trend signal",
+      "folder": "Team",
+      "tags": ["market", "theia", "switch", "10k-emraan"],
+      "updated": "2026-08-03T13:00:00Z",
+      "body": "**Full read: `team/reports/market/2026-W32.md`. Checked all three W31 watch-list items directly, plus re-verified 10k.emraan's day-count against my own previously-named one-month threshold.**\n\n**10k.emraan: 28 days elapsed, still unresolved, still no channel.** My own one-month framing (2026-07-06 to 2026-08-06) is NOT yet crossed — today is 3 days short. Naming the date precisely (Thursday 08-06) so it's stated once, cleanly, when it actually arrives rather than rounded early this week. Separately, today is also the first day this figure lands on exactly 2x Hermes's 14-day threshold — two independently-set lines converging in the same short window, not one signal restated twice.\n\n**No upload activity visible in the repo, checked directly.** `team/library/beats.json` still `{\"beats\": []}`, unchanged since 06-12. `checklist.md`/`description.md` `[TBD]` markers (beat store URL, publish time) still literal — read both files fully, not just grepped. Same honest limit as every prior week: manual platform-side steps aren't repo-checkable from this run.\n\n**The post-publish credit-edit hedge I filed in W31 (`t-w31-post-publish-credit-edit-hedge`) is actioned, not just filed** — Hemera added it directly into `checklist.md` on 07-28, instructing whoever executes the upload to treat the credit line as provisionally editable and flag it internally if still unconfirmed at upload time. Untested in practice since no upload has happened yet.\n\n**No new market/trend signal this week — sixth consecutive honest 'no', said plainly rather than padded.** No new task filed to Hemera this week; nothing sourced clears the bar for a genuinely new, actionable point distinct from prior weeks' filings. Standing watch items (drill tempo trends 170-190bpm relevant to Switch's 186bpm placement, SoundCloud discovery mechanics, creator-licensing platform entrants) carried forward unchanged.",
+      "links": ["team/reports/market/2026-W32.md", "team/reports/market/2026-W31.md", "team/approvals/queue.json", "team/reports/contacts.md", "src/data/beats.ts", "team/library/beats.json"]
+    },
+    {
+      "id": "os-note-hemera-standup-0803",
+      "title": "47th silent day. 10k.emraan hits 28/14 — exactly 2x threshold. Theia back on Monday market-read cadence.",
+      "folder": "Team",
+      "tags": ["hemera", "switch", "10k-emraan", "market"],
+      "updated": "2026-08-03T09:00:00Z",
+      "body": "**Re-derived every number directly from raw source this morning, nothing carried forward on trust.**\n\n**Silence: 47 consecutive days (Jun 18-Aug 3).** `cursors.json` still fully empty across discord/imap/copyparty, `team/inbox/` still zero files. Nothing mechanically changed.\n\n**Approvals queue: still 6 pending, header untouched since 2026-07-23 (correct, append-only).** Ages today: `ap-2026-06-19-switch-upload` 52d (stale, standing recommendation reject) · `ap-2026-06-27-switch-upload-replan` 37d (the live upload package) · `ap-2026-06-17-switch-w25-collab-story` 47d · `ap-2026-06-18-switch-w26-x-post` 46d · `ap-2026-07-06-collab-confirm-10k-emraan` 28d · `ap-2026-07-23-switch-gap-touchpoint2-reshare` 11d.\n\n**10k.emraan: day-count leg 28 days elapsed — today is exactly 2x the 14-day threshold.** Naming that once as a plain milestone, not a new tier of urgency: the underlying fact (no contact channel, no confirmation) hasn't moved since July 6. Release-distance leg stays retired.\n\n**Switch's two upload inputs (beat store URL, publish time) are still literal `[TBD]`.** `src/data/beats.ts` line 128 still reads `ISΛRK × 10k.emraan`, unconfirmed.\n\n**Today is Theia's normal Monday market-read cadence** — she has the floor next, last read was 2026-W31 (07-27).\n\nNo new discretionary strategy call today: both standing blockers remain squarely user-decision items the team cannot manufacture a resolution to.",
+      "links": ["team/approvals/queue.json", "team/reports/contacts.md", "team/drafts/uploads/switch/checklist.md", "src/data/beats.ts"]
+    },
     {
       "id": "os-note-mnemosyne-standup-0802",
       "title": "Pipeline verdict is GREEN. Meeting closed, task-count correction accepted, delta-tracking fix now in progress.",

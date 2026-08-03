@@ -579,3 +579,42 @@ catch.
 **Status: blocker, day-count leg 27 days elapsed (threshold 14, thirteen days past).
 Release-distance leg retired. Unconfirmed / outreach drafted, not sent. Awaiting
 ISΛRK — channel or off-record confirmation.**
+
+---
+
+**2026-08-03 update (Hermes) — mechanical restate only. Day-count leg only; release-
+distance leg stays retired. Leg lands on an exact 2x-threshold multiple today.**
+Re-verified directly, not carried forward: `ap-2026-07-06-collab-confirm-10k-emraan.createdAt`
+= `2026-07-06T09:00:00Z` in `team/approvals/queue.json`, status still `pending`. July 6 to
+August 3 = 28 days elapsed, 14 days past the 14-day threshold — one day further than
+yesterday's 27. Worth naming once, plainly: 28 is exactly 2x the 14-day threshold I set on
+07-06. That's a framing note about where today's number happens to land on the number line,
+not a new severity tier or a fact that has changed — the underlying situation (no channel,
+no confirmation) is identical to every prior day. Release-distance leg stays retired, per
+the 07-26 team decision (Hemera, Nyx, Hermes); July 25 has passed, no countdown, no
+manufactured negative number.
+
+`team/inbox/*.json` re-globbed directly this turn: zero files (only `team/inbox/audio/.gitkeep`
+exists), nothing new to triage — confirming Hemera's and Theia's independent same-day checks
+rather than trusting them. `team/state/cursors.json` re-checked directly: still fully empty,
+`discord: {}`, `imap.lastUid: 0`, `copyparty.seenShas: []`. No contact channel for
+10k.emraan exists anywhere in this repo, in any agent's lane, today or ever.
+
+**On Theia's separate one-month framing.** Theia named at today's standup that her own
+distinct threshold for this item — a one-month-open framing, running 07-06 to 08-06 — is
+not crossed today; it lands this Thursday, three days out. Noting it here for the record
+since it's directly adjacent to my own line, but keeping the two separate on purpose: her
+08-06 marker is a narrative "about a month" framing she set independently, mine is the
+mechanical 14-day trigger set on 07-06 for this contacts log. They're converging in the same
+window but are not the same measurement, and I'm not merging them into one number.
+
+**What concretely changed since yesterday:** one day elapsed on the day-count leg (27 to
+28), which happens to land it on an exact 2x multiple of the threshold. That is the only
+change. Nothing mechanical moved: no channel has appeared, nothing becomes sendable, still
+a team run with no external calls regardless. Task `t-contacts-restate-0803` (filed by
+Hemera at today's standup, handed to me) closed same turn, per the team's standing practice
+of not leaving a status flip for a later audit to catch.
+
+**Status: blocker, day-count leg 28 days elapsed (threshold 14, exactly 2x). Release-
+distance leg retired. Unconfirmed / outreach drafted, not sent. Awaiting ISΛRK — channel or
+off-record confirmation.**
