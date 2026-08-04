@@ -618,3 +618,39 @@ of not leaving a status flip for a later audit to catch.
 **Status: blocker, day-count leg 28 days elapsed (threshold 14, exactly 2x). Release-
 distance leg retired. Unconfirmed / outreach drafted, not sent. Awaiting ISΛRK — channel or
 off-record confirmation.**
+
+---
+
+**2026-08-04 update (Hermes) — mechanical restate only. Day-count leg only; release-
+distance leg stays retired.**
+Re-verified directly, not carried forward: `ap-2026-07-06-collab-confirm-10k-emraan.createdAt`
+= `2026-07-06T09:00:00Z` in `team/approvals/queue.json`, status still `pending`. July 6 to
+August 4 = 29 days elapsed, 15 days past the 14-day threshold, one day past yesterday's
+exact 2x mark (28) — climbing, nothing new in kind. Release-distance leg stays retired, per
+the 07-26 team decision (Hemera, Nyx, Hermes); July 25 has passed, no countdown, no
+manufactured negative number.
+
+`team/inbox/*.json` re-globbed directly this turn: zero files (only `team/inbox/audio/.gitkeep`
+exists), nothing new to triage. `team/state/cursors.json` re-checked directly: still fully
+empty, `discord: {}`, `imap.lastUid: 0`, `copyparty.seenShas: []`. No contact channel for
+10k.emraan exists anywhere in this repo, in any agent's lane, today or ever.
+
+**On Theia's separate one-month framing.** Theia's own one-month-open framing for this same
+blocker (running 07-06 to 08-06) lands this Thursday, 2026-08-06 — two days out. Keeping it
+genuinely separate, not merged into one number: her 08-06 marker is a narrative "about a
+month" framing she set independently; mine is the mechanical 14-day trigger set on 07-06 for
+this contacts log. Two different clocks measuring adjacent things — neither changes what
+either of us can do about it.
+
+**What concretely changed since yesterday:** one day elapsed on the day-count leg (28 to
+29). That is the only change. Nothing mechanical moved: no channel has appeared, nothing
+becomes sendable, still a team run with no external calls regardless. This remains squarely
+a user-decision blocker — the 10k.emraan channel-or-confirm and the two Switch upload
+`[TBD]` inputs are ISΛRK's calls, not the team's. Task `t-contacts-restate-0804` (filed by
+Hemera at today's standup, handed to me) closed same turn, in place, per the team's standing
+practice of not leaving a status flip for a later audit to catch.
+
+**Status: blocker, day-count leg 29 days elapsed (threshold 14, fifteen days past, one day
+past yesterday's exact 2x mark). Release-distance leg retired. Theia's separate one-month
+marker lands Thursday 2026-08-06, two days out — distinct clock, not merged. Unconfirmed /
+outreach drafted, not sent. Awaiting ISΛRK — channel or off-record confirmation.**
