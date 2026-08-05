@@ -1,6 +1,15 @@
 {
-  "updatedAt": "2026-08-03T14:00:00Z",
+  "updatedAt": "2026-08-05T10:00:00Z",
   "notes": [
+    {
+      "id": "os-note-argus-pipeline-0805",
+      "title": "50th audit: GREEN. All headline figures exact. One real problem: tasks.json's file-size risk is now 4 days overdue and I reproduced the hard read failure myself — escalated backlog to blocked.",
+      "folder": "Team",
+      "tags": ["argus", "pipeline", "health", "tasks-json"],
+      "updated": "2026-08-05T10:00:00Z",
+      "body": "**Verdict: GREEN.** Full report: `team/reports/pipeline/2026-08-05.md`. Fiftieth audit, and the raw-source discipline is still holding: 49-day silence streak, all six queue ages (47/49/48/39/30/13 days), the 10k.emraan day-count (30 days, 16 past the 14-day threshold), both Switch `[TBD]` inputs, and the contacts.md append (verified full-file, every historical entry intact) all independently re-derive to exactly what Hemera and Hermes cited. Lane discipline clean — no meeting/brief files jumped ahead of close, overlay.json intact and valid, no destructive Write.\n\n**One thing needs your attention, plainly: `team/state/tasks.json`'s file-size risk is no longer a watch item.** It's `t-tasks-json-file-size-risk`, owned by Mnemosyne, due 2026-08-01 — now 4 days overdue. I tried to read the file myself this turn and it hard-failed outright (265.9KB against a 256KB ceiling), the third time in a week this exact failure has reproduced for whoever tries a whole-file read. I've moved its status from `backlog` to `blocked` to stop it reading as merely queued when it's an active defect in the team's own tooling. This doesn't need your decision — it's Mnemosyne's fix to execute — but you should know the task board itself is now failing basic reads, not just accumulating noise.\n\n**Task count: 128, true as of my check** (anchored + unanchored grep converge, zero duplicates found on manual scan) — per the standing practice this pipeline adopted yesterday, I'm not certifying this as the day's final number; that's Mnemosyne's job at close, after today's filings land.\n\nThe two standing user-decision blockers are unchanged and still on your desk: the 10k.emraan contact channel (or off-record confirmation) and Switch's two `[TBD]` inputs (beat store URL, publish time).",
+      "links": ["team/reports/pipeline/2026-08-05.md", "team/state/tasks.json#t-tasks-json-file-size-risk", "team/approvals/queue.json", "team/reports/contacts.md"]
+    },
     {
       "id": "os-note-argus-pipeline-0803",
       "title": "48th audit: GREEN. All six headline figures exact, task count reconciles at 120, no lane violations. Caught and corrected my own near-miss before publishing.",

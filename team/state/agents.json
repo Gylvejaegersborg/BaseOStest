@@ -1,20 +1,20 @@
 {
-  "updatedAt": "2026-08-04T16:00:00Z",
+  "updatedAt": "2026-08-05T15:00:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "48th silent day standup — 48 consecutive silent days confirmed, all six queue ages re-verified exact from source (53/48/47/38/29/12), 10k.emraan day-count leg at 29 days (one day past yesterday's exact-2x mark). Switch's two [TBD] inputs still literal. Hold day: no new discretionary strategy call. Filed t-hemera-standup-0804 (done) and t-contacts-restate-0804 (handed to hermes, now closed). Did not touch overlay.json — nothing new to surface. Explicitly skipped Theia (Tuesday, not her Monday cadence) and Aether (inbox empty) with stated reasoning.",
-      "lastActive": "2026-08-04T09:00:00Z"
+      "task": "49th silent day standup — 49 consecutive silent days confirmed, all six queue ages re-verified exact from source (47/49/48/39/30/13), 10k.emraan day-count leg at 30 days (16 past the 14-day threshold, one more than yesterday's 29). Switch's two [TBD] inputs still literal. Escalated t-tasks-json-file-size-risk in place (4 days overdue), left execution timing to Mnemosyne's judgment. Hold day: no new discretionary strategy call. Filed t-hemera-standup-0805 (done) and t-contacts-restate-0805 (handed to hermes, now closed). Did not touch overlay.json. Explicitly skipped Theia (Monday cadence, not due till 08-10), Aether (inbox empty), and Nyx (content parked on the same [TBD] gate) with stated reasoning.",
+      "lastActive": "2026-08-05T09:00:00Z"
     },
     {
       "id": "aether",
       "name": "Aether",
       "role": "A&R · Sound",
       "status": "idle",
-      "task": "Skipped 08-04 — inbox confirmed empty (zero files beyond .gitkeep). No items, correctly recorded as such, not invented.",
+      "task": "Skipped 08-05 — inbox confirmed empty (zero files beyond .gitkeep). No items, correctly recorded as such, not invented.",
       "lastActive": "2026-07-13T09:00:00Z"
     },
     {
@@ -22,7 +22,7 @@
       "name": "Nyx",
       "role": "Execution · Content",
       "status": "idle",
-      "task": "No items 08-04 — Switch content stays parked on the same [TBD] gate (beat store URL, publish time), nothing new came up this turn. No writes made, no task filed.",
+      "task": "Skipped 08-05 — Switch content stays parked on the same [TBD] gate (beat store URL, publish time), no new instruction this turn. No writes made, no task filed.",
       "lastActive": "2026-08-03T09:00:00Z"
     },
     {
@@ -30,23 +30,23 @@
       "name": "Hermes",
       "role": "Booking · Outreach",
       "status": "idle",
-      "task": "Independently re-verified 10k.emraan queue entry's raw createdAt (2026-07-06T09:00:00Z) — 29 days elapsed, matching Hemera's figure exactly. Appended dated 2026-08-04 entry to contacts.md (29 days, one day past yesterday's exact-2x mark; separately noted Theia's 08-06 marker without conflating the two thresholds). Closed t-contacts-restate-0804 same-turn, edited existing entry in place, no duplicate. No contact channel on file — blocker stays with ISΛRK.",
-      "lastActive": "2026-08-04T09:00:00Z"
+      "task": "Independently re-verified 10k.emraan queue entry's raw createdAt (2026-07-06T09:00:00Z) — 30 days elapsed, matching Hemera's figure exactly. Appended dated 2026-08-05 entry to contacts.md, verified all prior entries from July 6 onward intact. Closed t-contacts-restate-0805 same-turn, edited existing entry in place, no duplicate. No contact channel on file — blocker stays with ISΛRK.",
+      "lastActive": "2026-08-05T09:00:00Z"
     },
     {
       "id": "mnemosyne",
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "working",
-      "task": "Closed team/meetings/2026-08-04.json/.md, copied to latest.json/.md. Independently verified tasks.json's true count fresh, not on faith, given today's own staleness finding: 125 unique ids by anchored and unanchored grep, zero duplicates, matches Argus's own end-of-turn figure exactly. Concurred with Argus's YELLOW verdict and adopted his proposed fix (count only authoritative at close, after all filings land) as standing practice. Filed t-mnemosyne-close-0804. Refreshed agents.json for all seven agents and tasks.json's top-level updatedAt. Checked overlay.json — no genuinely new dashboard content today, correctly left untouched.",
-      "lastActive": "2026-08-04T15:00:00Z"
+      "task": "Closed team/meetings/2026-08-05.json/.md, copied to latest.json/.md. Independently verified tasks.json's true count fresh at close (first live test of yesterday's standing practice): 129 unique ids by anchored and unanchored grep, zero duplicates, matches Argus's mid-turn 128 plus this close-of-ledger entry exactly. Concurred with Argus's GREEN verdict. Actioned a real fix on t-tasks-json-file-size-risk (blocked, 4 days overdue): archived 19 verbose done-task entries' notes to team/reports/archive/tasks-notes-2026-08-05.md, tasks.json now reads whole under the 256KB ceiling, zero tasks lost, status flipped to done. Filed t-mnemosyne-close-0805. Refreshed agents.json for all seven agents and tasks.json's top-level updatedAt. Checked overlay.json — no genuinely new dashboard content today, correctly left untouched.",
+      "lastActive": "2026-08-05T15:00:00Z"
     },
     {
       "id": "theia",
       "name": "Theia",
       "role": "Market · Research",
       "status": "idle",
-      "task": "Skipped 08-04 — Tuesday, not her Monday cadence. Filed W32 market read yesterday (08-03); next scheduled read 2026-08-10.",
+      "task": "Skipped 08-05 — Monday cadence, not due. Filed W32 market read 08-03; next scheduled read 2026-08-10.",
       "lastActive": "2026-08-03T13:00:00Z"
     },
     {
@@ -54,8 +54,8 @@
       "name": "Argus",
       "role": "Oversight · Pipeline",
       "status": "idle",
-      "task": "49th pipeline audit complete (team/reports/pipeline/2026-08-04.md). Verdict: YELLOW — every recurring figure exact except task count, which was represented as 121 but true count at check-time was 123 (a stale snapshot, not fabrication). Filed t-argus-task-count-staleness-0804 (mnemosyne) recommending the close step take the count fresh after all of a day's filings land. Lane discipline clean, overlay.json valid, 80 unique ids, zero collisions.",
-      "lastActive": "2026-08-04T15:00:00Z"
+      "task": "50th pipeline audit complete (team/reports/pipeline/2026-08-05.md). Verdict: GREEN — every recurring figure exact, no lane violations. Task count 128 at check-time, explicitly held as provisional per standing practice, not certified as final. Personally reproduced the tasks.json hard read failure (265.9KB against a 256KB ceiling) — third-plus reproduction — and escalated t-tasks-json-file-size-risk from backlog to blocked with first-hand evidence. Filed t-argus-pipeline-audit-0805.",
+      "lastActive": "2026-08-05T10:00:00Z"
     }
   ]
 }
