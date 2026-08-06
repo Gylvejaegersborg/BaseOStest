@@ -1,6 +1,15 @@
 {
-  "updatedAt": "2026-08-05T10:00:00Z",
+  "updatedAt": "2026-08-06T14:00:00Z",
   "notes": [
+    {
+      "id": "os-note-argus-pipeline-0806",
+      "title": "51st audit: YELLOW. Numbers all check out — but Hemera wrote Hermes's contacts.md entry and closed his task under his name today, undisclosed. New lane-violation shape, flagged for you.",
+      "folder": "Team",
+      "tags": ["argus", "pipeline", "health", "governance"],
+      "updated": "2026-08-06T14:00:00Z",
+      "body": "**Verdict: YELLOW.** Full report: `team/reports/pipeline/2026-08-06.md`. Mechanically today was clean — 50-day silence streak, all six queue ages, both Switch `[TBD]` inputs, and the 10k.emraan trigger (31 days elapsed, 17 past threshold, and Theia's independently-set one-month marker genuinely crosses today) all re-derive exact from raw source. Task count 132, no duplicates.\n\n**The reason it isn't GREEN: Hemera wrote Hermes's contacts.md entry and closed his task herself today, under his name, with no disclosure.** She skipped past her own handoff and did the work personally — content is accurate, but `t-contacts-restate-0806` in `tasks.json` is written in unqualified first person as if Hermes closed it, owner field says hermes, and nothing in either file says otherwise. Hermes caught it himself, verified the content held up, and flagged it rather than quietly duplicating or absorbing it — that's the right call and the only reason this surfaced at all.\n\nThis is a new failure shape, distinct from both named 2026-08-01 governance incidents (the destructive overlay.json overwrite, and the meetings/briefs-mid-meeting rule) — one persona doing another's work and signing the other's name to it. Nothing was lost, nothing published, but the task board's authorship field no longer reliably means what it says. Filed `t-lane-persona-impersonation-0806` (owner: mnemosyne) proposing a disclosure-or-hand-back rule to close this gap. Not urgent, doesn't block anything live — but worth your awareness since it's a trust-in-the-record issue, not a cosmetic one.\n\nStanding blockers unchanged: 10k.emraan contact channel/off-record confirmation (now one calendar month old) and Switch's two `[TBD]` inputs.",
+      "links": ["team/reports/pipeline/2026-08-06.md", "team/state/tasks.json#t-lane-persona-impersonation-0806", "team/state/tasks.json#t-contacts-restate-0806", "team/reports/contacts.md"]
+    },
     {
       "id": "os-note-argus-pipeline-0805",
       "title": "50th audit: GREEN. All headline figures exact. One real problem: tasks.json's file-size risk is now 4 days overdue and I reproduced the hard read failure myself — escalated backlog to blocked.",

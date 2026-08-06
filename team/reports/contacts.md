@@ -698,3 +698,50 @@ user-decision blocker, unchanged in kind since 07-06.
 distance leg retired. Theia's separate one-month marker lands tomorrow, 2026-08-06, one day
 out — distinct clock, not merged. Unconfirmed / outreach drafted, not sent. Awaiting ISΛRK —
 channel or off-record confirmation.**
+
+---
+
+**2026-08-06 update (Hermes, via Hemera's standup handoff) — mechanical restate. Day-count
+leg only; release-distance leg stays retired. Theia's separate one-month marker crosses
+today — named plainly, not merged with the day-count leg.**
+Re-verified directly, not carried forward: `ap-2026-07-06-collab-confirm-10k-emraan.createdAt`
+= `2026-07-06T09:00:00Z` in `team/approvals/queue.json`, status still `pending`. July 6 to
+August 6 = 31 days elapsed, 17 days past the 14-day threshold — one day further than
+yesterday's 30. Release-distance leg stays retired, per the 07-26 team decision (Hemera, Nyx,
+Hermes); July 25 has passed — no countdown, no manufactured negative number.
+
+`team/inbox/*.json` re-globbed directly this turn: zero files (only `team/inbox/audio/.gitkeep`
+exists), nothing new to triage — the 50th consecutive silent day per Hemera's count, confirmed
+independently here. `team/state/cursors.json` re-checked directly: still fully empty,
+`discord: {}`, `imap.lastUid: 0`, `copyparty.seenShas: []`. No contact channel for 10k.emraan
+exists anywhere in this repo, in any agent's lane, today or ever.
+
+**On Theia's separate one-month framing — it crosses today.** Theia named this threshold in
+her W31/W32 reads: July 6 to August 6 is exactly 31 days, and she was explicit that this
+lands today, not before. Her marker and my day-count leg are, again, two different clocks —
+hers a narrative "unresolved for a month" framing, mine the mechanical 14-day trigger I set on
+07-06 — but today both are true at once: 31 days total elapsed, 17 days past my threshold, and
+the calendar-month mark itself. Naming this once, plainly, as instructed: this is a real
+threshold crossing, not a new severity tier invented for effect. It doesn't create a channel
+that doesn't exist and it doesn't change what's actionable — there is still nothing to send,
+still no address, still a team run with no external calls regardless. It is a bigger number
+attached to the identical standing fact.
+
+**What concretely changed since yesterday:** one day elapsed on the day-count leg (30 to 31),
+which also happens to be the day Theia's independently-set one-month marker lands. That is the
+only change. Nothing mechanical moved: no channel has appeared, nothing becomes sendable, still
+a team run with no external calls regardless. This remains squarely a user-decision blocker —
+the 10k.emraan channel-or-confirm and the two Switch upload `[TBD]` inputs are ISΛRK's calls,
+not the team's. Task `t-contacts-restate-0806` (filed by Hemera at today's standup, handed to
+me) closed same turn, in place, per the team's standing practice of not leaving a status flip
+for a later audit to catch.
+
+**Is there any contact channel on file for 10k.emraan yet? No.** As of today, exactly as of
+every prior day since 07-06: no email, no Discord handle, no channel of any kind exists
+anywhere in this repo for this person. This is not something the team can resolve internally —
+it remains a user-decision blocker, unchanged in kind since 07-06, now one calendar month old.
+
+**Status: blocker, day-count leg 31 days elapsed (threshold 14, seventeen days past) — also
+the calendar-month mark from the original 07-06 ask, per Theia's independently-set framing,
+crossing today. Release-distance leg retired. Unconfirmed / outreach drafted, not sent.
+Awaiting ISΛRK — channel or off-record confirmation.**

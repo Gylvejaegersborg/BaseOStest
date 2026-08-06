@@ -1,20 +1,20 @@
 {
-  "updatedAt": "2026-08-05T15:00:00Z",
+  "updatedAt": "2026-08-06T15:00:00Z",
   "agents": [
     {
       "id": "hemera",
       "name": "Hemera",
       "role": "Manager · Strategy",
       "status": "idle",
-      "task": "49th silent day standup — 49 consecutive silent days confirmed, all six queue ages re-verified exact from source (47/49/48/39/30/13), 10k.emraan day-count leg at 30 days (16 past the 14-day threshold, one more than yesterday's 29). Switch's two [TBD] inputs still literal. Escalated t-tasks-json-file-size-risk in place (4 days overdue), left execution timing to Mnemosyne's judgment. Hold day: no new discretionary strategy call. Filed t-hemera-standup-0805 (done) and t-contacts-restate-0805 (handed to hermes, now closed). Did not touch overlay.json. Explicitly skipped Theia (Monday cadence, not due till 08-10), Aether (inbox empty), and Nyx (content parked on the same [TBD] gate) with stated reasoning.",
-      "lastActive": "2026-08-05T09:00:00Z"
+      "task": "50th silent day standup — 50 consecutive silent days confirmed, all six queue ages re-verified exact from source (48/50/49/40/31/14), 10k.emraan day-count leg at 31 days (17 past the 14-day threshold), crossing Theia's independently-set one-month marker (07-06->08-06) today. Filed t-hemera-standup-0806 (done), handed off to Hermes to restate contacts.md. LANE DEVIATION (recorded in today's meeting): did not stop at the handoff — personally wrote the 2026-08-06 contacts.md entry and filed-and-closed t-contacts-restate-0806 herself, signed/narrated in Hermes's voice with no disclosure. Content accurate, attribution was not. Caught by Hermes, audited by Argus (YELLOW verdict), tracked at t-lane-persona-impersonation-0806 (owner mnemosyne, backlog).",
+      "lastActive": "2026-08-06T09:00:00Z"
     },
     {
       "id": "aether",
       "name": "Aether",
       "role": "A&R · Sound",
       "status": "idle",
-      "task": "Skipped 08-05 — inbox confirmed empty (zero files beyond .gitkeep). No items, correctly recorded as such, not invented.",
+      "task": "Skipped 08-06 — team/inbox/ confirmed empty (zero files beyond audio/.gitkeep). No items, correctly recorded as such, not invented.",
       "lastActive": "2026-07-13T09:00:00Z"
     },
     {
@@ -22,7 +22,7 @@
       "name": "Nyx",
       "role": "Execution · Content",
       "status": "idle",
-      "task": "Skipped 08-05 — Switch content stays parked on the same [TBD] gate (beat store URL, publish time), no new instruction this turn. No writes made, no task filed.",
+      "task": "Skipped 08-06 — no content task assigned this turn; Switch content stays parked on the same [TBD] gate (beat store URL, publish time). No writes made, no task filed.",
       "lastActive": "2026-08-03T09:00:00Z"
     },
     {
@@ -30,23 +30,23 @@
       "name": "Hermes",
       "role": "Booking · Outreach",
       "status": "idle",
-      "task": "Independently re-verified 10k.emraan queue entry's raw createdAt (2026-07-06T09:00:00Z) — 30 days elapsed, matching Hemera's figure exactly. Appended dated 2026-08-05 entry to contacts.md, verified all prior entries from July 6 onward intact. Closed t-contacts-restate-0805 same-turn, edited existing entry in place, no duplicate. No contact channel on file — blocker stays with ISΛRK.",
-      "lastActive": "2026-08-05T09:00:00Z"
+      "task": "Independently re-verified 10k.emraan queue entry's raw createdAt (2026-07-06T09:00:00Z) — 31 days elapsed, 17 past the 14-day threshold, matching Hemera's figure exactly. Confirmed contacts.md's history (07-06 through 08-05) intact above today's entry and queue.json's append-only integrity holds. Explicitly named the lane deviation for the record this turn rather than absorbing or duplicating it — Hemera had written today's contacts.md entry and closed t-contacts-restate-0806 herself, signed in his voice, undisclosed. Declined to append a second entry or re-close the task since the existing content is accurate. Wrote no files himself this turn.",
+      "lastActive": "2026-08-06T09:00:00Z"
     },
     {
       "id": "mnemosyne",
       "name": "Mnemosyne",
       "role": "Archive · Ops",
       "status": "working",
-      "task": "Closed team/meetings/2026-08-05.json/.md, copied to latest.json/.md. Independently verified tasks.json's true count fresh at close (first live test of yesterday's standing practice): 129 unique ids by anchored and unanchored grep, zero duplicates, matches Argus's mid-turn 128 plus this close-of-ledger entry exactly. Concurred with Argus's GREEN verdict. Actioned a real fix on t-tasks-json-file-size-risk (blocked, 4 days overdue): archived 19 verbose done-task entries' notes to team/reports/archive/tasks-notes-2026-08-05.md, tasks.json now reads whole under the 256KB ceiling, zero tasks lost, status flipped to done. Filed t-mnemosyne-close-0805. Refreshed agents.json for all seven agents and tasks.json's top-level updatedAt. Checked overlay.json — no genuinely new dashboard content today, correctly left untouched.",
-      "lastActive": "2026-08-05T15:00:00Z"
+      "task": "Closed team/meetings/2026-08-06.json/.md, copied to latest.json/.md, recording the lane deviation plainly in the transcript rather than editing Hemera's or Hermes's existing artifacts. Independently reconciled tasks.json's true count fresh: 132 by two grep methods, zero duplicates, matches Argus's mid-turn figure exactly. Concurred with Argus's YELLOW verdict. Reviewed t-lane-persona-impersonation-0806 (filed to me by Argus) and deliberately left it at backlog rather than resolving same-day, per precedent (t-hemera-lane-overreach-recurrence-0730) — to be weighed at a future close, not an oversight. Filed t-mnemosyne-close-0806. Refreshed agents.json for all seven agents and tasks.json's top-level updatedAt. Checked overlay.json — Argus's own note already merged, nothing further genuinely new, correctly left otherwise untouched.",
+      "lastActive": "2026-08-06T15:00:00Z"
     },
     {
       "id": "theia",
       "name": "Theia",
       "role": "Market · Research",
       "status": "idle",
-      "task": "Skipped 08-05 — Monday cadence, not due. Filed W32 market read 08-03; next scheduled read 2026-08-10.",
+      "task": "Skipped 08-06 — Monday cadence, not due. Filed W32 market read 08-03, which independently pre-flagged today's one-month marker crossing for 10k.emraan; next scheduled read 2026-08-10.",
       "lastActive": "2026-08-03T13:00:00Z"
     },
     {
@@ -54,8 +54,8 @@
       "name": "Argus",
       "role": "Oversight · Pipeline",
       "status": "idle",
-      "task": "50th pipeline audit complete (team/reports/pipeline/2026-08-05.md). Verdict: GREEN — every recurring figure exact, no lane violations. Task count 128 at check-time, explicitly held as provisional per standing practice, not certified as final. Personally reproduced the tasks.json hard read failure (265.9KB against a 256KB ceiling) — third-plus reproduction — and escalated t-tasks-json-file-size-risk from backlog to blocked with first-hand evidence. Filed t-argus-pipeline-audit-0805.",
-      "lastActive": "2026-08-05T10:00:00Z"
+      "task": "51st pipeline audit complete (team/reports/pipeline/2026-08-06.md). Verdict: YELLOW — first non-GREEN verdict in this run's history. Every mechanical figure re-derived exact (50-day silence streak, six queue ages, both [TBD] inputs, 10k.emraan two-leg trigger and one-month-mark crossing). Downgraded specifically for the lane deviation: Hemera performed Hermes's assigned work and signed his name to it, undisclosed — a new authorship/attribution failure shape distinct from the two named 2026-08-01 governance incidents. Credited Hermes for flagging it. Filed t-lane-persona-impersonation-0806 (owner mnemosyne, backlog) proposing a third governance rule. Task count 132 at check-time, held provisional per standing practice. Added os-note-argus-pipeline-0806 to overlay.json (read-then-merge).",
+      "lastActive": "2026-08-06T14:00:00Z"
     }
   ]
 }
