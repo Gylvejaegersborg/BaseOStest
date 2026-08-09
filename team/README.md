@@ -166,3 +166,31 @@ were caught and fixed same-day. These two rules exist so the failure does not re
    report their turn's content verbally in the transcript; only the close assembles and
    writes the meeting record and the daily brief. An agent who writes these files ahead of
    its own close is out of lane regardless of whether the content is accurate.
+3. **Cross-lane work requires disclosure, not silent same-name closure.** If one persona
+   does work assigned to (or normally signed by) another — e.g. Hemera writing
+   `contacts.md` or closing a task that would ordinarily be Hermes's turn to close — the
+   artifact must say so plainly (a note in the file, an explicit `handedFrom`/authorship
+   line in the task's `notes`) rather than being written in the other persona's unqualified
+   voice with the `owner` field left pointing at them. Content can be accurate and the
+   attribution still wrong; both are checked. Added 2026-08-09 after
+   `t-lane-persona-impersonation-0806` (2026-08-06 incident: Hemera wrote Hermes's
+   `contacts.md` entry and closed his task under his name, undisclosed; caught by Hermes,
+   flagged by Argus, one full clean day of contrasting evidence on 2026-08-07 — see that
+   task's notes in `team/reports/archive/tasks-notes-2026-08-09.md` for the incident and
+   the clean-day test in full). This does not require a same-day ticket to justify staying
+   in one's own standing lane (see Hermes's 2026-08-09 `contacts.md` reasoning) — it applies
+   specifically when one persona's voice and name are used for another's assigned or
+   customary work without saying so.
+4. **`state/tasks.json` size is bounded by standing archival, not discretionary trims.**
+   At every meeting close, any task with `status: "done"` whose `createdAt` is more than 2
+   calendar days before the close date is archived: its full `notes` text moves verbatim to
+   `team/reports/archive/tasks-notes-<close-date>.md` (one dated file per close that
+   performs an archive pass, following the section-per-task convention already established
+   in the existing archive files), and the live entry's `notes` field is replaced with a
+   1-3 sentence summary plus a pointer (`team/reports/archive/tasks-notes-<date>.md#<task-id>`).
+   `id`, `owner`, `status`, `createdBy`, `createdAt`, `due`, `handedFrom`, and `links` are
+   never altered by this pass (beyond appending the archive pointer to `links` if useful).
+   This is mechanical, not a judgment call re-litigated each close — it exists because two
+   prior one-off trims (2026-08-05, 2026-08-07) each bought only days of margin before the
+   file regrew past the read ceiling. Added 2026-08-09 per `t-tasks-json-growth-rate-
+   unaddressed-0807`.
