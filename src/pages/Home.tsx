@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, MousePointerClick } from 'lucide-react'
+import { ArrowRight, MousePointerClick, X, ChevronRight } from 'lucide-react'
 import { Starfield } from '@/features/constellation/Starfield'
-import { Constellation } from '@/features/constellation/Constellation'
-import type { Body } from '@/features/constellation/layout'
+import { ConstellationScene } from '@/features/constellation/ConstellationScene'
+import { toSceneVec3, type Body } from '@/features/constellation/layout'
 import { sectionById } from '@/data/sections'
 import { projectById, STATUS_META } from '@/data/projects'
 import { StatusDot } from '@/components/ui/StatusDot'
@@ -16,6 +16,10 @@ export function Home() {
 
   const shown = hover ?? pinned
   const activeKey = hover?.key ?? pinned?.key ?? null
+  // Fly the 3D camera toward whatever body is pinned (a real selection, not
+  // a passing hover) so opening the HUD panel also feels like it's docking
+  // the camera onto that body rather than leaving the view static.
+  const focusTarget = pinned ? toSceneVec3(pinned) : null
 
   // On a mouse, clicking a sun jumps straight in. On touch there is no hover,
   // so a tap selects the body and shows its panel; the panel's button navigates.
@@ -43,7 +47,7 @@ export function Home() {
         </div>
       </div>
 
-      <Constellation activeKey={activeKey} onHover={setHover} onSelect={onSelect} />
+      <ConstellationScene activeKey={activeKey} focusTarget={focusTarget} onHover={setHover} onSelect={onSelect} />
 
       {/* Up Next agenda — appointments + timed tasks, shared with the Calendar */}
       <HomeAgenda />
@@ -53,73 +57,141 @@ export function Home() {
         <MousePointerClick size={13} /> hover = preview · click sun = open · click planet = pin
       </div>
 
-      {/* Info readout panel */}
-      <InfoPanel body={shown} onOpen={() => shown && navigate(sectionById(shown.sectionId).route)} />
+      {/* Right-docked HUD panel — scene stays full width behind it */}
+      <HudPanel
+        body={shown}
+        pinned={!!pinned}
+        onOpen={() => shown && navigate(sectionById(shown.sectionId).route)}
+        onClose={() => setPinned(null)}
+      />
     </div>
   )
 }
 
-function InfoPanel({ body, onOpen }: { body: Body | null; onOpen: () => void }) {
+function HudPanel({
+  body,
+  pinned,
+  onOpen,
+  onClose,
+}: {
+  body: Body | null
+  pinned: boolean
+  onOpen: () => void
+  onClose: () => void
+}) {
   const section = body ? sectionById(body.sectionId) : null
   const project = body?.projectId ? projectById(body.projectId) : undefined
+  const open = !!body
 
   return (
-    <div className="absolute bottom-4 left-4 right-4 z-10 sm:bottom-6 sm:left-auto sm:right-6 sm:w-[320px]">
-      <div
-        className="hud-corners relative border bg-panel/85 p-4 backdrop-blur-md transition-all"
-        style={{ borderColor: body ? `${body.accent}55` : '#1f2733', color: body?.accent ?? '#1f2733' }}
-      >
-        {!body ? (
-          <div className="text-xs text-dim">
-            <div className="label mb-2 text-dim">READOUT</div>
-            Point at a star to inspect a section or project.
-          </div>
-        ) : project ? (
-          <div className="animate-fade-in">
-            <div className="mb-1 flex items-center justify-between">
-              <span className="label" style={{ color: body.accent }}>
-                PROJECT · {section?.label}
-              </span>
-              <span
-                className="flex items-center gap-1 text-[10px] uppercase tracking-wider"
-                style={{ color: STATUS_META[project.status].color }}
-              >
-                <StatusDot color={STATUS_META[project.status].color} size={6} />
-                {STATUS_META[project.status].label}
-              </span>
-            </div>
-            <h3 className="font-display text-lg text-text">{project.name}</h3>
-            <p className="mt-1 text-xs text-dim">{project.tagline}</p>
-            <div className="mt-3 space-y-1.5 text-xs">
-              <Row label="NEXT" value={project.nextMove} />
-              <Row label="LAST" value={project.lastMove} />
-            </div>
+    <div
+      className={`absolute inset-y-0 right-0 z-10 flex w-full flex-col border-l border-line bg-panel/90 shadow-glow backdrop-blur-md transition-transform duration-200 ease-out sm:w-[340px] ${
+        open ? 'translate-x-0' : 'pointer-events-none translate-x-full'
+      }`}
+      style={{ borderLeftColor: body ? `${body.accent}55` : undefined }}
+    >
+      {!body ? (
+        <div className="p-4 text-xs text-dim">
+          <div className="label mb-2 text-dim">READOUT</div>
+          Point at a star to inspect a section or project.
+        </div>
+      ) : (
+        <div key={body.key} className="flex h-full flex-col animate-fade-in">
+          {/* Breadcrumb + close, Jira-card style header */}
+          <div className="flex items-center justify-between border-b border-line px-4 py-3">
             <button
               onClick={onOpen}
-              className="mt-3 flex w-full items-center justify-center gap-2 border border-line py-2 text-xs uppercase tracking-wider text-text transition-colors hover:border-accent/60 hover:text-accent"
+              className="flex items-center gap-1 text-[10px] uppercase tracking-widest text-dim transition-colors hover:text-accent"
             >
-              View in {section?.label} <ArrowRight size={13} />
+              {section?.code}
+              {project && (
+                <>
+                  <ChevronRight size={11} className="text-dim/60" />
+                  <span style={{ color: body.accent }}>{section?.label}</span>
+                </>
+              )}
             </button>
+            {pinned && (
+              <button onClick={onClose} className="text-dim transition-colors hover:text-text">
+                <X size={15} />
+              </button>
+            )}
           </div>
-        ) : (
-          <div className="animate-fade-in">
-            <div className="label mb-1" style={{ color: body.accent }}>
-              SECTION · {section?.code}
-            </div>
-            <h3 className="font-display text-xl" style={{ color: body.accent }}>
-              {section?.label}
-            </h3>
-            <p className="mt-2 text-xs text-dim">{section?.blurb}</p>
+
+          <div className="flex-1 overflow-y-auto p-4">
+            {project ? (
+              <>
+                <div className="mb-1 flex items-center justify-between">
+                  <span className="label" style={{ color: body.accent }}>
+                    PROJECT
+                  </span>
+                  <span
+                    className="flex items-center gap-1 text-[10px] uppercase tracking-wider"
+                    style={{ color: STATUS_META[project.status].color }}
+                  >
+                    <StatusDot color={STATUS_META[project.status].color} size={6} />
+                    {STATUS_META[project.status].label}
+                  </span>
+                </div>
+                <h3 className="font-display text-lg text-text">{project.name}</h3>
+                <p className="mt-1 text-xs text-dim">{project.tagline}</p>
+
+                {/* Jira-style progress + fields card */}
+                <div className="mt-3 border border-line bg-bg/40 p-3">
+                  <div className="mb-1.5 flex items-center justify-between text-[10px] tracking-wider text-dim">
+                    <span>PROGRESS</span>
+                    <span className="text-text/80">{project.progress}%</span>
+                  </div>
+                  <div className="h-1 w-full bg-bg">
+                    <div
+                      className="h-full transition-all"
+                      style={{ width: `${project.progress}%`, backgroundColor: body.accent }}
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-3 space-y-2 text-xs">
+                  <Row label="NEXT" value={project.nextMove} />
+                  <Row label="LAST" value={project.lastMove} />
+                </div>
+
+                {project.tags.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-1">
+                    {project.tags.map((t) => (
+                      <span
+                        key={t}
+                        className="border border-line px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-dim"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <div className="label mb-1" style={{ color: body.accent }}>
+                  SECTION · {section?.code}
+                </div>
+                <h3 className="font-display text-xl" style={{ color: body.accent }}>
+                  {section?.label}
+                </h3>
+                <p className="mt-2 text-xs text-dim">{section?.blurb}</p>
+              </>
+            )}
+          </div>
+
+          <div className="border-t border-line p-4">
             <button
               onClick={onOpen}
-              className="mt-3 flex w-full items-center justify-center gap-2 border py-2 text-xs uppercase tracking-wider transition-colors"
+              className="flex w-full items-center justify-center gap-2 border py-2 text-xs uppercase tracking-wider transition-colors"
               style={{ borderColor: `${body.accent}55`, color: body.accent }}
             >
-              Enter <ArrowRight size={13} />
+              {project ? `View in ${section?.label}` : 'Enter'} <ArrowRight size={13} />
             </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }
