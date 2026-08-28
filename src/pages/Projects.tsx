@@ -1,11 +1,10 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, ArrowUpRight, ChevronRight, X } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import {
   DndContext,
   DragOverlay,
-  PointerSensor,
-  TouchSensor,
+  MouseSensor,
   useDraggable,
   useDroppable,
   useSensor,
@@ -41,14 +40,23 @@ export function Projects() {
   const openProject = openId ? projects.find((p) => p.id === openId) ?? null : null
   const activeProject = activeId ? projects.find((p) => p.id === activeId) ?? null : null
 
-  // Distance/delay-based activation constraints let a plain tap/click still
-  // reach the card's onClick — the drag only "activates" once the pointer
-  // has genuinely moved (mouse) or been held+moved (touch), so short taps to
-  // open the popup and real drags to change status don't fight each other.
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 8 } }),
-  )
+  // Status changes go through here — used by drag-and-drop, the per-card
+  // quick arrows, and the popup's StatusSelect dropdown, so there's one code
+  // path for "change a project's status".
+  const moveStatus = (projectId: string, dir: -1 | 1) => {
+    const current = projects.find((p) => p.id === projectId)
+    if (!current) return
+    const idx = ORDER.indexOf(current.status)
+    const next = ORDER[idx + dir]
+    if (!next) return
+    updateProject(projectId, { status: next })
+  }
+
+  // MouseSensor ONLY — no TouchSensor. Drag-and-drop on mobile touch never
+  // worked reliably (it fought scrolling/tapping), so touch users get the
+  // per-card ‹ › quick-move arrows and the popup's status dropdown instead;
+  // desktop mouse users keep full drag-and-drop between columns.
+  const sensors = useSensors(useSensor(MouseSensor, { activationConstraint: { distance: 8 } }))
 
   const onDragStart = (e: DragStartEvent) => setActiveId(String(e.active.id))
 
@@ -71,7 +79,7 @@ export function Projects() {
         <div className="mb-4 shrink-0">
           <h1 className="font-display text-2xl tracking-wider text-text">PROJECT OVERVIEW</h1>
           <p className="text-xs text-dim">
-            {projects.length} projects · drag a card to change status, click for detail.
+            {projects.length} projects · drag a card (desktop) or use the ‹ › arrows to change status, click for detail.
           </p>
         </div>
 
@@ -92,6 +100,7 @@ export function Projects() {
                 projects={projects.filter((p) => p.status === status)}
                 onOpen={setOpenId}
                 onHover={setHover}
+                onMoveStatus={moveStatus}
               />
             ))}
           </div>
@@ -122,11 +131,13 @@ function KanbanColumn({
   projects,
   onOpen,
   onHover,
+  onMoveStatus,
 }: {
   status: ProjectStatus
   projects: Project[]
   onOpen: (id: string) => void
   onHover: (h: { project: Project; x: number; y: number } | null) => void
+  onMoveStatus: (id: string, dir: -1 | 1) => void
 }) {
   const meta = STATUS_META[status]
   const { setNodeRef, isOver } = useDroppable({ id: status })
@@ -151,7 +162,7 @@ function KanbanColumn({
       </div>
       <div className="flex-1 space-y-2 overflow-y-auto p-2.5">
         {projects.map((p) => (
-          <DraggableCard key={p.id} project={p} onOpen={onOpen} onHover={onHover} />
+          <ProjectCard key={p.id} project={p} onOpen={onOpen} onHover={onHover} onMoveStatus={onMoveStatus} />
         ))}
         {projects.length === 0 && (
           <div className="border border-dashed border-line px-2 py-6 text-center text-[10px] uppercase tracking-wider text-dim/60">
@@ -163,20 +174,26 @@ function KanbanColumn({
   )
 }
 
-function DraggableCard({
+function ProjectCard({
   project,
   onOpen,
   onHover,
+  onMoveStatus,
 }: {
   project: Project
   onOpen: (id: string) => void
   onHover: (h: { project: Project; x: number; y: number } | null) => void
+  onMoveStatus: (id: string, dir: -1 | 1) => void
 }) {
-  // useDraggable (not useSortable — within-column order isn't a requirement
-  // here) drives the drag; a plain onClick still opens the popup because the
-  // sensors' activation constraints only "steal" the gesture once the
-  // pointer has genuinely moved past the threshold.
+  // useDraggable drives desktop drag (MouseSensor only, see Projects()). A
+  // plain onClick still opens the popup because the sensor's activation
+  // constraint only "steals" the gesture once the mouse has genuinely moved
+  // past the threshold; on touch devices no sensor is attached at all, so
+  // these listeners are inert there and taps just hit onClick normally.
   const draggable = useDraggable({ id: project.id })
+  const idx = ORDER.indexOf(project.status)
+  const canMovePrev = idx > 0
+  const canMoveNext = idx < ORDER.length - 1
 
   return (
     <div
@@ -195,12 +212,38 @@ function DraggableCard({
       onPointerLeave={() => onHover(null)}
       className={cn('touch-manipulation cursor-pointer', draggable.isDragging && 'opacity-30')}
     >
-      <ProjectCardVisual project={project} />
+      <ProjectCardVisual
+        project={project}
+        canMovePrev={canMovePrev}
+        canMoveNext={canMoveNext}
+        onMovePrev={(e) => {
+          e.stopPropagation()
+          onMoveStatus(project.id, -1)
+        }}
+        onMoveNext={(e) => {
+          e.stopPropagation()
+          onMoveStatus(project.id, 1)
+        }}
+      />
     </div>
   )
 }
 
-function ProjectCardVisual({ project, dragging }: { project: Project; dragging?: boolean }) {
+function ProjectCardVisual({
+  project,
+  dragging,
+  canMovePrev,
+  canMoveNext,
+  onMovePrev,
+  onMoveNext,
+}: {
+  project: Project
+  dragging?: boolean
+  canMovePrev?: boolean
+  canMoveNext?: boolean
+  onMovePrev?: (e: React.MouseEvent) => void
+  onMoveNext?: (e: React.MouseEvent) => void
+}) {
   const section = sectionById(project.sectionId)
   return (
     <div
@@ -235,6 +278,33 @@ function ProjectCardVisual({ project, dragging }: { project: Project; dragging?:
             style={{ width: `${project.progress}%`, backgroundColor: section.accent }}
           />
         </div>
+
+        {/* Quick status change — one tap moves a card to the previous/next
+         *  status column. Replaces drag-and-drop (unreliable on mobile
+         *  touch); the popup's full StatusSelect dropdown still covers
+         *  jumping straight to a non-adjacent status. */}
+        {(onMovePrev || onMoveNext) && (
+          <div className="mt-2.5 flex items-center justify-between border-t border-line pt-2">
+            <button
+              onClick={onMovePrev}
+              disabled={!canMovePrev}
+              aria-label="Move to previous status"
+              className="flex items-center gap-0.5 text-[10px] uppercase tracking-wider text-dim transition-colors hover:text-accent disabled:opacity-20 disabled:hover:text-dim"
+            >
+              <ChevronLeft size={13} />
+              {canMovePrev ? STATUS_META[ORDER[ORDER.indexOf(project.status) - 1]].label : ''}
+            </button>
+            <button
+              onClick={onMoveNext}
+              disabled={!canMoveNext}
+              aria-label="Move to next status"
+              className="flex items-center gap-0.5 text-[10px] uppercase tracking-wider text-dim transition-colors hover:text-accent disabled:opacity-20 disabled:hover:text-dim"
+            >
+              {canMoveNext ? STATUS_META[ORDER[ORDER.indexOf(project.status) + 1]].label : ''}
+              <ChevronRight size={13} />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -275,7 +345,9 @@ function HoverPreview({ project, x, y }: { project: Project; x: number; y: numbe
 /** Jira-style click popup: adapted from the shared Modal's visual language
  *  (border/backdrop/header treatment) but docked as a right-side sliding card
  *  rather than a centered blocking overlay, matching the Home HUD panel's
- *  interaction pattern for cross-page consistency. The detail body itself
+ *  interaction pattern for cross-page consistency. Sized to a max-width on
+ *  mobile (not full-bleed) so the constellation/board stays visible behind
+ *  it as context, same treatment as Home's HUD panel. The detail body itself
  *  (tagline/what/progress/editable fields/timeline/links) is the same
  *  ProjectDetailBody the Home HUD renders for a planet, just with a slider
  *  progress control instead of a readout and a status dropdown added above it. */
@@ -304,7 +376,7 @@ function ProjectPopup({
        *  the other a true viewport-covering modal. */}
       <div className="absolute inset-0 z-40 animate-fade-in bg-black/50 backdrop-blur-[2px]" onClick={onClose} />
       <div
-        className="absolute inset-y-0 right-0 z-50 flex w-full flex-col border-l border-line-2 bg-panel shadow-glow animate-fade-in sm:w-[420px]"
+        className="absolute inset-y-0 right-0 z-50 flex w-[86vw] max-w-[340px] flex-col border-l border-line-2 bg-panel shadow-glow animate-fade-in sm:w-[420px] sm:max-w-none"
         style={{ borderLeftColor: `${section.accent}55` }}
       >
         {/* Breadcrumb header, links back into the 3D constellation */}

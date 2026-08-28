@@ -146,7 +146,7 @@ function HudPanel({
 
   return (
     <div
-      className={`absolute inset-y-0 right-0 z-10 flex w-full flex-col border-l border-line bg-panel/90 shadow-glow backdrop-blur-md transition-transform duration-200 ease-out sm:w-[360px] ${
+      className={`absolute inset-y-0 right-0 z-10 flex w-[86vw] max-w-[340px] flex-col border-l border-line bg-panel/90 shadow-glow backdrop-blur-md transition-transform duration-200 ease-out sm:w-[360px] sm:max-w-none ${
         open ? 'translate-x-0' : 'pointer-events-none translate-x-full'
       }`}
       style={{ borderLeftColor: body ? `${body.accent}55` : undefined }}
