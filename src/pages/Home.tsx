@@ -1,18 +1,47 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { ArrowRight, MousePointerClick, X, ChevronRight } from 'lucide-react'
 import { Starfield } from '@/features/constellation/Starfield'
 import { ConstellationScene } from '@/features/constellation/ConstellationScene'
-import { toSceneVec3, type Body } from '@/features/constellation/layout'
+import { buildBodies, toSceneVec3, type Body } from '@/features/constellation/layout'
 import { sectionById } from '@/data/sections'
 import { projectById, STATUS_META } from '@/data/projects'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { HomeAgenda } from '@/features/calendar/HomeAgenda'
 
+/** Navigation state the Kanban board (or anything else) can pass in when
+ *  linking back to the constellation: focus a specific project's planet, or
+ *  fall back to just entering that section's sun. */
+interface HomeFocusState {
+  focusProjectId?: string
+  focusSectionId?: string
+}
+
 export function Home() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [hover, setHover] = useState<Body | null>(null)
   const [pinned, setPinned] = useState<Body | null>(null)
+  const consumedNavFocus = useRef(false)
+
+  // One-time: if we were navigated here with a focus request (e.g. the Kanban
+  // board's "view in constellation" breadcrumb), pin that body so the HUD
+  // panel opens and the camera flies to it, same as a manual click would.
+  useEffect(() => {
+    if (consumedNavFocus.current) return
+    const state = location.state as HomeFocusState | null
+    if (!state?.focusProjectId && !state?.focusSectionId) return
+    consumedNavFocus.current = true
+    const { suns, planets } = buildBodies()
+    const target =
+      (state.focusProjectId && planets.find((p) => p.projectId === state.focusProjectId)) ||
+      (state.focusSectionId && suns.find((s) => s.sectionId === state.focusSectionId))
+    if (target) setPinned(target)
+    // Clear the nav state so revisiting "/" later (e.g. via back button)
+    // doesn't re-trigger the same focus.
+    navigate(location.pathname, { replace: true, state: null })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.state])
 
   const shown = hover ?? pinned
   const activeKey = hover?.key ?? pinned?.key ?? null
