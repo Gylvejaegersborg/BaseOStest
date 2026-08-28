@@ -33,7 +33,12 @@ export function Scene3D({ activeKey, focusTarget, onHover, onSelect }: Props) {
     <Canvas
       className="absolute inset-0 touch-none"
       camera={{ position: [0, 6, 26], fov: 50, near: 0.1, far: 500 }}
-      dpr={[1, 2]}
+      // Cap device pixel ratio lower on touch/coarse-pointer devices — most
+      // phones report a devicePixelRatio of 2-3, and rendering bloom +
+      // antialiasing at full native res on integrated mobile GPUs is the
+      // single biggest frame-time cost in this scene. 1.5 keeps things crisp
+      // enough while meaningfully cutting fill-rate cost.
+      dpr={isTouch ? [1, 1.5] : [1, 2]}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
     >
       <Suspense fallback={null}>
@@ -45,7 +50,7 @@ export function Scene3D({ activeKey, focusTarget, onHover, onSelect }: Props) {
         <pointLight position={[0, 10, 10]} intensity={40} distance={80} decay={2} />
         <pointLight position={[-18, -8, -14]} intensity={14} distance={70} decay={2} color="#e0408a" />
 
-        <ParticleStars />
+        <ParticleStars count={isTouch ? 900 : 1600} />
 
         {suns.map((s) => (
           <SunNode key={s.key} body={s} active={activeKey === s.key} onHover={onHover} onSelect={onSelect} />

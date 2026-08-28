@@ -1,12 +1,15 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ArrowRight, MousePointerClick, X, ChevronRight } from 'lucide-react'
 import { Starfield } from '@/features/constellation/Starfield'
 import { ConstellationScene } from '@/features/constellation/ConstellationScene'
 import { buildBodies, toSceneVec3, type Body } from '@/features/constellation/layout'
+import { detectWebGL } from '@/features/constellation/webgl'
 import { sectionById } from '@/data/sections'
-import { projectById, STATUS_META } from '@/data/projects'
-import { StatusDot } from '@/components/ui/StatusDot'
+import { PROJECTS, projectById } from '@/data/projects'
+import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
+import { useProjectOverrides, applyOverrides } from '@/features/projects/overrides'
+import { ProjectDetailBody } from '@/features/projects/ProjectDetailBody'
 import { HomeAgenda } from '@/features/calendar/HomeAgenda'
 
 /** Navigation state the Kanban board (or anything else) can pass in when
@@ -23,6 +26,20 @@ export function Home() {
   const [hover, setHover] = useState<Body | null>(null)
   const [pinned, setPinned] = useState<Body | null>(null)
   const consumedNavFocus = useRef(false)
+  // The 3D scene renders its own opaque canvas background once loaded, which
+  // fully covers the DOM starfield behind it — so only pay for that canvas's
+  // running rAF loop (nebula drift + shooting stars) when it will actually
+  // be visible, i.e. the WebGL fallback path.
+  const webglOk = useMemo(() => detectWebGL(), [])
+
+  // Same overrides store the Projects Kanban popup writes to, so editing a
+  // project's last/next move or progress from either surface stays in sync.
+  const { overrides, updateProject } = useProjectOverrides()
+  const overlay = useOsOverlay()
+  const overlayProjects = useMemo(
+    () => mergeById(PROJECTS, overlay.projects as typeof PROJECTS),
+    [overlay.projects],
+  )
 
   // One-time: if we were navigated here with a focus request (e.g. the Kanban
   // board's "view in constellation" breadcrumb), pin that body so the HUD
@@ -60,9 +77,19 @@ export function Home() {
     }
   }
 
+  // Resolve the shown body's project through the overlay + overrides so the
+  // HUD reflects any agent-written overlay data and any user edit made here
+  // or on the Kanban board, same as the Projects page.
+  const shownProject = shown?.projectId
+    ? applyOverrides(
+        [overlayProjects.find((p) => p.id === shown.projectId) ?? projectById(shown.projectId)!],
+        overrides,
+      )[0]
+    : undefined
+
   return (
     <div className="relative h-full w-full overflow-hidden">
-      <Starfield />
+      {!webglOk && <Starfield />}
       <div className="pointer-events-none absolute inset-0 grid-bg opacity-30" />
 
       {/* Title overlay */}
@@ -89,9 +116,11 @@ export function Home() {
       {/* Right-docked HUD panel — scene stays full width behind it */}
       <HudPanel
         body={shown}
+        project={shownProject}
         pinned={!!pinned}
         onOpen={() => shown && navigate(sectionById(shown.sectionId).route)}
         onClose={() => setPinned(null)}
+        onUpdateProject={(patch) => shownProject && updateProject(shownProject.id, patch)}
       />
     </div>
   )
@@ -99,22 +128,25 @@ export function Home() {
 
 function HudPanel({
   body,
+  project,
   pinned,
   onOpen,
   onClose,
+  onUpdateProject,
 }: {
   body: Body | null
+  project: ReturnType<typeof applyOverrides>[number] | undefined
   pinned: boolean
   onOpen: () => void
   onClose: () => void
+  onUpdateProject: (patch: { lastMove?: string; nextMove?: string; progress?: number }) => void
 }) {
   const section = body ? sectionById(body.sectionId) : null
-  const project = body?.projectId ? projectById(body.projectId) : undefined
   const open = !!body
 
   return (
     <div
-      className={`absolute inset-y-0 right-0 z-10 flex w-full flex-col border-l border-line bg-panel/90 shadow-glow backdrop-blur-md transition-transform duration-200 ease-out sm:w-[340px] ${
+      className={`absolute inset-y-0 right-0 z-10 flex w-full flex-col border-l border-line bg-panel/90 shadow-glow backdrop-blur-md transition-transform duration-200 ease-out sm:w-[360px] ${
         open ? 'translate-x-0' : 'pointer-events-none translate-x-full'
       }`}
       style={{ borderLeftColor: body ? `${body.accent}55` : undefined }}
@@ -126,7 +158,8 @@ function HudPanel({
         </div>
       ) : (
         <div key={body.key} className="flex h-full flex-col animate-fade-in">
-          {/* Breadcrumb + close, Jira-card style header */}
+          {/* Breadcrumb + close, Jira-card style header — same treatment as
+           *  the Projects Kanban popup's header for cross-page consistency. */}
           <div className="flex items-center justify-between border-b border-line px-4 py-3">
             <button
               onClick={onOpen}
@@ -149,54 +182,12 @@ function HudPanel({
 
           <div className="flex-1 overflow-y-auto p-4">
             {project ? (
-              <>
-                <div className="mb-1 flex items-center justify-between">
-                  <span className="label" style={{ color: body.accent }}>
-                    PROJECT
-                  </span>
-                  <span
-                    className="flex items-center gap-1 text-[10px] uppercase tracking-wider"
-                    style={{ color: STATUS_META[project.status].color }}
-                  >
-                    <StatusDot color={STATUS_META[project.status].color} size={6} />
-                    {STATUS_META[project.status].label}
-                  </span>
-                </div>
-                <h3 className="font-display text-lg text-text">{project.name}</h3>
-                <p className="mt-1 text-xs text-dim">{project.tagline}</p>
-
-                {/* Jira-style progress + fields card */}
-                <div className="mt-3 border border-line bg-bg/40 p-3">
-                  <div className="mb-1.5 flex items-center justify-between text-[10px] tracking-wider text-dim">
-                    <span>PROGRESS</span>
-                    <span className="text-text/80">{project.progress}%</span>
-                  </div>
-                  <div className="h-1 w-full bg-bg">
-                    <div
-                      className="h-full transition-all"
-                      style={{ width: `${project.progress}%`, backgroundColor: body.accent }}
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-3 space-y-2 text-xs">
-                  <Row label="NEXT" value={project.nextMove} />
-                  <Row label="LAST" value={project.lastMove} />
-                </div>
-
-                {project.tags.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-1">
-                    {project.tags.map((t) => (
-                      <span
-                        key={t}
-                        className="border border-line px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-dim"
-                      >
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </>
+              <ProjectDetailBody
+                project={project}
+                accent={body.accent}
+                onUpdate={onUpdateProject}
+                progressControl="readout"
+              />
             ) : (
               <>
                 <div className="label mb-1" style={{ color: body.accent }}>
@@ -221,15 +212,6 @@ function HudPanel({
           </div>
         </div>
       )}
-    </div>
-  )
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex gap-2">
-      <span className="w-9 shrink-0 text-[10px] tracking-wider text-dim">{label}</span>
-      <span className="text-text/80">{value}</span>
     </div>
   )
 }

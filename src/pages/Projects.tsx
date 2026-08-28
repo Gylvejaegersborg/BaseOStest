@@ -1,14 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  ArrowRight,
-  ArrowUpRight,
-  ChevronRight,
-  Check,
-  GitCommitHorizontal,
-  Pencil,
-  X,
-} from 'lucide-react'
+import { ArrowRight, ArrowUpRight, ChevronRight, X } from 'lucide-react'
 import {
   DndContext,
   DragOverlay,
@@ -23,6 +15,8 @@ import {
 } from '@dnd-kit/core'
 import { PROJECTS, STATUS_META, type Project, type ProjectStatus } from '@/data/projects'
 import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
+import { useProjectOverrides, applyOverrides } from '@/features/projects/overrides'
+import { ProjectDetailBody } from '@/features/projects/ProjectDetailBody'
 import { sectionById } from '@/data/sections'
 import { Badge } from '@/components/ui/Badge'
 import { StatusDot } from '@/components/ui/StatusDot'
@@ -30,55 +24,22 @@ import { cn } from '@/lib/cn'
 
 const ORDER: ProjectStatus[] = ['idea', 'active', 'paused', 'shipped']
 
-type ProjectOverrides = Record<
-  string,
-  { status?: ProjectStatus; lastMove?: string; nextMove?: string; progress?: number }
->
-
-function loadOverrides(): ProjectOverrides {
-  try {
-    return JSON.parse(localStorage.getItem('os:projects:overrides') ?? '{}')
-  } catch {
-    return {}
-  }
-}
-
-function saveOverrides(o: ProjectOverrides) {
-  localStorage.setItem('os:projects:overrides', JSON.stringify(o))
-}
-
-function applyOverrides(projects: Project[], overrides: ProjectOverrides): Project[] {
-  return projects.map((p) => {
-    const o = overrides[p.id]
-    return o ? { ...p, ...o } : p
-  })
-}
-
 export function Projects() {
-  const [overrides, setOverrides] = useState<ProjectOverrides>(loadOverrides)
+  const { overrides, updateProject } = useProjectOverrides()
   const [openId, setOpenId] = useState<string | null>(null)
   const [hover, setHover] = useState<{ project: Project; x: number; y: number } | null>(null)
   const [activeId, setActiveId] = useState<string | null>(null)
 
   // Agents can add projects or patch existing ones (lastMove/nextMove/progress…)
-  // via the OS overlay; the user's local overrides still win on top.
+  // via the OS overlay; the user's local overrides still win on top. Same
+  // overrides store the Home HUD's planet detail writes to, so an edit made
+  // on either surface stays in sync.
   const overlay = useOsOverlay()
   const base = useMemo(() => mergeById(PROJECTS, overlay.projects as Project[]), [overlay.projects])
 
   const projects = applyOverrides(base, overrides)
   const openProject = openId ? projects.find((p) => p.id === openId) ?? null : null
   const activeProject = activeId ? projects.find((p) => p.id === activeId) ?? null : null
-
-  const updateProject = (
-    id: string,
-    patch: { status?: ProjectStatus; lastMove?: string; nextMove?: string; progress?: number },
-  ) => {
-    setOverrides((prev) => {
-      const next = { ...prev, [id]: { ...prev[id], ...patch } }
-      saveOverrides(next)
-      return next
-    })
-  }
 
   // Distance/delay-based activation constraints let a plain tap/click still
   // reach the card's onClick — the drag only "activates" once the pointer
@@ -101,35 +62,49 @@ export function Projects() {
   }
 
   return (
-    <div className="flex h-full flex-col overflow-hidden p-6">
-      <div className="mb-4 shrink-0">
-        <h1 className="font-display text-2xl tracking-wider text-text">PROJECT OVERVIEW</h1>
-        <p className="text-xs text-dim">
-          {projects.length} projects · drag a card to change status, click for detail.
-        </p>
-      </div>
-
-      <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
-        <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 overflow-x-auto sm:grid-cols-2 lg:grid-cols-4">
-          {ORDER.map((status) => (
-            <KanbanColumn
-              key={status}
-              status={status}
-              projects={projects.filter((p) => p.status === status)}
-              onOpen={setOpenId}
-              onHover={setHover}
-            />
-          ))}
+    <div className="relative flex h-full flex-col overflow-hidden">
+      {/* Padding lives on this inner wrapper (not the relative container
+       *  above) so ProjectPopup/backdrop below can be absolute inset-0 and
+       *  sit flush against the page edges — same edge-to-edge docking as
+       *  Home's HUD panel, instead of being inset by the page's own padding. */}
+      <div className="flex h-full min-h-0 flex-col p-6">
+        <div className="mb-4 shrink-0">
+          <h1 className="font-display text-2xl tracking-wider text-text">PROJECT OVERVIEW</h1>
+          <p className="text-xs text-dim">
+            {projects.length} projects · drag a card to change status, click for detail.
+          </p>
         </div>
 
-        <DragOverlay dropAnimation={{ duration: 180, easing: 'ease-out' }}>
-          {activeProject ? <ProjectCardVisual project={activeProject} dragging /> : null}
-        </DragOverlay>
-      </DndContext>
+        <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
+          {/* Horizontal snap-scroll on every breakpoint rather than switching to
+           *  a vertical stack on mobile: a Kanban board that stacks status
+           *  columns vertically forces a user to scroll past every other
+           *  column's full card list just to reach the next status, which is
+           *  worse than just letting them swipe sideways between fixed-width
+           *  columns — the standard mobile Kanban pattern (Trello/Jira do the
+           *  same). snap-x + snap-start gives each column a natural resting
+           *  point on touch. */}
+          <div className="flex min-h-0 flex-1 snap-x snap-mandatory gap-3 overflow-x-auto pb-1">
+            {ORDER.map((status) => (
+              <KanbanColumn
+                key={status}
+                status={status}
+                projects={projects.filter((p) => p.status === status)}
+                onOpen={setOpenId}
+                onHover={setHover}
+              />
+            ))}
+          </div>
 
-      {hover && !openId && !activeId && (
-        <HoverPreview project={hover.project} x={hover.x} y={hover.y} />
-      )}
+          <DragOverlay dropAnimation={{ duration: 180, easing: 'ease-out' }}>
+            {activeProject ? <ProjectCardVisual project={activeProject} dragging /> : null}
+          </DragOverlay>
+        </DndContext>
+
+        {hover && !openId && !activeId && (
+          <HoverPreview project={hover.project} x={hover.x} y={hover.y} />
+        )}
+      </div>
 
       {openProject && (
         <ProjectPopup
@@ -160,7 +135,10 @@ function KanbanColumn({
     <div
       ref={setNodeRef}
       className={cn(
-        'flex min-h-0 flex-col border bg-panel/50 transition-colors',
+        // Fixed-ish width columns sized to comfortably show ~1.15 columns on
+        // a phone (a peek of the next column signals "swipe for more") and
+        // settle at a normal Kanban width from sm/lg up.
+        'flex min-h-0 w-[82vw] shrink-0 snap-start flex-col border bg-panel/50 transition-colors sm:w-[280px] lg:w-auto lg:flex-1',
         isOver ? 'border-line-2 bg-panel/80' : 'border-line',
       )}
     >
@@ -297,7 +275,10 @@ function HoverPreview({ project, x, y }: { project: Project; x: number; y: numbe
 /** Jira-style click popup: adapted from the shared Modal's visual language
  *  (border/backdrop/header treatment) but docked as a right-side sliding card
  *  rather than a centered blocking overlay, matching the Home HUD panel's
- *  interaction pattern for cross-page consistency. */
+ *  interaction pattern for cross-page consistency. The detail body itself
+ *  (tagline/what/progress/editable fields/timeline/links) is the same
+ *  ProjectDetailBody the Home HUD renders for a planet, just with a slider
+ *  progress control instead of a readout and a status dropdown added above it. */
 function ProjectPopup({
   project,
   onClose,
@@ -316,9 +297,14 @@ function ProjectPopup({
 
   return (
     <>
-      <div className="fixed inset-0 z-40 animate-fade-in bg-black/50 backdrop-blur-[2px]" onClick={onClose} />
+      {/* absolute (not fixed) so the popup is confined to this page's own
+       *  container, same as Home's HUD panel — it doesn't cover the mobile
+       *  top header/nav drawer, keeping the docked-panel behavior consistent
+       *  across both pages rather than one being a page-level overlay and
+       *  the other a true viewport-covering modal. */}
+      <div className="absolute inset-0 z-40 animate-fade-in bg-black/50 backdrop-blur-[2px]" onClick={onClose} />
       <div
-        className="fixed inset-y-0 right-0 z-50 flex w-full flex-col border-l border-line-2 bg-panel shadow-glow animate-fade-in sm:w-[420px]"
+        className="absolute inset-y-0 right-0 z-50 flex w-full flex-col border-l border-line-2 bg-panel shadow-glow animate-fade-in sm:w-[420px]"
         style={{ borderLeftColor: `${section.accent}55` }}
       >
         {/* Breadcrumb header, links back into the 3D constellation */}
@@ -338,7 +324,7 @@ function ProjectPopup({
         </div>
 
         <div className="flex-1 overflow-y-auto p-4">
-          <div className="flex items-center gap-3 text-xs">
+          <div className="mb-3 flex items-center gap-3 text-xs">
             <StatusSelect status={project.status} onChange={(status) => onUpdate({ status })} />
             <button
               onClick={viewInConstellation}
@@ -348,76 +334,13 @@ function ProjectPopup({
             </button>
           </div>
 
-          <h3 className="mt-3 font-display text-xl text-text">{project.name}</h3>
-          <p className="mt-1 text-xs text-dim">{project.tagline}</p>
-          <p className="mt-4 text-sm text-text/90">{project.what}</p>
-
-          <div className="mt-4 grid grid-cols-1 gap-3">
-            <EditableField
-              label="LAST MOVE"
-              value={project.lastMove}
-              color="#6b7785"
-              onSave={(v) => onUpdate({ lastMove: v })}
-            />
-            <EditableField
-              label="NEXT MOVE"
-              value={project.nextMove}
-              color={section.accent}
-              onSave={(v) => onUpdate({ nextMove: v })}
-            />
-          </div>
-
-          <div className="mt-4">
-            <label className="label mb-1 block">PROGRESS</label>
-            <div className="flex items-center gap-3">
-              <input
-                type="range"
-                min={0}
-                max={100}
-                value={project.progress}
-                onChange={(e) => onUpdate({ progress: Number(e.target.value) })}
-                className="flex-1 accent-accent"
-              />
-              <span className="w-10 text-right text-xs tabular-nums text-text">{project.progress}%</span>
-            </div>
-            <div className="mt-1.5 h-1 w-full bg-bg">
-              <div
-                className="h-full transition-all"
-                style={{ width: `${project.progress}%`, backgroundColor: section.accent }}
-              />
-            </div>
-          </div>
-
-          <div className="mt-5">
-            <div className="label mb-2">MOVE TIMELINE</div>
-            <ol className="space-y-2">
-              {project.timeline.map((m, i) => (
-                <li key={i} className="flex gap-3 text-xs">
-                  <GitCommitHorizontal size={14} className="mt-0.5 shrink-0 text-dim" />
-                  <div>
-                    <span className="text-dim tabular-nums">{m.date}</span>
-                    <div className="text-text/85">{m.text}</div>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-
-          {project.links && (
-            <div className="mt-5 flex flex-wrap gap-2">
-              {project.links.map((l) => (
-                <a
-                  key={l.href}
-                  href={l.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-1 border border-line px-2 py-1 text-xs text-accent hover:border-accent/60"
-                >
-                  {l.label} <ArrowUpRight size={12} />
-                </a>
-              ))}
-            </div>
-          )}
+          <ProjectDetailBody
+            project={project}
+            accent={section.accent}
+            onUpdate={onUpdate}
+            progressControl="slider"
+            showStatusBadge={false}
+          />
         </div>
 
         <div className="border-t border-line p-4">
@@ -451,78 +374,6 @@ function StatusSelect({ status, onChange }: { status: ProjectStatus; onChange: (
         ))}
       </select>
       <StatusDot color={meta.color} size={7} className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2" />
-    </div>
-  )
-}
-
-function EditableField({
-  label,
-  value,
-  color,
-  onSave,
-}: {
-  label: string
-  value: string
-  color: string
-  onSave: (v: string) => void
-}) {
-  const [editing, setEditing] = useState(false)
-  const [draft, setDraft] = useState(value)
-
-  const commit = () => {
-    onSave(draft)
-    setEditing(false)
-  }
-  const cancel = () => {
-    setDraft(value)
-    setEditing(false)
-  }
-
-  return (
-    <div className="border border-line bg-bg/40 p-3">
-      <div className="mb-1 flex items-center justify-between">
-        <span className="label" style={{ color }}>
-          {label}
-        </span>
-        {editing ? (
-          <div className="flex gap-1">
-            <button onClick={commit} className="text-neon-green/80 hover:text-neon-green">
-              <Check size={12} />
-            </button>
-            <button onClick={cancel} className="text-dim hover:text-danger">
-              <X size={12} />
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={() => {
-              setDraft(value)
-              setEditing(true)
-            }}
-            className="text-dim hover:text-text"
-          >
-            <Pencil size={12} />
-          </button>
-        )}
-      </div>
-      {editing ? (
-        <textarea
-          autoFocus
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault()
-              commit()
-            }
-            if (e.key === 'Escape') cancel()
-          }}
-          rows={2}
-          className="w-full resize-none bg-transparent text-xs text-text/85 outline-none"
-        />
-      ) : (
-        <div className="text-xs text-text/85">{value}</div>
-      )}
     </div>
   )
 }
