@@ -59,7 +59,7 @@ export const SECTIONS: Section[] = [
     code: 'AGT.02',
     route: '/chat',
     icon: MessagesSquare,
-    blurb: 'Talk to Claude, Hemera and Nyx. Upload files, record voice.',
+    blurb: 'Agent Harness — live conversation, tasks, automations and terminal.',
     accent: '#36e0c8',
   },
   {
