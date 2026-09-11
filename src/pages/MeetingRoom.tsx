@@ -5,6 +5,8 @@ import { Panel } from '@/components/ui/Panel'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { useTeamState } from '@/features/team/useTeamState'
 import { dispatchWorkflow } from '@/features/team/githubClient'
+import { useAgentOsAgents } from '@/features/agentos/useAgentOsAgents'
+import { useAgentOsActivityFeed } from '@/features/agentos/useAgentOsActivityFeed'
 import { cn } from '@/lib/cn'
 
 interface Mover {
@@ -49,16 +51,40 @@ export function MeetingRoom() {
   // mock roster, and the latest meeting transcript replaces the random chatter.
   const team = useTeamState()
   const live = team.connection === 'live'
+
+  // Real Agent-OS runtime state — a SECOND, independent live source, layered
+  // on top of (not replacing) the team-plan snapshot above: agentOs reports
+  // "is a session/task genuinely executing right now," which is a stronger,
+  // more real-time signal than the daily-standup plan when it says so, but
+  // silence from it doesn't override a richer team-plan status like
+  // 'thinking'. See useAgentOsActivityFeed below for the Room Feed's own,
+  // separate live source (real turn/tool events, not just a status field).
+  const agentOs = useAgentOsAgents()
+  const agentOsLive = agentOs.connection === 'live'
+  const agentOsById = useMemo(() => new Map(agentOs.agents.map((a) => [a.id, a])), [agentOs.agents])
+
   const agents = useMemo<Agent[]>(
     () =>
       AGENTS.map((a) => {
         const l = live ? team.agents.find((x) => x.id === a.id) : undefined
-        return l ? { ...a, role: l.role, status: l.status, task: l.task } : a
+        let merged = l ? { ...a, role: l.role, status: l.status, task: l.task } : a
+        const rt = agentOsLive ? agentOsById.get(a.id) : undefined
+        if (rt?.status === 'working') merged = { ...merged, status: 'working' }
+        return merged
       }),
-    [live, team.agents],
+    [live, team.agents, agentOsLive, agentOsById],
   )
   const agentsRef = useRef(agents)
   agentsRef.current = agents
+
+  // Real Agent-OS activity (agent.turn.*/tool.call.* events over SSE) —
+  // when present, this REPLACES the simulated/replayed feed below with
+  // genuine runtime activity, the core Phase 6 move: Meeting becomes a
+  // projection of what Agent-OS is actually doing, not only a replay of a
+  // committed transcript or canned chatter.
+  const agentOsActivity = useAgentOsActivityFeed()
+  const agentOsActivityRef = useRef(agentOsActivity.connected)
+  agentOsActivityRef.current = agentOsActivity.connected
   const turnsRef = useRef<{ agent: Agent; text: string }[] | null>(null)
   const turnIdxRef = useRef(0)
   useEffect(() => {
@@ -99,9 +125,13 @@ export function MeetingRoom() {
   }, [])
 
   // feed loop: replays the live meeting transcript when present, random mock
-  // chatter otherwise (refs keep the interval stable across state changes)
+  // chatter otherwise (refs keep the interval stable across state changes).
+  // Skipped entirely once real Agent-OS activity is flowing — that's a
+  // stronger live source and the two shouldn't visually compete for the
+  // same speech-bubble/feed-panel real estate.
   useEffect(() => {
     const id = window.setInterval(() => {
+      if (agentOsActivityRef.current) return
       const list = agentsRef.current
       const turns = turnsRef.current
       let agent: Agent
@@ -152,7 +182,8 @@ export function MeetingRoom() {
           <h1 className="font-display text-lg tracking-wider text-text">MEETING ROOM</h1>
           <span className="ml-auto text-xs text-dim">
             {agents.filter((a) => a.status !== 'offline').length} agents present
-            {live && team.meeting && <span className="text-accent"> · replaying {team.meeting.date} standup</span>}
+            {agentOsActivity.connected && <span className="text-accent"> · live Agent-OS activity</span>}
+            {!agentOsActivity.connected && live && team.meeting && <span className="text-accent"> · replaying {team.meeting.date} standup</span>}
           </span>
           {team.hasToken && (
             <button
@@ -206,21 +237,42 @@ export function MeetingRoom() {
           </div>
         </Panel>
 
-        <Panel title="Room Feed" code="LIVE" accent="#36e0c8" className="flex-1" bodyClassName="p-2">
+        <Panel
+          title="Room Feed"
+          code={agentOsActivity.connected ? 'AGENT-OS' : 'LIVE'}
+          accent="#36e0c8"
+          className="flex-1"
+          bodyClassName="p-2"
+        >
           <div className="flex items-center gap-1.5 px-1 pb-2 text-[10px] text-dim">
-            <MessageSquare size={11} /> agents posting in real time
+            <MessageSquare size={11} />
+            {agentOsActivity.connected ? 'real Agent-OS runtime activity' : 'agents posting in real time'}
           </div>
           <div className="space-y-2">
-            {feed.map((f) => (
-              <div key={f.id} className="animate-fade-in border-l-2 pl-2" style={{ borderColor: f.agent.color }}>
-                <div className="flex items-center gap-2 text-[10px]">
-                  <span style={{ color: f.agent.color }}>{f.agent.name}</span>
-                  <span className="text-dim tabular-nums">{f.time}</span>
-                </div>
-                <div className="text-xs text-text/85">{f.text}</div>
-              </div>
-            ))}
-            {!feed.length && <div className="px-1 text-xs text-dim">listening…</div>}
+            {agentOsActivity.connected
+              ? agentOsActivity.feed.map((f) => {
+                  const a = agents.find((x) => x.id === f.agentId)
+                  return (
+                    <div key={f.id} className="animate-fade-in border-l-2 pl-2" style={{ borderColor: a?.color ?? '#6b7785' }}>
+                      <div className="flex items-center gap-2 text-[10px]">
+                        <span style={{ color: a?.color ?? '#6b7785' }}>{a?.name ?? f.agentId}</span>
+                        <span className="text-dim tabular-nums">{f.time}</span>
+                      </div>
+                      <div className="text-xs text-text/85">{f.text}</div>
+                    </div>
+                  )
+                })
+              : feed.map((f) => (
+                  <div key={f.id} className="animate-fade-in border-l-2 pl-2" style={{ borderColor: f.agent.color }}>
+                    <div className="flex items-center gap-2 text-[10px]">
+                      <span style={{ color: f.agent.color }}>{f.agent.name}</span>
+                      <span className="text-dim tabular-nums">{f.time}</span>
+                    </div>
+                    <div className="text-xs text-text/85">{f.text}</div>
+                  </div>
+                ))}
+            {agentOsActivity.connected && !agentOsActivity.feed.length && <div className="px-1 text-xs text-dim">listening…</div>}
+            {!agentOsActivity.connected && !feed.length && <div className="px-1 text-xs text-dim">listening…</div>}
           </div>
         </Panel>
       </aside>

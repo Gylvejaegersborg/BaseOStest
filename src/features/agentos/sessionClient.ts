@@ -77,22 +77,54 @@ export function cancelChatSession(sessionId: string, reason?: string): Promise<A
   return request<AgentOsSession>(`/sessions/${sessionId}/cancel`, { method: 'POST', body: JSON.stringify({ reason }) })
 }
 
+export interface AgentOsApproval {
+  id: string
+  agentId: string
+  sessionId: string
+  toolName: string
+  args: Record<string, unknown>
+  reason: string
+  status: 'pending' | 'approved' | 'rejected'
+  requestedAt: string
+  resolvedAt?: string
+  resolvedBy?: string
+  resolutionNote?: string
+}
+
+/** Every pending tool-execution approval across every agent/session — the
+ * durable, restart-surviving requests created when a PermissionPolicy rule
+ * evaluates to "ask" with no synchronous callback (see agent-os's
+ * approvals.ts). Deliberately a DIFFERENT thing from the GitHub-workflow
+ * content-publish approval queue Team.tsx's ApprovalsTab already shows
+ * (team/approvals/queue.json) — that's "should this YouTube upload go out,"
+ * this is "should this agent be allowed to run this shell command." Shown
+ * as a separate panel rather than merged into one list. */
+export async function fetchPendingApprovals(): Promise<AgentOsApproval[]> {
+  const { approvals } = await request<{ approvals: AgentOsApproval[] }>('/approvals?status=pending')
+  return approvals
+}
+
+export function resolveApproval(id: string, decision: 'approve' | 'reject', resolvedBy?: string): Promise<AgentOsApproval> {
+  return request<AgentOsApproval>(`/approvals/${id}/${decision}`, { method: 'POST', body: JSON.stringify({ resolvedBy }) })
+}
+
 export interface SessionEvent {
   type: string
   payload: Record<string, unknown>
 }
 
-/** Opens the gateway's SSE stream (GET /events) and forwards every event
- *  whose payload.sessionId matches — the gateway filters by event TYPE
- *  server-side (?types=) but not by session, so that half of the
- *  filtering happens here. Returns a disposer that closes the connection.
+/** Opens the gateway's SSE stream (GET /events?types=...) and forwards
+ *  every event of the given types to onEvent, unfiltered by session —
+ *  the raw building block both subscribeToSessionEvents (below, filtered
+ *  to one session) and MeetingRoom's activity feed (unfiltered, every
+ *  agent) are built on. Returns a disposer that closes the connection.
  *  Auto-reconnects with backoff, mirroring discorddash/bridgeClient.ts's
  *  openGateway() WebSocket reconnect shape (same problem, different
  *  transport: don't leave the UI silently stuck disconnected). */
-export function subscribeToSessionEvents(sessionId: string, onEvent: (e: SessionEvent) => void): () => void {
+export function subscribeToEvents(types: string[], onEvent: (e: SessionEvent) => void): () => void {
   if (!BASE) return () => {}
 
-  const types = ['agent.turn.start', 'tool.call.start', 'tool.call.end', 'agent.turn.end', 'session.status.changed'].join(',')
+  const typesParam = types.join(',')
   let source: EventSource | null = null
   let retry = 0
   let timer: ReturnType<typeof setTimeout> | undefined
@@ -100,12 +132,12 @@ export function subscribeToSessionEvents(sessionId: string, onEvent: (e: Session
 
   const connect = () => {
     if (disposed) return
-    source = new EventSource(`${BASE}/events?types=${types}`)
-    for (const type of types.split(',')) {
+    source = new EventSource(`${BASE}/events?types=${typesParam}`)
+    for (const type of types) {
       source.addEventListener(type, (ev) => {
         try {
           const payload = JSON.parse((ev as MessageEvent).data)
-          if (payload.sessionId === sessionId) onEvent({ type, payload })
+          onEvent({ type, payload })
         } catch {
           /* ignore malformed frames */
         }
@@ -134,4 +166,15 @@ export function subscribeToSessionEvents(sessionId: string, onEvent: (e: Session
     clearTimeout(timer)
     source?.close()
   }
+}
+
+const SESSION_EVENT_TYPES = ['agent.turn.start', 'tool.call.start', 'tool.call.end', 'agent.turn.end', 'session.status.changed']
+
+/** subscribeToEvents(), narrowed to one session — the gateway filters by
+ *  event TYPE server-side (?types=) but not by session, so that half of
+ *  the filtering happens here, client-side, against payload.sessionId. */
+export function subscribeToSessionEvents(sessionId: string, onEvent: (e: SessionEvent) => void): () => void {
+  return subscribeToEvents(SESSION_EVENT_TYPES, (e) => {
+    if (e.payload.sessionId === sessionId) onEvent(e)
+  })
 }
