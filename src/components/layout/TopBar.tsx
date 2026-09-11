@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { SECTIONS } from '@/data/sections'
-import { AGENTS } from '@/data/agents'
+import { useAgentOsAgents } from '@/features/agentos/useAgentOsAgents'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { clock, shortDate } from '@/lib/time'
 
 export function TopBar() {
   const [now, setNow] = useState(new Date())
   const location = useLocation()
+  const { agents } = useAgentOsAgents()
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000)
@@ -17,7 +18,7 @@ export function TopBar() {
   const section =
     SECTIONS.find((s) => (s.route === '/' ? location.pathname === '/' : location.pathname.startsWith(s.route))) ??
     SECTIONS[0]
-  const online = AGENTS.filter((a) => a.status !== 'offline').length
+  const online = agents.filter((a) => a.status !== 'offline').length
 
   return (
     <header className="flex h-11 items-center justify-between border-b border-line bg-panel/60 px-4 text-xs">
