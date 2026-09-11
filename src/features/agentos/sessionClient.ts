@@ -168,7 +168,14 @@ export function subscribeToEvents(types: string[], onEvent: (e: SessionEvent) =>
   }
 }
 
-const SESSION_EVENT_TYPES = ['agent.turn.start', 'tool.call.start', 'tool.call.end', 'agent.turn.end', 'session.status.changed']
+const SESSION_EVENT_TYPES = [
+  'agent.turn.start',
+  'agent.turn.delta',
+  'tool.call.start',
+  'tool.call.end',
+  'agent.turn.end',
+  'session.status.changed',
+]
 
 /** subscribeToEvents(), narrowed to one session — the gateway filters by
  *  event TYPE server-side (?types=) but not by session, so that half of

@@ -55,6 +55,7 @@ export function useAgentOsChat(agentId: string) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [streaming, setStreaming] = useState(false)
   const [workingOn, setWorkingOn] = useState<string | null>(null)
+  const [streamingText, setStreamingText] = useState('')
 
   const sessionIdRef = useRef<string | null>(null)
   sessionIdRef.current = sessionId
@@ -127,6 +128,13 @@ export function useAgentOsChat(agentId: string) {
       if (e.type === 'agent.turn.start') {
         setStreaming(true)
         setWorkingOn(null)
+        setStreamingText('')
+      } else if (e.type === 'agent.turn.delta') {
+        // Real incremental text — see agent-os's agent-loop.ts/model.ts:
+        // this is the actual provider-level stream, not a simulated
+        // typing effect. Appended live, ahead of the durable
+        // session.message refreshHistory() picks up once the turn ends.
+        setStreamingText((t) => t + String(e.payload.delta ?? ''))
       } else if (e.type === 'tool.call.start') {
         setWorkingOn(String(e.payload.name ?? 'a tool'))
       } else if (e.type === 'tool.call.end') {
@@ -134,10 +142,12 @@ export function useAgentOsChat(agentId: string) {
       } else if (e.type === 'agent.turn.end') {
         setStreaming(false)
         setWorkingOn(null)
+        setStreamingText('')
         refreshHistory(sessionId)
       } else if (e.type === 'session.status.changed' && e.payload.status === 'cancelled') {
         setStreaming(false)
         setWorkingOn(null)
+        setStreamingText('')
         refreshHistory(sessionId)
       }
     })
@@ -196,5 +206,5 @@ export function useAgentOsChat(agentId: string) {
     [refreshHistory],
   )
 
-  return { connection, errorText, sessions, sessionId, messages, streaming, workingOn, send, cancel, newSession, switchSession }
+  return { connection, errorText, sessions, sessionId, messages, streaming, workingOn, streamingText, send, cancel, newSession, switchSession }
 }

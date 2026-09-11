@@ -189,7 +189,17 @@ export function Chat() {
           {chat.messages.map((m) => (
             <MessageRow key={m.id} msg={m} agentColor={agent.color} agentName={agent.name} />
           ))}
-          {chat.streaming && (
+          {/* Real incremental text arriving live over SSE (agent.turn.delta) —
+              once the model starts producing text, show it as it actually
+              streams in rather than a generic "thinking" indicator. */}
+          {chat.streaming && chat.streamingText && (
+            <MessageRow
+              msg={{ id: '__streaming', role: 'assistant', text: chat.streamingText, time: '' }}
+              agentColor={agent.color}
+              agentName={agent.name}
+            />
+          )}
+          {chat.streaming && !chat.streamingText && (
             <div className="flex gap-3">
               <div className="flex h-7 w-7 shrink-0 items-center justify-center border text-[10px]" style={{ borderColor: `${agent.color}66`, color: agent.color }}>
                 <Bot size={14} />
