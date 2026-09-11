@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import {
@@ -137,7 +138,9 @@ function BriefTab({
         {agents.map((a) => (
           <div key={a.id} className="border border-line bg-bg/40 p-2" style={{ borderLeftColor: agentColor(a.id), borderLeftWidth: 2 }}>
             <div className="flex items-center gap-2 text-xs">
-              <span style={{ color: agentColor(a.id) }}>{a.name}</span>
+              <Link to={`/chat?agent=${a.id}`} style={{ color: agentColor(a.id) }} className="hover:underline" title={`Open a chat with ${a.name}`}>
+                {a.name}
+              </Link>
               <span className="text-[10px] text-dim">{a.role}</span>
               <span className="ml-auto text-[9px] uppercase tracking-wider text-dim">{a.status}</span>
             </div>

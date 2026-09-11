@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Activity, Cpu, MessageSquare, Timer, CheckCircle2, Play } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Activity, Cpu, MessageSquare, Timer, CheckCircle2, Play, MessageCircle } from 'lucide-react'
 import { AGENTS, type Agent } from '@/data/agents'
 import { Panel } from '@/components/ui/Panel'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { useTeamState } from '@/features/team/useTeamState'
 import { dispatchWorkflow } from '@/features/team/githubClient'
-import { useAgentOsAgents } from '@/features/agentos/useAgentOsAgents'
-import { useAgentOsActivityFeed } from '@/features/agentos/useAgentOsActivityFeed'
+import { useAgentOsContext } from '@/features/agentos/AgentOsProvider'
 import { cn } from '@/lib/cn'
 
 interface Mover {
@@ -59,7 +59,7 @@ export function MeetingRoom() {
   // silence from it doesn't override a richer team-plan status like
   // 'thinking'. See useAgentOsActivityFeed below for the Room Feed's own,
   // separate live source (real turn/tool events, not just a status field).
-  const agentOs = useAgentOsAgents()
+  const agentOs = useAgentOsContext()
   const agentOsLive = agentOs.connection === 'live'
   const agentOsById = useMemo(() => new Map(agentOs.agents.map((a) => [a.id, a])), [agentOs.agents])
 
@@ -82,7 +82,7 @@ export function MeetingRoom() {
   // genuine runtime activity, the core Phase 6 move: Meeting becomes a
   // projection of what Agent-OS is actually doing, not only a replay of a
   // committed transcript or canned chatter.
-  const agentOsActivity = useAgentOsActivityFeed()
+  const agentOsActivity = agentOs.activity
   const agentOsActivityRef = useRef(agentOsActivity.connected)
   agentOsActivityRef.current = agentOsActivity.connected
   const turnsRef = useRef<{ agent: Agent; text: string }[] | null>(null)
@@ -217,7 +217,25 @@ export function MeetingRoom() {
 
       {/* Side: selected agent + feed */}
       <aside className="flex w-full shrink-0 flex-col gap-3 overflow-y-auto border-t border-line bg-panel/30 p-3 lg:w-[320px] lg:border-l lg:border-t-0">
-        <Panel title={agent.name} code={agent.model} accent={agent.color}>
+        <Panel
+          title={agent.name}
+          code={agent.model}
+          accent={agent.color}
+          right={
+            // Sub-agents (nyx-w1/nyx-w2) are presentational-only — they
+            // have no Agent-OS identity of their own, so there's no real
+            // session to open. Link only appears for the genuine roster.
+            !agent.id.includes('-w') && (
+              <Link
+                to={`/chat?agent=${agent.id}`}
+                title={`Open a chat with ${agent.name}`}
+                className="flex items-center gap-1 text-[10px] uppercase tracking-wider hover:text-accent"
+              >
+                <MessageCircle size={12} /> Chat
+              </Link>
+            )
+          }
+        >
           <div className="mb-3 flex items-center gap-2 text-xs">
             <StatusDot color={STATUS_COLOR[agent.status]} pulse={agent.status === 'working'} size={7} />
             <span style={{ color: STATUS_COLOR[agent.status] }} className="uppercase tracking-wider">

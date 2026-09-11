@@ -1,5 +1,5 @@
 import { StatusDot } from '@/components/ui/StatusDot'
-import { useAgentOsAgents } from '@/features/agentos/useAgentOsAgents'
+import { useAgentOsContext } from '@/features/agentos/AgentOsProvider'
 
 const CONNECTION_LABEL: Record<string, string> = {
   live: 'AGENT-OS LIVE',
@@ -9,7 +9,7 @@ const CONNECTION_LABEL: Record<string, string> = {
 }
 
 export function StatusBar() {
-  const { agents, connection } = useAgentOsAgents()
+  const { agents, connection } = useAgentOsContext()
   const names = agents
     .slice(0, 3)
     .map((a) => a.name.toLowerCase())

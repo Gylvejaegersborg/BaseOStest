@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Mic, Paperclip, Send, Square, X, Bot, Plus, MessagesSquare, ChevronDown, AlertTriangle } from 'lucide-react'
 import { AGENTS } from '@/data/agents'
 import { StatusDot } from '@/components/ui/StatusDot'
@@ -13,13 +14,25 @@ interface Attachment {
   kind: 'file' | 'audio'
 }
 
-// Every entry here is a real Agent-OS agent (seeded by the gateway's
-// seedDefaultAgents()) — there is no more "reserved for another model,
-// not connected yet" special-casing. All three currently share whichever
-// single model the gateway process itself is configured with (see
-// gateway/server.ts's GatewayDeps — per-agent model routing is a
-// documented future step, not yet wired into the turns route).
-const CHAT_AGENTS = AGENTS.slice(0, 3)
+// Every real (non-sub-agent) entry in the roster is a genuine Agent-OS
+// agent (seeded by the gateway's seedDefaultAgents()) — there is no more
+// "reserved for another model, not connected yet" special-casing, so
+// unlike before, Chat isn't artificially limited to the first three. All
+// of them currently share whichever single model the gateway process
+// itself is configured with (see gateway/server.ts's GatewayDeps —
+// per-agent model routing is a documented future step, not yet wired
+// into the turns route). The two nyx-w* sub-agents are presentational
+// only (MeetingRoom's simulated worker fan-out) and have no Agent-OS
+// identity to open a real session against.
+const CHAT_AGENTS = AGENTS.filter((a) => !a.id.includes('-w'))
+
+/** Deep-linking from MeetingRoom/Team ("open in Chat") — Phase 7's
+ * cross-navigation move: the three pages are views over the same
+ * runtime, so jumping from "here's what Claude is doing" straight into
+ * a conversation with Claude should just work via a plain URL. */
+function initialAgentId(param: string | null): string {
+  return param && CHAT_AGENTS.some((a) => a.id === param) ? param : CHAT_AGENTS[0].id
+}
 
 function fmtSize(bytes: number) {
   if (bytes < 1024) return `${bytes} B`
@@ -32,7 +45,8 @@ function sessionLabel(s: AgentOsSession): string {
 }
 
 export function Chat() {
-  const [agentId, setAgentId] = useState(CHAT_AGENTS[0].id)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [agentId, setAgentId] = useState(() => initialAgentId(searchParams.get('agent')))
   const [draft, setDraft] = useState('')
   const [pending, setPending] = useState<Attachment[]>([])
   const [dragging, setDragging] = useState(false)
@@ -137,7 +151,7 @@ export function Chat() {
           {CHAT_AGENTS.map((a) => (
             <button
               key={a.id}
-              onClick={() => setAgentId(a.id)}
+              onClick={() => { setAgentId(a.id); setSearchParams({ agent: a.id }, { replace: true }) }}
               className={cn(
                 'flex items-center gap-1.5 border px-2.5 py-1 text-xs transition-colors',
                 a.id === agentId ? 'text-text' : 'border-line text-dim hover:text-text',

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { SECTIONS } from '@/data/sections'
-import { useAgentOsAgents } from '@/features/agentos/useAgentOsAgents'
+import { useAgentOsContext } from '@/features/agentos/AgentOsProvider'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { clock, shortDate } from '@/lib/time'
 
 export function TopBar() {
   const [now, setNow] = useState(new Date())
   const location = useLocation()
-  const { agents } = useAgentOsAgents()
+  const { agents } = useAgentOsContext()
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000)

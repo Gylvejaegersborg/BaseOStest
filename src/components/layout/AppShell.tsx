@@ -6,6 +6,7 @@ import { StatusBar } from './StatusBar'
 import { CalendarProvider, useCalendar } from '@/features/calendar/CalendarContext'
 import { NudgeStack } from '@/features/calendar/NudgeStack'
 import { OsOverlayProvider } from '@/features/team/osOverlay'
+import { AgentOsProvider } from '@/features/agentos/AgentOsProvider'
 
 function GlobalNudges() {
   const { remindersEngine } = useCalendar()
@@ -26,6 +27,7 @@ export function AppShell() {
   return (
     <OsOverlayProvider>
       <CalendarProvider>
+      <AgentOsProvider>
       <div className="flex h-dvh w-full overflow-hidden bg-bg text-text">
         <NavBar className="hidden lg:flex" />
         <div className="flex min-w-0 flex-1 flex-col">
@@ -46,6 +48,7 @@ export function AppShell() {
         </div>
       </div>
       <GlobalNudges />
+      </AgentOsProvider>
       </CalendarProvider>
     </OsOverlayProvider>
   )
