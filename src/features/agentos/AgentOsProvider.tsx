@@ -8,6 +8,9 @@ interface AgentOsContextValue {
   agents: Agent[]
   connection: AgentOsConnection
   events: WorkbenchEvent[]
+  /** Re-fetches the agent roster — call after creating or editing an
+   *  agent from the Workbench so the change shows up without a reload. */
+  refreshAgents: () => void
 }
 
 const AgentOsContext = createContext<AgentOsContextValue | null>(null)
@@ -22,9 +25,9 @@ const AgentOsContext = createContext<AgentOsContextValue | null>(null)
  * into one page.
  */
 export function AgentOsProvider({ children }: { children: ReactNode }) {
-  const { agents, connection } = useAgentOsAgents()
+  const { agents, connection, refresh } = useAgentOsAgents()
   const events = useAgentOsEventLog()
-  return <AgentOsContext.Provider value={{ agents, connection, events }}>{children}</AgentOsContext.Provider>
+  return <AgentOsContext.Provider value={{ agents, connection, events, refreshAgents: refresh }}>{children}</AgentOsContext.Provider>
 }
 
 export function useAgentOsContext(): AgentOsContextValue {

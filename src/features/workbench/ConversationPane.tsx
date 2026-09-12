@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { Mic, Paperclip, Send, Square, X, Bot, Plus, ChevronDown, AlertTriangle } from 'lucide-react'
+import { Mic, Paperclip, Send, Square, X, Bot, AlertTriangle } from 'lucide-react'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { cn } from '@/lib/cn'
-import { useAgentOsContext } from '@/features/agentos/AgentOsProvider'
-import { useAgentOsChat, type ChatMessage } from '@/features/agentos/useAgentOsChat'
-import type { AgentOsSession } from '@/features/agentos/sessionClient'
+import type { Agent } from '@/data/agents'
+import type { useAgentOsChat, ChatMessage } from '@/features/agentos/useAgentOsChat'
 
 interface Attachment {
   id: string
@@ -19,34 +18,23 @@ function fmtSize(bytes: number) {
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`
 }
 
-function sessionLabel(s: AgentOsSession): string {
-  return s.title || new Date(s.createdAt).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
-}
-
 /**
- * The workbench's center pane in "chat" mode — one agent's full thread
- * history (every session with them, not just the most recent), live
- * streaming, tool activity, attachments. This is Chat.tsx's conversation
- * UI, now driven by whichever agent is selected in the AgentRail rather
- * than an in-page agent selector.
+ * The workbench's center pane in "chat" mode — message list, composer,
+ * attachments, streaming. `agent` and `chat` are owned by AgentWorkspace
+ * (one useAgentOsChat instance shared with ThreadHeader, which lives in
+ * the top strip now) so switching threads there is reflected here without
+ * a second, independent session subscription.
  */
-export function ConversationPane({ agentId }: { agentId: string }) {
-  const { agents } = useAgentOsContext()
-  const agent = agents.find((a) => a.id === agentId)
+export function ConversationPane({ agent, chat }: { agent: Agent; chat: ReturnType<typeof useAgentOsChat> }) {
   const [draft, setDraft] = useState('')
   const [pending, setPending] = useState<Attachment[]>([])
   const [dragging, setDragging] = useState(false)
-  const [threadsOpen, setThreadsOpen] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
-
-  const chat = useAgentOsChat(agentId)
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
   }, [chat.messages, chat.streaming])
-
-  if (!agent) return null
 
   const addFiles = (files: FileList | null) => {
     if (!files) return
@@ -78,57 +66,6 @@ export function ConversationPane({ agentId }: { agentId: string }) {
       onDragLeave={() => setDragging(false)}
       onDrop={(e) => { e.preventDefault(); setDragging(false); addFiles(e.dataTransfer.files) }}
     >
-      {/* Thread picker — every session with THIS agent */}
-      <div className="relative border-b border-line">
-        <div
-          role="button"
-          tabIndex={0}
-          onClick={() => setThreadsOpen((o) => !o)}
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setThreadsOpen((o) => !o) } }}
-          className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left"
-        >
-          <StatusDot color={agent.color} size={7} />
-          <span className="font-display text-sm tracking-wider" style={{ color: agent.color }}>{agent.name}</span>
-          <span className="min-w-0 flex-1 truncate text-xs text-dim">
-            {chat.sessions.find((s) => s.id === chat.sessionId) ? sessionLabel(chat.sessions.find((s) => s.id === chat.sessionId)!) : 'New chat'}
-          </span>
-          <button
-            onClick={(e) => { e.stopPropagation(); chat.newSession() }}
-            disabled={chat.connection !== 'ready'}
-            title="New thread"
-            className="text-dim hover:text-accent disabled:opacity-40"
-          >
-            <Plus size={14} />
-          </button>
-          <ChevronDown size={14} className={cn('shrink-0 text-dim transition-transform', threadsOpen && 'rotate-180')} />
-        </div>
-        {threadsOpen && (
-          <>
-            <div className="fixed inset-0 z-30" onClick={() => setThreadsOpen(false)} />
-            <div className="absolute inset-x-0 top-full z-40 max-h-[50vh] overflow-y-auto border-b border-line-2 bg-panel shadow-glow animate-fade-in">
-              {!chat.sessions.length && <p className="px-3 py-4 text-center text-[11px] text-dim">No threads yet.</p>}
-              {[...chat.sessions]
-                .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
-                .map((s) => (
-                  <button
-                    key={s.id}
-                    onClick={() => { chat.switchSession(s.id); setThreadsOpen(false) }}
-                    className={cn(
-                      'flex w-full flex-col gap-0.5 border-l-2 px-3 py-2.5 text-left transition-colors',
-                      s.id === chat.sessionId ? 'border-accent bg-accent/5' : 'border-transparent hover:bg-panel-2/50',
-                    )}
-                  >
-                    <span className="flex items-center justify-between text-xs text-text">
-                      <span className="truncate">{sessionLabel(s)}</span>
-                      {s.status !== 'active' && <span className="text-[9px] text-dim">{s.status}</span>}
-                    </span>
-                  </button>
-                ))}
-            </div>
-          </>
-        )}
-      </div>
-
       {notReady && (
         <div className="flex items-start gap-2 border-b border-line bg-amber/10 px-3 py-2 text-[11px] text-amber/90">
           <AlertTriangle size={14} className="mt-0.5 shrink-0" />

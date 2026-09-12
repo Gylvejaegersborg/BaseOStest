@@ -10,7 +10,7 @@ import { AGENTS } from '@/data/agents'
 import { Panel } from '@/components/ui/Panel'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { cn } from '@/lib/cn'
-import { dispatchWorkflow, fetchFile, getToken, listDir } from '@/features/team/githubClient'
+import { dispatchWorkflow, fetchFile, fetchJson, getToken, listDir } from '@/features/team/githubClient'
 import { useTeamState } from '@/features/team/useTeamState'
 import type { ApprovalItem, IntakeRecord, TeamTask, TeamTaskStatus } from '@/features/team/types'
 
@@ -129,6 +129,7 @@ function BriefTab({
       </Panel>
       <div className="space-y-3">
         <RunPanel hasToken={hasToken} onRefresh={onRefresh} />
+        {hasToken && <AutomationToggle />}
         <Panel title="Roster" code="TEAM.AGT" accent="#36e0c8" bodyClassName="space-y-2 p-2">
         {agents.map((a) => (
           <div key={a.id} className="border border-line bg-bg/40 p-2" style={{ borderLeftColor: agentColor(a.id), borderLeftWidth: 2 }}>
@@ -230,6 +231,79 @@ function RunPanel({ hasToken, onRefresh }: { hasToken: boolean; onRefresh: () =>
         <p className="text-[11px] text-ok" style={{ color: '#46d369' }}>
           Dispatched “{done}” — it runs in a minute or two. Hit Refresh up top when it lands.
         </p>
+      )}
+      {error && <p className="text-[11px] text-danger">{error}</p>}
+    </Panel>
+  )
+}
+
+// ── Automation kill switch ──────────────────────────────────────────────────
+// The daily meeting and intake sweep otherwise run unattended on a schedule
+// (team/README.md#state/automation.json) — this is the user's own on/off
+// switch for that, separate from RunPanel's "run one now" buttons (which
+// always work, on or off: see the gate job in team-daily-meeting.yml).
+interface AutomationState {
+  enabled: boolean
+  updatedAt: string
+  updatedBy: string
+}
+
+function AutomationToggle() {
+  const [state, setState] = useState<AutomationState | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+
+  const load = () => {
+    setLoading(true)
+    fetchJson<AutomationState>('team/state/automation.json')
+      .then((s) => { setState(s); setError('') })
+      .catch(() => setState({ enabled: true, updatedAt: '', updatedBy: '' })) // file not committed yet — schedule runs as normal
+      .finally(() => setLoading(false))
+  }
+
+  useEffect(load, [])
+
+  const toggle = async () => {
+    if (!state) return
+    const next = !state.enabled
+    setBusy(true)
+    setError('')
+    try {
+      await dispatchWorkflow('team-automation.yml', { enabled: next ? 'on' : 'off' })
+      // The workflow commits within seconds — this is a plain file write, no agents involved.
+      window.setTimeout(load, 15_000)
+      setState({ ...state, enabled: next })
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <Panel title="Automation" code="TEAM.AUTO" accent={state?.enabled ?? true ? '#46d369' : '#6b7785'} bodyClassName="space-y-2 p-3">
+      <p className="text-[11px] leading-relaxed text-dim">
+        The daily meeting (07:30 Oslo) and intake sweep run on their own when this is on. Turning
+        it off does not stop a run in progress, and "Hold standup now" / "Run intake sweep" above
+        always work either way.
+      </p>
+      <button
+        onClick={toggle}
+        disabled={loading || busy || !state}
+        className={cn(
+          'flex w-full items-center justify-center gap-1.5 border px-3 py-1.5 text-xs uppercase tracking-wider disabled:opacity-50',
+          state?.enabled
+            ? 'border-line text-dim hover:border-danger/60 hover:text-danger'
+            : 'border-ok/40 bg-ok/10 text-ok',
+        )}
+        style={!state?.enabled ? { borderColor: '#46d36966', color: '#46d369', backgroundColor: '#46d36915' } : undefined}
+      >
+        <StatusDot color={state?.enabled ? '#46d369' : '#6b7785'} size={7} pulse={!!state?.enabled} />
+        {loading ? 'Checking…' : busy ? 'Updating…' : state?.enabled ? 'Unattended runs ON — turn off' : 'Unattended runs OFF — turn on'}
+      </button>
+      {state?.updatedAt && (
+        <p className="text-[10px] text-dim">last changed {new Date(state.updatedAt).toLocaleString('en-GB')} by {state.updatedBy}</p>
       )}
       {error && <p className="text-[11px] text-danger">{error}</p>}
     </Panel>
