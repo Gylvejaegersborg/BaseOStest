@@ -21,4 +21,20 @@ fi
 echo "[setup] Installing agent-os dependencies…"
 npm install --prefix "$AGENT_OS_DIR"
 
-echo "[setup] Done. The gateway starts automatically on every Codespace start (see start.sh)."
+# Ollama gives the gateway a real, zero-cost local model to fall back on —
+# see start.sh for why this is the DEFAULT here specifically (no
+# ANTHROPIC_TOKEN/ANTHROPIC_API_KEY/OPENAI_API_KEY set on this Codespace).
+# The installer needs zstd to unpack itself, which the base devcontainer
+# image doesn't ship. Both steps are idempotent (skip if already present)
+# so a rebuild doesn't redo them unnecessarily — though the model itself
+# still gets re-pulled on a real rebuild, since ~/.ollama isn't part of
+# the persisted /workspaces mount.
+if ! command -v ollama >/dev/null 2>&1; then
+  echo "[setup] Installing Ollama (zstd first — its installer needs it to unpack)…"
+  sudo apt-get update -qq && sudo apt-get install -y -qq zstd
+  curl -fsSL https://ollama.com/install.sh | sh
+else
+  echo "[setup] Ollama already installed."
+fi
+
+echo "[setup] Done. The gateway + Ollama start automatically on every Codespace start (see start.sh)."
