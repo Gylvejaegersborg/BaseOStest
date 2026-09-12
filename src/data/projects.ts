@@ -33,7 +33,7 @@ export const PROJECTS: Project[] = [
   {
     id: 'artist-mgmt',
     name: 'AI Artist Management',
-    sectionId: 'room',
+    sectionId: 'workbench',
     status: 'active',
     tagline: 'An autonomous team running the ISΛRK artist project.',
     what: 'A crew of AI agents that plan releases, schedule posts, draft copy and keep the artist brand moving without me babysitting every step.',
@@ -149,7 +149,7 @@ export const PROJECTS: Project[] = [
   {
     id: 'discord-bots',
     name: 'Discord Connection & Bots',
-    sectionId: 'room',
+    sectionId: 'workbench',
     status: 'active',
     tagline: 'Agents reach me through Discord.',
     what: 'Bots that bridge the agents to Discord — status pings, approvals, and a channel where the crew posts what it is doing.',
@@ -180,7 +180,7 @@ export const PROJECTS: Project[] = [
   {
     id: 'ai-businesses',
     name: 'AI-Run Small Businesses',
-    sectionId: 'room',
+    sectionId: 'workbench',
     status: 'idea',
     tagline: 'Tiny ventures the agents operate.',
     what: 'Experiment: small, mostly-autonomous businesses where agents handle ops and I set direction. Early scoping only.',

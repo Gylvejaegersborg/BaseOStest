@@ -1,18 +1,24 @@
 import { Suspense, lazy } from 'react'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import { AppShell } from './components/layout/AppShell'
 import { Home } from './pages/Home'
 import { Notes } from './pages/Notes'
-import { Chat } from './pages/Chat'
+import { Workbench } from './pages/Workbench'
 import { Calendar } from './pages/Calendar'
 import { Projects } from './pages/Projects'
 import { Lab } from './pages/Lab'
-import { MeetingRoom } from './pages/MeetingRoom'
 import { Ops } from './pages/Ops'
 
 const Sudoku = lazy(() => import('./pages/Sudoku').then((m) => ({ default: m.Sudoku })))
 const Weather = lazy(() => import('./pages/Weather').then((m) => ({ default: m.Weather })))
 const Team = lazy(() => import('./pages/Team').then((m) => ({ default: m.Team })))
+
+/** Chat and Meeting Room are retired in favor of the single Workbench
+ *  page — these keep old bookmarks/links (Team's "open a chat with X")
+ *  working, preserving the ?agent= query param. */
+function LegacyRedirect() {
+  return <Navigate to={{ pathname: '/workbench', search: window.location.search }} replace />
+}
 
 const router = createBrowserRouter([
   {
@@ -21,11 +27,12 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
       { path: 'notes', element: <Notes /> },
-      { path: 'chat', element: <Chat /> },
+      { path: 'workbench', element: <Workbench /> },
+      { path: 'chat', element: <LegacyRedirect /> },
+      { path: 'room', element: <LegacyRedirect /> },
       { path: 'calendar', element: <Calendar /> },
       { path: 'projects', element: <Projects /> },
       { path: 'lab', element: <Lab /> },
-      { path: 'room', element: <MeetingRoom /> },
       { path: 'ops', element: <Ops /> },
       {
         path: 'team',

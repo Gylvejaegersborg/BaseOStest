@@ -54,11 +54,10 @@ function sunZ(sectionId: SectionId): number {
 // near the centre so the others read as orbiting it.
 const SUN_POS: Record<string, { x: number; y: number }> = {
   notes: { x: 250, y: 175 },
-  chat: { x: 540, y: 110 },
+  workbench: { x: 540, y: 110 },
   calendar: { x: 850, y: 180 },
   projects: { x: 600, y: 365 },
   lab: { x: 200, y: 440 },
-  room: { x: 910, y: 470 },
   team: { x: 760, y: 555 },
   ops: { x: 1060, y: 300 },
   weather: { x: 540, y: 585 },
@@ -66,22 +65,22 @@ const SUN_POS: Record<string, { x: number; y: number }> = {
 
 // Constellation outline: which suns are linked by faint lines.
 export const SUN_LINKS: [SectionId, SectionId][] = [
-  ['notes', 'chat'],
-  ['chat', 'calendar'],
+  ['notes', 'workbench'],
+  ['workbench', 'calendar'],
   ['calendar', 'ops'],
-  ['ops', 'room'],
-  ['room', 'lab'],
+  ['ops', 'workbench'],
+  ['workbench', 'lab'],
   ['lab', 'notes'],
   ['projects', 'notes'],
   ['projects', 'calendar'],
-  ['projects', 'room'],
+  ['projects', 'workbench'],
   ['projects', 'lab'],
   ['projects', 'weather'],
   ['projects', 'team'],
-  ['team', 'room'],
+  ['team', 'workbench'],
   ['team', 'weather'],
   ['weather', 'lab'],
-  ['weather', 'room'],
+  ['weather', 'workbench'],
 ]
 
 export function buildBodies(): { suns: Body[]; planets: Body[] } {
