@@ -15,7 +15,29 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # See team-daily-meeting.yml's identical gate job — same kill switch
+  # (team/README.md#state/automation.json), same "manual dispatch always
+  # runs" exception.
+  gate:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'workflow_dispatch'
+    outputs:
+      enabled: ${{ steps.check.outputs.enabled }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: check
+        run: |
+          if [ -f team/state/automation.json ] && \
+             [ "$(node -e "console.log(JSON.parse(require('fs').readFileSync('team/state/automation.json','utf8')).enabled)")" = "false" ]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Team automation is turned off (team/state/automation.json) — skipping the intake sweep."
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+
   intake:
+    needs: [gate]
+    if: always() && needs.gate.result != 'failure' && (github.event_name == 'workflow_dispatch' || needs.gate.outputs.enabled == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:

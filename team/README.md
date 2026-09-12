@@ -11,6 +11,8 @@ them too — agents must tolerate hand edits.
 state/agents.json      live agent roster: status + current task per agent
 state/tasks.json       the shared task board
 state/cursors.json     intake watermarks (Discord message id, IMAP uid, copyparty SHAs)
+state/automation.json  kill switch for the scheduled meeting/intake runs — control plane,
+                        NOT agent-writable (see governance rules)
 meetings/<date>.json   structured meeting record   (+ <date>.md transcript, latest.json copy)
 briefs/<date>.md       daily brief for ISΛRK       (+ latest.md copy)
 inbox/audio/<id>.<ext> raw incoming beats
@@ -100,6 +102,16 @@ change plus `id`.
   "imap": { "lastUid": 0 },
   "copyparty": { "seenShas": [] } }
 ```
+
+### state/automation.json
+```json
+{ "enabled": true, "updatedAt": "ISO-8601", "updatedBy": "ISΛRK (dashboard)|<name>" }
+```
+Read by `team-daily-meeting.yml` and `team-intake.yml` before anything else runs — when
+`enabled` is `false` the run stops immediately (no meeting, no sweep, no commit). Written
+only by the `team-automation.yml` workflow (dispatched from the Team page's "Automation"
+toggle) or by hand. **No agent may write this file** — it is the user's own kill switch
+for whether the team runs unsupervised at all, not team state.
 
 ### meetings/<date>.json (and latest.json)
 ```json
@@ -194,3 +206,11 @@ were caught and fixed same-day. These two rules exist so the failure does not re
    prior one-off trims (2026-08-05, 2026-08-07) each bought only days of margin before the
    file regrew past the read ceiling. Added 2026-08-09 per `t-tasks-json-growth-rate-
    unaddressed-0807`.
+5. **`state/automation.json` is off-limits to every agent, in every workflow, at every
+   turn — read it if you like, never write it.** It is the user's own switch for whether
+   the team runs unsupervised at all; a persona deciding on its own that the team should
+   (or shouldn't) run autonomously is exactly the failure mode it exists to prevent. Only
+   `team-automation.yml` (dispatched by the user from the Team page) writes this file.
+   Added after the daily meeting and intake sweep had run unattended, on schedule, every
+   day since 2026-06-13 with no user-supplied agenda or intake most days — not a bug, but
+   not something any persona should ever quietly turn off or on either.

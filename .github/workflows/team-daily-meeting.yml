@@ -20,7 +20,32 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # The user's kill switch — see team/README.md#state/automation.json. A
+  # manual `workflow_dispatch` (the Team page's "Hold standup now" button,
+  # or a human) always runs regardless of this flag; only the unattended
+  # schedule/repository_dispatch triggers are gated. When the automation is
+  # off, this is the entire run — one fast, clearly-labeled skip, no agents
+  # invoked, nothing committed.
+  gate:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'workflow_dispatch'
+    outputs:
+      enabled: ${{ steps.check.outputs.enabled }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: check
+        run: |
+          if [ -f team/state/automation.json ] && \
+             [ "$(node -e "console.log(JSON.parse(require('fs').readFileSync('team/state/automation.json','utf8')).enabled)")" = "false" ]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Team automation is turned off (team/state/automation.json) — skipping the daily meeting."
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+
   meeting:
+    needs: [gate]
+    if: always() && needs.gate.result != 'failure' && (github.event_name == 'workflow_dispatch' || needs.gate.outputs.enabled == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
