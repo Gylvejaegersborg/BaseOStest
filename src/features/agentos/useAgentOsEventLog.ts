@@ -43,6 +43,7 @@ export function describeWorkbenchEvent(e: WorkbenchEvent): string {
     }
     case 'agent.turn.end': {
       if (p.cancelled) return `${p.agentId ?? '?'}: turn cancelled`
+      if (p.error) return `${p.agentId ?? '?'}: turn failed — ${String(p.error).slice(0, 90)}`
       const content = String(p.finalContent ?? '')
       return `${p.agentId ?? '?'}: ${content.slice(0, 90)}${content.length > 90 ? '…' : ''}`
     }
