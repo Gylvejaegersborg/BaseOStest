@@ -6,6 +6,13 @@ set -euo pipefail
 
 AGENT_OS_DIR="$HOME/agent-os"
 GATEWAY_PORT=8787
+# Captured before any `cd` below — this is BaseOStest's own checkout root,
+# handed to the gateway as BASEOS_REPO_DIR so its sandbox (gateway/cli.ts's
+# SandboxPolicy) can allow the "claude" agent's shell tool into BOTH repos.
+# The two don't share a useful common ancestor in a Codespace (agent-os
+# lives under $HOME, this one under /workspaces/...), hence passing it
+# explicitly rather than relying on a single shared workspaceRoot.
+BASEOS_REPO_DIR="$PWD"
 # Small enough for a 2-core/8GB Codespace, and — unlike llama3.2:1b —
 # actually documented as good at TOOL USE, which matters here: the
 # gateway sends real tool definitions (shell, record-artifact, ...) and
@@ -57,7 +64,7 @@ if [ -d "$AGENT_OS_DIR" ]; then
   echo "[start] Starting Agent-OS gateway on :$GATEWAY_PORT…"
   # Falls back further to a deterministic stub model with zero config at
   # all (see agent-os's gateway/cli.ts) if even Ollama isn't reachable.
-  (cd "$AGENT_OS_DIR" && AGENT_OS_GATEWAY_PORT="$GATEWAY_PORT" OLLAMA_MODEL="$OLLAMA_MODEL" nohup npm run gateway > /tmp/agent-os-gateway.log 2>&1 &)
+  (cd "$AGENT_OS_DIR" && AGENT_OS_GATEWAY_PORT="$GATEWAY_PORT" OLLAMA_MODEL="$OLLAMA_MODEL" BASEOS_REPO_DIR="$BASEOS_REPO_DIR" nohup npm run gateway > /tmp/agent-os-gateway.log 2>&1 &)
 else
   echo "[start] agent-os not found at $AGENT_OS_DIR (postCreateCommand didn't run?) — Workbench will fall back to mock data."
 fi
