@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Modal } from '@/components/ui/Modal'
-import { createAgent, updateAgent } from '@/features/agentos/client'
+import { createAgent, fetchAgents, updateAgent } from '@/features/agentos/client'
 import { useAgentOsContext } from '@/features/agentos/AgentOsProvider'
 import { cn } from '@/lib/cn'
 
@@ -75,8 +75,31 @@ export function AgentEditorModal({
   const [customModel, setCustomModel] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [capabilitySuggestions, setCapabilitySuggestions] = useState<string[]>([])
 
   const isEdit = !!target
+
+  // Best-effort discoverability, not a taxonomy fetch — pulls whatever
+  // capability strings the rest of the roster already declared so typing
+  // here isn't a total guessing game, without pretending there's a fixed
+  // list to validate against.
+  useEffect(() => {
+    if (!open) return
+    let cancelled = false
+    fetchAgents()
+      .then((agents) => {
+        if (cancelled) return
+        const all = new Set<string>()
+        for (const a of agents) for (const c of a.capabilities ?? []) all.add(c)
+        setCapabilitySuggestions([...all].sort())
+      })
+      .catch(() => {
+        /* no suggestions is fine — the field still works as plain free text */
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [open])
 
   useEffect(() => {
     if (!open) return
@@ -177,8 +200,23 @@ export function AgentEditorModal({
             value={capabilities}
             onChange={(e) => setCapabilities(e.target.value)}
             placeholder="comma-separated, e.g. audio-mix, mastering"
+            list="capability-suggestions"
             className="w-full border border-line bg-bg/40 px-2 py-1.5 text-sm text-text outline-none focus:border-accent/50"
           />
+          {/* Not a <select> on purpose — agent-os deliberately keeps
+              capabilities free-text and unenforced (see its identity.ts:
+              "a simple declared list, not enforced against anything"),
+              so there's no fixed taxonomy to pick from. This datalist is
+              just a discoverability aid, sourced from every OTHER agent's
+              already-declared capabilities, typing past it still works. */}
+          <datalist id="capability-suggestions">
+            {capabilitySuggestions.map((c) => (
+              <option key={c} value={c} />
+            ))}
+          </datalist>
+          <p className="mt-1 text-[10px] text-dim">
+            Free text, comma-separated — agent-os doesn't enforce a fixed list of capabilities.
+          </p>
         </div>
         <div>
           <label className="label mb-1 block">Default model</label>

@@ -74,6 +74,12 @@ export function FlowTab({
       {error && <p className="border-b border-danger/40 bg-danger/10 p-2 text-xs text-danger">{error}</p>}
       {flow ? (
         <div className="flex-1 overflow-y-auto p-3">
+          {flow.status === 'cancelled' && flow.steps.some((s) => s.status === 'running') && (
+            <p className="mb-3 border border-line bg-panel-2/60 px-2.5 py-1.5 text-[11px] text-dim">
+              Cancelling a Flow stops any <em>not-yet-started</em> steps — it can't interrupt a step whose model call is already
+              in flight. The step below marked "running" will finish (or fail/time out) on its own.
+            </p>
+          )}
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs">
               <span className="text-dim">Flow</span>
