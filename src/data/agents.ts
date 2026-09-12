@@ -11,6 +11,16 @@ export interface Agent {
   chatter: string[]
 }
 
+/** The nyx-w1/nyx-w2 entries are presentational-only sub-agents (Nyx's
+ *  simulated worker fan-out) with no real Agent-OS identity — every count
+ *  or picker that means "real agents" should filter them out with this,
+ *  not repeat the `-w` suffix check inline (that drifted out of sync once
+ *  already: see TopBar's "N agents online" counting them until this
+ *  helper existed). */
+export function isRealAgent(a: { id: string }): boolean {
+  return !a.id.includes('-w')
+}
+
 export const AGENTS: Agent[] = [
   {
     id: 'claude',
