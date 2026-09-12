@@ -2,11 +2,10 @@ import {
   Orbit,
   Briefcase,
   NotebookPen,
-  MessagesSquare,
+  Bot,
   CalendarDays,
   FolderKanban,
   FlaskConical,
-  Users,
   Activity,
   CloudSun,
   type LucideIcon,
@@ -15,11 +14,10 @@ import {
 export type SectionId =
   | 'home'
   | 'notes'
-  | 'chat'
+  | 'workbench'
   | 'calendar'
   | 'projects'
   | 'lab'
-  | 'room'
   | 'team'
   | 'ops'
   | 'weather'
@@ -54,12 +52,12 @@ export const SECTIONS: Section[] = [
     accent: '#46d369',
   },
   {
-    id: 'chat',
-    label: 'Chat',
+    id: 'workbench',
+    label: 'Workbench',
     code: 'AGT.02',
-    route: '/chat',
-    icon: MessagesSquare,
-    blurb: 'Talk to Claude, Hemera and Nyx. Upload files, record voice.',
+    route: '/workbench',
+    icon: Bot,
+    blurb: 'Every agent, one surface: conversations, tasks, flows, artifacts and approvals.',
     accent: '#36e0c8',
   },
   {
@@ -88,15 +86,6 @@ export const SECTIONS: Section[] = [
     icon: FlaskConical,
     blurb: 'Live pages and apps you have built. Poke, preview and test them.',
     accent: '#36e0c8',
-  },
-  {
-    id: 'room',
-    label: 'Meeting Room',
-    code: 'AGT.06',
-    route: '/room',
-    icon: Users,
-    blurb: 'The agents, in one open room. Watch them work and talk.',
-    accent: '#e0408a',
   },
   {
     id: 'team',

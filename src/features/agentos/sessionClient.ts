@@ -108,6 +108,117 @@ export function resolveApproval(id: string, decision: 'approve' | 'reject', reso
   return request<AgentOsApproval>(`/approvals/${id}/${decision}`, { method: 'POST', body: JSON.stringify({ resolvedBy }) })
 }
 
+export type AgentOsTaskStatus = 'queued' | 'running' | 'succeeded' | 'failed' | 'timed_out' | 'cancelled' | 'lost'
+
+export interface AgentOsTask {
+  id: string
+  type: string
+  agentId: string
+  workerId?: string
+  parentTaskId?: string
+  flowId?: string
+  status: AgentOsTaskStatus
+  createdAt: string
+  startedAt?: string
+  completedAt?: string
+  input: Record<string, unknown>
+  output?: Record<string, unknown>
+}
+
+export async function fetchTasks(filter: { agentId?: string; flowId?: string; status?: AgentOsTaskStatus } = {}): Promise<AgentOsTask[]> {
+  const params = new URLSearchParams()
+  if (filter.agentId) params.set('agentId', filter.agentId)
+  if (filter.flowId) params.set('flowId', filter.flowId)
+  if (filter.status) params.set('status', filter.status)
+  const qs = params.toString()
+  const { tasks } = await request<{ tasks: AgentOsTask[] }>(`/tasks${qs ? `?${qs}` : ''}`)
+  return tasks
+}
+
+export type AgentOsArtifactType = 'code' | 'file' | 'report' | 'image' | 'dataset' | 'plan' | 'draft' | 'other'
+
+export interface AgentOsArtifact {
+  id: string
+  type: AgentOsArtifactType
+  location: string
+  producer: string
+  createdAt: string
+  taskId?: string
+  sessionId?: string
+  flowId?: string
+  metadata: Record<string, unknown>
+}
+
+export async function fetchArtifacts(
+  filter: { producer?: string; sessionId?: string; taskId?: string; flowId?: string } = {},
+): Promise<AgentOsArtifact[]> {
+  const params = new URLSearchParams()
+  if (filter.producer) params.set('producer', filter.producer)
+  if (filter.sessionId) params.set('sessionId', filter.sessionId)
+  if (filter.taskId) params.set('taskId', filter.taskId)
+  if (filter.flowId) params.set('flowId', filter.flowId)
+  const qs = params.toString()
+  const { artifacts } = await request<{ artifacts: AgentOsArtifact[] }>(`/artifacts${qs ? `?${qs}` : ''}`)
+  return artifacts
+}
+
+export type AgentOsFlowStatus = 'running' | 'succeeded' | 'failed' | 'cancelled'
+
+export interface AgentOsFlowStep {
+  id: string
+  taskId?: string
+  dependsOn: string[]
+  status: AgentOsTaskStatus
+}
+
+export interface AgentOsFlow {
+  id: string
+  kind: 'managed' | 'mirrored'
+  status: AgentOsFlowStatus
+  steps: AgentOsFlowStep[]
+  revision: number
+}
+
+export interface FlowStepInput {
+  id: string
+  agentId: string
+  goal: string
+  dependsOn?: string[]
+  retries?: number
+}
+
+/** Creates a Flow and starts driving it in the BACKGROUND on the gateway
+ *  — returns as soon as the Flow is created (agent-os's POST /flows does
+ *  not block on the whole DAG, which can take minutes). Watch progress
+ *  via subscribeToEvents(['flow.step.started','flow.step.completed',
+ *  'flow.completed']) or by polling fetchFlow(). */
+export function createFlow(steps: FlowStepInput[]): Promise<AgentOsFlow> {
+  return request<AgentOsFlow>('/flows', { method: 'POST', body: JSON.stringify({ steps }) })
+}
+
+export function fetchFlow(flowId: string): Promise<AgentOsFlow> {
+  return request<AgentOsFlow>(`/flows/${flowId}`)
+}
+
+export async function fetchFlows(): Promise<AgentOsFlow[]> {
+  const { flows } = await request<{ flows: AgentOsFlow[] }>('/flows')
+  return flows
+}
+
+/** Resumes an EXISTING flow — the gateway re-derives remaining work from
+ *  the flow's persisted step statuses, so this is also how you'd retry
+ *  after a step that got stuck ('lost') once reconciled. Needs the same
+ *  step definitions the flow was created with (agentId/goal/dependsOn
+ *  aren't persisted server-side beyond id/dependsOn/status — see
+ *  agent-os's flow-engine.ts). */
+export function resumeFlow(flowId: string, steps: FlowStepInput[]): Promise<AgentOsFlow> {
+  return request<AgentOsFlow>(`/flows/${flowId}/resume`, { method: 'POST', body: JSON.stringify({ steps }) })
+}
+
+export function cancelFlow(flowId: string, reason?: string): Promise<AgentOsFlow> {
+  return request<AgentOsFlow>(`/flows/${flowId}/cancel`, { method: 'POST', body: JSON.stringify({ reason }) })
+}
+
 export interface SessionEvent {
   type: string
   payload: Record<string, unknown>
