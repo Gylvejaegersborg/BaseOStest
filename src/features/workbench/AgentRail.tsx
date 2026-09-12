@@ -38,13 +38,19 @@ export function AgentRail({ selectedAgentId, onSelect }: { selectedAgentId: stri
   // identity) — see Chat.tsx's own CHAT_AGENTS filter for the same rule.
   const realAgents = agents.filter((a) => !a.id.includes('-w'))
 
-  const openEdit = async (id: string) => {
+  // Opens immediately with best-effort local data (never a dead click,
+  // even if the gateway turns out to be unreachable) and upgrades to the
+  // live record when fetchAgent succeeds. If it doesn't, the modal is
+  // still open and its own save attempt surfaces a real error — silently
+  // refusing to open at all (the old behavior) looked identical to a
+  // broken button with no way to tell why.
+  const openEdit = async (a: Agent) => {
+    setEditing({ id: a.id, name: a.name, persona: '', role: a.role, capabilities: [] })
     try {
-      const remote = await fetchAgent(id)
+      const remote = await fetchAgent(a.id)
       setEditing({ id: remote.id, name: remote.name, persona: remote.persona, role: remote.role ?? '', capabilities: remote.capabilities })
     } catch {
-      // Not a real Agent-OS identity yet (e.g. gateway unreachable, or this
-      // id only exists in the bundled presentational roster) — nothing to edit.
+      // Keep the local-data fallback already showing — see comment above.
     }
   }
 
@@ -52,15 +58,16 @@ export function AgentRail({ selectedAgentId, onSelect }: { selectedAgentId: stri
     <aside className="flex h-full w-full flex-col overflow-y-auto border-r border-line bg-panel/30 lg:w-[220px]">
       <div className="flex items-center justify-between border-b border-line px-3 py-2">
         <span className="label">Agents</span>
-        <button
-          onClick={() => setEditing('new')}
-          disabled={connection !== 'live'}
-          title={connection === 'live' ? 'New agent' : 'Connect an Agent-OS gateway to create agents'}
-          className="text-dim hover:text-accent disabled:opacity-40"
-        >
+        <button onClick={() => setEditing('new')} title="New agent" className="text-dim hover:text-accent">
           <Plus size={14} />
         </button>
       </div>
+      {connection !== 'live' && (
+        <p className="border-b border-line px-3 py-2 text-[10px] leading-relaxed text-dim">
+          No live Agent-OS gateway ({connection}) — creating or editing an agent here will fail until one is
+          configured (<code className="text-text/70">VITE_AGENT_OS_GATEWAY_URL</code>).
+        </p>
+      )}
       <div className="flex-1 overflow-y-auto">
         {realAgents.map((a) => (
           <div
@@ -80,15 +87,13 @@ export function AgentRail({ selectedAgentId, onSelect }: { selectedAgentId: stri
                 <span className="block truncate text-[10px] text-dim">{a.role}</span>
               </span>
             </button>
-            {connection === 'live' && (
-              <button
-                onClick={() => openEdit(a.id)}
-                title={`Edit ${a.name}`}
-                className="shrink-0 text-dim opacity-0 hover:text-accent group-hover:opacity-100"
-              >
-                <Pencil size={12} />
-              </button>
-            )}
+            <button
+              onClick={() => openEdit(a)}
+              title={`Edit ${a.name}`}
+              className="shrink-0 text-dim opacity-40 hover:text-accent group-hover:opacity-100"
+            >
+              <Pencil size={12} />
+            </button>
           </div>
         ))}
       </div>

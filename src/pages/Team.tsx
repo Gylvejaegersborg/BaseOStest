@@ -129,7 +129,7 @@ function BriefTab({
       </Panel>
       <div className="space-y-3">
         <RunPanel hasToken={hasToken} onRefresh={onRefresh} />
-        {hasToken && <AutomationToggle />}
+        <AutomationToggle hasToken={hasToken} />
         <Panel title="Roster" code="TEAM.AGT" accent="#36e0c8" bodyClassName="space-y-2 p-2">
         {agents.map((a) => (
           <div key={a.id} className="border border-line bg-bg/40 p-2" style={{ borderLeftColor: agentColor(a.id), borderLeftWidth: 2 }}>
@@ -248,7 +248,7 @@ interface AutomationState {
   updatedBy: string
 }
 
-function AutomationToggle() {
+function AutomationToggle({ hasToken }: { hasToken: boolean }) {
   const [state, setState] = useState<AutomationState | null>(null)
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
@@ -262,10 +262,13 @@ function AutomationToggle() {
       .finally(() => setLoading(false))
   }
 
+  // Reading the file works even without a token (public-repo raw fallback,
+  // same as everywhere else in this page) — only dispatching the toggle
+  // workflow needs one. See RunPanel's identical hasToken gate above.
   useEffect(load, [])
 
   const toggle = async () => {
-    if (!state) return
+    if (!state || !hasToken) return
     const next = !state.enabled
     setBusy(true)
     setError('')
@@ -288,9 +291,12 @@ function AutomationToggle() {
         it off does not stop a run in progress, and "Hold standup now" / "Run intake sweep" above
         always work either way.
       </p>
+      {!hasToken && (
+        <p className="text-[11px] text-dim">Connect GitHub (top right) to turn this on or off from here.</p>
+      )}
       <button
         onClick={toggle}
-        disabled={loading || busy || !state}
+        disabled={loading || busy || !state || !hasToken}
         className={cn(
           'flex w-full items-center justify-center gap-1.5 border px-3 py-1.5 text-xs uppercase tracking-wider disabled:opacity-50',
           state?.enabled

@@ -61,7 +61,7 @@ export function ConversationPane({ agent, chat }: { agent: Agent; chat: ReturnTy
 
   return (
     <div
-      className="relative flex h-full min-h-0 min-w-0 flex-col"
+      className="relative flex h-full min-h-0 min-w-0 flex-1 flex-col"
       onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
       onDragLeave={() => setDragging(false)}
       onDrop={(e) => { e.preventDefault(); setDragging(false); addFiles(e.dataTransfer.files) }}
