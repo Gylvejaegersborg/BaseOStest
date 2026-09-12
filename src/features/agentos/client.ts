@@ -77,6 +77,7 @@ export interface UpdateAgentInput {
   persona?: string
   role?: string
   capabilities?: string[]
+  defaultModel?: string
 }
 
 /** PUT {base}/agents/:id — updates an existing agent's identity fields

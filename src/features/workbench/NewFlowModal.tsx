@@ -1,15 +1,32 @@
 import { useState } from 'react'
+import { Plus, Trash2 } from 'lucide-react'
 import { Modal } from '@/components/ui/Modal'
 import { AGENTS } from '@/data/agents'
 import { FLOW_TEMPLATES, resolveFlowTemplate, type FlowTemplate } from '@/data/flowTemplates'
 import { createFlow, type FlowStepInput } from '@/features/agentos/sessionClient'
 import { cn } from '@/lib/cn'
 
+const REAL_AGENTS = AGENTS.filter((a) => !a.id.includes('-w'))
+
+interface DraftStep {
+  key: string
+  id: string
+  agentId: string
+  goal: string
+  dependsOn: string[]
+}
+
+function newDraftStep(n: number): DraftStep {
+  return { key: crypto.randomUUID(), id: `step-${n}`, agentId: REAL_AGENTS[0]?.id ?? '', goal: '', dependsOn: [] }
+}
+
 /**
- * Starts a new Flow from a predefined template — no planner involved.
- * Pick a template, type one goal, optionally reassign which agent runs
- * each step, submit. Resolves to FlowStepInput[] client-side and POSTs
- * straight to /flows (flow-engine.ts drives it in the background).
+ * Starts a new Flow either from a predefined template (no planner
+ * involved — pick a pattern, type one goal, optionally reassign which
+ * agent runs each step) or built from scratch step by step (any number
+ * of steps, any agent per step, arbitrary dependencies). Both paths
+ * resolve to the same FlowStepInput[] and POST straight to /flows
+ * (flow-engine.ts drives it in the background).
  */
 export function NewFlowModal({
   open,
@@ -21,15 +38,19 @@ export function NewFlowModal({
   onCreated: (flowId: string, steps: FlowStepInput[]) => void
 }) {
   const [template, setTemplate] = useState<FlowTemplate | null>(null)
+  const [custom, setCustom] = useState(false)
   const [goal, setGoal] = useState('')
   const [overrides, setOverrides] = useState<Record<string, string>>({})
+  const [customSteps, setCustomSteps] = useState<DraftStep[]>([])
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
   const reset = () => {
     setTemplate(null)
+    setCustom(false)
     setGoal('')
     setOverrides({})
+    setCustomSteps([])
     setError('')
   }
 
@@ -38,12 +59,49 @@ export function NewFlowModal({
     onClose()
   }
 
+  const startCustom = () => {
+    setCustom(true)
+    setCustomSteps([newDraftStep(1)])
+  }
+
+  const addStep = () => setCustomSteps((steps) => [...steps, newDraftStep(steps.length + 1)])
+  const removeStep = (key: string) => {
+    setCustomSteps((steps) => {
+      const removed = steps.find((s) => s.key === key)
+      const rest = steps.filter((s) => s.key !== key)
+      // Drop the removed step from any other step's dependsOn too — a
+      // dangling dependency on an id that no longer exists would just
+      // silently never resolve on the gateway.
+      return removed ? rest.map((s) => ({ ...s, dependsOn: s.dependsOn.filter((d) => d !== removed.id) })) : rest
+    })
+  }
+  const updateStep = (key: string, patch: Partial<DraftStep>) =>
+    setCustomSteps((steps) => steps.map((s) => (s.key === key ? { ...s, ...patch } : s)))
+  const toggleDependsOn = (key: string, depId: string) =>
+    setCustomSteps((steps) =>
+      steps.map((s) =>
+        s.key === key ? { ...s, dependsOn: s.dependsOn.includes(depId) ? s.dependsOn.filter((d) => d !== depId) : [...s.dependsOn, depId] } : s,
+      ),
+    )
+
+  const customIds = customSteps.map((s) => s.id.trim()).filter(Boolean)
+  const customValid =
+    customSteps.length > 0 &&
+    customSteps.every((s) => s.id.trim() && s.goal.trim() && s.agentId) &&
+    new Set(customIds).size === customSteps.length
+
   const submit = async () => {
-    if (!template || !goal.trim()) return
     setSubmitting(true)
     setError('')
     try {
-      const steps = resolveFlowTemplate(template, goal.trim(), overrides)
+      let steps: FlowStepInput[]
+      if (custom) {
+        if (!customValid) return
+        steps = customSteps.map((s) => ({ id: s.id.trim(), agentId: s.agentId, goal: s.goal.trim(), dependsOn: s.dependsOn }))
+      } else {
+        if (!template || !goal.trim()) return
+        steps = resolveFlowTemplate(template, goal.trim(), overrides)
+      }
       const flow = await createFlow(steps)
       onCreated(flow.id, steps)
       reset()
@@ -55,9 +113,11 @@ export function NewFlowModal({
     }
   }
 
+  const canSubmit = custom ? customValid : !!template && !!goal.trim()
+
   return (
-    <Modal open={open} onClose={handleClose} title="New Flow" code="WB.01" accent="#36e0c8" width={480}>
-      {!template ? (
+    <Modal open={open} onClose={handleClose} title="New Flow" code="WB.01" accent="#36e0c8" width={560}>
+      {!template && !custom ? (
         <div className="space-y-2">
           <p className="mb-2 text-xs text-dim">Pick a pattern — each step runs with its own agent, in order or in parallel.</p>
           {FLOW_TEMPLATES.map((t) => (
@@ -70,11 +130,98 @@ export function NewFlowModal({
               <div className="mt-0.5 text-[11px] text-dim">{t.description}</div>
             </button>
           ))}
+          <button
+            onClick={startCustom}
+            className="block w-full border border-dashed border-line bg-bg/20 p-3 text-left hover:border-accent/50 hover:bg-panel-2/50"
+          >
+            <div className="text-sm text-text/90">Custom</div>
+            <div className="mt-0.5 text-[11px] text-dim">Build a flow step by step — any agents, any dependencies.</div>
+          </button>
+        </div>
+      ) : custom ? (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-text/90">Custom flow</span>
+            <button onClick={() => { setCustom(false); setCustomSteps([]) }} className="text-[11px] text-dim underline hover:text-text">
+              change pattern
+            </button>
+          </div>
+          <div className="space-y-2">
+            {customSteps.map((s) => {
+              const others = customSteps.filter((o) => o.key !== s.key && o.id.trim())
+              return (
+                <div key={s.key} className="space-y-1.5 border border-line bg-bg/40 p-2.5">
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      value={s.id}
+                      onChange={(e) => updateStep(s.key, { id: e.target.value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-') })}
+                      placeholder="step id"
+                      className="w-28 shrink-0 border border-line bg-bg/60 px-1.5 py-1 text-xs text-text outline-none focus:border-accent/50"
+                    />
+                    <select
+                      value={s.agentId}
+                      onChange={(e) => updateStep(s.key, { agentId: e.target.value })}
+                      className="flex-1 border border-line bg-bg/60 px-1.5 py-1 text-xs text-text outline-none"
+                    >
+                      {REAL_AGENTS.map((a) => (
+                        <option key={a.id} value={a.id}>{a.name}</option>
+                      ))}
+                    </select>
+                    <button onClick={() => removeStep(s.key)} title="Remove step" className="shrink-0 text-dim hover:text-danger">
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                  <textarea
+                    value={s.goal}
+                    onChange={(e) => updateStep(s.key, { goal: e.target.value })}
+                    rows={2}
+                    placeholder="What should this step do?"
+                    className="w-full resize-none border border-line bg-bg/60 p-1.5 text-xs text-text outline-none focus:border-accent/50"
+                  />
+                  {others.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-2 text-[10px] text-dim">
+                      <span>depends on:</span>
+                      {others.map((o) => (
+                        <label key={o.key} className="flex items-center gap-1">
+                          <input
+                            type="checkbox"
+                            checked={s.dependsOn.includes(o.id.trim())}
+                            onChange={() => toggleDependsOn(s.key, o.id.trim())}
+                          />
+                          {o.id.trim() || '(unnamed step)'}
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+          <button
+            onClick={addStep}
+            className="flex w-full items-center justify-center gap-1.5 border border-line px-2.5 py-1.5 text-[11px] uppercase tracking-wider text-dim hover:border-accent/60 hover:text-accent"
+          >
+            <Plus size={12} /> Add step
+          </button>
+          {customSteps.length > 0 && !customValid && (
+            <p className="text-[10px] text-dim">Every step needs a unique id, an agent and a goal before this can start.</p>
+          )}
+          {error && <p className="border border-danger/40 bg-danger/10 p-2 text-xs text-danger">{error}</p>}
+          <button
+            onClick={submit}
+            disabled={!canSubmit || submitting}
+            className={cn(
+              'w-full border px-3 py-2 text-xs uppercase tracking-wider disabled:opacity-40',
+              'border-accent/40 bg-accent/10 text-accent hover:bg-accent/20',
+            )}
+          >
+            {submitting ? 'Starting…' : 'Start flow'}
+          </button>
         </div>
       ) : (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-text/90">{template.name}</span>
+            <span className="text-sm text-text/90">{template!.name}</span>
             <button onClick={() => setTemplate(null)} className="text-[11px] text-dim underline hover:text-text">
               change template
             </button>
@@ -92,7 +239,7 @@ export function NewFlowModal({
           </div>
           <div className="space-y-1.5">
             <span className="label block">Steps</span>
-            {template.steps.map((s) => (
+            {template!.steps.map((s) => (
               <div key={s.id} className="flex items-center gap-2 border border-line bg-bg/40 px-2.5 py-1.5 text-xs">
                 <span className="w-24 shrink-0 truncate text-text/80">{s.label}</span>
                 <select
@@ -100,7 +247,7 @@ export function NewFlowModal({
                   onChange={(e) => setOverrides((o) => ({ ...o, [s.id]: e.target.value }))}
                   className="flex-1 border border-line bg-bg/60 px-1.5 py-1 text-xs text-text outline-none"
                 >
-                  {AGENTS.filter((a) => !a.id.includes('-w')).map((a) => (
+                  {REAL_AGENTS.map((a) => (
                     <option key={a.id} value={a.id}>
                       {a.name}
                     </option>
@@ -113,7 +260,7 @@ export function NewFlowModal({
           {error && <p className="border border-danger/40 bg-danger/10 p-2 text-xs text-danger">{error}</p>}
           <button
             onClick={submit}
-            disabled={!goal.trim() || submitting}
+            disabled={!canSubmit || submitting}
             className={cn(
               'w-full border px-3 py-2 text-xs uppercase tracking-wider disabled:opacity-40',
               'border-accent/40 bg-accent/10 text-accent hover:bg-accent/20',
