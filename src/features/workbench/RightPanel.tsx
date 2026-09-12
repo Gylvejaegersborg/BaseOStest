@@ -5,6 +5,8 @@ import { ApprovalsTab } from './ApprovalsTab'
 import { FlowTab } from './FlowTab'
 import { EventsTab } from './EventsTab'
 import { STRIP_TABS, type StripTab } from './WorkbenchTopStrip'
+import { useResizablePanel } from './useResizablePanel'
+import { ResizeHandle } from './ResizeHandle'
 import type { FlowStepInput } from '@/features/agentos/sessionClient'
 
 /**
@@ -12,7 +14,8 @@ import type { FlowStepInput } from '@/features/agentos/sessionClient'
  * one tab's content at a time, opened/closed via the top strip's icons
  * (see WorkbenchTopStrip), rather than the earlier always-visible bottom
  * strip. Tasks/Artifacts/Events stay filtered to the selected agent when
- * one is chosen; Flow and Approvals span every agent.
+ * one is chosen; Flow and Approvals span every agent. Resizable via its
+ * left edge, persisted per-viewer like the AgentRail's own width.
  */
 export function RightPanel({
   tab,
@@ -30,22 +33,32 @@ export function RightPanel({
   onClose: () => void
 }) {
   const label = STRIP_TABS.find((t) => t.id === tab)?.label ?? tab
+  const { width, onMouseDown } = useResizablePanel({
+    defaultWidth: 380,
+    min: 280,
+    max: 720,
+    edge: 'left',
+    storageKey: 'os:workbench:rightPanelWidth',
+  })
 
   return (
-    <aside className="flex h-full w-[380px] max-w-[90vw] shrink-0 flex-col border-l border-line-2 bg-panel/40">
-      <div className="flex items-center justify-between border-b border-line px-3 py-2">
-        <span className="label">{label}</span>
-        <button onClick={onClose} className="text-dim hover:text-text" title="Close">
-          <X size={14} />
-        </button>
-      </div>
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        {tab === 'tasks' && <TasksTab agentId={agentId} />}
-        {tab === 'flow' && <FlowTab flowId={flowId} steps={flowSteps} onSelectFlow={onSelectFlow} />}
-        {tab === 'artifacts' && <ArtifactsTab agentId={agentId} />}
-        {tab === 'approvals' && <ApprovalsTab />}
-        {tab === 'events' && <EventsTab agentId={agentId} />}
-      </div>
-    </aside>
+    <div className="flex h-full shrink-0">
+      <ResizeHandle onMouseDown={onMouseDown} />
+      <aside className="flex h-full max-w-[90vw] flex-col border-l border-line-2 bg-panel/40" style={{ width }}>
+        <div className="flex items-center justify-between border-b border-line px-3 py-2">
+          <span className="label">{label}</span>
+          <button onClick={onClose} className="text-dim hover:text-text" title="Close">
+            <X size={14} />
+          </button>
+        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          {tab === 'tasks' && <TasksTab agentId={agentId} />}
+          {tab === 'flow' && <FlowTab flowId={flowId} steps={flowSteps} onSelectFlow={onSelectFlow} />}
+          {tab === 'artifacts' && <ArtifactsTab agentId={agentId} />}
+          {tab === 'approvals' && <ApprovalsTab />}
+          {tab === 'events' && <EventsTab agentId={agentId} />}
+        </div>
+      </aside>
+    </div>
   )
 }

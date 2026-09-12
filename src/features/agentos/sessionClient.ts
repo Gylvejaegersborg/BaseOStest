@@ -77,6 +77,10 @@ export function cancelChatSession(sessionId: string, reason?: string): Promise<A
   return request<AgentOsSession>(`/sessions/${sessionId}/cancel`, { method: 'POST', body: JSON.stringify({ reason }) })
 }
 
+export function renameChatSession(sessionId: string, title: string): Promise<AgentOsSession> {
+  return request<AgentOsSession>(`/sessions/${sessionId}/rename`, { method: 'POST', body: JSON.stringify({ title }) })
+}
+
 export interface AgentOsApproval {
   id: string
   agentId: string

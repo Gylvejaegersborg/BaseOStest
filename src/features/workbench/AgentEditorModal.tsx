@@ -13,13 +13,46 @@ interface EditTarget {
   defaultModel?: string
 }
 
+const OTHER_MODEL = '__other__'
+
+// A curated starting point, not a live query against any provider —
+// agent-os has no "list available models" endpoint (each adapter just
+// takes whatever model id you hand it — see agent-os's models/real.ts).
+// Model ids move fast and availability depends on your own account/keys,
+// so "Custom" always stays the escape hatch rather than trying to be
+// exhaustive. Only takes effect once the gateway resolves a real
+// provider (an env var set on the gateway process) — with none set,
+// every agent still gets the deterministic stub regardless of this.
+const MODEL_GROUPS: { label: string; options: { value: string; label: string }[] }[] = [
+  {
+    label: 'Anthropic',
+    options: [
+      { value: 'claude-opus-5', label: 'Claude Opus 5' },
+      { value: 'claude-sonnet-5', label: 'Claude Sonnet 5' },
+      { value: 'claude-haiku-4-5-20251001', label: 'Claude Haiku 4.5' },
+    ],
+  },
+  {
+    label: 'OpenAI',
+    options: [
+      { value: 'gpt-4o', label: 'GPT-4o' },
+      { value: 'gpt-4o-mini', label: 'GPT-4o mini' },
+    ],
+  },
+  {
+    label: 'Ollama (local)',
+    options: [{ value: 'llama3.2', label: 'Llama 3.2' }],
+  },
+]
+
 /**
  * Create or edit an Agent-OS agent identity — POST /agents to register a
- * brand-new one, PUT /agents/:id to update name/persona/role/capabilities
- * on an existing one. `target` present means edit (id locked); absent
- * means create (id is a free field, becomes permanent once submitted —
- * agent-os has no rename/delete route). Live status, current task/worker
- * and metrics stay server-derived and aren't editable here.
+ * brand-new one, PUT /agents/:id to update name/persona/role/capabilities/
+ * defaultModel on an existing one. `target` present means edit (id
+ * locked); absent means create (id is a free field, becomes permanent
+ * once submitted — agent-os has no rename/delete route). Live status,
+ * current task/worker and metrics stay server-derived and aren't
+ * editable here.
  */
 export function AgentEditorModal({
   open,
@@ -39,6 +72,7 @@ export function AgentEditorModal({
   const [persona, setPersona] = useState('')
   const [capabilities, setCapabilities] = useState('')
   const [defaultModel, setDefaultModel] = useState('')
+  const [customModel, setCustomModel] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
@@ -52,7 +86,10 @@ export function AgentEditorModal({
     setRole(target?.role ?? '')
     setPersona(target?.persona ?? '')
     setCapabilities(target?.capabilities.join(', ') ?? '')
-    setDefaultModel(target?.defaultModel ?? '')
+    const preset = target?.defaultModel ?? ''
+    const isKnown = !preset || MODEL_GROUPS.some((g) => g.options.some((o) => o.value === preset))
+    setDefaultModel(isKnown ? preset : OTHER_MODEL)
+    setCustomModel(isKnown ? '' : preset)
   }, [open, target])
 
   const submit = async () => {
@@ -60,9 +97,16 @@ export function AgentEditorModal({
     setBusy(true)
     setError('')
     const caps = capabilities.split(',').map((c) => c.trim()).filter(Boolean)
+    const resolvedModel = (defaultModel === OTHER_MODEL ? customModel : defaultModel).trim() || undefined
     try {
       if (isEdit) {
-        await updateAgent(target!.id, { name: name.trim(), persona: persona.trim(), role: role.trim() || undefined, capabilities: caps })
+        await updateAgent(target!.id, {
+          name: name.trim(),
+          persona: persona.trim(),
+          role: role.trim() || undefined,
+          capabilities: caps,
+          defaultModel: resolvedModel,
+        })
         onSaved(target!.id)
       } else {
         const agent = await createAgent({
@@ -71,7 +115,7 @@ export function AgentEditorModal({
           persona: persona.trim(),
           role: role.trim() || undefined,
           capabilities: caps,
-          defaultModel: defaultModel.trim() || undefined,
+          defaultModel: resolvedModel,
         })
         onSaved(agent.id)
       }
@@ -136,17 +180,37 @@ export function AgentEditorModal({
             className="w-full border border-line bg-bg/40 px-2 py-1.5 text-sm text-text outline-none focus:border-accent/50"
           />
         </div>
-        {!isEdit && (
-          <div>
-            <label className="label mb-1 block">Default model (optional)</label>
+        <div>
+          <label className="label mb-1 block">Default model</label>
+          <select
+            value={defaultModel}
+            onChange={(e) => setDefaultModel(e.target.value)}
+            className="w-full border border-line bg-bg/40 px-2 py-1.5 text-sm text-text outline-none focus:border-accent/50"
+          >
+            <option value="">Use the gateway's default</option>
+            {MODEL_GROUPS.map((g) => (
+              <optgroup key={g.label} label={g.label}>
+                {g.options.map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </optgroup>
+            ))}
+            <option value={OTHER_MODEL}>Custom…</option>
+          </select>
+          {defaultModel === OTHER_MODEL && (
             <input
-              value={defaultModel}
-              onChange={(e) => setDefaultModel(e.target.value)}
-              placeholder="leave blank to use the gateway's default"
-              className="w-full border border-line bg-bg/40 px-2 py-1.5 text-sm text-text outline-none focus:border-accent/50"
+              value={customModel}
+              onChange={(e) => setCustomModel(e.target.value)}
+              autoFocus
+              placeholder="exact model id, e.g. claude-sonnet-4-5-20250929"
+              className="mt-1.5 w-full border border-line bg-bg/40 px-2 py-1.5 text-sm text-text outline-none focus:border-accent/50"
             />
-          </div>
-        )}
+          )}
+          <p className="mt-1 text-[10px] text-dim">
+            Only takes effect once the gateway itself has a real provider configured (an API key set on the gateway
+            process) — with none set, every agent gets the same deterministic stub regardless of this.
+          </p>
+        </div>
         {error && <p className="border border-danger/40 bg-danger/10 p-2 text-xs text-danger">{error}</p>}
         <button
           onClick={submit}

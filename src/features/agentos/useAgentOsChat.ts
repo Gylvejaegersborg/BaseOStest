@@ -5,6 +5,7 @@ import {
   createChatSession,
   getSessionHistory,
   listChatSessions,
+  renameChatSession,
   sendTurn,
   subscribeToSessionEvents,
   type AgentOsSession,
@@ -206,5 +207,16 @@ export function useAgentOsChat(agentId: string) {
     [refreshHistory],
   )
 
-  return { connection, errorText, sessions, sessionId, messages, streaming, workingOn, streamingText, send, cancel, newSession, switchSession }
+  const rename = useCallback(
+    async (id: string, title: string) => {
+      await renameChatSession(id, title)
+      await refreshSessions()
+    },
+    [refreshSessions],
+  )
+
+  return {
+    connection, errorText, sessions, sessionId, messages, streaming, workingOn, streamingText,
+    send, cancel, newSession, switchSession, rename,
+  }
 }

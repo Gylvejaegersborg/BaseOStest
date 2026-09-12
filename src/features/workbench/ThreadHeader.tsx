@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, ChevronDown } from 'lucide-react'
+import { Plus, ChevronDown, Pencil } from 'lucide-react'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { cn } from '@/lib/cn'
 import type { Agent } from '@/data/agents'
@@ -15,11 +15,28 @@ function sessionLabel(s: AgentOsSession): string {
  * the old standalone "Viewing X" line entirely (see Workbench.tsx). Click
  * to open the thread list (every session with this agent); unchanged
  * behavior from before, just relocated out of the conversation pane so it
- * reads as one continuous top strip instead of two stacked bars.
+ * reads as one continuous top strip instead of two stacked bars. Every row
+ * in that list can be renamed in place (default titles are just a
+ * formatted date/time, which stops being useful the moment you have more
+ * than one or two threads going).
  */
 export function ThreadHeader({ agent, chat }: { agent: Agent; chat: ReturnType<typeof useAgentOsChat> }) {
   const [open, setOpen] = useState(false)
+  const [renamingId, setRenamingId] = useState<string | null>(null)
+  const [renameValue, setRenameValue] = useState('')
   const current = chat.sessions.find((s) => s.id === chat.sessionId)
+
+  const startRename = (s: AgentOsSession) => {
+    setRenamingId(s.id)
+    setRenameValue(sessionLabel(s))
+  }
+
+  const commitRename = () => {
+    const id = renamingId
+    const title = renameValue.trim()
+    setRenamingId(null)
+    if (id && title) chat.rename(id, title)
+  }
 
   return (
     <div className="relative">
@@ -50,21 +67,48 @@ export function ThreadHeader({ agent, chat }: { agent: Agent; chat: ReturnType<t
             {!chat.sessions.length && <p className="px-3 py-4 text-center text-[11px] text-dim">No threads yet.</p>}
             {[...chat.sessions]
               .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
-              .map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => { chat.switchSession(s.id); setOpen(false) }}
-                  className={cn(
-                    'flex w-full flex-col gap-0.5 border-l-2 px-3 py-2.5 text-left transition-colors',
-                    s.id === chat.sessionId ? 'border-accent bg-accent/5' : 'border-transparent hover:bg-panel-2/50',
-                  )}
-                >
-                  <span className="flex items-center justify-between text-xs text-text">
-                    <span className="truncate">{sessionLabel(s)}</span>
-                    {s.status !== 'active' && <span className="text-[9px] text-dim">{s.status}</span>}
-                  </span>
-                </button>
-              ))}
+              .map((s) =>
+                renamingId === s.id ? (
+                  <div key={s.id} className="flex items-center gap-1 border-l-2 border-accent bg-accent/5 px-3 py-1.5">
+                    <input
+                      autoFocus
+                      value={renameValue}
+                      onChange={(e) => setRenameValue(e.target.value)}
+                      onFocus={(e) => e.target.select()}
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') commitRename()
+                        if (e.key === 'Escape') setRenamingId(null)
+                      }}
+                      onBlur={commitRename}
+                      className="min-w-0 flex-1 border border-line bg-bg/60 px-1.5 py-1 text-xs text-text outline-none focus:border-accent/50"
+                    />
+                  </div>
+                ) : (
+                  <button
+                    key={s.id}
+                    onClick={() => { chat.switchSession(s.id); setOpen(false) }}
+                    className={cn(
+                      'group flex w-full items-center justify-between gap-2 border-l-2 px-3 py-2.5 text-left transition-colors',
+                      s.id === chat.sessionId ? 'border-accent bg-accent/5' : 'border-transparent hover:bg-panel-2/50',
+                    )}
+                  >
+                    <span className="flex min-w-0 items-center gap-2 text-xs text-text">
+                      <span className="truncate">{sessionLabel(s)}</span>
+                      {s.status !== 'active' && <span className="shrink-0 text-[9px] text-dim">{s.status}</span>}
+                    </span>
+                    <span
+                      role="button"
+                      tabIndex={-1}
+                      onClick={(e) => { e.stopPropagation(); startRename(s) }}
+                      title="Rename thread"
+                      className="shrink-0 text-dim opacity-40 hover:text-accent group-hover:opacity-100"
+                    >
+                      <Pencil size={11} />
+                    </span>
+                  </button>
+                ),
+              )}
           </div>
         </>
       )}
