@@ -4,6 +4,7 @@ import { ArtifactsTab } from './ArtifactsTab'
 import { ApprovalsTab } from './ApprovalsTab'
 import { FlowTab } from './FlowTab'
 import { EventsTab } from './EventsTab'
+import { MemoryTab } from './MemoryTab'
 import { STRIP_TABS, type StripTab } from './WorkbenchTopStrip'
 import { useResizablePanel } from './useResizablePanel'
 import { ResizeHandle } from './ResizeHandle'
@@ -57,6 +58,7 @@ export function RightPanel({
           {tab === 'artifacts' && <ArtifactsTab agentId={agentId} />}
           {tab === 'approvals' && <ApprovalsTab />}
           {tab === 'events' && <EventsTab agentId={agentId} />}
+          {tab === 'memory' && <MemoryTab agentId={agentId} />}
         </div>
       </aside>
     </div>

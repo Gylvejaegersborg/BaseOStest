@@ -300,3 +300,102 @@ export function subscribeToSessionEvents(sessionId: string, onEvent: (e: Session
     if (e.payload.sessionId === sessionId) onEvent(e)
   })
 }
+
+// ---- Agent memory — "what has this agent learned" (agent-os's memory.ts,
+// surfaced via its gateway routes under /agents/:id/memory). See that
+// file's own header for the full model this mirrors: fast-path episodic
+// writes, a deterministic dreaming pass that's the ONLY thing allowed to
+// write curated memory, and an agent's own bounded "nominate, human
+// approves" voice. ----
+
+export type EpisodicKind = 'preference' | 'correction' | 'fact' | 'outcome' | 'skill-candidate'
+
+export interface AgentOsEpisodicEntry {
+  id: string
+  agentId: string
+  timestamp: string
+  content: string
+  kind: EpisodicKind
+  sourceSessionId: string
+  wasExplicitCorrection: boolean
+  repetitionCount: number
+  taskOutcome?: 'success' | 'failure'
+  agentFlaggedImportant?: boolean
+}
+
+export type NominationStatus = 'pending' | 'approved' | 'rejected'
+
+export interface AgentOsMemoryNomination {
+  id: string
+  agentId: string
+  content: string
+  kind: EpisodicKind
+  sourceSessionId: string
+  status: NominationStatus
+  nominatedAt: string
+  reviewedAt?: string
+  reviewNote?: string
+  resultingEpisodicEntryId?: string
+}
+
+export interface AgentOsMemoryPromotionDecision {
+  episodicEntryId: string
+  eligibilityScore: number
+  eligible: boolean
+  decision: 'promoted' | 'held'
+}
+
+export interface AgentOsDreamingPass {
+  id: string
+  ranAt: string
+  episodicEntriesReviewed: number
+  promotions: AgentOsMemoryPromotionDecision[]
+}
+
+export interface AgentOsCuratedMemory {
+  /** MEMORY.md-equivalent: durable facts, procedures, environment notes. */
+  content: string
+  /** USER.md-equivalent: user profile/preference information. */
+  userProfile: string
+  lastConsolidatedAt?: string
+}
+
+export interface AgentOsMemorySummary {
+  curated: AgentOsCuratedMemory
+  episodicCount: number
+  lastDreamingPass?: AgentOsDreamingPass
+}
+
+export function fetchAgentMemory(agentId: string): Promise<AgentOsMemorySummary> {
+  return request<AgentOsMemorySummary>(`/agents/${encodeURIComponent(agentId)}/memory`)
+}
+
+export async function fetchAgentEpisodicMemory(agentId: string): Promise<AgentOsEpisodicEntry[]> {
+  const { entries } = await request<{ entries: AgentOsEpisodicEntry[] }>(`/agents/${encodeURIComponent(agentId)}/memory/episodic`)
+  return entries
+}
+
+export async function fetchAgentDreamingPasses(agentId: string): Promise<AgentOsDreamingPass[]> {
+  const { passes } = await request<{ passes: AgentOsDreamingPass[] }>(`/agents/${encodeURIComponent(agentId)}/memory/dreaming-passes`)
+  return passes
+}
+
+export async function fetchAgentMemoryNominations(agentId: string, status?: NominationStatus): Promise<AgentOsMemoryNomination[]> {
+  const qs = status ? `?status=${status}` : ''
+  const { nominations } = await request<{ nominations: AgentOsMemoryNomination[] }>(`/agents/${encodeURIComponent(agentId)}/memory/nominations${qs}`)
+  return nominations
+}
+
+export function approveMemoryNomination(agentId: string, nominationId: string, reviewNote?: string): Promise<{ entry: AgentOsEpisodicEntry }> {
+  return request(`/agents/${encodeURIComponent(agentId)}/memory/nominations/${nominationId}/approve`, {
+    method: 'POST',
+    body: JSON.stringify({ reviewNote }),
+  })
+}
+
+export function rejectMemoryNomination(agentId: string, nominationId: string, reviewNote?: string): Promise<{ ok: true }> {
+  return request(`/agents/${encodeURIComponent(agentId)}/memory/nominations/${nominationId}/reject`, {
+    method: 'POST',
+    body: JSON.stringify({ reviewNote }),
+  })
+}

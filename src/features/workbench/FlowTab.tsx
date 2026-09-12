@@ -1,6 +1,8 @@
-import { CheckCircle2, XCircle, Clock, Loader2, Ban, ArrowRight, RotateCcw, Square } from 'lucide-react'
+import { useState } from 'react'
+import { CheckCircle2, XCircle, Clock, Loader2, Ban, ArrowRight, RotateCcw, Square, ChevronDown, ChevronRight } from 'lucide-react'
 import { useAgentOsFlow, useAgentOsFlowList } from '@/features/agentos/useAgentOsFlow'
-import type { AgentOsFlowStatus, AgentOsTaskStatus, FlowStepInput } from '@/features/agentos/sessionClient'
+import { useAgentOsTasks } from '@/features/agentos/useAgentOsTasks'
+import type { AgentOsFlowStatus, AgentOsTask, AgentOsTaskStatus, FlowStepInput } from '@/features/agentos/sessionClient'
 import { cn } from '@/lib/cn'
 
 const STEP_ICON: Record<AgentOsTaskStatus, typeof CheckCircle2> = {
@@ -30,6 +32,15 @@ const FLOW_COLOR: Record<AgentOsFlowStatus, string> = {
   cancelled: '#6b7785',
 }
 
+/** Same extraction used by TasksTab — `finalContent` for a chat-style
+ * turn, else a pretty-printed dump of whatever's in the task's output. */
+function taskOutputText(t: AgentOsTask | undefined): string | null {
+  const out = t?.output
+  if (out && typeof out.finalContent === 'string' && out.finalContent.trim()) return out.finalContent
+  if (out && Object.keys(out).length) return JSON.stringify(out, null, 2)
+  return null
+}
+
 /**
  * The workbench's Flow tab — live DAG view of the currently active Flow
  * (if any), with cancel/resume, plus a picker to switch to any other
@@ -52,14 +63,23 @@ export function FlowTab({
 }) {
   const { flow, error, cancel, resume } = useAgentOsFlow(flowId, steps)
   const { flows, loading } = useAgentOsFlowList()
+  const { tasks } = useAgentOsTasks(flowId ? { flowId } : {})
+  const [openStep, setOpenStep] = useState<string | null>(null)
 
   const stepMeta = (stepId: string) => steps.find((s) => s.id === stepId)
+  const taskFor = (taskId: string | undefined) => (taskId ? tasks.find((t) => t.id === taskId) : undefined)
 
   return (
     <div className="flex h-full flex-col">
       {error && <p className="border-b border-danger/40 bg-danger/10 p-2 text-xs text-danger">{error}</p>}
       {flow ? (
         <div className="flex-1 overflow-y-auto p-3">
+          {flow.status === 'cancelled' && flow.steps.some((s) => s.status === 'running') && (
+            <p className="mb-3 border border-line bg-panel-2/60 px-2.5 py-1.5 text-[11px] text-dim">
+              Cancelling a Flow stops any <em>not-yet-started</em> steps — it can't interrupt a step whose model call is already
+              in flight. The step below marked "running" will finish (or fail/time out) on its own.
+            </p>
+          )}
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs">
               <span className="text-dim">Flow</span>
@@ -93,19 +113,44 @@ export function FlowTab({
             {flow.steps.map((s) => {
               const meta = stepMeta(s.id)
               const Icon = STEP_ICON[s.status]
+              const task = taskFor(s.taskId)
+              const output = taskOutputText(task)
+              const isOpen = openStep === s.id
+              const Chevron = isOpen ? ChevronDown : ChevronRight
               return (
-                <div key={s.id} className="flex items-center gap-2 border border-line bg-bg/40 px-2.5 py-1.5 text-xs">
-                  <Icon size={13} style={{ color: STEP_COLOR[s.status] }} className={s.status === 'running' ? 'animate-spin' : undefined} />
-                  <span className="truncate text-text/80">{meta?.goal ?? s.id}</span>
-                  <span className="shrink-0 text-dim">· {meta?.agentId ?? '?'}</span>
-                  {s.dependsOn.length > 0 && (
-                    <span className="flex items-center gap-1 text-[10px] text-dim">
-                      <ArrowRight size={10} /> {s.dependsOn.join(', ')}
+                <div key={s.id} className="border border-line bg-bg/40">
+                  <button
+                    onClick={() => setOpenStep((cur) => (cur === s.id ? null : s.id))}
+                    className="flex w-full items-center gap-2 px-2.5 py-1.5 text-left text-xs hover:bg-panel-2/30"
+                  >
+                    <Chevron size={11} className="shrink-0 text-dim" />
+                    <Icon size={13} style={{ color: STEP_COLOR[s.status] }} className={s.status === 'running' ? 'animate-spin' : undefined} />
+                    <span className="truncate text-text/80">{meta?.goal ?? s.id}</span>
+                    <span className="shrink-0 text-dim">· {meta?.agentId ?? '?'}</span>
+                    {s.dependsOn.length > 0 && (
+                      <span className="flex items-center gap-1 text-[10px] text-dim">
+                        <ArrowRight size={10} /> {s.dependsOn.join(', ')}
+                      </span>
+                    )}
+                    <span className="ml-auto text-[10px] uppercase tracking-wider" style={{ color: STEP_COLOR[s.status] }}>
+                      {s.status}
                     </span>
+                  </button>
+                  {isOpen && (
+                    <div className="border-t border-line/40 px-2.5 py-2">
+                      {output ? (
+                        <pre className="max-h-64 overflow-y-auto whitespace-pre-wrap break-words text-[11px] text-text/80">{output}</pre>
+                      ) : (
+                        <p className="text-[11px] text-dim">
+                          {s.status === 'running' || s.status === 'queued'
+                            ? 'Still running — no output yet.'
+                            : s.taskId
+                              ? 'No output recorded for this step.'
+                              : "No task linked to this step yet — it hasn't started."}
+                        </p>
+                      )}
+                    </div>
                   )}
-                  <span className="ml-auto text-[10px] uppercase tracking-wider" style={{ color: STEP_COLOR[s.status] }}>
-                    {s.status}
-                  </span>
                 </div>
               )
             })}

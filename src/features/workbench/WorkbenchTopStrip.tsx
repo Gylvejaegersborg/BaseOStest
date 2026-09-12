@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
-import { ListChecks, Workflow, FileStack, ShieldCheck, Activity as ActivityIcon, Plus } from 'lucide-react'
+import { ListChecks, Workflow, FileStack, ShieldCheck, Activity as ActivityIcon, Brain, Plus } from 'lucide-react'
 import { cn } from '@/lib/cn'
 
-export type StripTab = 'tasks' | 'flow' | 'artifacts' | 'approvals' | 'events'
+export type StripTab = 'tasks' | 'flow' | 'artifacts' | 'approvals' | 'events' | 'memory'
 
 export const STRIP_TABS: { id: StripTab; label: string; icon: typeof ListChecks }[] = [
   { id: 'tasks', label: 'Tasks', icon: ListChecks },
@@ -10,6 +10,7 @@ export const STRIP_TABS: { id: StripTab; label: string; icon: typeof ListChecks 
   { id: 'artifacts', label: 'Artifacts', icon: FileStack },
   { id: 'approvals', label: 'Approvals', icon: ShieldCheck },
   { id: 'events', label: 'Events', icon: ActivityIcon },
+  { id: 'memory', label: 'Memory', icon: Brain },
 ]
 
 /**

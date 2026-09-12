@@ -1,9 +1,10 @@
-import { useState } from 'react'
-import { Plus, Trash2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Plus, Trash2, FileText, X } from 'lucide-react'
 import { Modal } from '@/components/ui/Modal'
 import { AGENTS } from '@/data/agents'
 import { FLOW_TEMPLATES, resolveFlowTemplate, type FlowTemplate } from '@/data/flowTemplates'
 import { createFlow, type FlowStepInput } from '@/features/agentos/sessionClient'
+import { deleteFlowDraft, listFlowDrafts, saveFlowDraft, type FlowDraft } from '@/data/flowDrafts'
 import { cn } from '@/lib/cn'
 
 const REAL_AGENTS = AGENTS.filter((a) => !a.id.includes('-w'))
@@ -44,6 +45,12 @@ export function NewFlowModal({
   const [customSteps, setCustomSteps] = useState<DraftStep[]>([])
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [drafts, setDrafts] = useState<FlowDraft[]>([])
+  const [draftId, setDraftId] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (open) setDrafts(listFlowDrafts())
+  }, [open])
 
   const reset = () => {
     setTemplate(null)
@@ -52,6 +59,28 @@ export function NewFlowModal({
     setOverrides({})
     setCustomSteps([])
     setError('')
+    setDraftId(null)
+  }
+
+  const resumeDraft = (d: FlowDraft) => {
+    setDraftId(d.id)
+    setError('')
+    if (d.kind === 'custom') {
+      setCustom(true)
+      setCustomSteps(
+        (d.customSteps ?? []).map((s) => ({ key: crypto.randomUUID(), id: s.id, agentId: s.agentId, goal: s.goal, dependsOn: s.dependsOn })),
+      )
+    } else {
+      const t = FLOW_TEMPLATES.find((t) => t.id === d.templateId) ?? null
+      setTemplate(t)
+      setGoal(d.goal ?? '')
+      setOverrides(d.overrides ?? {})
+    }
+  }
+
+  const removeDraft = (id: string) => {
+    deleteFlowDraft(id)
+    setDrafts((ds) => ds.filter((d) => d.id !== id))
   }
 
   const handleClose = () => {
@@ -103,6 +132,7 @@ export function NewFlowModal({
         steps = resolveFlowTemplate(template, goal.trim(), overrides)
       }
       const flow = await createFlow(steps)
+      if (draftId) deleteFlowDraft(draftId)
       onCreated(flow.id, steps)
       reset()
       onClose()
@@ -114,11 +144,52 @@ export function NewFlowModal({
   }
 
   const canSubmit = custom ? customValid : !!template && !!goal.trim()
+  const canSaveDraft = custom ? customSteps.length > 0 : !!template
+
+  const saveDraft = () => {
+    const id = draftId ?? crypto.randomUUID()
+    const draft: FlowDraft = custom
+      ? {
+          id,
+          name: customSteps[0]?.goal?.trim().slice(0, 60) || customSteps[0]?.id || 'Untitled custom flow',
+          createdAt: new Date().toISOString(),
+          kind: 'custom',
+          customSteps: customSteps.map((s) => ({ id: s.id.trim(), agentId: s.agentId, goal: s.goal, dependsOn: s.dependsOn })),
+        }
+      : {
+          id,
+          name: goal.trim().slice(0, 60) || template!.name,
+          createdAt: new Date().toISOString(),
+          kind: 'template',
+          templateId: template!.id,
+          goal,
+          overrides,
+        }
+    saveFlowDraft(draft)
+    reset()
+    onClose()
+  }
 
   return (
     <Modal open={open} onClose={handleClose} title="New Flow" code="WB.01" accent="#36e0c8" width={560}>
       {!template && !custom ? (
         <div className="space-y-2">
+          {drafts.length > 0 && (
+            <div className="mb-3 space-y-1.5 border border-line bg-bg/20 p-2">
+              <span className="label block">Drafts</span>
+              {drafts.map((d) => (
+                <div key={d.id} className="flex items-center gap-2 border border-line bg-bg/40 px-2 py-1.5 text-xs">
+                  <FileText size={12} className="shrink-0 text-dim" />
+                  <button onClick={() => resumeDraft(d)} className="flex-1 truncate text-left text-text/80 hover:text-accent">
+                    {d.name}
+                  </button>
+                  <button onClick={() => removeDraft(d.id)} title="Delete draft" className="shrink-0 text-dim hover:text-danger">
+                    <X size={13} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
           <p className="mb-2 text-xs text-dim">Pick a pattern — each step runs with its own agent, in order or in parallel.</p>
           {FLOW_TEMPLATES.map((t) => (
             <button
@@ -207,16 +278,25 @@ export function NewFlowModal({
             <p className="text-[10px] text-dim">Every step needs a unique id, an agent and a goal before this can start.</p>
           )}
           {error && <p className="border border-danger/40 bg-danger/10 p-2 text-xs text-danger">{error}</p>}
-          <button
-            onClick={submit}
-            disabled={!canSubmit || submitting}
-            className={cn(
-              'w-full border px-3 py-2 text-xs uppercase tracking-wider disabled:opacity-40',
-              'border-accent/40 bg-accent/10 text-accent hover:bg-accent/20',
-            )}
-          >
-            {submitting ? 'Starting…' : 'Start flow'}
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={saveDraft}
+              disabled={!canSaveDraft}
+              className="flex-1 border border-line px-3 py-2 text-xs uppercase tracking-wider text-text/80 hover:bg-panel-2 disabled:opacity-40"
+            >
+              Save as draft
+            </button>
+            <button
+              onClick={submit}
+              disabled={!canSubmit || submitting}
+              className={cn(
+                'flex-1 border px-3 py-2 text-xs uppercase tracking-wider disabled:opacity-40',
+                'border-accent/40 bg-accent/10 text-accent hover:bg-accent/20',
+              )}
+            >
+              {submitting ? 'Starting…' : 'Start flow'}
+            </button>
+          </div>
         </div>
       ) : (
         <div className="space-y-3">
@@ -258,16 +338,25 @@ export function NewFlowModal({
             ))}
           </div>
           {error && <p className="border border-danger/40 bg-danger/10 p-2 text-xs text-danger">{error}</p>}
-          <button
-            onClick={submit}
-            disabled={!canSubmit || submitting}
-            className={cn(
-              'w-full border px-3 py-2 text-xs uppercase tracking-wider disabled:opacity-40',
-              'border-accent/40 bg-accent/10 text-accent hover:bg-accent/20',
-            )}
-          >
-            {submitting ? 'Starting…' : 'Start flow'}
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={saveDraft}
+              disabled={!canSaveDraft}
+              className="flex-1 border border-line px-3 py-2 text-xs uppercase tracking-wider text-text/80 hover:bg-panel-2 disabled:opacity-40"
+            >
+              Save as draft
+            </button>
+            <button
+              onClick={submit}
+              disabled={!canSubmit || submitting}
+              className={cn(
+                'flex-1 border px-3 py-2 text-xs uppercase tracking-wider disabled:opacity-40',
+                'border-accent/40 bg-accent/10 text-accent hover:bg-accent/20',
+              )}
+            >
+              {submitting ? 'Starting…' : 'Start flow'}
+            </button>
+          </div>
         </div>
       )}
     </Modal>
