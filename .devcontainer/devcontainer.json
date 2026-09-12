@@ -2,17 +2,26 @@
   "name": "Personal OS",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
 
-  // Install deps once on first create, start the dev server on every start
-  "postCreateCommand": "npm install",
-  "postStartCommand": "npm run dev -- --host 0.0.0.0",
+  // Install deps + clone/install agent-os once on first create (setup.sh);
+  // start the agent-os gateway + BaseOStest's dev server on every start
+  // (start.sh) — see both scripts for what each step does and why.
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "postStartCommand": "bash .devcontainer/start.sh",
 
-  // Forward Vite's default port and open it in the browser automatically
-  "forwardPorts": [5173],
+  // Forward Vite's port (auto-opens in the browser) and the Agent-OS
+  // gateway's port (does NOT auto-open — it's an API, not a page).
+  "forwardPorts": [5173, 8787],
   "portsAttributes": {
     "5173": {
       "label": "Personal OS",
       "onAutoForward": "openBrowser",
       "protocol": "http"
+    },
+    "8787": {
+      "label": "Agent-OS gateway",
+      "onAutoForward": "notify",
+      "protocol": "http",
+      "visibility": "public"
     }
   },
 
