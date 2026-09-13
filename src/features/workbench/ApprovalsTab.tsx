@@ -1,6 +1,7 @@
-import { ThumbsUp, ThumbsDown } from 'lucide-react'
+import { ThumbsUp, ThumbsDown, FileEdit, FilePlus } from 'lucide-react'
 import { AGENTS } from '@/data/agents'
 import { useAgentOsApprovals } from '@/features/agentos/useAgentOsApprovals'
+import type { AgentOsApproval } from '@/features/agentos/sessionClient'
 
 function agentColor(id: string): string {
   return AGENTS.find((a) => a.id === id)?.color ?? '#6b7785'
@@ -8,6 +9,73 @@ function agentColor(id: string): string {
 
 function agentName(id: string): string {
   return AGENTS.find((a) => a.id === id)?.name ?? id
+}
+
+const MAX_DIFF_CHARS = 4000
+
+/** edit_file's whole call IS the diff — {old_string, new_string} needs no
+ * computed line-matching, just a removed/added block each, the same shape
+ * Claude Code/Codex render for a structured edit. write_file has no
+ * "before" content available here (nothing proactively reads the file
+ * just to build a preview), so it's shown as a flat "new content" block
+ * instead of a diff. Caps each side so one huge edit doesn't blow out the
+ * Approvals panel — this is a review surface, not a full file viewer. */
+function ToolCallPreview({ approval }: { approval: AgentOsApproval }) {
+  const { toolName, args } = approval
+
+  if (toolName === 'edit_file' && typeof args.old_string === 'string' && typeof args.new_string === 'string') {
+    const oldStr = args.old_string.slice(0, MAX_DIFF_CHARS)
+    const newStr = args.new_string.slice(0, MAX_DIFF_CHARS)
+    return (
+      <div className="mb-1.5">
+        {typeof args.path === 'string' && (
+          <div className="mb-1 flex items-center gap-1.5 text-[10px] text-dim">
+            <FileEdit size={11} /> <code className="text-text/80">{args.path}</code>
+            {args.replace_all === true && <span className="rounded-sm bg-panel-2 px-1 text-[9px] uppercase tracking-wider">all occurrences</span>}
+          </div>
+        )}
+        <pre className="max-h-48 overflow-y-auto whitespace-pre-wrap break-words border border-line bg-bg/60 p-1.5 text-[11px]">
+          {oldStr.split('\n').map((line, i) => (
+            <div key={`old-${i}`} className="bg-danger/10 text-danger">
+              − {line}
+            </div>
+          ))}
+          {newStr.split('\n').map((line, i) => (
+            <div key={`new-${i}`} style={{ backgroundColor: '#46d36915', color: '#46d369' }}>
+              + {line}
+            </div>
+          ))}
+        </pre>
+      </div>
+    )
+  }
+
+  if (toolName === 'write_file' && typeof args.content === 'string') {
+    const content = args.content.slice(0, MAX_DIFF_CHARS)
+    return (
+      <div className="mb-1.5">
+        {typeof args.path === 'string' && (
+          <div className="mb-1 flex items-center gap-1.5 text-[10px] text-dim">
+            <FilePlus size={11} /> <code className="text-text/80">{args.path}</code>
+            <span className="rounded-sm bg-panel-2 px-1 text-[9px] uppercase tracking-wider">new content</span>
+          </div>
+        )}
+        <pre className="max-h-48 overflow-y-auto whitespace-pre-wrap break-words border border-line bg-bg/60 p-1.5 text-[11px]" style={{ color: '#46d369' }}>
+          {content
+            .split('\n')
+            .map((line, i) => (
+              <div key={i}>+ {line}</div>
+            ))}
+        </pre>
+      </div>
+    )
+  }
+
+  if (typeof args.command === 'string') {
+    return <code className="mb-1.5 block max-w-full overflow-x-auto whitespace-pre text-[11px] text-text/85">{args.command}</code>
+  }
+
+  return null
 }
 
 /** Real, durable Agent-OS tool-execution approvals — moved here from
@@ -43,9 +111,7 @@ export function ApprovalsTab() {
               <code className="text-text/80">{a.toolName}</code>
               <span>· {new Date(a.requestedAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</span>
             </div>
-            {typeof a.args.command === 'string' && (
-              <code className="mb-1.5 block max-w-full overflow-x-auto whitespace-pre text-[11px] text-text/85">{a.args.command}</code>
-            )}
+            <ToolCallPreview approval={a} />
             <p className="mb-2 text-[11px] text-dim">{a.reason}</p>
             <div className="flex gap-2">
               <button
