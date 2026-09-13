@@ -156,7 +156,7 @@ export function useAgentOsChat(agentId: string) {
   }, [sessionId, connection, refreshHistory])
 
   const send = useCallback(
-    async (text: string) => {
+    async (text: string, planMode?: boolean) => {
       const id = sessionIdRef.current
       if (!id || connection !== 'ready' || !text.trim()) return
 
@@ -165,7 +165,7 @@ export function useAgentOsChat(agentId: string) {
       setStreaming(true)
 
       try {
-        await sendTurn(id, text)
+        await sendTurn(id, text, planMode)
       } catch (err) {
         setMessages((m) => [
           ...m,

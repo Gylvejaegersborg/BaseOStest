@@ -83,8 +83,8 @@ export async function getSessionHistory(sessionId: string): Promise<AgentOsHisto
  *  calls, cancellation) is instead observed via subscribeToSessionEvents
  *  below, concurrently with this call. A generous 120s timeout since a
  *  real model call plus tool hops can genuinely take a while. */
-export function sendTurn(sessionId: string, userMessage: string): Promise<AgentOsTurnResult> {
-  return request<AgentOsTurnResult>(`/sessions/${sessionId}/turns`, { method: 'POST', body: JSON.stringify({ userMessage }) }, 120000)
+export function sendTurn(sessionId: string, userMessage: string, planMode?: boolean): Promise<AgentOsTurnResult> {
+  return request<AgentOsTurnResult>(`/sessions/${sessionId}/turns`, { method: 'POST', body: JSON.stringify({ userMessage, planMode }) }, 120000)
 }
 
 export function cancelChatSession(sessionId: string, reason?: string): Promise<AgentOsSession> {
