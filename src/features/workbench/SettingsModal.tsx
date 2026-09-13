@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Plus, Trash2, Pencil } from 'lucide-react'
+import { Plus, Trash2, Pencil, Webhook } from 'lucide-react'
 import { Modal } from '@/components/ui/Modal'
-import { fetchSkills, fetchSkill, saveSkill, deleteSkill, type SkillMetadata } from '@/features/agentos/client'
+import { fetchSkills, fetchSkill, saveSkill, deleteSkill, fetchConfiguredHooks, type SkillMetadata, type ConfiguredHook } from '@/features/agentos/client'
 import { cn } from '@/lib/cn'
+
+type SettingsSection = 'skills' | 'hooks'
 
 /** Empty-string sentinel for "no skill selected yet" vs "editing a new,
  * unsaved one" — keeps the three modes (list / editing existing /
@@ -20,7 +22,11 @@ const NEW_SKILL = '__new__'
  * capability by itself, just context the model can choose to load).
  */
 export function SettingsModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [section, setSection] = useState<SettingsSection>('skills')
   const [skills, setSkills] = useState<SkillMetadata[]>([])
+  const [hooks, setHooks] = useState<ConfiguredHook[]>([])
+  const [hooksLoading, setHooksLoading] = useState(true)
+  const [hooksError, setHooksError] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [editingName, setEditingName] = useState<string | null>(null)
@@ -45,6 +51,18 @@ export function SettingsModal({ open, onClose }: { open: boolean; onClose: () =>
 
   useEffect(() => {
     if (open) refresh()
+  }, [open])
+
+  useEffect(() => {
+    if (!open) return
+    setHooksLoading(true)
+    fetchConfiguredHooks()
+      .then((h) => {
+        setHooks(h)
+        setHooksError('')
+      })
+      .catch((err) => setHooksError((err as Error)?.message ?? 'Could not load hooks'))
+      .finally(() => setHooksLoading(false))
   }, [open])
 
   const startNew = () => {
@@ -104,7 +122,49 @@ export function SettingsModal({ open, onClose }: { open: boolean; onClose: () =>
 
   return (
     <Modal open={open} onClose={onClose} title="Settings" code="WB.02" accent="#f0a020" width={620}>
-      {!isEditing ? (
+      {!isEditing && (
+        <div className="mb-3 flex gap-1 border-b border-line">
+          {(['skills', 'hooks'] as const).map((s) => (
+            <button
+              key={s}
+              onClick={() => setSection(s)}
+              className={cn(
+                'border-b-2 px-3 py-1.5 text-[11px] uppercase tracking-wider',
+                section === s ? 'border-accent text-accent' : 'border-transparent text-dim hover:text-text',
+              )}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
+      {section === 'hooks' && !isEditing ? (
+        <div className="space-y-3">
+          <p className="text-[11px] text-dim">
+            Read-only — agent-os's <code>hooks.json</code> (<code>AGENT_OS_HOOKS_FILE</code> to point elsewhere), loaded once at gateway startup.
+            Edit the file directly (or ask the Engineer agent, which already has file-tool access) and restart the gateway to pick up changes —
+            hooks can't be hot-reloaded safely.
+          </p>
+          {hooksError && <p className="border border-danger/40 bg-danger/10 p-2 text-xs text-danger">{hooksError}</p>}
+          {hooksLoading && <p className="text-xs text-dim">Loading…</p>}
+          {!hooksLoading && !hooks.length && <p className="border border-line bg-bg/20 p-2 text-[11px] text-dim">No hooks configured.</p>}
+          <div className="space-y-1.5">
+            {hooks.map((h, i) => (
+              <div key={i} className="flex items-start gap-2 border border-line bg-bg/40 p-2.5">
+                <Webhook size={14} className="mt-0.5 shrink-0 text-dim" />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 text-sm text-text/90">
+                    {h.label ?? h.event}
+                    <span className="rounded-sm bg-panel-2 px-1 text-[9px] uppercase tracking-wider text-dim">{h.event}</span>
+                    {h.matchTool && <span className="rounded-sm bg-panel-2 px-1 text-[9px] text-dim">only {h.matchTool}</span>}
+                  </div>
+                  <code className="mt-0.5 block truncate text-[11px] text-dim">{h.command}</code>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : !isEditing ? (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="label">Skills</span>

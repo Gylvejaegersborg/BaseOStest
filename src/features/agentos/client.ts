@@ -144,3 +144,21 @@ export function saveSkill(input: SaveSkillInput): Promise<SkillFull> {
 export function deleteSkill(name: string): Promise<{ ok: true }> {
   return deleteJSON<{ ok: true }>(`/skills/${encodeURIComponent(name)}`)
 }
+
+// ---- Configured hooks — read-only visibility into agent-os's
+// hooks.json (configured-hooks.ts). No write here on purpose: editing
+// the file and restarting the gateway is the real contract (hooks.ts's
+// registry has no hot-reload/removal-by-source mechanism), so this is
+// "what's actually loaded right now," not an editor. ----
+
+export interface ConfiguredHook {
+  event: string
+  command: string
+  matchTool?: string
+  label?: string
+}
+
+export async function fetchConfiguredHooks(): Promise<ConfiguredHook[]> {
+  const { hooks } = await getJSON<{ hooks: ConfiguredHook[] }>('/hooks')
+  return hooks
+}
