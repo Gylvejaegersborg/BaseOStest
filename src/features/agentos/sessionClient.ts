@@ -35,6 +35,20 @@ export interface AgentOsTurnResult {
   cancelled?: boolean
 }
 
+export interface AgentOsSessionUsage {
+  inputTokens: number
+  outputTokens: number
+  /** How many turns in this session actually reported usage — 0 means
+   * "never reported" (the stub model, or a provider whose response
+   * didn't carry it), not "really did use zero tokens." Treat 0 as
+   * "nothing to show" rather than a real measurement. */
+  turnsWithUsage: number
+}
+
+export function fetchSessionUsage(sessionId: string): Promise<AgentOsSessionUsage> {
+  return request<AgentOsSessionUsage>(`/sessions/${sessionId}/usage`)
+}
+
 async function request<T>(path: string, init?: RequestInit, timeoutMs = 60000): Promise<T> {
   if (!BASE) throw new Error('agent-os gateway not configured')
   const res = await fetch(`${BASE}${path}`, {
@@ -69,8 +83,8 @@ export async function getSessionHistory(sessionId: string): Promise<AgentOsHisto
  *  calls, cancellation) is instead observed via subscribeToSessionEvents
  *  below, concurrently with this call. A generous 120s timeout since a
  *  real model call plus tool hops can genuinely take a while. */
-export function sendTurn(sessionId: string, userMessage: string): Promise<AgentOsTurnResult> {
-  return request<AgentOsTurnResult>(`/sessions/${sessionId}/turns`, { method: 'POST', body: JSON.stringify({ userMessage }) }, 120000)
+export function sendTurn(sessionId: string, userMessage: string, planMode?: boolean): Promise<AgentOsTurnResult> {
+  return request<AgentOsTurnResult>(`/sessions/${sessionId}/turns`, { method: 'POST', body: JSON.stringify({ userMessage, planMode }) }, 120000)
 }
 
 export function cancelChatSession(sessionId: string, reason?: string): Promise<AgentOsSession> {
@@ -398,4 +412,27 @@ export function rejectMemoryNomination(agentId: string, nominationId: string, re
     method: 'POST',
     body: JSON.stringify({ reviewNote }),
   })
+}
+
+// ---- File revisions — per-file undo for edit_file/write_file
+// (agent-os's file-revisions.ts). A scoped-down "checkpoint" — undoes
+// ONE file's mutations, not a full session rewind. ----
+
+export interface AgentOsFileRevision {
+  id: string
+  path: string
+  timestamp: string
+  previousContent?: string
+  existedBefore: boolean
+  tool: 'edit_file' | 'write_file' | 'restore'
+}
+
+export async function fetchFileRevisions(path?: string): Promise<AgentOsFileRevision[]> {
+  const qs = path ? `?path=${encodeURIComponent(path)}` : ''
+  const { revisions } = await request<{ revisions: AgentOsFileRevision[] }>(`/files/revisions${qs}`)
+  return revisions
+}
+
+export function restoreFileRevision(id: string): Promise<{ ok: true }> {
+  return request(`/files/revisions/${encodeURIComponent(id)}/restore`, { method: 'POST' })
 }

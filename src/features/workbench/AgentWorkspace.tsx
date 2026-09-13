@@ -18,6 +18,7 @@ export function AgentWorkspace({
   activePanel,
   onSelectTab,
   onNewFlow,
+  onOpenSettings,
   flowId,
   flowSteps,
   onSelectFlow,
@@ -26,6 +27,7 @@ export function AgentWorkspace({
   activePanel: StripTab | null
   onSelectTab: (tab: StripTab) => void
   onNewFlow: () => void
+  onOpenSettings: () => void
   flowId: string | null
   flowSteps: FlowStepInput[]
   onSelectFlow: (id: string | null, steps: FlowStepInput[]) => void
@@ -43,6 +45,7 @@ export function AgentWorkspace({
         activePanel={activePanel}
         onSelectTab={onSelectTab}
         onNewFlow={onNewFlow}
+        onOpenSettings={onOpenSettings}
       />
       <div className="flex min-h-0 flex-1">
         <ConversationPane agent={agent} chat={chat} />

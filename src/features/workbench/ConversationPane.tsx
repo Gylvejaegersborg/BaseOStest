@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Mic, Paperclip, Send, Square, X, Bot, AlertTriangle } from 'lucide-react'
+import { Mic, Paperclip, Send, Square, X, Bot, AlertTriangle, Eye } from 'lucide-react'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { cn } from '@/lib/cn'
 import type { Agent } from '@/data/agents'
@@ -29,6 +29,7 @@ export function ConversationPane({ agent, chat }: { agent: Agent; chat: ReturnTy
   const [draft, setDraft] = useState('')
   const [pending, setPending] = useState<Attachment[]>([])
   const [dragging, setDragging] = useState(false)
+  const [planMode, setPlanMode] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -52,7 +53,7 @@ export function ConversationPane({ agent, chat }: { agent: Agent; chat: ReturnTy
     const withAttachments = pending.length
       ? `${draft.trim()}\n\n[attached: ${pending.map((a) => a.name).join(', ')}]`
       : draft.trim()
-    chat.send(withAttachments)
+    chat.send(withAttachments, planMode)
     setDraft('')
     setPending([])
   }
@@ -122,7 +123,23 @@ export function ConversationPane({ agent, chat }: { agent: Agent; chat: ReturnTy
             ))}
           </div>
         )}
+        {planMode && (
+          <p className="mb-2 flex items-center gap-1.5 text-[11px] text-dim">
+            <Eye size={12} /> Plan mode: {agent.name} can only inspect this turn — shell/file edits/delegation are blocked by the harness, not just
+            asked not to.
+          </p>
+        )}
         <div className="flex items-end gap-2">
+          <button
+            onClick={() => setPlanMode((p) => !p)}
+            title={planMode ? 'Plan mode on — click to allow real changes again' : 'Plan mode off — click to inspect only, no real changes'}
+            className={cn(
+              'border p-2 transition-colors',
+              planMode ? 'border-accent/50 bg-accent/10 text-accent' : 'border-line text-dim hover:border-accent/60 hover:text-accent',
+            )}
+          >
+            <Eye size={16} />
+          </button>
           <button onClick={() => fileRef.current?.click()} className="border border-line p-2 text-dim hover:border-accent/60 hover:text-accent" title="Attach file">
             <Paperclip size={16} />
           </button>

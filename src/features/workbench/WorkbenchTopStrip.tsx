@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
-import { ListChecks, Workflow, FileStack, ShieldCheck, Activity as ActivityIcon, Brain, Plus } from 'lucide-react'
+import { ListChecks, Workflow, FileStack, ShieldCheck, Activity as ActivityIcon, Brain, History, Plus, Settings } from 'lucide-react'
 import { cn } from '@/lib/cn'
 
-export type StripTab = 'tasks' | 'flow' | 'artifacts' | 'approvals' | 'events' | 'memory'
+export type StripTab = 'tasks' | 'flow' | 'artifacts' | 'approvals' | 'events' | 'memory' | 'files'
 
 export const STRIP_TABS: { id: StripTab; label: string; icon: typeof ListChecks }[] = [
   { id: 'tasks', label: 'Tasks', icon: ListChecks },
@@ -11,6 +11,7 @@ export const STRIP_TABS: { id: StripTab; label: string; icon: typeof ListChecks 
   { id: 'approvals', label: 'Approvals', icon: ShieldCheck },
   { id: 'events', label: 'Events', icon: ActivityIcon },
   { id: 'memory', label: 'Memory', icon: Brain },
+  { id: 'files', label: 'Files', icon: History },
 ]
 
 /**
@@ -27,11 +28,13 @@ export function WorkbenchTopStrip({
   activePanel,
   onSelectTab,
   onNewFlow,
+  onOpenSettings,
 }: {
   left: ReactNode
   activePanel: StripTab | null
   onSelectTab: (tab: StripTab) => void
   onNewFlow: () => void
+  onOpenSettings: () => void
 }) {
   return (
     <div className="flex items-center justify-between gap-3 border-b border-line px-3 py-2">
@@ -58,6 +61,13 @@ export function WorkbenchTopStrip({
           className="ml-1 flex items-center gap-1.5 border border-accent/40 bg-accent/10 px-2.5 py-1.5 text-[11px] uppercase tracking-wider text-accent hover:bg-accent/20"
         >
           <Plus size={12} /> <span className="hidden sm:inline">New Flow</span>
+        </button>
+        <button
+          onClick={onOpenSettings}
+          title="Settings"
+          className="flex items-center gap-1.5 border border-transparent px-2 py-1.5 text-dim hover:border-line hover:text-text"
+        >
+          <Settings size={14} />
         </button>
       </div>
     </div>
