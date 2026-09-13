@@ -48,6 +48,16 @@ async function writeJSON<T>(method: 'POST' | 'PUT', path: string, body: unknown,
   return res.json() as Promise<T>
 }
 
+async function deleteJSON<T>(path: string, timeoutMs = 5000): Promise<T> {
+  if (!BASE) throw new Error('agent-os gateway not configured')
+  const res = await fetch(`${BASE}${path}`, { method: 'DELETE', headers: { accept: 'application/json' }, signal: AbortSignal.timeout(timeoutMs) })
+  if (!res.ok) {
+    const errBody = await res.json().catch(() => null)
+    throw new Error(errBody?.error ?? `agent-os gateway ${res.status} on ${path}`)
+  }
+  return res.json() as Promise<T>
+}
+
 export async function fetchAgents(): Promise<AgentOsAgent[]> {
   const { agents } = await getJSON<{ agents: AgentOsAgent[] }>('/agents')
   return agents
@@ -85,4 +95,52 @@ export interface UpdateAgentInput {
  *  server-derived, not editable here. */
 export function updateAgent(id: string, input: UpdateAgentInput): Promise<AgentOsAgent> {
   return writeJSON<AgentOsAgent>('PUT', `/agents/${encodeURIComponent(id)}`, input)
+}
+
+// ---- Skills — agentskills.io-format instructions every agent shares
+// (agent-os's skills.ts). Human-managed: this is a settings surface for
+// the operator to curate the catalog directly, not something an agent
+// writes to itself. ----
+
+export interface SkillMetadata {
+  name: string
+  description: string
+  license?: string
+  compatibility?: string
+  metadata?: Record<string, string>
+  allowedTools?: string[]
+}
+
+export interface SkillFull extends SkillMetadata {
+  body: string
+}
+
+export async function fetchSkills(): Promise<SkillMetadata[]> {
+  const { skills } = await getJSON<{ skills: SkillMetadata[] }>('/skills')
+  return skills
+}
+
+export function fetchSkill(name: string): Promise<SkillFull> {
+  return getJSON<SkillFull>(`/skills/${encodeURIComponent(name)}`)
+}
+
+export interface SaveSkillInput {
+  name: string
+  description: string
+  body: string
+  license?: string
+  compatibility?: string
+  metadata?: Record<string, string>
+  allowedTools?: string[]
+}
+
+/** POST {base}/skills — creates or overwrites a skill by name (agent-os's
+ *  writeSkill() + a hot-registration into the live catalog, no gateway
+ *  restart needed). */
+export function saveSkill(input: SaveSkillInput): Promise<SkillFull> {
+  return writeJSON<SkillFull>('POST', '/skills', input)
+}
+
+export function deleteSkill(name: string): Promise<{ ok: true }> {
+  return deleteJSON<{ ok: true }>(`/skills/${encodeURIComponent(name)}`)
 }

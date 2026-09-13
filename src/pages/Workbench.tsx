@@ -5,6 +5,7 @@ import { AgentWorkspace } from '@/features/workbench/AgentWorkspace'
 import { WorkbenchTopStrip, type StripTab } from '@/features/workbench/WorkbenchTopStrip'
 import { RightPanel } from '@/features/workbench/RightPanel'
 import { NewFlowModal } from '@/features/workbench/NewFlowModal'
+import { SettingsModal } from '@/features/workbench/SettingsModal'
 import { useAgentOsContext } from '@/features/agentos/AgentOsProvider'
 import type { FlowStepInput } from '@/features/agentos/sessionClient'
 
@@ -30,6 +31,7 @@ export function Workbench() {
   const [activeFlowId, setActiveFlowId] = useState<string | null>(null)
   const [activeFlowSteps, setActiveFlowSteps] = useState<FlowStepInput[]>([])
   const [newFlowOpen, setNewFlowOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   const selectAgent = (id: string) => {
     setSelectedAgentId(id)
@@ -57,6 +59,7 @@ export function Workbench() {
             activePanel={activePanel}
             onSelectTab={selectTab}
             onNewFlow={() => setNewFlowOpen(true)}
+            onOpenSettings={() => setSettingsOpen(true)}
             flowId={activeFlowId}
             flowSteps={activeFlowSteps}
             onSelectFlow={selectFlow}
@@ -68,6 +71,7 @@ export function Workbench() {
               activePanel={activePanel}
               onSelectTab={selectTab}
               onNewFlow={() => setNewFlowOpen(true)}
+              onOpenSettings={() => setSettingsOpen(true)}
             />
             <div className="flex min-h-0 flex-1">
               <div className="flex flex-1 items-center justify-center text-xs text-dim">Pick an agent on the left to open a conversation.</div>
@@ -94,6 +98,7 @@ export function Workbench() {
           setActivePanel('flow')
         }}
       />
+      <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </div>
   )
 }
