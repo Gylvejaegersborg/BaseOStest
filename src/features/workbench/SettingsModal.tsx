@@ -1,7 +1,16 @@
 import { useEffect, useState } from 'react'
-import { Plus, Trash2, Pencil, Webhook } from 'lucide-react'
+import { Plus, Trash2, Pencil, Webhook, Link2 } from 'lucide-react'
 import { Modal } from '@/components/ui/Modal'
-import { fetchSkills, fetchSkill, saveSkill, deleteSkill, fetchConfiguredHooks, type SkillMetadata, type ConfiguredHook } from '@/features/agentos/client'
+import {
+  fetchSkills,
+  fetchSkill,
+  saveSkill,
+  deleteSkill,
+  installSkillFromUrl,
+  fetchConfiguredHooks,
+  type SkillMetadata,
+  type ConfiguredHook,
+} from '@/features/agentos/client'
 import { cn } from '@/lib/cn'
 
 type SettingsSection = 'skills' | 'hooks'
@@ -36,6 +45,8 @@ export function SettingsModal({ open, onClose }: { open: boolean; onClose: () =>
   const [body, setBody] = useState('')
   const [saving, setSaving] = useState(false)
   const [busyName, setBusyName] = useState<string | null>(null)
+  const [installingUrl, setInstallingUrl] = useState(false)
+  const [installUrl, setInstallUrl] = useState('')
 
   const refresh = async () => {
     setLoading(true)
@@ -102,6 +113,21 @@ export function SettingsModal({ open, onClose }: { open: boolean; onClose: () =>
       setError((err as Error)?.message ?? 'Could not save skill')
     } finally {
       setSaving(false)
+    }
+  }
+
+  const installFromUrl = async () => {
+    if (!installUrl.trim()) return
+    setInstallingUrl(true)
+    setError('')
+    try {
+      await installSkillFromUrl(installUrl.trim())
+      setInstallUrl('')
+      await refresh()
+    } catch (err) {
+      setError((err as Error)?.message ?? 'Could not install skill from that URL')
+    } finally {
+      setInstallingUrl(false)
     }
   }
 
@@ -179,6 +205,23 @@ export function SettingsModal({ open, onClose }: { open: boolean; onClose: () =>
             agentskills.io-format instructions, shared by every agent — each one's name+description is always in context; the full body only
             loads when an agent actually calls the <code>skill</code> tool for it.
           </p>
+          <div className="flex items-center gap-1.5">
+            <Link2 size={12} className="shrink-0 text-dim" />
+            <input
+              value={installUrl}
+              onChange={(e) => setInstallUrl(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && installFromUrl()}
+              placeholder="Install from URL — a raw SKILL.md link…"
+              className="min-w-0 flex-1 border border-line bg-bg/40 px-2 py-1 text-xs text-text outline-none placeholder:text-dim focus:border-accent/50"
+            />
+            <button
+              onClick={installFromUrl}
+              disabled={!installUrl.trim() || installingUrl}
+              className="shrink-0 border border-line px-2.5 py-1 text-[11px] uppercase tracking-wider text-text/80 hover:bg-panel-2 disabled:opacity-40"
+            >
+              {installingUrl ? 'Installing…' : 'Install'}
+            </button>
+          </div>
           {error && <p className="border border-danger/40 bg-danger/10 p-2 text-xs text-danger">{error}</p>}
           {loading && <p className="text-xs text-dim">Loading…</p>}
           {!loading && !skills.length && <p className="border border-line bg-bg/20 p-2 text-[11px] text-dim">No skills yet.</p>}

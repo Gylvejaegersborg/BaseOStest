@@ -145,6 +145,12 @@ export function deleteSkill(name: string): Promise<{ ok: true }> {
   return deleteJSON<{ ok: true }>(`/skills/${encodeURIComponent(name)}`)
 }
 
+/** POST {base}/skills/install — fetches a raw SKILL.md from any URL
+ *  server-side and installs it exactly like a hand-authored one. */
+export function installSkillFromUrl(url: string): Promise<SkillFull> {
+  return writeJSON<SkillFull>('POST', '/skills/install', { url })
+}
+
 // ---- Configured hooks — read-only visibility into agent-os's
 // hooks.json (configured-hooks.ts). No write here on purpose: editing
 // the file and restarting the gateway is the real contract (hooks.ts's
