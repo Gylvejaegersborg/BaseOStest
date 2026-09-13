@@ -35,6 +35,20 @@ export interface AgentOsTurnResult {
   cancelled?: boolean
 }
 
+export interface AgentOsSessionUsage {
+  inputTokens: number
+  outputTokens: number
+  /** How many turns in this session actually reported usage — 0 means
+   * "never reported" (the stub model, or a provider whose response
+   * didn't carry it), not "really did use zero tokens." Treat 0 as
+   * "nothing to show" rather than a real measurement. */
+  turnsWithUsage: number
+}
+
+export function fetchSessionUsage(sessionId: string): Promise<AgentOsSessionUsage> {
+  return request<AgentOsSessionUsage>(`/sessions/${sessionId}/usage`)
+}
+
 async function request<T>(path: string, init?: RequestInit, timeoutMs = 60000): Promise<T> {
   if (!BASE) throw new Error('agent-os gateway not configured')
   const res = await fetch(`${BASE}${path}`, {

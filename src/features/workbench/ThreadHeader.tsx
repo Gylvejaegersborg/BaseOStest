@@ -5,6 +5,11 @@ import { cn } from '@/lib/cn'
 import type { Agent } from '@/data/agents'
 import type { useAgentOsChat } from '@/features/agentos/useAgentOsChat'
 import type { AgentOsSession } from '@/features/agentos/sessionClient'
+import { useAgentOsSessionUsage } from '@/features/agentos/useAgentOsSessionUsage'
+
+function fmtTokens(n: number): string {
+  return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n)
+}
 
 function sessionLabel(s: AgentOsSession): string {
   return s.title || new Date(s.createdAt).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
@@ -25,6 +30,7 @@ export function ThreadHeader({ agent, chat }: { agent: Agent; chat: ReturnType<t
   const [renamingId, setRenamingId] = useState<string | null>(null)
   const [renameValue, setRenameValue] = useState('')
   const current = chat.sessions.find((s) => s.id === chat.sessionId)
+  const usage = useAgentOsSessionUsage(chat.sessionId, chat.streaming)
 
   const startRename = (s: AgentOsSession) => {
     setRenamingId(s.id)
@@ -50,6 +56,14 @@ export function ThreadHeader({ agent, chat }: { agent: Agent; chat: ReturnType<t
         <StatusDot color={agent.color} size={7} />
         <span className="font-display text-sm tracking-wider" style={{ color: agent.color }}>{agent.name}</span>
         <span className="min-w-0 max-w-[220px] truncate text-xs text-dim">{current ? sessionLabel(current) : 'New chat'}</span>
+        {!!usage?.turnsWithUsage && (
+          <span
+            title={`${usage.inputTokens.toLocaleString()} input + ${usage.outputTokens.toLocaleString()} output tokens this thread`}
+            className="shrink-0 rounded-sm bg-panel-2 px-1.5 py-0.5 text-[10px] text-dim"
+          >
+            {fmtTokens(usage.inputTokens + usage.outputTokens)} tok
+          </span>
+        )}
         <button
           onClick={(e) => { e.stopPropagation(); chat.newSession() }}
           disabled={chat.connection !== 'ready'}
