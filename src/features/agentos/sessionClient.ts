@@ -413,3 +413,26 @@ export function rejectMemoryNomination(agentId: string, nominationId: string, re
     body: JSON.stringify({ reviewNote }),
   })
 }
+
+// ---- File revisions — per-file undo for edit_file/write_file
+// (agent-os's file-revisions.ts). A scoped-down "checkpoint" — undoes
+// ONE file's mutations, not a full session rewind. ----
+
+export interface AgentOsFileRevision {
+  id: string
+  path: string
+  timestamp: string
+  previousContent?: string
+  existedBefore: boolean
+  tool: 'edit_file' | 'write_file' | 'restore'
+}
+
+export async function fetchFileRevisions(path?: string): Promise<AgentOsFileRevision[]> {
+  const qs = path ? `?path=${encodeURIComponent(path)}` : ''
+  const { revisions } = await request<{ revisions: AgentOsFileRevision[] }>(`/files/revisions${qs}`)
+  return revisions
+}
+
+export function restoreFileRevision(id: string): Promise<{ ok: true }> {
+  return request(`/files/revisions/${encodeURIComponent(id)}/restore`, { method: 'POST' })
+}
