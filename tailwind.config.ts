@@ -171,6 +171,14 @@ export default {
           from: { opacity: '0', transform: 'scale(0.98)' },
           to: { opacity: '1', transform: 'scale(1)' },
         },
+        // Mobile's dock-zone mechanism (Phase 6, responsive pass) — the
+        // same summoned-panel role as desktop's side pane, entering from
+        // the bottom instead since there's no edge to drag to on a narrow
+        // screen.
+        'sheet-up': {
+          from: { opacity: '0', transform: 'translateY(100%)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
       },
       animation: {
         twinkle: 'twinkle 3s ease-in-out infinite',
@@ -191,6 +199,7 @@ export default {
         'ambient-pulse': 'ambient-pulse 3s ease-in-out infinite',
         'cross-fade': 'cross-fade 220ms cubic-bezier(0.2, 0, 0, 1)',
         'settle-forward': 'settle-forward 280ms cubic-bezier(0.34, 1.2, 0.64, 1)',
+        'sheet-up': 'sheet-up 220ms cubic-bezier(0.2, 0, 0, 1)',
       },
     },
   },

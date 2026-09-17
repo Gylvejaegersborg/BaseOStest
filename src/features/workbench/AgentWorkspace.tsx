@@ -1,3 +1,4 @@
+import { ChevronLeft } from 'lucide-react'
 import { useAgentOsContext } from '@/features/agentos/AgentOsProvider'
 import { useAgentOsChat } from '@/features/agentos/useAgentOsChat'
 import type { FlowStepInput } from '@/features/agentos/sessionClient'
@@ -24,6 +25,7 @@ export function AgentWorkspace({
   onSelectFlow,
   dockedNoteId,
   onDockNote,
+  onBack,
 }: {
   agentId: string
   activePanel: StripTab | null
@@ -35,6 +37,7 @@ export function AgentWorkspace({
   onSelectFlow: (id: string | null, steps: FlowStepInput[]) => void
   dockedNoteId: string | null
   onDockNote: (id: string | null) => void
+  onBack: () => void
 }) {
   const { agents } = useAgentOsContext()
   const agent = agents.find((a) => a.id === agentId)
@@ -45,7 +48,14 @@ export function AgentWorkspace({
   return (
     <>
       <WorkbenchTopStrip
-        left={<ThreadHeader agent={agent} chat={chat} />}
+        left={
+          <div className="flex min-w-0 items-center gap-2">
+            <button onClick={onBack} className="shrink-0 text-dim hover:text-text lg:hidden" title="Back to agents">
+              <ChevronLeft size={14} />
+            </button>
+            <ThreadHeader agent={agent} chat={chat} />
+          </div>
+        }
         activePanel={activePanel}
         onSelectTab={onSelectTab}
         onNewFlow={onNewFlow}

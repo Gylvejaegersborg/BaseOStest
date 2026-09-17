@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ChevronLeft } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import { AgentRail } from '@/features/workbench/AgentRail'
 import { AgentWorkspace } from '@/features/workbench/AgentWorkspace'
@@ -9,6 +10,7 @@ import { NewFlowModal } from '@/features/workbench/NewFlowModal'
 import { SettingsModal } from '@/features/workbench/SettingsModal'
 import { useAgentOsContext } from '@/features/agentos/AgentOsProvider'
 import type { FlowStepInput } from '@/features/agentos/sessionClient'
+import { cn } from '@/lib/cn'
 
 /**
  * The single-page Agent-OS workbench — the merged replacement for the old
@@ -20,6 +22,12 @@ import type { FlowStepInput } from '@/features/agentos/sessionClient'
  * live as icon toggles in the top strip, opening a right-side panel one
  * at a time (Claude Code's own side-panel pattern) rather than an
  * always-visible bottom strip.
+ *
+ * Responsive pass (Phase 6): desktop keeps the rail + main-content
+ * multi-pane layout at all times; below `lg` it collapses to a single
+ * focused surface per the design doc ("focused surface is single-pane
+ * at all times") — the rail full-width until an agent or Team is picked,
+ * then that surface takes over full-width with a back control to return.
  */
 export function Workbench() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -61,15 +69,34 @@ export function Workbench() {
   // an activity-bar icon has.
   const selectTab = (tab: StripTab) => setActivePanel((cur) => (cur === tab ? null : tab))
 
+  // Below `lg`, this is the single focused surface's "back" action —
+  // returns to the rail as the mobile home view.
+  const backToRail = () => {
+    setSelectedAgentId(null)
+    setSearchParams({}, { replace: true })
+    setActivePanel((cur) => (cur === 'team' ? null : cur))
+  }
+
+  const railFocused = !selectedAgentId && activePanel !== 'team'
+
   return (
     <div className="flex h-full">
-      <AgentRail selectedAgentId={selectedAgentId} onSelect={selectAgent} />
+      <div className={cn('h-full', railFocused ? 'flex' : 'hidden lg:flex')}>
+        <AgentRail selectedAgentId={selectedAgentId} onSelect={selectAgent} />
+      </div>
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className={cn('min-w-0 flex-1 flex-col', railFocused ? 'hidden lg:flex' : 'flex')}>
         {activePanel === 'team' ? (
           <>
             <WorkbenchTopStrip
-              left={<span className="text-xs text-dim">Team</span>}
+              left={
+                <span className="flex items-center gap-2 text-xs text-dim">
+                  <button onClick={backToRail} className="text-dim hover:text-text lg:hidden" title="Back to agents">
+                    <ChevronLeft size={14} />
+                  </button>
+                  Team
+                </span>
+              }
               activePanel={activePanel}
               onSelectTab={selectTab}
               onNewFlow={() => setNewFlowOpen(true)}
@@ -92,6 +119,7 @@ export function Workbench() {
             onSelectFlow={selectFlow}
             dockedNoteId={dockedNoteId}
             onDockNote={dockNote}
+            onBack={backToRail}
           />
         ) : (
           <>
