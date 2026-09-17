@@ -19,7 +19,10 @@ interface Options {
  *  current width and the onMouseDown to put on the drag handle element;
  *  the rest (mousemove/mouseup while dragging) is handled here via
  *  window-level listeners so the drag keeps tracking even if the cursor
- *  leaves the handle itself. */
+ *  leaves the handle itself.
+ *
+ *  System-wide primitive (design-system workspace model) — any resizable
+ *  structural or summoned panel uses this, not just Workbench's rail. */
 export function useResizablePanel({ defaultWidth, min, max, edge, storageKey }: Options) {
   const [width, setWidth] = useState(() => {
     try {

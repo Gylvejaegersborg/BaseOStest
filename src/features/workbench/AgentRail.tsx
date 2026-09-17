@@ -5,8 +5,8 @@ import { StatusDot } from '@/components/ui/StatusDot'
 import { useAgentOsContext } from '@/features/agentos/AgentOsProvider'
 import { fetchAgent } from '@/features/agentos/client'
 import { AgentEditorModal } from './AgentEditorModal'
-import { useResizablePanel } from './useResizablePanel'
-import { ResizeHandle } from './ResizeHandle'
+import { useResizablePanel } from '@/components/ui/useResizablePanel'
+import { ResizeHandle } from '@/components/ui/ResizeHandle'
 import { cn } from '@/lib/cn'
 
 const STATUS_COLOR: Record<Agent['status'], string> = {
