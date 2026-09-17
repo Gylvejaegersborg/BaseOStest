@@ -121,3 +121,12 @@ export const NAV_SECTIONS = SECTIONS.filter((s) => s.id !== 'home')
 export function sectionById(id: SectionId): Section {
   return SECTIONS.find((s) => s.id === id)!
 }
+
+/** Which section a route belongs to — shared by the rail, mobile nav, and
+ *  the shell's cross-fade transition so "what section am I in" is computed
+ *  once, not reimplemented per consumer. */
+export function sectionForPath(pathname: string): Section {
+  return (
+    SECTIONS.find((s) => (s.route === '/' ? pathname === '/' : pathname.startsWith(s.route))) ?? SECTIONS[0]
+  )
+}

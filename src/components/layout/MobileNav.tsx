@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { MoreHorizontal, X } from 'lucide-react'
-import { SECTIONS, type SectionId } from '@/data/sections'
+import { SECTIONS, sectionForPath, type SectionId } from '@/data/sections'
 import { clock } from '@/lib/time'
 import { useAgentActivitySignal } from '@/features/agentos/useAgentActivitySignal'
 import { cn } from '@/lib/cn'
@@ -22,9 +22,7 @@ export function MobileTopBar() {
     return () => clearInterval(t)
   }, [])
 
-  const section =
-    SECTIONS.find((s) => (s.route === '/' ? location.pathname === '/' : location.pathname.startsWith(s.route))) ??
-    SECTIONS[0]
+  const section = sectionForPath(location.pathname)
 
   return (
     <header className="flex h-12 shrink-0 items-center justify-between border-b border-line bg-panel/80 px-3 backdrop-blur lg:hidden">
@@ -48,9 +46,7 @@ export function MobileBottomNav() {
 
   const primary = PRIMARY_IDS.map((id) => SECTIONS.find((s) => s.id === id)!)
   const overflow = SECTIONS.filter((s) => !PRIMARY_IDS.includes(s.id))
-  const overflowActive = overflow.some((s) =>
-    s.route === '/' ? location.pathname === '/' : location.pathname.startsWith(s.route),
-  )
+  const overflowActive = !PRIMARY_IDS.includes(sectionForPath(location.pathname).id)
 
   return (
     <>
