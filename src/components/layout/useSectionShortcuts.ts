@@ -15,7 +15,12 @@ export function useSectionShortcuts(onJump: () => void) {
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (!e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) return
-      const index = Number(e.key) - 1
+      // e.key reflects the shifted character (Shift+1 → "!" on most layouts,
+      // not "1"), so it can't be used to detect a digit while Shift is held.
+      // e.code reports the physical key regardless of modifiers.
+      const match = /^Digit([0-9])$/.exec(e.code)
+      if (!match) return
+      const index = Number(match[1]) - 1
       if (!(index >= 0 && index < SECTION_SHORTCUTS.length)) return
 
       const target = e.target as HTMLElement | null
