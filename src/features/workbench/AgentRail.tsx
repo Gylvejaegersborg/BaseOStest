@@ -120,8 +120,11 @@ export function AgentRail({ selectedAgentId, onSelect }: { selectedAgentId: stri
   }
 
   return (
-    <div className="flex h-full shrink-0">
-      <aside className="flex h-full flex-col overflow-y-auto border-r border-line bg-panel/30" style={{ width }}>
+    <div className="flex h-full shrink-0 max-lg:w-full">
+      <aside
+        className="flex h-full flex-col overflow-y-auto border-r border-line bg-panel/30 max-lg:!w-full"
+        style={{ width }}
+      >
         <div className="flex items-center justify-between border-b border-line px-3 py-2">
           <button onClick={toggleCollapsed} title="Collapse" className="text-dim hover:text-accent">
             <ChevronsLeft size={14} />
@@ -169,7 +172,7 @@ export function AgentRail({ selectedAgentId, onSelect }: { selectedAgentId: stri
 
         {modal}
       </aside>
-      <ResizeHandle onMouseDown={onMouseDown} />
+      <ResizeHandle onMouseDown={onMouseDown} className="max-lg:hidden" />
     </div>
   )
 }
