@@ -82,6 +82,13 @@
 .prose-term {
   @apply text-text/90 text-sm leading-relaxed;
 }
+/* Notes' calm register (Phase 5, page-specific patterns) — the first real
+ * use of the `read` typeface, on the compound selector so it wins on
+ * specificity over .prose-term's own text-sm rather than fighting it via
+ * utility-class order (which is undefined against a plain CSS class). */
+.prose-term.prose-read {
+  @apply font-read text-base leading-loose;
+}
 .prose-term h1,
 .prose-term h2,
 .prose-term h3 {

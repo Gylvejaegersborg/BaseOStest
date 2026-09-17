@@ -5,6 +5,14 @@ import { AGENTS } from '@/data/agents'
 import { Panel } from '@/components/ui/Panel'
 import { StatusDot } from '@/components/ui/StatusDot'
 
+/**
+ * Ops is the deliberate Command Deck exception (design territories,
+ * page-specific patterns): every Panel below is left at its legacy flat
+ * look on purpose — no `elevation` prop, no atmosphere tint, radius-none —
+ * so this page reads as sharp/rigid-HUD by choice, not because it never
+ * got migrated to the new depth system the rest of the app uses.
+ */
+
 const STATE_COLOR = { up: '#46d369', degraded: '#f0a020', down: '#ff5566' } as const
 const SEV_COLOR: Record<OpsError['severity'], string> = { error: '#ff5566', warn: '#f0a020', info: '#6b7785' }
 const DEVICE_ICON: Record<string, typeof Cpu> = {
