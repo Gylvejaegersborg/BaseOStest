@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useEffect } from 'react'
-import { X } from 'lucide-react'
+import { Panel } from './Panel'
 
 interface ModalProps {
   open: boolean
@@ -12,6 +12,12 @@ interface ModalProps {
   width?: number
 }
 
+/** Modal is Panel in its contained role (dismissible), sharing one header/
+ *  dismiss implementation instead of duplicating it. Visual output is kept
+ *  identical to before this merge (bg-panel, border-line-2, shadow-glow,
+ *  square corners) rather than adopting Panel's elevation-4 look here —
+ *  that system-wide visual shift belongs to the page-specific phase, applied
+ *  deliberately per surface rather than defaulted onto every modal at once. */
 export function Modal({ open, onClose, title, code, accent, children, width = 560 }: ModalProps) {
   useEffect(() => {
     if (!open) return
@@ -28,22 +34,22 @@ export function Modal({ open, onClose, title, code, accent, children, width = 56
       onClick={onClose}
     >
       <div
-        className="relative w-full border border-line-2 bg-panel shadow-glow max-h-[85dvh] flex flex-col"
-        style={{ maxWidth: width, borderColor: accent ? `${accent}55` : undefined }}
+        className="relative w-full max-h-[85dvh]"
+        style={{ maxWidth: width }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-line px-4 py-3">
-          <div className="flex items-baseline gap-2">
-            {code && <span className="text-[10px] tracking-widest text-dim">{code}</span>}
-            <h3 className="font-display uppercase tracking-wider" style={{ color: accent ?? '#c8d2dc' }}>
-              {title}
-            </h3>
-          </div>
-          <button onClick={onClose} className="text-dim hover:text-text transition-colors">
-            <X size={16} />
-          </button>
-        </div>
-        <div className="overflow-y-auto p-4">{children}</div>
+        <Panel
+          title={title}
+          code={code}
+          accent={accent}
+          dismissible
+          onDismiss={onClose}
+          className="max-h-[85dvh] border-line-2 bg-panel shadow-glow"
+          bodyClassName="overflow-y-auto p-4"
+          style={{ borderColor: accent ? `${accent}55` : undefined }}
+        >
+          {children}
+        </Panel>
       </div>
     </div>
   )

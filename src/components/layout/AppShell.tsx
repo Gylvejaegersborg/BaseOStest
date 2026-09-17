@@ -1,6 +1,6 @@
 import { Outlet, useLocation } from 'react-router-dom'
 import { NavBar } from './NavBar'
-import { MobileNav } from './MobileNav'
+import { MobileTopBar, MobileBottomNav } from './MobileNav'
 import { TopBar } from './TopBar'
 import { StatusBar } from './StatusBar'
 import { CalendarProvider, useCalendar } from '@/features/calendar/CalendarContext'
@@ -31,7 +31,7 @@ export function AppShell() {
       <div className="flex h-dvh w-full overflow-hidden bg-bg text-text">
         <NavBar className="hidden lg:flex" />
         <div className="flex min-w-0 flex-1 flex-col">
-          <MobileNav />
+          <MobileTopBar />
           {!isHome && (
             <div className="hidden lg:block">
               <TopBar />
@@ -45,6 +45,7 @@ export function AppShell() {
               <StatusBar />
             </div>
           )}
+          <MobileBottomNav />
         </div>
       </div>
       <GlobalNudges />

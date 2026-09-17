@@ -7,8 +7,8 @@ import { EventsTab } from './EventsTab'
 import { MemoryTab } from './MemoryTab'
 import { FileRevisionsTab } from './FileRevisionsTab'
 import { STRIP_TABS, type StripTab } from './WorkbenchTopStrip'
-import { useResizablePanel } from './useResizablePanel'
-import { ResizeHandle } from './ResizeHandle'
+import { useResizablePanel } from '@/components/ui/useResizablePanel'
+import { ResizeHandle } from '@/components/ui/ResizeHandle'
 import type { FlowStepInput } from '@/features/agentos/sessionClient'
 
 /**

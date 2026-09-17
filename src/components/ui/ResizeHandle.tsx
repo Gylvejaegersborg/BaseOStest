@@ -1,7 +1,10 @@
 import { cn } from '@/lib/cn'
 
 /** The visual/interactive strip for useResizablePanel's onMouseDown — a
- *  thin bar that highlights on hover/drag so it reads as grabbable. */
+ *  thin bar that highlights on hover/drag so it reads as grabbable.
+ *
+ *  System-wide primitive (design-system workspace model) — pairs with
+ *  useResizablePanel for any resizable structural or summoned panel. */
 export function ResizeHandle({ onMouseDown, className }: { onMouseDown: (e: React.MouseEvent) => void; className?: string }) {
   return (
     <div
