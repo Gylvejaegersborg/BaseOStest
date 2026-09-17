@@ -141,7 +141,7 @@ export function ConversationPane({
           <div className="mb-2 flex flex-wrap gap-2">
             {pending.map((a) => (
               <span key={a.id} className="flex items-center gap-1.5 border border-line bg-panel-2 px-2 py-1 text-[11px]">
-                {a.kind === 'audio' ? <Mic size={11} className="text-magenta" /> : <Paperclip size={11} className="text-accent" />}
+                {a.kind === 'audio' ? <Mic size={11} className="text-danger" /> : <Paperclip size={11} className="text-accent" />}
                 <span className="max-w-[160px] truncate">{a.name}</span>
                 <span className="text-dim">{fmtSize(a.size)}</span>
                 <button onClick={() => setPending((p) => p.filter((x) => x.id !== a.id))} className="text-dim hover:text-danger">
@@ -362,14 +362,14 @@ function MicButton({ onClip }: { onClip: (att: { id: string; name: string; size:
       onClick={recording ? stop : start}
       className={cn(
         'flex items-center gap-1.5 border p-2 transition-colors',
-        recording ? 'border-magenta/60 bg-magenta/10 text-magenta' : 'border-line text-dim hover:border-magenta/60 hover:text-magenta',
+        recording ? 'border-danger/60 bg-danger/10 text-danger' : 'border-line text-dim hover:border-danger/60 hover:text-danger',
       )}
       title={recording ? 'Stop recording' : 'Record voice'}
     >
       {recording ? <Square size={16} /> : <Mic size={16} />}
       {recording && (
         <span className="flex items-center gap-1.5 text-[11px] tabular-nums">
-          <StatusDot color="#e0408a" pulse size={6} />
+          <StatusDot color="#ff5566" pulse size={6} />
           {String(Math.floor(secs / 60)).padStart(2, '0')}:{String(secs % 60).padStart(2, '0')}
         </span>
       )}

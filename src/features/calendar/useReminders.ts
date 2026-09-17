@@ -263,7 +263,7 @@ export function useReminders(
         refId: id,
         source: 'appt',
         title: 'Test reminder',
-        color: '#36e0c8',
+        color: '#c77591',
         stage: 'manual',
         body: 'This is what a nudge looks like. Reminders are live.',
       },

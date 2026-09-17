@@ -16,7 +16,13 @@ export default {
         'line-2': '#363330',
         text: '#c8d2dc',
         dim: '#6b7785',
-        accent: '#36e0c8',
+        // Accent (revised) — moved off the teal/cyan that had become the de
+        // facto color of every button, border and highlight in the app,
+        // toward a desaturated rose (purple/pink/red family) per direct
+        // feedback. Per-agent/per-section/category colors elsewhere are
+        // untouched — those are deliberate differentiation, not this fatigue.
+        accent: '#c77591',
+
         amber: '#f0a020',
         magenta: '#e0408a',
         'neon-green': '#46d369',
@@ -85,7 +91,7 @@ export default {
         forward: 'cubic-bezier(0.34, 1.2, 0.64, 1)',
       },
       boxShadow: {
-        glow: '0 0 0 1px rgba(54,224,200,0.25), 0 0 14px -2px rgba(54,224,200,0.35)',
+        glow: '0 0 0 1px rgba(199,117,145,0.25), 0 0 14px -2px rgba(199,117,145,0.35)',
         'glow-magenta': '0 0 0 1px rgba(224,64,138,0.25), 0 0 14px -2px rgba(224,64,138,0.35)',
         // Elevation shadows (design tokens, Phase 0) — pairs with surface-3/surface-4 for
         // summoned and contained panels.

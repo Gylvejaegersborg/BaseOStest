@@ -38,7 +38,7 @@ export const SECTIONS: Section[] = [
     route: '/',
     icon: Orbit,
     blurb: 'The map. Every section a sun, every project a planet in orbit.',
-    accent: '#36e0c8',
+    accent: '#c77591',
   },
   {
     id: 'notes',
@@ -56,7 +56,7 @@ export const SECTIONS: Section[] = [
     route: '/workbench',
     icon: Bot,
     blurb: 'Every agent, one surface: conversations, tasks, flows, artifacts and approvals.',
-    accent: '#36e0c8',
+    accent: '#c77591',
   },
   {
     id: 'calendar',
@@ -83,7 +83,7 @@ export const SECTIONS: Section[] = [
     route: '/lab',
     icon: FlaskConical,
     blurb: 'Live pages and apps you have built. Poke, preview and test them.',
-    accent: '#36e0c8',
+    accent: '#c77591',
   },
   {
     id: 'ops',

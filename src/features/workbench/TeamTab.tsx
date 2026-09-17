@@ -137,7 +137,7 @@ function BriefTab({
       <div className="space-y-3">
         <RunPanel hasToken={hasToken} onRefresh={onRefresh} />
         <AutomationToggle hasToken={hasToken} />
-        <Panel title="Roster" code="TEAM.AGT" accent="#36e0c8" bodyClassName="space-y-2 p-2">
+        <Panel title="Roster" code="TEAM.AGT" accent="#c77591" bodyClassName="space-y-2 p-2">
         {agents.map((a) => (
           <div key={a.id} className="border border-line bg-bg/40 p-2" style={{ borderLeftColor: agentColor(a.id), borderLeftWidth: 2 }}>
             <div className="flex items-center gap-2 text-xs">

@@ -19,7 +19,7 @@ export function StatusBar() {
     <footer className="flex h-6 items-center justify-between border-t border-line bg-panel/60 px-4 text-[10px] tracking-wider text-dim">
       <div className="flex items-center gap-3">
         <span className="flex items-center gap-1.5">
-          <StatusDot color={connection === 'live' ? '#46d369' : '#36e0c8'} size={6} /> SYSTEM NOMINAL
+          <StatusDot color={connection === 'live' ? '#46d369' : '#c77591'} size={6} /> SYSTEM NOMINAL
         </span>
         <span className="hidden sm:inline">{CONNECTION_LABEL[connection] ?? CONNECTION_LABEL.mock}</span>
       </div>

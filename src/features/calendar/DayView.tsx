@@ -167,7 +167,7 @@ export function DayView({
         <Panel
           title="Agents gathered"
           code="AGT"
-          accent="#36e0c8"
+          accent="#c77591"
           bodyClassName="p-2"
           right={<Bot size={13} className="text-dim" />}
         >
@@ -213,7 +213,7 @@ function NowLine({ now }: { now: Date }) {
     <div className="flex items-center gap-2 py-1" aria-label="current time">
       <span className="text-[9px] font-medium tabular-nums text-accent">{format(now, 'HH:mm')}</span>
       <span className="h-px flex-1 bg-accent/60" />
-      <StatusDot color="#36e0c8" pulse size={5} />
+      <StatusDot color="#c77591" pulse size={5} />
     </div>
   )
 }
