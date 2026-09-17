@@ -104,6 +104,15 @@ export function NavBar({ className }: { className?: string }) {
               >
                 {({ isActive }) => (
                   <>
+                    {sectionAmbient && (
+                      // Ambient presence as atmosphere, not a badge — a soft
+                      // wash entering from the row's right (content-facing)
+                      // edge and fading out toward the rail's outer edge.
+                      <span
+                        className="pointer-events-none absolute inset-0 animate-ambient-pulse"
+                        style={{ background: `linear-gradient(to left, ${s.accent}4d, transparent 75%)` }}
+                      />
+                    )}
                     <span
                       className={cn(
                         'absolute left-0 top-1/2 h-7 w-0.5 -translate-y-1/2 transition-all',
@@ -113,12 +122,6 @@ export function NavBar({ className }: { className?: string }) {
                     />
                     <span className="relative">
                       <Icon size={18} style={isActive ? { color: s.accent } : undefined} />
-                      {sectionAmbient && (
-                        <span
-                          className="absolute -right-1 -top-1 h-1.5 w-1.5 rounded-full animate-ambient-pulse"
-                          style={{ backgroundColor: s.accent }}
-                        />
-                      )}
                       {sectionActionable > 0 && (
                         <span className="absolute -right-1 -top-1 h-1.5 w-1.5 rounded-full bg-danger" />
                       )}
