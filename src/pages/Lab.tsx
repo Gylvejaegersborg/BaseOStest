@@ -1,6 +1,6 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
-import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe, Gauge, Music2, Download, Workflow, Grid3x3, Film, Anchor, ClipboardCheck, Scissors, Stethoscope, Signature } from 'lucide-react'
-import { LAB_MODULES, type LabModule } from '@/data/labs'
+import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe, Gauge, Music2, Download, Workflow, Grid3x3, Film, Anchor, ClipboardCheck, Scissors, Stethoscope, Signature, ChevronDown } from 'lucide-react'
+import { LAB_MODULES, LAB_GROUPS, type LabModule, type LabGroup } from '@/data/labs'
 import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
 import { Panel } from '@/components/ui/Panel'
 import { Modal } from '@/components/ui/Modal'
@@ -84,6 +84,13 @@ export function Lab() {
   const overlay = useOsOverlay()
   const labModules = useMemo(() => mergeById(LAB_MODULES, overlay.lab), [overlay.lab])
   const selected = labModules.find((m) => m.id === selectedId)!
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<LabGroup>>(new Set())
+  const toggleGroup = (g: LabGroup) =>
+    setCollapsedGroups((prev) => {
+      const next = new Set(prev)
+      next.has(g) ? next.delete(g) : next.add(g)
+      return next
+    })
 
   const openModule = (id: string) => {
     setSelectedId(id)
@@ -97,10 +104,31 @@ export function Lab() {
           <h1 className="font-display text-2xl tracking-wider text-text">LAB</h1>
           <p className="text-xs text-dim">Pages and apps you have built. Preview, launch and poke them.</p>
         </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {labModules.map((m) => (
-            <ModuleCard key={m.id} mod={m} active={m.id === selectedId} onClick={() => openModule(m.id)} />
-          ))}
+        <div className="flex flex-col gap-5">
+          {LAB_GROUPS.map((group) => {
+            const modules = labModules.filter((m) => (m.group ?? 'sandbox') === group.id)
+            if (modules.length === 0) return null
+            const collapsed = collapsedGroups.has(group.id)
+            return (
+              <div key={group.id}>
+                <button
+                  onClick={() => toggleGroup(group.id)}
+                  className="mb-2 flex items-center gap-2 text-dim hover:text-text"
+                >
+                  <ChevronDown size={13} className={cn('transition-transform', collapsed && '-rotate-90')} />
+                  <span className="font-display text-xs uppercase tracking-widest">{group.label}</span>
+                  <span className="text-[10px] text-dim">{modules.length}</span>
+                </button>
+                {!collapsed && (
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                    {modules.map((m) => (
+                      <ModuleCard key={m.id} mod={m} active={m.id === selectedId} onClick={() => openModule(m.id)} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
       </div>
 

@@ -9,7 +9,6 @@ import { Projects } from './pages/Projects'
 import { Lab } from './pages/Lab'
 import { Ops } from './pages/Ops'
 
-const Sudoku = lazy(() => import('./pages/Sudoku').then((m) => ({ default: m.Sudoku })))
 const Weather = lazy(() => import('./pages/Weather').then((m) => ({ default: m.Weather })))
 const Team = lazy(() => import('./pages/Team').then((m) => ({ default: m.Team })))
 
@@ -18,6 +17,13 @@ const Team = lazy(() => import('./pages/Team').then((m) => ({ default: m.Team })
  *  working, preserving the ?agent= query param. */
 function LegacyRedirect() {
   return <Navigate to={{ pathname: '/workbench', search: window.location.search }} replace />
+}
+
+/** The standalone Sudoku route is retired — it now lives as a Lab module
+ *  (grouped under Sandbox), consistent with Lab holding ISΛRK's other
+ *  small standalone builds rather than duplicating routing for one of them. */
+function SudokuRedirect() {
+  return <Navigate to="/lab" replace />
 }
 
 const router = createBrowserRouter([
@@ -50,14 +56,7 @@ const router = createBrowserRouter([
           </Suspense>
         ),
       },
-      {
-        path: 'sudoku',
-        element: (
-          <Suspense fallback={<div className="h-full w-full bg-claude-bg" />}>
-            <Sudoku />
-          </Suspense>
-        ),
-      },
+      { path: 'sudoku', element: <SudokuRedirect /> },
     ],
   },
 ])
