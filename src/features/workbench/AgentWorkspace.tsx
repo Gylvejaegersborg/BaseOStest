@@ -58,7 +58,6 @@ export function AgentWorkspace({
         }
         activePanel={activePanel}
         onSelectTab={onSelectTab}
-        onNewFlow={onNewFlow}
         onOpenSettings={onOpenSettings}
       />
       <div className="flex min-h-0 flex-1">
@@ -73,6 +72,7 @@ export function AgentWorkspace({
             onClose={() => onSelectTab(activePanel)}
             dockedNoteId={dockedNoteId}
             onSelectNote={onDockNote}
+            onNewFlow={onNewFlow}
           />
         )}
       </div>

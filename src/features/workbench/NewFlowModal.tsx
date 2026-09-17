@@ -171,7 +171,7 @@ export function NewFlowModal({
   }
 
   return (
-    <Modal open={open} onClose={handleClose} title="New Flow" code="WB.01" accent="#36e0c8" width={560}>
+    <Modal open={open} onClose={handleClose} title="New Flow" code="WB.01" accent="#c77591" width={560}>
       {!template && !custom ? (
         <div className="space-y-2">
           {drafts.length > 0 && (

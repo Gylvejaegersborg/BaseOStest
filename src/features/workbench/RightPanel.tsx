@@ -35,6 +35,7 @@ export function RightPanel({
   onClose,
   dockedNoteId,
   onSelectNote,
+  onNewFlow,
 }: {
   tab: StripTab
   agentId: string | null
@@ -44,6 +45,7 @@ export function RightPanel({
   onClose: () => void
   dockedNoteId: string | null
   onSelectNote: (id: string | null) => void
+  onNewFlow: () => void
 }) {
   const label = STRIP_TABS.find((t) => t.id === tab)?.label ?? tab
   const { width, onMouseDown } = useResizablePanel({
@@ -71,7 +73,7 @@ export function RightPanel({
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto">
             {tab === 'tasks' && <TasksTab agentId={agentId} />}
-            {tab === 'flow' && <FlowTab flowId={flowId} steps={flowSteps} onSelectFlow={onSelectFlow} />}
+            {tab === 'flow' && <FlowTab flowId={flowId} steps={flowSteps} onSelectFlow={onSelectFlow} onNewFlow={onNewFlow} />}
             {tab === 'artifacts' && <ArtifactsTab agentId={agentId} />}
             {tab === 'approvals' && <ApprovalsTab />}
             {tab === 'events' && <EventsTab agentId={agentId} />}

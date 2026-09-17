@@ -24,7 +24,7 @@ function mergeAgent(local: Agent, remote: AgentOsAgent | undefined): Agent {
 // agent" form) that have no entry in the bundled presentational roster —
 // deterministic per id so a given agent keeps the same color across
 // reloads without needing its own persisted color field anywhere.
-const SYNTH_PALETTE = ['#36e0c8', '#f0a020', '#e0408a', '#58b6f0', '#46d369', '#b07ce8', '#e3d24b', '#ff6b6b']
+const SYNTH_PALETTE = ['#c77591', '#f0a020', '#e0408a', '#58b6f0', '#46d369', '#b07ce8', '#e3d24b', '#ff6b6b']
 
 function synthColor(id: string): string {
   let h = 0

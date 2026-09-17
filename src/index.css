@@ -17,7 +17,7 @@
     @apply bg-bg text-text font-mono antialiased;
     margin: 0;
     background-image:
-      radial-gradient(circle at 20% -10%, rgba(54, 224, 200, 0.05), transparent 45%),
+      radial-gradient(circle at 20% -10%, rgba(199, 117, 145, 0.05), transparent 45%),
       radial-gradient(circle at 90% 110%, rgba(224, 64, 138, 0.05), transparent 45%);
     background-attachment: fixed;
   }
@@ -116,7 +116,7 @@
   @apply list-decimal pl-5 my-3 space-y-1 marker:text-dim;
 }
 .prose-term blockquote {
-  @apply border-l-2 border-magenta/60 pl-3 my-3 text-dim italic;
+  @apply border-l-2 border-line-2 pl-3 my-3 text-dim italic;
 }
 .prose-term code {
   @apply bg-panel-2 text-amber px-1.5 py-0.5 rounded text-[0.85em];

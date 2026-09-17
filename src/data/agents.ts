@@ -27,7 +27,7 @@ export const AGENTS: Agent[] = [
     name: 'Claude',
     role: 'Builder · Code',
     model: 'claude-code',
-    color: '#36e0c8',
+    color: '#c77591',
     status: 'working',
     task: 'Wiring the Notes section to the vault API',
     stats: { tasksDone: 184, tokens: '12.4M', uptime: '6d 04h', load: 0.62 },

@@ -260,7 +260,7 @@ export function Calendar() {
 
         <TaskPanel tasks={tasks} onToggle={toggleTask} onEdit={setEditingTask} onAdd={addTask} />
 
-        <Panel title="AI Cron Jobs" code="AGT" accent="#36e0c8" bodyClassName="p-2">
+        <Panel title="AI Cron Jobs" code="AGT" accent="#c77591" bodyClassName="p-2">
           <div className="space-y-1.5">
             {crons.map((c) => (
               <button

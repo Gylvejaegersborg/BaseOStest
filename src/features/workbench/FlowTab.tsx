@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CheckCircle2, XCircle, Clock, Loader2, Ban, ArrowRight, RotateCcw, Square, ChevronDown, ChevronRight } from 'lucide-react'
+import { CheckCircle2, XCircle, Clock, Loader2, Ban, ArrowRight, RotateCcw, Square, ChevronDown, ChevronRight, Plus } from 'lucide-react'
 import { useAgentOsFlow, useAgentOsFlowList } from '@/features/agentos/useAgentOsFlow'
 import { useAgentOsTasks } from '@/features/agentos/useAgentOsTasks'
 import type { AgentOsFlowStatus, AgentOsTask, AgentOsTaskStatus, FlowStepInput } from '@/features/agentos/sessionClient'
@@ -50,16 +50,20 @@ function taskOutputText(t: AgentOsTask | undefined): string | null {
  * server-side, see sessionClient.ts's resumeFlow docs). Flows picked from
  * the list below the active one carry no such metadata, so resume is
  * disabled for those until you re-select them as the active flow from a
- * context that has it.
+ * context that has it. `onNewFlow` opens the flow-creation modal — lives
+ * here rather than the top strip since it's an action scoped to this
+ * panel's own content, not a global control.
  */
 export function FlowTab({
   flowId,
   steps,
   onSelectFlow,
+  onNewFlow,
 }: {
   flowId: string | null
   steps: FlowStepInput[]
   onSelectFlow: (id: string | null, steps: FlowStepInput[]) => void
+  onNewFlow: () => void
 }) {
   const { flow, error, cancel, resume } = useAgentOsFlow(flowId, steps)
   const { flows, loading } = useAgentOsFlowList()
@@ -157,11 +161,17 @@ export function FlowTab({
           </div>
         </div>
       ) : (
-        <p className="p-3 text-xs text-dim">No active flow selected. Pick one below, or start one from the + New menu.</p>
+        <p className="p-3 text-xs text-dim">No active flow selected. Pick one below, or start a new one.</p>
       )}
       <div className="max-h-[30%] overflow-y-auto border-t border-line">
-        <div className="border-b border-line px-3 py-1.5">
+        <div className="flex items-center justify-between border-b border-line px-3 py-1.5">
           <span className="label">All flows</span>
+          <button
+            onClick={onNewFlow}
+            className="flex items-center gap-1.5 border border-accent/40 bg-accent/10 px-2 py-1 text-[10px] uppercase tracking-wider text-accent hover:bg-accent/20"
+          >
+            <Plus size={11} /> New Flow
+          </button>
         </div>
         {loading && <p className="p-2 text-xs text-dim">Loading…</p>}
         {!loading && !flows.length && <p className="p-2 text-xs text-dim">No flows yet.</p>}

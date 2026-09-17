@@ -29,7 +29,7 @@ export function Constellation({ activeKey, onHover, onSelect }: Props) {
               y1={pa.y}
               x2={pb.x}
               y2={pb.y}
-              stroke="#36e0c8"
+              stroke="#c77591"
               strokeWidth={0.6}
               strokeDasharray="2 6"
             />

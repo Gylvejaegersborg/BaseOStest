@@ -581,7 +581,7 @@ function TestConsole({ mod }: { mod: LabModule }) {
   const COLOR: Record<Line['kind'], string> = { in: '#c8d2dc', out: '#6b7785', ok: '#46d369', err: '#ff5566' }
 
   return (
-    <Panel title="Test Console" code="SANDBOX" accent="#36e0c8" className="flex-1" bodyClassName="flex flex-col p-0">
+    <Panel title="Test Console" code="SANDBOX" accent="#c77591" className="flex-1" bodyClassName="flex flex-col p-0">
       <div className="flex gap-1 border-b border-line p-2">
         {actions.map((a) => {
           const Icon = a.icon

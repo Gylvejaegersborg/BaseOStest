@@ -86,7 +86,7 @@ export function Ops() {
           )}
         </div>
 
-        <Panel title="Services" code="HEALTH" accent="#36e0c8" className="mb-3" bodyClassName="p-2">
+        <Panel title="Services" code="HEALTH" accent="#c77591" className="mb-3" bodyClassName="p-2">
           <div className="space-y-1.5">
             {SERVICES.map((s) => (
               <ServiceRow key={s.id} svc={s} />
