@@ -179,11 +179,21 @@ export function Notes() {
   // ---- render --------------------------------------------------------------
 
   return (
-    <div className="flex h-full">
+    <div className="relative flex h-full overflow-hidden">
+      {/* Warm atmosphere wash (Phase 5, page-specific patterns) — Notes is the
+          system's warmest context tint, distinct from Workbench/Ops' cool-alert
+          register; a wash behind the content, not a full repaint. */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          background:
+            'radial-gradient(circle at 12% -10%, rgba(240,160,32,0.07), transparent 45%), radial-gradient(circle at 90% 105%, rgba(224,180,120,0.05), transparent 50%)',
+        }}
+      />
       {/* Browser */}
       <aside
         className={cn(
-          'w-full shrink-0 flex-col border-r border-line bg-panel/40 lg:flex lg:w-[300px]',
+          'relative z-10 w-full shrink-0 flex-col border-r border-line bg-panel/40 lg:flex lg:w-[300px]',
           mobileView === 'note' ? 'hidden' : 'flex',
         )}
       >
@@ -259,7 +269,7 @@ export function Notes() {
       {/* Editor / preview */}
       <section
         className={cn(
-          'min-w-0 flex-1 flex-col lg:flex',
+          'relative z-10 min-w-0 flex-1 flex-col lg:flex',
           mobileView === 'list' ? 'hidden' : 'flex',
         )}
       >
@@ -317,15 +327,18 @@ export function Notes() {
                   onChange={(e) => updateBody(selected.id, e.target.value)}
                   onBlur={finishEditing}
                   spellCheck={false}
-                  className="h-full w-full resize-none bg-bg/40 p-5 text-sm leading-relaxed text-text/90 outline-none"
+                  // Raw markdown stays monospace on purpose — source syntax
+                  // reads better aligned, even though the rendered preview
+                  // below uses Notes' calmer `read` typeface.
+                  className="h-full w-full resize-none bg-bg/40 p-8 text-sm leading-relaxed text-text/90 outline-none"
                 />
               ) : (
                 <div
                   onClick={() => setEditing(true)}
                   title="Click to edit"
-                  className="h-full cursor-text overflow-y-auto p-5"
+                  className="h-full cursor-text overflow-y-auto p-8"
                 >
-                  <article className="prose-term mx-auto w-full max-w-3xl">
+                  <article className="prose-term prose-read mx-auto w-full max-w-3xl">
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{body}</ReactMarkdown>
                   </article>
                 </div>
