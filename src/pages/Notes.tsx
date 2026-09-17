@@ -186,8 +186,11 @@ export function Notes() {
       <div
         className="pointer-events-none absolute inset-0 z-0"
         style={{
+          // Strengthened per feedback — the wash read as barely-there against
+          // the old blue-leaning base; now the base is neutral-warm too, so
+          // this reads as real atmosphere rather than needing to overpower it.
           background:
-            'radial-gradient(circle at 12% -10%, rgba(240,160,32,0.07), transparent 45%), radial-gradient(circle at 90% 105%, rgba(224,180,120,0.05), transparent 50%)',
+            'radial-gradient(circle at 12% -10%, rgba(240,160,32,0.16), transparent 55%), radial-gradient(circle at 90% 105%, rgba(224,180,120,0.11), transparent 60%)',
         }}
       />
       {/* Browser */}
