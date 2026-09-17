@@ -99,7 +99,6 @@ export function Workbench() {
               }
               activePanel={activePanel}
               onSelectTab={selectTab}
-              onNewFlow={() => setNewFlowOpen(true)}
               onOpenSettings={() => setSettingsOpen(true)}
             />
             <div className="min-h-0 flex-1">
@@ -127,7 +126,6 @@ export function Workbench() {
               left={<span className="text-xs text-dim">All agents</span>}
               activePanel={activePanel}
               onSelectTab={selectTab}
-              onNewFlow={() => setNewFlowOpen(true)}
               onOpenSettings={() => setSettingsOpen(true)}
             />
             <div className="flex min-h-0 flex-1">
@@ -142,6 +140,7 @@ export function Workbench() {
                   onClose={() => setActivePanel(null)}
                   dockedNoteId={dockedNoteId}
                   onSelectNote={dockNote}
+                  onNewFlow={() => setNewFlowOpen(true)}
                 />
               )}
             </div>

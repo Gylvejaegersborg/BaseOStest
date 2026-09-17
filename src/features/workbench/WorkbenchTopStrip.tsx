@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { ListChecks, Workflow, FileStack, ShieldCheck, Activity as ActivityIcon, Brain, History, Briefcase, StickyNote, Plus, Settings, LayoutPanelLeft } from 'lucide-react'
+import { ListChecks, Workflow, FileStack, ShieldCheck, Activity as ActivityIcon, Brain, History, Briefcase, StickyNote, Settings, LayoutPanelLeft } from 'lucide-react'
 import { Tabs, type TabItem } from '@/components/ui/Tabs'
 import { cn } from '@/lib/cn'
 
@@ -31,27 +31,26 @@ const ALL_TABS = [...STRIP_TABS, TEAM_STRIP_TAB]
  * thread-picker bar) with one row: `left` is whichever agent/thread
  * identity is active (or "All agents"), the icons on the right toggle the
  * right-side panel open to that tab (click the active one again to
- * close it — the same activity-bar pattern Claude Code's own UI uses),
- * and New Flow opens the flow-creation modal.
+ * close it — the same activity-bar pattern Claude Code's own UI uses).
+ * New Flow lives inside the Flow tab itself (FlowTab.tsx), not here — it's
+ * an action scoped to that panel's own content, not a global strip action.
  *
- * Responsive pass (Phase 6): nine separate icon buttons plus New Flow and
- * Settings don't fit a phone-width bar next to the agent identity and its
- * own back control. Below `lg`, the nine collapse into one "Panels"
- * overflow button with a dropdown list — the tabs themselves are runtime
- * state, not navigation, so folding them behind one control loses nothing
- * a mobile user reaches for constantly.
+ * Responsive pass (Phase 6): nine separate icon buttons plus Settings
+ * don't fit a phone-width bar next to the agent identity and its own back
+ * control. Below `lg`, the nine collapse into one "Panels" overflow
+ * button with a dropdown list — the tabs themselves are runtime state,
+ * not navigation, so folding them behind one control loses nothing a
+ * mobile user reaches for constantly.
  */
 export function WorkbenchTopStrip({
   left,
   activePanel,
   onSelectTab,
-  onNewFlow,
   onOpenSettings,
 }: {
   left: ReactNode
   activePanel: StripTab | null
   onSelectTab: (tab: StripTab) => void
-  onNewFlow: () => void
   onOpenSettings: () => void
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -99,12 +98,6 @@ export function WorkbenchTopStrip({
           )}
         </div>
 
-        <button
-          onClick={onNewFlow}
-          className="ml-1 flex items-center gap-1.5 border border-accent/40 bg-accent/10 px-2.5 py-1.5 text-[11px] uppercase tracking-wider text-accent hover:bg-accent/20"
-        >
-          <Plus size={12} /> <span className="hidden sm:inline">New Flow</span>
-        </button>
         <button
           onClick={onOpenSettings}
           title="Settings"
