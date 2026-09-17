@@ -1,6 +1,5 @@
 import {
   Orbit,
-  Briefcase,
   NotebookPen,
   Bot,
   CalendarDays,
@@ -18,7 +17,6 @@ export type SectionId =
   | 'calendar'
   | 'projects'
   | 'lab'
-  | 'team'
   | 'ops'
   | 'weather'
 
@@ -86,15 +84,6 @@ export const SECTIONS: Section[] = [
     icon: FlaskConical,
     blurb: 'Live pages and apps you have built. Poke, preview and test them.',
     accent: '#36e0c8',
-  },
-  {
-    id: 'team',
-    label: 'Team',
-    code: 'AGT.07',
-    route: '/team',
-    icon: Briefcase,
-    blurb: 'The management team: briefs, task board, approvals and beat intake.',
-    accent: '#f0a020',
   },
   {
     id: 'ops',
