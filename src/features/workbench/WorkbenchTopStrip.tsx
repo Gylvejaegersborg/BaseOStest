@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
-import { ListChecks, Workflow, FileStack, ShieldCheck, Activity as ActivityIcon, Brain, History, Briefcase, Plus, Settings } from 'lucide-react'
+import { ListChecks, Workflow, FileStack, ShieldCheck, Activity as ActivityIcon, Brain, History, Briefcase, StickyNote, Plus, Settings } from 'lucide-react'
 import { Tabs, type TabItem } from '@/components/ui/Tabs'
 
-export type StripTab = 'tasks' | 'flow' | 'artifacts' | 'approvals' | 'events' | 'memory' | 'files' | 'team'
+export type StripTab = 'tasks' | 'flow' | 'artifacts' | 'approvals' | 'events' | 'memory' | 'files' | 'notes' | 'team'
 
 export const STRIP_TABS: TabItem<StripTab>[] = [
   { id: 'tasks', label: 'Tasks', icon: ListChecks },
@@ -12,6 +12,7 @@ export const STRIP_TABS: TabItem<StripTab>[] = [
   { id: 'events', label: 'Events', icon: ActivityIcon },
   { id: 'memory', label: 'Memory', icon: Brain },
   { id: 'files', label: 'Files', icon: History },
+  { id: 'notes', label: 'Notes', icon: StickyNote },
 ]
 
 /** Team is its own group, not just an eighth runtime-state tab — it's the

@@ -5,11 +5,15 @@ export default {
   theme: {
     extend: {
       colors: {
-        bg: '#0a0c10',
-        panel: '#11141b',
-        'panel-2': '#161b24',
-        line: '#1f2733',
-        'line-2': '#2a3442',
+        // Base neutral scale (design tokens, revised) — shifted off the original
+        // blue-leaning grays toward true neutral-warm per direct feedback; the
+        // "general blue-ish tint" was the base itself, not just a weak context
+        // wash fighting it. Same lightness steps as before, hue removed.
+        bg: '#0c0b0a',
+        panel: '#171513',
+        'panel-2': '#1d1b18',
+        line: '#2a2724',
+        'line-2': '#363330',
         text: '#c8d2dc',
         dim: '#6b7785',
         accent: '#36e0c8',
@@ -41,11 +45,12 @@ export default {
         'isark-coral': '#FFB48A',
         // Elevation surface ramp (design tokens, Phase 0) — real luminance steps for the
         // new depth system, additive alongside bg/panel/panel-2. surface-0 mirrors `bg`.
-        'surface-0': '#0a0c10',
-        'surface-1': '#12151c',
-        'surface-2': '#191d26',
-        'surface-3': '#21262f',
-        'surface-4': '#282e38',
+        // Same warm-neutral revision as the base scale above.
+        'surface-0': '#0c0b0a',
+        'surface-1': '#1a1815',
+        'surface-2': '#221f1b',
+        'surface-3': '#2a2621',
+        'surface-4': '#322d27',
       },
       fontFamily: {
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
