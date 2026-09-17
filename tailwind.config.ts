@@ -22,6 +22,16 @@ export default {
         // feedback. Per-agent/per-section/category colors elsewhere are
         // untouched — those are deliberate differentiation, not this fatigue.
         accent: '#c77591',
+        // Accent tonal ramp — the follow-up fix: a flat single accent tone
+        // used everywhere still read as monotonous even off teal. Same hue
+        // family, varying only lightness/saturation, so hover/active states,
+        // glows and washes can use real tonal depth instead of one flat
+        // color at different opacities. accent-3 === accent above.
+        'accent-1': '#e0b8c5',
+        'accent-2': '#d496ad',
+        'accent-3': '#c77591',
+        'accent-4': '#ba4568',
+        'accent-5': '#91304a',
 
         amber: '#f0a020',
         magenta: '#e0408a',
@@ -91,7 +101,9 @@ export default {
         forward: 'cubic-bezier(0.34, 1.2, 0.64, 1)',
       },
       boxShadow: {
-        glow: '0 0 0 1px rgba(199,117,145,0.25), 0 0 14px -2px rgba(199,117,145,0.35)',
+        // Two tones from the accent ramp (a light ring, a deeper blur)
+        // instead of one flat hue at two opacities — real tonal depth.
+        glow: '0 0 0 1px rgba(212,150,173,0.3), 0 0 14px -2px rgba(145,48,74,0.4)',
         'glow-magenta': '0 0 0 1px rgba(224,64,138,0.25), 0 0 14px -2px rgba(224,64,138,0.35)',
         // Elevation shadows (design tokens, Phase 0) — pairs with surface-3/surface-4 for
         // summoned and contained panels.

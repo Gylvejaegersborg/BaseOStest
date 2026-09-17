@@ -54,7 +54,7 @@ export function Tabs<T extends string>({ tabs, active, onChange, className, labe
           className={cn(
             'flex items-center gap-1.5 border px-2 py-1.5 text-[11px] uppercase tracking-wider transition-colors',
             active === t.id
-              ? 'border-accent/40 bg-accent/10 text-accent'
+              ? 'border-accent-3/40 bg-gradient-to-br from-accent-1/20 to-accent-4/10 text-accent-4'
               : 'border-transparent text-dim hover:border-line hover:text-text',
           )}
         >

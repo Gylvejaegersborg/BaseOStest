@@ -16,8 +16,10 @@
   body {
     @apply bg-bg text-text font-mono antialiased;
     margin: 0;
+    /* Accent wash uses two tones from the ramp (light → deep) rather than
+     * one flat hue fading to transparent, for real tonal depth. */
     background-image:
-      radial-gradient(circle at 20% -10%, rgba(199, 117, 145, 0.05), transparent 45%),
+      radial-gradient(circle at 20% -10%, rgba(212, 150, 173, 0.05), rgba(145, 48, 74, 0.025) 30%, transparent 48%),
       radial-gradient(circle at 90% 110%, rgba(224, 64, 138, 0.05), transparent 45%);
     background-attachment: fixed;
   }
