@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
-import { ListChecks, Workflow, FileStack, ShieldCheck, Activity as ActivityIcon, Brain, History, Plus, Settings } from 'lucide-react'
+import { ListChecks, Workflow, FileStack, ShieldCheck, Activity as ActivityIcon, Brain, History, Briefcase, Plus, Settings } from 'lucide-react'
 import { Tabs, type TabItem } from '@/components/ui/Tabs'
 
-export type StripTab = 'tasks' | 'flow' | 'artifacts' | 'approvals' | 'events' | 'memory' | 'files'
+export type StripTab = 'tasks' | 'flow' | 'artifacts' | 'approvals' | 'events' | 'memory' | 'files' | 'team'
 
 export const STRIP_TABS: TabItem<StripTab>[] = [
   { id: 'tasks', label: 'Tasks', icon: ListChecks },
@@ -13,6 +13,13 @@ export const STRIP_TABS: TabItem<StripTab>[] = [
   { id: 'memory', label: 'Memory', icon: Brain },
   { id: 'files', label: 'Files', icon: History },
 ]
+
+/** Team is its own group, not just an eighth runtime-state tab — it's the
+ *  management/oversight surface (brief, board, approvals queue, intake,
+ *  reports, meetings) merged in from the old standalone Team page (IA
+ *  decision, Phase 4), so it's visually separated by a divider rather than
+ *  appended into the agent-runtime row above. */
+export const TEAM_STRIP_TAB: TabItem<StripTab> = { id: 'team', label: 'Team', icon: Briefcase }
 
 /**
  * The workbench's single top strip — replaces the old two-bar layout
@@ -41,6 +48,8 @@ export function WorkbenchTopStrip({
       <div className="min-w-0 flex-1">{left}</div>
       <div className="flex shrink-0 items-center gap-1">
         <Tabs tabs={STRIP_TABS} active={activePanel} onChange={onSelectTab} />
+        <div className="mx-1 h-4 w-px bg-line" />
+        <Tabs tabs={[TEAM_STRIP_TAB]} active={activePanel} onChange={onSelectTab} />
         <button
           onClick={onNewFlow}
           className="ml-1 flex items-center gap-1.5 border border-accent/40 bg-accent/10 px-2.5 py-1.5 text-[11px] uppercase tracking-wider text-accent hover:bg-accent/20"

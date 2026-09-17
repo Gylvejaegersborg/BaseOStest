@@ -58,7 +58,6 @@ const SUN_POS: Record<string, { x: number; y: number }> = {
   calendar: { x: 850, y: 180 },
   projects: { x: 600, y: 365 },
   lab: { x: 200, y: 440 },
-  team: { x: 760, y: 555 },
   ops: { x: 1060, y: 300 },
   weather: { x: 540, y: 585 },
 }
@@ -76,9 +75,6 @@ export const SUN_LINKS: [SectionId, SectionId][] = [
   ['projects', 'workbench'],
   ['projects', 'lab'],
   ['projects', 'weather'],
-  ['projects', 'team'],
-  ['team', 'workbench'],
-  ['team', 'weather'],
   ['weather', 'lab'],
   ['weather', 'workbench'],
 ]

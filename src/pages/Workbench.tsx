@@ -4,6 +4,7 @@ import { AgentRail } from '@/features/workbench/AgentRail'
 import { AgentWorkspace } from '@/features/workbench/AgentWorkspace'
 import { WorkbenchTopStrip, type StripTab } from '@/features/workbench/WorkbenchTopStrip'
 import { RightPanel } from '@/features/workbench/RightPanel'
+import { TeamTab } from '@/features/workbench/TeamTab'
 import { NewFlowModal } from '@/features/workbench/NewFlowModal'
 import { SettingsModal } from '@/features/workbench/SettingsModal'
 import { useAgentOsContext } from '@/features/agentos/AgentOsProvider'
@@ -27,7 +28,10 @@ export function Workbench() {
     const param = searchParams.get('agent')
     return param && agents.some((a) => a.id === param) ? param : null
   })
-  const [activePanel, setActivePanel] = useState<StripTab | null>(null)
+  const [activePanel, setActivePanel] = useState<StripTab | null>(() => {
+    const param = searchParams.get('panel')
+    return param === 'team' ? 'team' : null
+  })
   const [activeFlowId, setActiveFlowId] = useState<string | null>(null)
   const [activeFlowSteps, setActiveFlowSteps] = useState<FlowStepInput[]>([])
   const [newFlowOpen, setNewFlowOpen] = useState(false)
@@ -36,6 +40,8 @@ export function Workbench() {
   const selectAgent = (id: string) => {
     setSelectedAgentId(id)
     setSearchParams({ agent: id }, { replace: true })
+    // Picking an agent takes priority over the full-width Team view.
+    setActivePanel((cur) => (cur === 'team' ? null : cur))
   }
 
   const selectFlow = (id: string | null, steps: FlowStepInput[]) => {
@@ -52,7 +58,20 @@ export function Workbench() {
       <AgentRail selectedAgentId={selectedAgentId} onSelect={selectAgent} />
 
       <div className="flex min-w-0 flex-1 flex-col">
-        {selectedAgentId ? (
+        {activePanel === 'team' ? (
+          <>
+            <WorkbenchTopStrip
+              left={<span className="text-xs text-dim">Team</span>}
+              activePanel={activePanel}
+              onSelectTab={selectTab}
+              onNewFlow={() => setNewFlowOpen(true)}
+              onOpenSettings={() => setSettingsOpen(true)}
+            />
+            <div className="min-h-0 flex-1">
+              <TeamTab />
+            </div>
+          </>
+        ) : selectedAgentId ? (
           <AgentWorkspace
             key={selectedAgentId}
             agentId={selectedAgentId}

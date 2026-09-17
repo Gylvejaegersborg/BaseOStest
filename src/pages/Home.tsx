@@ -5,7 +5,7 @@ import { Starfield } from '@/features/constellation/Starfield'
 import { ConstellationScene } from '@/features/constellation/ConstellationScene'
 import { buildBodies, toSceneVec3, type Body } from '@/features/constellation/layout'
 import { detectWebGL } from '@/features/constellation/webgl'
-import { sectionById } from '@/data/sections'
+import { sectionById, SECTIONS } from '@/data/sections'
 import { PROJECTS, projectById } from '@/data/projects'
 import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
 import { useProjectOverrides, applyOverrides } from '@/features/projects/overrides'
@@ -99,7 +99,7 @@ export function Home() {
           THE <span className="text-accent">CONSTELLATION</span>
         </h1>
         <div className="mt-1 hidden max-w-md text-xs text-dim sm:block">
-          Nine sections, ten projects — one map. Hover a body to read it, click a sun to enter.
+          {SECTIONS.length} sections, {PROJECTS.length} projects — one map. Hover a body to read it, click a sun to enter.
         </div>
       </div>
 

@@ -10,7 +10,6 @@ import { Lab } from './pages/Lab'
 import { Ops } from './pages/Ops'
 
 const Weather = lazy(() => import('./pages/Weather').then((m) => ({ default: m.Weather })))
-const Team = lazy(() => import('./pages/Team').then((m) => ({ default: m.Team })))
 
 /** Chat and Meeting Room are retired in favor of the single Workbench
  *  page — these keep old bookmarks/links (Team's "open a chat with X")
@@ -24,6 +23,13 @@ function LegacyRedirect() {
  *  small standalone builds rather than duplicating routing for one of them. */
 function SudokuRedirect() {
   return <Navigate to="/lab" replace />
+}
+
+/** The standalone Team page is retired — it's merged into Workbench as its
+ *  Team tab (IA decision, Phase 4), so old /team links open Workbench with
+ *  that tab pre-selected instead of landing on a dead route. */
+function TeamRedirect() {
+  return <Navigate to="/workbench?panel=team" replace />
 }
 
 const router = createBrowserRouter([
@@ -40,14 +46,7 @@ const router = createBrowserRouter([
       { path: 'projects', element: <Projects /> },
       { path: 'lab', element: <Lab /> },
       { path: 'ops', element: <Ops /> },
-      {
-        path: 'team',
-        element: (
-          <Suspense fallback={<div className="h-full w-full bg-bg" />}>
-            <Team />
-          </Suspense>
-        ),
-      },
+      { path: 'team', element: <TeamRedirect /> },
       {
         path: 'weather',
         element: (

@@ -36,7 +36,15 @@ function agentColor(id: string): string {
   return AGENTS.find((a) => a.id === id)?.color ?? '#6b7785'
 }
 
-export function Team() {
+/**
+ * Team's former standalone page, embedded as Workbench's Team tab (IA
+ * decision, Phase 4) — full width in the main content area (not the
+ * narrow RightPanel: Board's 5-column kanban and Reports/Meetings' file
+ * browsers need page-like space, not a 380px side panel). The page-level
+ * "MANAGEMENT TEAM" title is dropped since WorkbenchTopStrip already
+ * gives this context; everything else is unchanged from the old page.
+ */
+export function TeamTab() {
   const team = useTeamState()
   const [tab, setTab] = useState<Tab>('brief')
   const [showTokenPanel, setShowTokenPanel] = useState(false)
@@ -46,7 +54,6 @@ export function Team() {
   return (
     <div className="flex h-full flex-col">
       <div className="flex flex-wrap items-center gap-3 border-b border-line px-4 py-2">
-        <h1 className="font-display text-lg tracking-wider text-text">MANAGEMENT TEAM</h1>
         <span className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider" style={{ color: conn.color }}>
           <StatusDot color={conn.color} pulse={team.connection === 'live'} size={6} />
           {conn.label}
@@ -95,7 +102,7 @@ export function Team() {
       <div className="min-h-0 flex-1 overflow-y-auto p-3">
         {tab === 'brief' && <BriefTab brief={team.brief} agents={team.agents} hasToken={team.hasToken} onRefresh={team.refresh} />}
         {tab === 'board' && <BoardTab tasks={team.tasks} />}
-        {tab === 'approvals' && <ApprovalsTab approvals={team.approvals} onResolved={team.refresh} />}
+        {tab === 'approvals' && <TeamApprovalsTab approvals={team.approvals} onResolved={team.refresh} />}
         {tab === 'intake' && <IntakeTab records={team.intake} live={team.connection === 'live'} />}
         {tab === 'reports' && <ReportsTab live={team.connection === 'live'} />}
         {tab === 'meetings' && <MeetingsTab live={team.connection === 'live'} />}
@@ -229,7 +236,7 @@ function RunPanel({ hasToken, onRefresh }: { hasToken: boolean; onRefresh: () =>
 
       {done && (
         <p className="text-[11px] text-ok" style={{ color: '#46d369' }}>
-          Dispatched “{done}” — it runs in a minute or two. Hit Refresh up top when it lands.
+          Dispatched "{done}" — it runs in a minute or two. Hit Refresh up top when it lands.
         </p>
       )}
       {error && <p className="text-[11px] text-danger">{error}</p>}
@@ -355,7 +362,8 @@ function BoardTab({ tasks }: { tasks: TeamTask[] }) {
   )
 }
 
-// ── Approvals ────────────────────────────────────────────────────────────────
+// ── Approvals (Team's content-publish queue — distinct from Agent-OS's own
+// Approvals tab in the strip above, which is tool-execution approvals) ──────
 const TYPE_ICON: Record<ApprovalItem['type'], typeof Mail> = {
   youtube_upload: FileAudio,
   soundcloud_upload: FileAudio,
@@ -364,7 +372,7 @@ const TYPE_ICON: Record<ApprovalItem['type'], typeof Mail> = {
   site_publish: CheckCircle2,
 }
 
-function ApprovalsTab({ approvals, onResolved }: { approvals: ApprovalItem[]; onResolved: () => void }) {
+function TeamApprovalsTab({ approvals, onResolved }: { approvals: ApprovalItem[]; onResolved: () => void }) {
   const [dispatched, setDispatched] = useState<Record<string, string>>({})
   const [error, setError] = useState('')
 
