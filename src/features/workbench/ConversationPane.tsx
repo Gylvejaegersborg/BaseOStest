@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { Mic, Paperclip, Send, Square, X, Bot, AlertTriangle, Eye } from 'lucide-react'
+import { Mic, Paperclip, Send, Square, X, Bot, AlertTriangle, Eye, StickyNote, FileUp, FileText } from 'lucide-react'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { cn } from '@/lib/cn'
 import type { Agent } from '@/data/agents'
 import type { useAgentOsChat, ChatMessage } from '@/features/agentos/useAgentOsChat'
+import { useNotesList, createNoteFromText } from '@/features/notes/notesStore'
 
 interface Attachment {
   id: string
@@ -25,11 +26,21 @@ function fmtSize(bytes: number) {
  * the top strip now) so switching threads there is reflected here without
  * a second, independent session subscription.
  */
-export function ConversationPane({ agent, chat }: { agent: Agent; chat: ReturnType<typeof useAgentOsChat> }) {
+export function ConversationPane({
+  agent,
+  chat,
+  onDockNote,
+}: {
+  agent: Agent
+  chat: ReturnType<typeof useAgentOsChat>
+  onDockNote: (id: string | null) => void
+}) {
   const [draft, setDraft] = useState('')
   const [pending, setPending] = useState<Attachment[]>([])
   const [dragging, setDragging] = useState(false)
   const [planMode, setPlanMode] = useState(false)
+  const [attachMenuOpen, setAttachMenuOpen] = useState(false)
+  const [notePickerOpen, setNotePickerOpen] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -60,6 +71,18 @@ export function ConversationPane({ agent, chat }: { agent: Agent; chat: ReturnTy
 
   const notReady = chat.connection === 'unconfigured' || chat.connection === 'error'
 
+  const sendToNotes = (text: string) => {
+    const id = createNoteFromText(text)
+    onDockNote(id)
+  }
+
+  const referenceNote = (id: string, title: string) => {
+    setDraft((d) => (d ? `${d} [[${title}]]` : `[[${title}]]`))
+    setNotePickerOpen(false)
+    setAttachMenuOpen(false)
+    onDockNote(id)
+  }
+
   return (
     <div
       className="relative flex h-full min-h-0 min-w-0 flex-1 flex-col"
@@ -86,10 +109,15 @@ export function ConversationPane({ agent, chat }: { agent: Agent; chat: ReturnTy
           <p className="text-center text-xs text-dim">Session open. Type a message to start.</p>
         )}
         {chat.messages.map((m) => (
-          <MessageRow key={m.id} msg={m} agentColor={agent.color} agentName={agent.name} />
+          <MessageRow key={m.id} msg={m} agentColor={agent.color} agentName={agent.name} onSendToNotes={sendToNotes} />
         ))}
         {chat.streaming && chat.streamingText && (
-          <MessageRow msg={{ id: '__streaming', role: 'assistant', text: chat.streamingText, time: '' }} agentColor={agent.color} agentName={agent.name} />
+          <MessageRow
+            msg={{ id: '__streaming', role: 'assistant', text: chat.streamingText, time: '' }}
+            agentColor={agent.color}
+            agentName={agent.name}
+            onSendToNotes={sendToNotes}
+          />
         )}
         {chat.streaming && !chat.streamingText && (
           <div className="flex gap-3">
@@ -140,9 +168,37 @@ export function ConversationPane({ agent, chat }: { agent: Agent; chat: ReturnTy
           >
             <Eye size={16} />
           </button>
-          <button onClick={() => fileRef.current?.click()} className="border border-line p-2 text-dim hover:border-accent/60 hover:text-accent" title="Attach file">
-            <Paperclip size={16} />
-          </button>
+          <div className="relative">
+            <button
+              onClick={() => setAttachMenuOpen((o) => !o)}
+              className={cn(
+                'border p-2 transition-colors',
+                attachMenuOpen ? 'border-accent/50 bg-accent/10 text-accent' : 'border-line text-dim hover:border-accent/60 hover:text-accent',
+              )}
+              title="Attach"
+            >
+              <Paperclip size={16} />
+            </button>
+            {attachMenuOpen && !notePickerOpen && (
+              <div className="absolute bottom-full left-0 z-10 mb-1 w-44 border border-line bg-panel shadow-elevation-3">
+                <button
+                  onClick={() => { setAttachMenuOpen(false); fileRef.current?.click() }}
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-text hover:bg-panel-2"
+                >
+                  <FileUp size={13} className="text-dim" /> Attach file
+                </button>
+                <button
+                  onClick={() => setNotePickerOpen(true)}
+                  className="flex w-full items-center gap-2 border-t border-line px-3 py-2 text-left text-xs text-text hover:bg-panel-2"
+                >
+                  <FileText size={13} className="text-dim" /> Reference note
+                </button>
+              </div>
+            )}
+            {attachMenuOpen && notePickerOpen && (
+              <NotePicker onPick={referenceNote} onClose={() => { setAttachMenuOpen(false); setNotePickerOpen(false) }} />
+            )}
+          </div>
           <input ref={fileRef} type="file" multiple hidden onChange={(e) => addFiles(e.target.files)} />
           <MicButton onClip={(att) => setPending((p) => [...p, att])} />
           <textarea
@@ -179,10 +235,20 @@ export function ConversationPane({ agent, chat }: { agent: Agent; chat: ReturnTy
   )
 }
 
-function MessageRow({ msg, agentColor, agentName }: { msg: ChatMessage; agentColor: string; agentName: string }) {
+function MessageRow({
+  msg,
+  agentColor,
+  agentName,
+  onSendToNotes,
+}: {
+  msg: ChatMessage
+  agentColor: string
+  agentName: string
+  onSendToNotes: (text: string) => void
+}) {
   const isUser = msg.role === 'user'
   return (
-    <div className={cn('flex gap-3', isUser && 'flex-row-reverse')}>
+    <div className={cn('group flex gap-3', isUser && 'flex-row-reverse')}>
       <div
         className="flex h-7 w-7 shrink-0 items-center justify-center border text-[10px]"
         style={{ borderColor: isUser ? '#2a3442' : `${agentColor}66`, color: isUser ? '#6b7785' : agentColor }}
@@ -193,6 +259,15 @@ function MessageRow({ msg, agentColor, agentName }: { msg: ChatMessage; agentCol
         <div className="mb-1 flex items-center gap-2 text-[10px] text-dim" style={isUser ? { justifyContent: 'flex-end' } : undefined}>
           <span>{isUser ? 'You' : agentName}</span>
           {msg.time && <span>{msg.time}</span>}
+          {msg.text && (
+            <button
+              onClick={() => onSendToNotes(msg.text)}
+              title="Send to Notes"
+              className="text-dim opacity-0 transition-opacity hover:text-accent group-hover:opacity-100"
+            >
+              <StickyNote size={11} />
+            </button>
+          )}
         </div>
         <div
           className={cn('inline-block border px-3 py-2 text-sm', isUser ? 'border-line bg-panel-2 text-text' : 'border-line bg-panel/70 text-text/90')}
@@ -200,6 +275,42 @@ function MessageRow({ msg, agentColor, agentName }: { msg: ChatMessage; agentCol
         >
           {msg.text && <p className="whitespace-pre-wrap text-left">{msg.text}</p>}
         </div>
+      </div>
+    </div>
+  )
+}
+
+function NotePicker({ onPick, onClose }: { onPick: (id: string, title: string) => void; onClose: () => void }) {
+  const notes = useNotesList()
+  const [query, setQuery] = useState('')
+  const filtered = notes.filter((n) => n.title.toLowerCase().includes(query.trim().toLowerCase())).slice(0, 8)
+
+  return (
+    <div className="absolute bottom-full left-0 z-10 mb-1 w-64 border border-line bg-panel shadow-elevation-3">
+      <div className="flex items-center gap-1.5 border-b border-line px-2 py-1.5">
+        <button onClick={onClose} className="text-dim hover:text-text" title="Back">
+          <X size={12} />
+        </button>
+        <input
+          autoFocus
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search notes…"
+          className="w-full bg-transparent text-xs text-text placeholder:text-dim focus:outline-none"
+        />
+      </div>
+      <div className="max-h-56 overflow-y-auto">
+        {filtered.length === 0 && <p className="px-3 py-2 text-[11px] text-dim">No notes found.</p>}
+        {filtered.map((n) => (
+          <button
+            key={n.id}
+            onClick={() => onPick(n.id, n.title)}
+            className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs text-text hover:bg-panel-2"
+          >
+            <FileText size={12} className="shrink-0 text-dim" />
+            <span className="truncate">{n.title}</span>
+          </button>
+        ))}
       </div>
     </div>
   )

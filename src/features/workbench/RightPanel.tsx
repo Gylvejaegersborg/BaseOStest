@@ -6,6 +6,7 @@ import { FlowTab } from './FlowTab'
 import { EventsTab } from './EventsTab'
 import { MemoryTab } from './MemoryTab'
 import { FileRevisionsTab } from './FileRevisionsTab'
+import { NotesTab } from './NotesTab'
 import { STRIP_TABS, type StripTab } from './WorkbenchTopStrip'
 import { useResizablePanel } from '@/components/ui/useResizablePanel'
 import { ResizeHandle } from '@/components/ui/ResizeHandle'
@@ -26,6 +27,8 @@ export function RightPanel({
   flowSteps,
   onSelectFlow,
   onClose,
+  dockedNoteId,
+  onSelectNote,
 }: {
   tab: StripTab
   agentId: string | null
@@ -33,6 +36,8 @@ export function RightPanel({
   flowSteps: FlowStepInput[]
   onSelectFlow: (id: string | null, steps: FlowStepInput[]) => void
   onClose: () => void
+  dockedNoteId: string | null
+  onSelectNote: (id: string | null) => void
 }) {
   const label = STRIP_TABS.find((t) => t.id === tab)?.label ?? tab
   const { width, onMouseDown } = useResizablePanel({
@@ -61,6 +66,7 @@ export function RightPanel({
           {tab === 'events' && <EventsTab agentId={agentId} />}
           {tab === 'memory' && <MemoryTab agentId={agentId} />}
           {tab === 'files' && <FileRevisionsTab />}
+          {tab === 'notes' && <NotesTab dockedNoteId={dockedNoteId} onSelectNote={onSelectNote} />}
         </div>
       </aside>
     </div>

@@ -36,6 +36,14 @@ export function Workbench() {
   const [activeFlowSteps, setActiveFlowSteps] = useState<FlowStepInput[]>([])
   const [newFlowOpen, setNewFlowOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [dockedNoteId, setDockedNoteId] = useState<string | null>(null)
+
+  // Shared by a chat message's "Send to Notes" action and the composer's
+  // note picker — either summons the same docked Notes panel to the same note.
+  const dockNote = (id: string | null) => {
+    setDockedNoteId(id)
+    if (id) setActivePanel('notes')
+  }
 
   const selectAgent = (id: string) => {
     setSelectedAgentId(id)
@@ -82,6 +90,8 @@ export function Workbench() {
             flowId={activeFlowId}
             flowSteps={activeFlowSteps}
             onSelectFlow={selectFlow}
+            dockedNoteId={dockedNoteId}
+            onDockNote={dockNote}
           />
         ) : (
           <>
@@ -102,6 +112,8 @@ export function Workbench() {
                   flowSteps={activeFlowSteps}
                   onSelectFlow={selectFlow}
                   onClose={() => setActivePanel(null)}
+                  dockedNoteId={dockedNoteId}
+                  onSelectNote={dockNote}
                 />
               )}
             </div>

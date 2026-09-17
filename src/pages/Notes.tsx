@@ -1,38 +1,14 @@
 import { useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Check, ChevronLeft, FileText, Hash, Pencil, Plus, Trash2, Wand2, X } from 'lucide-react'
 import { NOTES, NOTE_FOLDERS, NOTE_TAGS, type Note } from '@/data/notes'
 import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
+import { NOTES_STORAGE as STORAGE, loadJSON, saveJSON, titleFromBody } from '@/features/notes/notesStore'
 import { SearchInput } from '@/components/ui/SearchInput'
 import { relTime } from '@/lib/time'
 import { cn } from '@/lib/cn'
-
-const STORAGE = {
-  drafts: 'os:notes:drafts',
-  userNotes: 'os:notes:user',
-  deleted: 'os:notes:deleted',
-  tags: 'os:notes:tags',
-}
-
-function loadJSON<T>(key: string, fallback: T): T {
-  try {
-    const raw = localStorage.getItem(key)
-    return raw == null ? fallback : (JSON.parse(raw) as T)
-  } catch {
-    return fallback
-  }
-}
-function saveJSON(key: string, value: unknown) {
-  localStorage.setItem(key, JSON.stringify(value))
-}
-
-// Derive a display title from the body's first H1 so renaming via the editor
-// "just works"; fall back to the stored title.
-function titleFromBody(body: string, fallback: string): string {
-  const m = body.match(/^#\s+(.+)$/m)
-  return m ? m[1].trim() : fallback
-}
 
 // Suggest tags based on which known keywords appear in the body. Adds to the
 // existing list rather than replacing — manual additions are preserved.
@@ -67,7 +43,11 @@ export function Notes() {
       .map((n) => ({ ...n, tags: tagsOverride[n.id] ?? n.tags }))
   }, [userNotes, deleted, tagsOverride, overlay.notes])
 
-  const [selectedId, setSelectedId] = useState<string>(allNotes[0]?.id ?? '')
+  const [searchParams] = useSearchParams()
+  const [selectedId, setSelectedId] = useState<string>(() => {
+    const param = searchParams.get('note')
+    return param && allNotes.some((n) => n.id === param) ? param : allNotes[0]?.id ?? ''
+  })
   const selected = allNotes.find((n) => n.id === selectedId) ?? allNotes[0]
   const body = selected ? drafts[selected.id] ?? selected.body : ''
   const displayTitle = selected ? titleFromBody(body, selected.title) : ''

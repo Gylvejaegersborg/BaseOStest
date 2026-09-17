@@ -22,6 +22,8 @@ export function AgentWorkspace({
   flowId,
   flowSteps,
   onSelectFlow,
+  dockedNoteId,
+  onDockNote,
 }: {
   agentId: string
   activePanel: StripTab | null
@@ -31,6 +33,8 @@ export function AgentWorkspace({
   flowId: string | null
   flowSteps: FlowStepInput[]
   onSelectFlow: (id: string | null, steps: FlowStepInput[]) => void
+  dockedNoteId: string | null
+  onDockNote: (id: string | null) => void
 }) {
   const { agents } = useAgentOsContext()
   const agent = agents.find((a) => a.id === agentId)
@@ -48,7 +52,7 @@ export function AgentWorkspace({
         onOpenSettings={onOpenSettings}
       />
       <div className="flex min-h-0 flex-1">
-        <ConversationPane agent={agent} chat={chat} />
+        <ConversationPane agent={agent} chat={chat} onDockNote={onDockNote} />
         {activePanel && (
           <RightPanel
             tab={activePanel}
@@ -57,6 +61,8 @@ export function AgentWorkspace({
             flowSteps={flowSteps}
             onSelectFlow={onSelectFlow}
             onClose={() => onSelectTab(activePanel)}
+            dockedNoteId={dockedNoteId}
+            onSelectNote={onDockNote}
           />
         )}
       </div>
