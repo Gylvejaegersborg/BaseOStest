@@ -154,6 +154,18 @@ export default {
           '0%, 100%': { opacity: '0.15' },
           '50%': { opacity: '0.5' },
         },
+        // Section cross-fade (navigation model, Phase 3) — the "you moved
+        // to a different room" orientation cue on top-level route changes.
+        'cross-fade': {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
+        // "Going deeper within a section" — a slight forward settle rather
+        // than a lateral move, per the navigation model's depth language.
+        'settle-forward': {
+          from: { opacity: '0', transform: 'scale(0.98)' },
+          to: { opacity: '1', transform: 'scale(1)' },
+        },
       },
       animation: {
         twinkle: 'twinkle 3s ease-in-out infinite',
@@ -172,6 +184,8 @@ export default {
         glow: 'glow 3.2s ease-in-out infinite',
         'glow-soft': 'glow-soft 6s ease-in-out infinite',
         'ambient-pulse': 'ambient-pulse 3s ease-in-out infinite',
+        'cross-fade': 'cross-fade 220ms cubic-bezier(0.2, 0, 0, 1)',
+        'settle-forward': 'settle-forward 280ms cubic-bezier(0.34, 1.2, 0.64, 1)',
       },
     },
   },

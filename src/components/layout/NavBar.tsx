@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import { SECTIONS, type SectionId } from '@/data/sections'
+import { SECTIONS, sectionForPath, type SectionId } from '@/data/sections'
 import { useAgentActivitySignal } from '@/features/agentos/useAgentActivitySignal'
 import { useSectionShortcuts } from './useSectionShortcuts'
 import { cn } from '@/lib/cn'
@@ -48,7 +48,7 @@ export function NavBar({ className }: { className?: string }) {
       {/* Always-visible sliver — reserves layout space so expanding never reflows content. */}
       <div className="flex h-full w-2 flex-col items-center gap-0.5 border-r border-line bg-panel/60 py-3">
         {SECTIONS.map((s) => {
-          const isActive = s.route === '/' ? location.pathname === '/' : location.pathname.startsWith(s.route)
+          const isActive = s.id === sectionForPath(location.pathname).id
           const { ambient: sectionAmbient, actionable: sectionActionable } = signalFor(s.id)
           return (
             <NavLink
@@ -110,7 +110,7 @@ export function NavBar({ className }: { className?: string }) {
                       // edge and fading out toward the rail's outer edge.
                       <span
                         className="pointer-events-none absolute inset-0 animate-ambient-pulse"
-                        style={{ background: `linear-gradient(to left, ${s.accent}4d, transparent 75%)` }}
+                        style={{ background: `linear-gradient(to left, ${s.accent}3e, transparent 75%)` }}
                       />
                     )}
                     <span
