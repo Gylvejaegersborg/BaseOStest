@@ -39,15 +39,53 @@ export default {
         'isark-mint': '#A8E6D0',
         'isark-lavender': '#B6A8FF',
         'isark-coral': '#FFB48A',
+        // Elevation surface ramp (design tokens, Phase 0) — real luminance steps for the
+        // new depth system, additive alongside bg/panel/panel-2. surface-0 mirrors `bg`.
+        'surface-0': '#0a0c10',
+        'surface-1': '#12151c',
+        'surface-2': '#191d26',
+        'surface-3': '#21262f',
+        'surface-4': '#282e38',
       },
       fontFamily: {
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
         display: ['"Share Tech Mono"', 'monospace'],
         claude: ['"Lora"', 'Georgia', 'ui-serif', 'serif'],
+        // Warm humanist sans for Notes/long-form content (design tokens, Phase 0).
+        // System stack placeholder until a specific typeface is sourced.
+        read: ['"Inter"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
+      // Radius scale (design tokens, Phase 0) — namespaced so existing `rounded-sm/md/lg`
+      // usage across Lab's modules is untouched; new OS components consume these directly.
+      borderRadius: {
+        control: '4px',
+        panel: '8px',
+        docked: '14px',
+      },
+      // Type scale addition (design tokens, Phase 0) — only the one genuinely new step;
+      // existing base/lg/xl/2xl sizes are left as-is to avoid rippling through the app.
+      fontSize: {
+        '2xs': ['10px', { lineHeight: '14px', letterSpacing: '0.02em' }],
+      },
+      // Motion tokens (design tokens, Phase 0) — namespaced durations/easings for the
+      // navigation-model and shell motion work in later phases.
+      transitionDuration: {
+        instant: '80ms',
+        fast: '150ms',
+        settle: '220ms',
+        deep: '280ms',
+      },
+      transitionTimingFunction: {
+        standard: 'cubic-bezier(0.2, 0, 0, 1)',
+        forward: 'cubic-bezier(0.34, 1.2, 0.64, 1)',
       },
       boxShadow: {
         glow: '0 0 0 1px rgba(54,224,200,0.25), 0 0 14px -2px rgba(54,224,200,0.35)',
         'glow-magenta': '0 0 0 1px rgba(224,64,138,0.25), 0 0 14px -2px rgba(224,64,138,0.35)',
+        // Elevation shadows (design tokens, Phase 0) — pairs with surface-3/surface-4 for
+        // summoned and contained panels.
+        'elevation-3': '0 8px 24px -8px rgba(0,0,0,0.45)',
+        'elevation-4': '0 16px 40px -12px rgba(0,0,0,0.55)',
       },
       keyframes: {
         twinkle: {
@@ -110,6 +148,12 @@ export default {
           '0%, 100%': { opacity: '0.25' },
           '50%': { opacity: '0.6' },
         },
+        // Ambient agent-activity signal (design tokens, Phase 0) — distinct from the
+        // interaction-motion durations above; this is atmosphere, not feedback.
+        'ambient-pulse': {
+          '0%, 100%': { opacity: '0.15' },
+          '50%': { opacity: '0.5' },
+        },
       },
       animation: {
         twinkle: 'twinkle 3s ease-in-out infinite',
@@ -127,6 +171,7 @@ export default {
         'breathe-strong': 'breathe-strong 3.4s ease-in-out infinite',
         glow: 'glow 3.2s ease-in-out infinite',
         'glow-soft': 'glow-soft 6s ease-in-out infinite',
+        'ambient-pulse': 'ambient-pulse 3s ease-in-out infinite',
       },
     },
   },
