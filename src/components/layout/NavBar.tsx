@@ -4,6 +4,7 @@ import { SECTIONS, sectionForPath, type SectionId } from '@/data/sections'
 import { useAgentActivitySignal } from '@/features/agentos/useAgentActivitySignal'
 import { useSectionShortcuts } from './useSectionShortcuts'
 import { cn } from '@/lib/cn'
+import { shade } from '@/lib/color'
 
 const KEYBOARD_PIN_MS = 1500
 
@@ -110,7 +111,9 @@ export function NavBar({ className }: { className?: string }) {
                       // edge and fading out toward the rail's outer edge.
                       <span
                         className="pointer-events-none absolute inset-0 animate-ambient-pulse"
-                        style={{ background: `linear-gradient(to left, ${s.accent}3e, transparent 75%)` }}
+                        style={{
+                          background: `linear-gradient(to left, ${s.accent}3e, ${shade(s.accent, -0.3)}14 40%, transparent 75%)`,
+                        }}
                       />
                     )}
                     <span

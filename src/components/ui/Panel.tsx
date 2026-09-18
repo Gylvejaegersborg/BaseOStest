@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { X } from 'lucide-react'
 import { cn } from '@/lib/cn'
+import { shade } from '@/lib/color'
 
 /** Elevation level per the design-system workspace model: 1 = structural
  *  (Notes' list, Workbench's roster), 2 = content surface within a panel,
@@ -51,6 +52,12 @@ export function Panel({
   onDismiss,
   style,
 }: PanelProps) {
+  // A light and a deep tone derived from the one accent color, instead of
+  // a flat fill at different opacities — real tonal depth from whatever
+  // hex a call site passes (shared accent, agent color, section color).
+  const light = accent ? shade(accent, 0.4) : undefined
+  const deep = accent ? shade(accent, -0.4) : undefined
+
   return (
     <div
       className={cn(
@@ -58,7 +65,16 @@ export function Panel({
         elevation ? ELEVATION_CLASSES[elevation] : 'border-line bg-panel/80 backdrop-blur-sm',
         className,
       )}
-      style={{ ...(accent ? { borderColor: `${accent}33` } : undefined), ...style }}
+      style={{
+        ...(accent
+          ? {
+              borderColor: `${accent}33`,
+              backgroundImage: `linear-gradient(160deg, ${light}14 0%, transparent 55%)`,
+              boxShadow: `inset 0 1px 0 0 ${light}26, 0 12px 28px -20px ${deep}55`,
+            }
+          : undefined),
+        ...style,
+      }}
     >
       {(title || right || dismissible) && (
         <div className="flex items-center justify-between border-b border-line px-3 py-2">
