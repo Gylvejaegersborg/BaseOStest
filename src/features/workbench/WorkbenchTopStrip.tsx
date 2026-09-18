@@ -77,7 +77,7 @@ export function WorkbenchTopStrip({
             <LayoutPanelLeft size={14} />
           </button>
           {menuOpen && (
-            <div className="absolute right-0 top-full z-20 mt-1 w-44 border border-line bg-panel shadow-elevation-3">
+            <div className="absolute right-0 top-full z-20 mt-1 w-44 rounded-docked border border-line bg-panel shadow-elevation-3">
               {ALL_TABS.map((t) => (
                 <button
                   key={t.id}

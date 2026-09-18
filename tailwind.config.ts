@@ -32,6 +32,19 @@ export default {
         'accent-3': '#c77591',
         'accent-4': '#ba4568',
         'accent-5': '#91304a',
+        // Purple and red get the same tonal-ramp treatment as the accent,
+        // so the ambient/decorative layer (nebula, washes) can lean on them
+        // more without either being a single flat tone.
+        'violet-1': '#c4b5e3',
+        'violet-2': '#ac92d9',
+        'violet-3': '#946ecf',
+        'violet-4': '#773dc2',
+        'violet-5': '#5d2c96',
+        'crimson-1': '#e8b0b5',
+        'crimson-2': '#e3878f',
+        'crimson-3': '#e05c67',
+        'crimson-4': '#db2433',
+        'crimson-5': '#aa1824',
 
         amber: '#f0a020',
         magenta: '#e0408a',

@@ -140,7 +140,7 @@ export function ConversationPane({
         {pending.length > 0 && (
           <div className="mb-2 flex flex-wrap gap-2">
             {pending.map((a) => (
-              <span key={a.id} className="flex items-center gap-1.5 border border-line bg-panel-2 px-2 py-1 text-[11px]">
+              <span key={a.id} className="flex items-center gap-1.5 rounded-control border border-line bg-panel-2 px-2 py-1 text-[11px]">
                 {a.kind === 'audio' ? <Mic size={11} className="text-danger" /> : <Paperclip size={11} className="text-accent" />}
                 <span className="max-w-[160px] truncate">{a.name}</span>
                 <span className="text-dim">{fmtSize(a.size)}</span>
@@ -162,7 +162,7 @@ export function ConversationPane({
             onClick={() => setPlanMode((p) => !p)}
             title={planMode ? 'Plan mode on — click to allow real changes again' : 'Plan mode off — click to inspect only, no real changes'}
             className={cn(
-              'border p-2 transition-colors',
+              'rounded-control border p-2 transition-colors',
               planMode ? 'border-accent/50 bg-accent/10 text-accent' : 'border-line text-dim hover:border-accent/60 hover:text-accent',
             )}
           >
@@ -172,7 +172,7 @@ export function ConversationPane({
             <button
               onClick={() => setAttachMenuOpen((o) => !o)}
               className={cn(
-                'border p-2 transition-colors',
+                'rounded-control border p-2 transition-colors',
                 attachMenuOpen ? 'border-accent/50 bg-accent/10 text-accent' : 'border-line text-dim hover:border-accent/60 hover:text-accent',
               )}
               title="Attach"
@@ -180,7 +180,7 @@ export function ConversationPane({
               <Paperclip size={16} />
             </button>
             {attachMenuOpen && !notePickerOpen && (
-              <div className="absolute bottom-full left-0 z-10 mb-1 w-44 border border-line bg-panel shadow-elevation-3">
+              <div className="absolute bottom-full left-0 z-10 mb-1 w-44 rounded-docked border border-line bg-panel shadow-elevation-3">
                 <button
                   onClick={() => { setAttachMenuOpen(false); fileRef.current?.click() }}
                   className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-text hover:bg-panel-2"
@@ -214,7 +214,7 @@ export function ConversationPane({
             onClick={send}
             disabled={notReady}
             className={cn(
-              'border p-2 transition-colors disabled:opacity-40',
+              'rounded-control border p-2 transition-colors disabled:opacity-40',
               chat.streaming
                 ? 'border-danger/40 bg-danger/10 text-danger hover:bg-danger/20'
                 : 'border-accent/40 bg-accent/10 text-accent hover:bg-accent/20',
@@ -270,7 +270,7 @@ function MessageRow({
           )}
         </div>
         <div
-          className={cn('inline-block border px-3 py-2 text-sm', isUser ? 'border-line bg-panel-2 text-text' : 'border-line bg-panel/70 text-text/90')}
+          className={cn('inline-block rounded-panel border px-3 py-2 text-sm', isUser ? 'border-line bg-panel-2 text-text' : 'border-line bg-panel/70 text-text/90')}
           style={!isUser ? { borderColor: `${agentColor}33` } : undefined}
         >
           {msg.text && <p className="whitespace-pre-wrap text-left">{msg.text}</p>}
@@ -286,7 +286,7 @@ function NotePicker({ onPick, onClose }: { onPick: (id: string, title: string) =
   const filtered = notes.filter((n) => n.title.toLowerCase().includes(query.trim().toLowerCase())).slice(0, 8)
 
   return (
-    <div className="absolute bottom-full left-0 z-10 mb-1 w-64 border border-line bg-panel shadow-elevation-3">
+    <div className="absolute bottom-full left-0 z-10 mb-1 w-64 rounded-docked border border-line bg-panel shadow-elevation-3">
       <div className="flex items-center gap-1.5 border-b border-line px-2 py-1.5">
         <button onClick={onClose} className="text-dim hover:text-text" title="Back">
           <X size={12} />
@@ -361,7 +361,7 @@ function MicButton({ onClip }: { onClip: (att: { id: string; name: string; size:
     <button
       onClick={recording ? stop : start}
       className={cn(
-        'flex items-center gap-1.5 border p-2 transition-colors',
+        'flex items-center gap-1.5 rounded-control border p-2 transition-colors',
         recording ? 'border-danger/60 bg-danger/10 text-danger' : 'border-line text-dim hover:border-danger/60 hover:text-danger',
       )}
       title={recording ? 'Stop recording' : 'Record voice'}

@@ -86,7 +86,7 @@ export function Ops() {
           )}
         </div>
 
-        <Panel title="Services" code="HEALTH" accent="#c77591" className="mb-3" bodyClassName="p-2">
+        <Panel title="Services" code="HEALTH" accent="#e05c67" className="mb-3 rounded-none" bodyClassName="p-2">
           <div className="space-y-1.5">
             {SERVICES.map((s) => (
               <ServiceRow key={s.id} svc={s} />
@@ -94,7 +94,7 @@ export function Ops() {
           </div>
         </Panel>
 
-        <Panel title="Devices" code="CONN" accent="#46d369" bodyClassName="p-2">
+        <Panel title="Devices" code="CONN" accent="#46d369" className="rounded-none" bodyClassName="p-2">
           <div className="space-y-1.5">
             {DEVICES.map((d) => {
               const Icon = DEVICE_ICON[d.kind] ?? Cpu
@@ -117,7 +117,7 @@ export function Ops() {
 
       {/* Log stream */}
       <div className="lg:col-span-1">
-        <Panel title="Live Log" code="STREAM" accent="#f0a020" className="lg:h-full" bodyClassName="p-0">
+        <Panel title="Live Log" code="STREAM" accent="#f0a020" className="lg:h-full rounded-none" bodyClassName="p-0">
           <div className="flex items-center gap-1.5 border-b border-line px-3 py-1.5 text-[10px] text-dim">
             <Terminal size={11} /> tail -f /var/log/personal-os
           </div>
@@ -135,7 +135,7 @@ export function Ops() {
 
       {/* Errors + agent health */}
       <div className="lg:col-span-1">
-        <Panel title="Errors & Warnings" code="ALERT" accent="#ff5566" className="mb-3" bodyClassName="p-2">
+        <Panel title="Errors & Warnings" code="ALERT" accent="#ff5566" className="mb-3 rounded-none" bodyClassName="p-2">
           <div className="space-y-1.5">
             {OPS_ERRORS.map((e) => (
               <div key={e.id} className="border-l-2 bg-bg/30 px-2 py-1.5" style={{ borderColor: SEV_COLOR[e.severity] }}>
@@ -151,7 +151,7 @@ export function Ops() {
           </div>
         </Panel>
 
-        <Panel title="Agent Health" code="AGT" accent="#e0408a" bodyClassName="p-2">
+        <Panel title="Agent Health" code="AGT" accent="#e0408a" className="rounded-none" bodyClassName="p-2">
           <div className="space-y-1.5">
             {AGENTS.map((a) => (
               <div key={a.id} className="flex items-center gap-2 border border-line bg-bg/30 px-2 py-1.5">
