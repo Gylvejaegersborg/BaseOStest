@@ -74,7 +74,7 @@ export function Ops() {
     <div className="grid h-full grid-cols-1 gap-3 overflow-y-auto p-4 lg:grid-cols-3">
       <div className="lg:col-span-1">
         <div className="mb-3 flex items-center gap-3">
-          <h1 className="font-display text-2xl tracking-wider text-text">OPS CONSOLE</h1>
+          <h1 className="font-display text-2xl tracking-wider text-crimson-3">OPS CONSOLE</h1>
           <span className={`flex items-center gap-1 text-[10px] uppercase tracking-wider ${online ? 'text-neon-green' : 'text-danger'}`}>
             {online ? <Wifi size={12} /> : <WifiOff size={12} />}
             {online ? 'online' : 'offline'}
