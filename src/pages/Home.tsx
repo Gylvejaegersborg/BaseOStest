@@ -96,7 +96,10 @@ export function Home() {
       <div className="pointer-events-none absolute left-4 top-4 z-10 sm:left-6 sm:top-6">
         <div className="text-[10px] tracking-[0.4em] text-dim sm:text-[11px]">PERSONAL OPERATING SYSTEM</div>
         <h1 className="font-display text-2xl tracking-wider text-text sm:text-4xl lg:text-5xl">
-          THE <span className="text-accent">CONSTELLATION</span>
+          THE{' '}
+          <span className="bg-gradient-to-r from-accent-3 via-accent-4 to-violet-4 bg-clip-text text-transparent">
+            CONSTELLATION
+          </span>
         </h1>
         <div className="mt-1 hidden max-w-md text-xs text-dim sm:block">
           {SECTIONS.length} sections, {PROJECTS.length} projects — one map. Hover a body to read it, click a sun to enter.
