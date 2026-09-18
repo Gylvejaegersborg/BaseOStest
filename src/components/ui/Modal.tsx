@@ -44,7 +44,7 @@ export function Modal({ open, onClose, title, code, accent, children, width = 56
           accent={accent}
           dismissible
           onDismiss={onClose}
-          className="max-h-[85dvh] border-line-2 bg-panel shadow-glow"
+          className="max-h-[85dvh] rounded-docked border-line-2 bg-panel shadow-glow"
           bodyClassName="overflow-y-auto p-4"
           style={{ borderColor: accent ? `${accent}55` : undefined }}
         >

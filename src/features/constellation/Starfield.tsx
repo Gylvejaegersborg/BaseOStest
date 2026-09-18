@@ -66,9 +66,11 @@ export function Starfield() {
       t0 += dt
       ctx.clearRect(0, 0, w, h)
 
-      // Two faint, slowly-drifting nebula blobs as a backdrop layer.
+      // Three faint, slowly-drifting nebula blobs as a backdrop layer —
+      // rose/magenta/violet rather than two, for more chromatic depth.
       drawNebula(ctx, w, h, t0, '#c77591', 0.6, 0.42, 0.05)
       drawNebula(ctx, w, h, t0 + 7.3, '#e0408a', 0.35, 0.7, 0.045)
+      drawNebula(ctx, w, h, t0 + 14.1, '#946ecf', 0.75, 0.25, 0.035)
 
       // Stars: drift + wrap + twinkle.
       for (const s of stars) {

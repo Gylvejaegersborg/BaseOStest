@@ -62,7 +62,7 @@ export function Panel({
     <div
       className={cn(
         'relative flex flex-col border',
-        elevation ? ELEVATION_CLASSES[elevation] : 'border-line bg-panel/80 backdrop-blur-sm',
+        elevation ? ELEVATION_CLASSES[elevation] : 'rounded-panel border-line bg-panel/80 backdrop-blur-sm',
         className,
       )}
       style={{
