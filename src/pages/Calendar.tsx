@@ -173,7 +173,7 @@ export function Calendar() {
     <div className="flex h-full flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
       {/* Calendar grid */}
       <div className="flex h-[72vh] min-w-0 flex-col lg:h-auto lg:flex-1">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-2">
+        <div className="flex flex-wrap items-center justify-between gap-1.5 border-b border-line px-2 py-2 sm:gap-2 sm:px-4">
           <div className="flex items-center gap-3">
             <h1 className="font-display text-lg tracking-wider text-text">CALENDAR</h1>
             <span className="text-xs text-dim">
@@ -184,7 +184,12 @@ export function Calendar() {
                   : format(month, 'MMMM yyyy')}
             </span>
           </div>
-          <div className="flex items-center gap-2">
+          {/* flex-wrap here too — at the narrowest phone widths (320px) the
+           *  view toggle + bell + nav group no longer fit on one line even
+           *  after the outer row wraps around the title; wrapping again
+           *  keeps this row's own overflow from pushing the whole page into
+           *  horizontal scroll instead of just breaking onto a second line. */}
+          <div className="flex flex-wrap items-center gap-1.5">
             {/* View toggle */}
             <div className="flex border border-line">
               {(['day', 'week', 'month'] as const).map((v) => (
@@ -213,7 +218,7 @@ export function Calendar() {
             </button>
             {/* Period nav — day view now steps through real dates instead of
              *  being pinned to today, same shape as week/month's prev/today/next. */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5 sm:gap-1">
               <button
                 onClick={() =>
                   view === 'day'
