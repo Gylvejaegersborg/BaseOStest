@@ -57,7 +57,7 @@ export function MonthView({ month, appts, tasks, onSelectDay, onSelectAppt }: Mo
               key={day.toISOString()}
               onClick={() => onSelectDay(day)}
               className={cn(
-                'flex flex-col gap-1 border-b border-r border-line/50 p-1.5 text-left transition-colors',
+                'flex min-w-0 flex-col gap-1 border-b border-r border-line/50 p-1.5 text-left transition-colors',
                 today ? 'bg-accent/5' : 'hover:bg-panel-2/40',
                 !inMonth && 'opacity-35',
               )}
