@@ -41,6 +41,7 @@ import { ReminderModal } from '@/features/calendar/ReminderModal'
 import { TaskPanel, TaskModal } from '@/features/calendar/TaskPanel'
 import { RemindersPanel } from '@/features/calendar/RemindersPanel'
 import { useCalendar } from '@/features/calendar/CalendarContext'
+import { OverflowDebugger } from '@/features/calendar/OverflowDebugger'
 
 const DAY_START = 7
 const DAY_END = 22
@@ -410,6 +411,7 @@ export function Calendar() {
           setDayDetail(null)
         }}
       />
+      <OverflowDebugger />
     </div>
   )
 }
