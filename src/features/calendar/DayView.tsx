@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { format, isSameDay } from 'date-fns'
+import { format, isSameDay, isToday, isTomorrow, isYesterday } from 'date-fns'
 import { Bell, BookOpen, Bot, ExternalLink, MapPin, RefreshCw, Shuffle, Sparkles } from 'lucide-react'
 import {
   KIND_COLOR,
@@ -19,6 +19,11 @@ import { dailyTrysilPlace, trysilUrl } from './trysil'
 import { useDailyWikipedia, RANDOM_FALLBACK } from './useDailyWikipedia'
 
 interface DayViewProps {
+  /** The day being viewed — Day view used to be hardcoded to "now"; it now
+   *  browses any date, so this drives all the content while `useNow()`
+   *  below is kept separately for the live clock/now-line, which only
+   *  apply when that day happens to be today. */
+  date: Date
   appts: Appt[]
   tasks: Task[]
   reminders: Reminder[]
@@ -48,6 +53,7 @@ function greeting(h: number): string {
 }
 
 export function DayView({
+  date,
   appts,
   tasks,
   reminders,
@@ -59,72 +65,87 @@ export function DayView({
   onSelectCron,
 }: DayViewProps) {
   const now = useNow()
+  const today = isToday(date)
+  // "now" only means something for the day that actually contains it — a
+  // browsed past/future day has no live line, no in-progress appt, and every
+  // appt on it reads as either fully past or fully ahead.
   const nowHour = now.getHours() + now.getMinutes() / 60
+  const isPast = !today && date < now
 
-  const todayAppts = useMemo(
-    () => appts.filter((a) => isSameDay(apptDate(a), now)).sort((a, b) => a.start - b.start),
-    [appts, now],
+  const dayAppts = useMemo(
+    () => appts.filter((a) => isSameDay(apptDate(a), date)).sort((a, b) => a.start - b.start),
+    [appts, date],
   )
-  const todayTasks = useMemo(
+  const dayTasks = useMemo(
     () =>
       tasks
-        .filter((t) => t.dayOffset != null && isSameDay(offsetDate(t.dayOffset), now))
+        .filter((t) => t.dayOffset != null && isSameDay(offsetDate(t.dayOffset), date))
         .sort((a, b) => (a.dueTime ?? 99) - (b.dueTime ?? 99)),
-    [tasks, now],
+    [tasks, date],
   )
-  const todayReminders = useMemo(
-    () => reminders.filter((r) => isSameDay(offsetDate(r.dayOffset), now)).sort((a, b) => a.time - b.time),
-    [reminders, now],
+  const dayReminders = useMemo(
+    () => reminders.filter((r) => isSameDay(offsetDate(r.dayOffset), date)).sort((a, b) => a.time - b.time),
+    [reminders, date],
   )
 
-  const tasksOpen = todayTasks.filter((t) => t.status !== 'done').length
-  const tasksDone = todayTasks.length - tasksOpen
-  const upcomingCount = todayAppts.filter((a) => a.end > nowHour).length
+  const tasksOpen = dayTasks.filter((t) => t.status !== 'done').length
+  const tasksDone = dayTasks.length - tasksOpen
+  const upcomingCount = dayAppts.filter((a) => a.end > nowHour).length
 
   // Index of the first not-yet-finished appointment — where the "now" line goes.
-  const nowIdx = todayAppts.findIndex((a) => a.end > nowHour)
+  const nowIdx = today ? dayAppts.findIndex((a) => a.end > nowHour) : -1
+
+  const dayLabel = today ? 'Today' : isYesterday(date) ? 'Yesterday' : isTomorrow(date) ? 'Tomorrow' : format(date, 'EEEE')
 
   return (
-    <div className="min-h-0 flex-1 overflow-auto p-3">
+    <div className="min-h-0 flex-1 overflow-auto p-2.5 sm:p-3">
       {/* Hero */}
-      <div className="hud-corners relative mb-3 border border-line bg-panel/60 p-4 text-accent">
+      <div className="hud-corners relative mb-3 border border-line bg-panel/60 p-3 text-accent sm:p-4">
         <div className="flex flex-wrap items-end justify-between gap-2">
           <div>
-            <div className="label text-dim">{greeting(now.getHours())}</div>
-            <h2 className="font-display text-2xl tracking-wide text-text">{format(now, 'EEEE')}</h2>
-            <div className="text-sm text-dim">{format(now, 'dd MMMM yyyy')}</div>
+            <div className="label text-dim">{today ? greeting(now.getHours()) : dayLabel}</div>
+            <h2 className="font-display text-xl tracking-wide text-text sm:text-2xl">{format(date, 'EEEE')}</h2>
+            <div className="text-sm text-dim">{format(date, 'dd MMMM yyyy')}</div>
           </div>
           <div className="text-right">
-            <div className="font-display text-3xl tabular-nums text-accent">{format(now, 'HH:mm')}</div>
+            {today && <div className="font-display text-2xl tabular-nums text-accent sm:text-3xl">{format(now, 'HH:mm')}</div>}
             <div className="mt-1 text-[11px] text-dim">
-              {todayAppts.length} events · {upcomingCount} upcoming · {tasksOpen} to do · {tasksDone} done
+              {dayAppts.length} events
+              {today && ` · ${upcomingCount} upcoming`}
+              {!today && !isPast && dayAppts.length > 0 && ' · scheduled'}
+              {` · ${tasksOpen} to do · ${tasksDone} done`}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="grid gap-3 lg:grid-cols-2">
-        {/* Today's agenda */}
-        <Panel title="Today" code="AGENDA" accent="#f0a020" bodyClassName="p-2">
-          {todayAppts.length ? (
+      <div className={cn('grid gap-3', today && 'lg:grid-cols-2')}>
+        {/* Day's agenda */}
+        <Panel title={dayLabel} code="AGENDA" accent="#f0a020" bodyClassName="p-2">
+          {dayAppts.length ? (
             <div className="space-y-1">
-              {todayAppts.map((a, i) => (
+              {dayAppts.map((a, i) => (
                 <div key={a.id}>
                   {i === nowIdx && <NowLine now={now} />}
-                  <ApptRow appt={a} done={a.end <= nowHour} live={a.start <= nowHour && a.end > nowHour} onClick={() => onSelectAppt(a)} />
+                  <ApptRow
+                    appt={a}
+                    done={today ? a.end <= nowHour : isPast}
+                    live={today && a.start <= nowHour && a.end > nowHour}
+                    onClick={() => onSelectAppt(a)}
+                  />
                 </div>
               ))}
-              {nowIdx === -1 && <NowLine now={now} />}
+              {today && nowIdx === -1 && <NowLine now={now} />}
             </div>
           ) : (
-            <Empty>Nothing on the agenda today.</Empty>
+            <Empty>Nothing on the agenda {today ? 'today' : dayLabel.toLowerCase()}.</Empty>
           )}
 
-          {(todayTasks.length > 0 || todayReminders.length > 0) && (
+          {(dayTasks.length > 0 || dayReminders.length > 0) && (
             <div className="mt-3 border-t border-line pt-2">
-              <div className="label mb-1.5">Due today</div>
+              <div className="label mb-1.5">Due {today ? 'today' : dayLabel.toLowerCase()}</div>
               <div className="space-y-1">
-                {todayTasks.map((t) => (
+                {dayTasks.map((t) => (
                   <div
                     key={t.id}
                     className="flex items-center gap-2 border-l-2 bg-bg/40 px-2 py-1.5"
@@ -144,7 +165,7 @@ export function DayView({
                     {t.dueTime != null && <span className="text-[10px] tabular-nums text-dim">{hhmm(t.dueTime)}</span>}
                   </div>
                 ))}
-                {todayReminders.map((r) => (
+                {dayReminders.map((r) => (
                   <button
                     key={r.id}
                     onClick={() => onSelectReminder(r)}
@@ -163,46 +184,53 @@ export function DayView({
           )}
         </Panel>
 
-        {/* What the agents gathered */}
-        <Panel
-          title="Agents gathered"
-          code="AGT"
-          accent="#c77591"
-          bodyClassName="p-2"
-          right={<Bot size={13} className="text-dim" />}
-        >
-          <div className="space-y-1.5">
-            {crons.map((c) => (
-              <button
-                key={c.id}
-                onClick={() => onSelectCron(c)}
-                className="block w-full border border-line bg-bg/30 px-2 py-1.5 text-left transition-colors hover:bg-panel-2/60"
-              >
-                <div className="flex items-center gap-2">
-                  <StatusDot color={CRON_STATUS_COLOR[c.status]} pulse={c.status === 'running'} size={6} />
-                  <span className="min-w-0 flex-1 truncate text-xs text-text">{c.name}</span>
-                  <span className="text-[9px] text-dim">{c.lastRun}</span>
-                </div>
-                {c.outputs && c.outputs.length > 0 && (
-                  <div className="mt-1 flex flex-wrap gap-1 pl-4">
-                    {c.outputs.map((o, i) => (
-                      <span key={i} className="border border-line/60 px-1 py-0.5 text-[9px] text-dim">
-                        {o}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                <div className="mt-0.5 pl-4 text-[9px] text-dim/70">{c.owner} · {cronScheduleLabel(c.schedule)}</div>
-              </button>
-            ))}
-          </div>
-        </Panel>
+        {/* The rest of this only makes sense for today: cron runs are live
+         *  process state, and the Wikipedia/Trysil cards are "today" content,
+         *  not content for whatever date happens to be browsed. */}
+        {today && (
+          <>
+            {/* What the agents gathered */}
+            <Panel
+              title="Agents gathered"
+              code="AGT"
+              accent="#c77591"
+              bodyClassName="p-2"
+              right={<Bot size={13} className="text-dim" />}
+            >
+              <div className="space-y-1.5">
+                {crons.map((c) => (
+                  <button
+                    key={c.id}
+                    onClick={() => onSelectCron(c)}
+                    className="block w-full border border-line bg-bg/30 px-2 py-1.5 text-left transition-colors hover:bg-panel-2/60"
+                  >
+                    <div className="flex items-center gap-2">
+                      <StatusDot color={CRON_STATUS_COLOR[c.status]} pulse={c.status === 'running'} size={6} />
+                      <span className="min-w-0 flex-1 truncate text-xs text-text">{c.name}</span>
+                      <span className="text-[9px] text-dim">{c.lastRun}</span>
+                    </div>
+                    {c.outputs && c.outputs.length > 0 && (
+                      <div className="mt-1 flex flex-wrap gap-1 pl-4">
+                        {c.outputs.map((o, i) => (
+                          <span key={i} className="border border-line/60 px-1 py-0.5 text-[9px] text-dim">
+                            {o}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <div className="mt-0.5 pl-4 text-[9px] text-dim/70">{c.owner} · {cronScheduleLabel(c.schedule)}</div>
+                  </button>
+                ))}
+              </div>
+            </Panel>
 
-        {/* Daily Wikipedia */}
-        <WikipediaCard />
+            {/* Daily Wikipedia */}
+            <WikipediaCard />
 
-        {/* Daily Trysil place */}
-        <TrysilCard now={now} />
+            {/* Daily Trysil place */}
+            <TrysilCard now={now} />
+          </>
+        )}
       </div>
     </div>
   )
