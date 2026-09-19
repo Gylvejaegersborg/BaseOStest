@@ -170,7 +170,7 @@ export function Calendar() {
     setEditingReminder({ id: `new-${Date.now()}`, title: '', dayOffset, time })
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
+    <div className="flex h-full flex-col overflow-y-auto overflow-x-hidden lg:flex-row lg:overflow-hidden">
       {/* Calendar grid */}
       <div className="flex h-[72vh] min-w-0 flex-col lg:h-auto lg:flex-1">
         <div className="flex flex-wrap items-center justify-between gap-1.5 border-b border-line px-2 py-2 sm:gap-2 sm:px-4">
@@ -322,7 +322,7 @@ export function Calendar() {
       </div>
 
       {/* Side panels */}
-      <aside className="flex w-full shrink-0 flex-col gap-3 overflow-y-auto border-t border-line bg-panel/30 p-3 lg:w-[320px] lg:border-l lg:border-t-0">
+      <aside className="flex w-full shrink-0 flex-col gap-3 overflow-y-auto overflow-x-hidden border-t border-line bg-panel/30 p-3 lg:w-[320px] lg:border-l lg:border-t-0">
         <RemindersPanel
           enabled={remindersEngine.enabled}
           permission={remindersEngine.permission}
