@@ -41,7 +41,6 @@ import { ReminderModal } from '@/features/calendar/ReminderModal'
 import { TaskPanel, TaskModal } from '@/features/calendar/TaskPanel'
 import { RemindersPanel } from '@/features/calendar/RemindersPanel'
 import { useCalendar } from '@/features/calendar/CalendarContext'
-import { GapDebugger } from '@/features/calendar/GapDebugger'
 
 const DAY_START = 7
 const DAY_END = 22
@@ -178,7 +177,7 @@ export function Calendar() {
        *  short content before the aside panels underneath. max-height still
        *  caps a busy day/Week's grid so the toolbar above stays put while
        *  that scrolls internally, but a short day now just shrinks to fit. */}
-      <div data-cal-grid-wrapper className="flex max-h-[72vh] min-w-0 flex-col lg:h-auto lg:flex-1">
+      <div className="flex max-h-[72vh] min-w-0 flex-col lg:h-auto lg:flex-1">
         <div className="flex flex-wrap items-center justify-between gap-1.5 border-b border-line px-2 py-2 sm:gap-2 sm:px-4">
           <div className="flex items-center gap-3">
             <h1 className="font-display text-lg tracking-wider text-text">CALENDAR</h1>
@@ -328,7 +327,14 @@ export function Calendar() {
       </div>
 
       {/* Side panels */}
-      <aside data-cal-aside className="flex w-full shrink-0 flex-col gap-3 overflow-y-auto overflow-x-hidden border-t border-line bg-panel/30 p-3 lg:w-[320px] lg:border-l lg:border-t-0">
+      {/* No border-t on mobile — every panel inside (and the calendar panel
+       *  above) already draws its own border box, so this extra full-width
+       *  divider line just read as a stray line sitting between two panels
+       *  once the calendar region stopped reserving a fixed 72vh (nothing
+       *  filled the space that used to visually justify a section boundary
+       *  there). Desktop keeps its own border-l — that one's an actual
+       *  persistent sidebar edge, not a leftover from the old spacing. */}
+      <aside className="flex w-full shrink-0 flex-col gap-3 overflow-y-auto overflow-x-hidden bg-panel/30 p-3 lg:w-[320px] lg:border-l">
         <RemindersPanel
           enabled={remindersEngine.enabled}
           permission={remindersEngine.permission}
@@ -416,7 +422,6 @@ export function Calendar() {
           setDayDetail(null)
         }}
       />
-      <GapDebugger />
     </div>
   )
 }
