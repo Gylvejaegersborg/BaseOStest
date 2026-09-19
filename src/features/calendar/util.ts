@@ -1,5 +1,5 @@
-import { addDays, differenceInCalendarDays, startOfDay } from 'date-fns'
-import type { Appt, Reminder, Task } from '@/data/calendar'
+import { addDays, addMonths, differenceInCalendarDays, isSameDay, startOfDay } from 'date-fns'
+import type { Appt, Recurrence, Reminder, Task } from '@/data/calendar'
 
 // Captured once at module load. Appt/Task dayOffsets are relative to this day.
 export const TODAY = new Date()
@@ -40,6 +40,65 @@ export function parseHM(v: string): number | null {
   const mn = Number(m[2])
   if (hr > 23 || mn > 59) return null
   return hr + mn / 60
+}
+
+/** Does an item anchored on `anchorDayOffset` (with an optional recurrence)
+ *  occur on `targetDay`? `targetDay` must be a start-of-day Date (as every
+ *  call site already has via `offsetDate`/`day` props, not a live "now"). */
+export function occursOnDay(anchorDayOffset: number, recurrence: Recurrence | undefined, targetDay: Date): boolean {
+  const anchor = offsetDate(anchorDayOffset)
+  if (targetDay < anchor) return false
+  if (!recurrence) return isSameDay(anchor, targetDay)
+  if (recurrence.until != null && targetDay > offsetDate(recurrence.until)) return false
+  if (recurrence.freq === 'daily') return true
+  if (recurrence.freq === 'weekly') return differenceInCalendarDays(targetDay, anchor) % 7 === 0
+  return targetDay.getDate() === anchor.getDate()
+}
+
+export function apptOccursOn(a: Appt, day: Date): boolean {
+  return occursOnDay(a.dayOffset, a.recurrence, day)
+}
+
+export function taskOccursOn(t: Task, day: Date): boolean {
+  return t.dayOffset != null && occursOnDay(t.dayOffset, t.recurrence, day)
+}
+
+export function reminderOccursOn(r: Reminder, day: Date): boolean {
+  return occursOnDay(r.dayOffset, r.recurrence, day)
+}
+
+/** Next timestamp (ms) an anchor+hour+recurrence occurs at or after `from`.
+ *  Non-recurring items just resolve to their single occurrence regardless of
+ *  `from` — callers that need "only if upcoming" already filter on that
+ *  separately. Bounded so a stale/malformed recurrence can't loop forever. */
+function nextOccurrenceMs(
+  anchorDayOffset: number,
+  hour: number,
+  recurrence: Recurrence | undefined,
+  from: number,
+): number | null {
+  if (!recurrence) return atHour(offsetDate(anchorDayOffset), hour).getTime()
+  const untilMs = recurrence.until != null ? atHour(offsetDate(recurrence.until), 23.99).getTime() : Infinity
+  let d = offsetDate(anchorDayOffset)
+  for (let i = 0; i < 400; i++) {
+    const ms = atHour(d, hour).getTime()
+    if (ms >= from) return ms <= untilMs ? ms : null
+    d = recurrence.freq === 'daily' ? addDays(d, 1) : recurrence.freq === 'weekly' ? addDays(d, 7) : addMonths(d, 1)
+  }
+  return null
+}
+
+export function apptNextMs(a: Appt, from = Date.now()): number | null {
+  return nextOccurrenceMs(a.dayOffset, a.start, a.recurrence, from)
+}
+
+export function taskNextMs(t: Task, from = Date.now()): number | null {
+  if (t.dayOffset == null || t.dueTime == null) return null
+  return nextOccurrenceMs(t.dayOffset, t.dueTime, t.recurrence, from)
+}
+
+export function reminderNextMs(r: Reminder, from = Date.now()): number | null {
+  return nextOccurrenceMs(r.dayOffset, r.time, r.recurrence, from)
 }
 
 export function apptStartMs(a: Appt): number {

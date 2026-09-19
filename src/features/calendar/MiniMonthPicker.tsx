@@ -20,10 +20,9 @@ interface MiniMonthPickerProps {
   /** The currently selected day, also seeds which month opens first. */
   value: Date
   onSelect: (day: Date) => void
-  /** Days worth marking with a dot (has appointments/tasks/reminders) — keyed
-   *  by `yyyy-MM-dd`, so the picker can hint at activity while browsing
-   *  months without pulling in the full agenda-building logic itself. */
-  markedDays?: Set<string>
+  /** Whether a given day has anything on it (appt/task/reminder, recurring
+   *  ones included) — a dot hint while browsing months. */
+  isDayMarked?: (day: Date) => boolean
 }
 
 /** Compact month-grid date picker — the thing Day view was missing:
@@ -31,7 +30,7 @@ interface MiniMonthPickerProps {
  *  boundary or land on an arbitrary date. This is deliberately lighter than
  *  MonthView (no per-day event previews) since it's a jump-to-date control,
  *  not a second calendar surface. */
-export function MiniMonthPicker({ value, onSelect, markedDays }: MiniMonthPickerProps) {
+export function MiniMonthPicker({ value, onSelect, isDayMarked }: MiniMonthPickerProps) {
   const [cursor, setCursor] = useState(() => startOfMonth(value))
 
   const days = useMemo(() => {
@@ -70,7 +69,7 @@ export function MiniMonthPicker({ value, onSelect, markedDays }: MiniMonthPicker
           const inMonth = isSameMonth(day, cursor)
           const selected = isSameDay(day, value)
           const today = isToday(day)
-          const marked = markedDays?.has(format(day, 'yyyy-MM-dd'))
+          const marked = isDayMarked?.(day)
           return (
             <button
               key={day.toISOString()}

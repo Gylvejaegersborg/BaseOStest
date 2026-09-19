@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronDown, ChevronUp, Plus, Trash2 } from 'lucide-react'
+import { ChevronDown, ChevronUp, Plus, Repeat, Trash2 } from 'lucide-react'
 import {
   PRIORITY_COLOR,
   PRIORITY_LABEL,
@@ -13,6 +13,7 @@ import { Modal } from '@/components/ui/Modal'
 import { cn } from '@/lib/cn'
 import { offsetDate, hhmm, parseHM } from './util'
 import { DateField } from './DateField'
+import { RecurrenceField } from './RecurrenceField'
 import { format } from 'date-fns'
 
 const STATUS_LABEL: Record<TaskStatus, string> = { todo: 'To do', doing: 'Doing', done: 'Done' }
@@ -126,6 +127,7 @@ function TaskRow({ task, onToggle, onEdit }: { task: Task; onToggle: () => void;
         <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px]">
           <span style={{ color }}>{PRIORITY_LABEL[task.priority]}</span>
           {label && <span className={overdue ? 'text-danger' : 'text-dim'}>{label}</span>}
+          {task.recurrence && <Repeat size={9} className="text-dim" />}
           {task.status === 'doing' && <span className="text-accent">{STATUS_LABEL.doing}</span>}
           {subTotal > 0 && (
             <span className="text-dim">
@@ -233,6 +235,8 @@ export function TaskModal({
           </select>
         </div>
       </div>
+
+      <RecurrenceField value={draft.recurrence} onChange={(recurrence) => set({ recurrence })} />
 
       <label className="label mb-1 block">Tag</label>
       <select

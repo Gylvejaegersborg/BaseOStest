@@ -4,6 +4,7 @@ import { REMINDER_COLOR, type Reminder } from '@/data/calendar'
 import { Modal } from '@/components/ui/Modal'
 import { hhmm, parseHM } from './util'
 import { DateField } from './DateField'
+import { RecurrenceField } from './RecurrenceField'
 
 function firstLine(s: string): string {
   return s.trim().split('\n')[0].slice(0, 80)
@@ -71,6 +72,8 @@ export function ReminderModal({
           />
         </div>
       </div>
+
+      <RecurrenceField value={draft.recurrence} onChange={(recurrence) => set({ recurrence })} />
 
       <label className="label mb-1 block">Notes</label>
       <textarea

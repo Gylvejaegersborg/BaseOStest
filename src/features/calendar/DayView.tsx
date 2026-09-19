@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { format, isSameDay, isToday, isTomorrow, isYesterday } from 'date-fns'
-import { Bell, BookOpen, Bot, ExternalLink, MapPin, RefreshCw, Shuffle, Sparkles } from 'lucide-react'
+import { format, isToday, isTomorrow, isYesterday } from 'date-fns'
+import { Bell, BookOpen, Bot, ExternalLink, MapPin, RefreshCw, Repeat, Shuffle, Sparkles } from 'lucide-react'
 import {
   KIND_COLOR,
   PRIORITY_COLOR,
@@ -13,7 +13,7 @@ import {
 import { Panel } from '@/components/ui/Panel'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { cn } from '@/lib/cn'
-import { apptDate, hhmm, offsetDate } from './util'
+import { apptOccursOn, hhmm, reminderOccursOn, taskOccursOn } from './util'
 import { cronScheduleLabel, CRON_STATUS_COLOR } from './cron'
 import { dailyTrysilPlace, trysilUrl } from './trysil'
 import { useDailyWikipedia, RANDOM_FALLBACK } from './useDailyWikipedia'
@@ -73,18 +73,15 @@ export function DayView({
   const isPast = !today && date < now
 
   const dayAppts = useMemo(
-    () => appts.filter((a) => isSameDay(apptDate(a), date)).sort((a, b) => a.start - b.start),
+    () => appts.filter((a) => apptOccursOn(a, date)).sort((a, b) => a.start - b.start),
     [appts, date],
   )
   const dayTasks = useMemo(
-    () =>
-      tasks
-        .filter((t) => t.dayOffset != null && isSameDay(offsetDate(t.dayOffset), date))
-        .sort((a, b) => (a.dueTime ?? 99) - (b.dueTime ?? 99)),
+    () => tasks.filter((t) => taskOccursOn(t, date)).sort((a, b) => (a.dueTime ?? 99) - (b.dueTime ?? 99)),
     [tasks, date],
   )
   const dayReminders = useMemo(
-    () => reminders.filter((r) => isSameDay(offsetDate(r.dayOffset), date)).sort((a, b) => a.time - b.time),
+    () => reminders.filter((r) => reminderOccursOn(r, date)).sort((a, b) => a.time - b.time),
     [reminders, date],
   )
 
@@ -176,6 +173,7 @@ export function DayView({
                     <span className={cn('min-w-0 flex-1 truncate text-xs', r.done ? 'text-dim line-through' : 'text-text')}>
                       {r.title}
                     </span>
+                    {r.recurrence && <Repeat size={9} className="shrink-0 text-dim" />}
                     <span className="text-[10px] tabular-nums text-dim">{hhmm(r.time)}</span>
                   </button>
                 ))}
@@ -264,6 +262,7 @@ function ApptRow({ appt, done, live, onClick }: { appt: Appt; done: boolean; liv
       <span className={cn('min-w-0 flex-1 truncate text-xs', done ? 'text-dim line-through' : 'text-text')}>
         {appt.title}
       </span>
+      {appt.recurrence && <Repeat size={9} className="shrink-0 text-dim" />}
       {appt.location && (
         <span className="flex shrink-0 items-center gap-0.5 text-[10px] text-dim">
           <MapPin size={9} /> {appt.location}

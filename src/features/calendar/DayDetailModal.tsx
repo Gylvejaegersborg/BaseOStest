@@ -1,4 +1,4 @@
-import { format, isSameDay } from 'date-fns'
+import { format } from 'date-fns'
 import { Bell, CalendarRange, Clock, MapPin } from 'lucide-react'
 import {
   KIND_COLOR,
@@ -11,7 +11,7 @@ import {
 } from '@/data/calendar'
 import { Modal } from '@/components/ui/Modal'
 import { StatusDot } from '@/components/ui/StatusDot'
-import { apptDate, hhmm, offsetDate } from './util'
+import { apptOccursOn, hhmm, reminderOccursOn, taskOccursOn } from './util'
 
 interface DayDetailModalProps {
   day: Date | null
@@ -38,11 +38,9 @@ export function DayDetailModal({
 }: DayDetailModalProps) {
   if (!day) return null
 
-  const dayAppts = appts.filter((a) => isSameDay(apptDate(a), day)).sort((a, b) => a.start - b.start)
-  const dayTasks = tasks.filter((t) => t.dayOffset != null && isSameDay(offsetDate(t.dayOffset), day))
-  const dayReminders = reminders
-    .filter((r) => !r.done && isSameDay(offsetDate(r.dayOffset), day))
-    .sort((a, b) => a.time - b.time)
+  const dayAppts = appts.filter((a) => apptOccursOn(a, day)).sort((a, b) => a.start - b.start)
+  const dayTasks = tasks.filter((t) => taskOccursOn(t, day))
+  const dayReminders = reminders.filter((r) => !r.done && reminderOccursOn(r, day)).sort((a, b) => a.time - b.time)
 
   return (
     <Modal open={!!day} onClose={onClose} title={format(day, 'EEEE')} code={format(day, 'dd MMM yyyy')} accent="#f0a020" width={460}>

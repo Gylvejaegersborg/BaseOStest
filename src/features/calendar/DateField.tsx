@@ -8,6 +8,7 @@ interface DateFieldProps {
   onChange: (dayOffset: number | undefined) => void
   allowEmpty?: boolean
   className?: string
+  disabled?: boolean
 }
 
 /**
@@ -15,12 +16,13 @@ interface DateFieldProps {
  * calendar dates (native date input) while the rest of the app keeps working
  * in day-offset units.
  */
-export function DateField({ value, onChange, allowEmpty = false, className }: DateFieldProps) {
+export function DateField({ value, onChange, allowEmpty = false, className, disabled }: DateFieldProps) {
   const dateStr = value != null ? format(offsetDate(value), 'yyyy-MM-dd') : ''
   return (
     <input
       type="date"
       value={dateStr}
+      disabled={disabled}
       onChange={(e) => {
         const v = e.target.value
         if (!v) {

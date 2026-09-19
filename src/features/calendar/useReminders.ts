@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Appt, Reminder, Task } from '@/data/calendar'
 import { KIND_COLOR, PRIORITY_COLOR, REMINDER_COLOR } from '@/data/calendar'
-import { apptStartMs, hhmm, reminderMs, taskDueMs, untilLabel } from './util'
+import { apptNextMs, hhmm, reminderNextMs, taskNextMs, untilLabel } from './util'
 import {
   getPermission,
   pushNotification,
@@ -35,9 +35,13 @@ interface Target {
   source: Source
   title: string
   color: string
-  startAt: number
   lead: number // minutes
   hour: number
+  /** Resolves to the relevant occurrence's start time given a lower bound —
+   *  recomputed every tick (see below) instead of fixed once, so a
+   *  recurring item's target rolls forward to its next occurrence on its
+   *  own rather than staying pinned to whichever one was first computed. */
+  nextStartAt: (from: number) => number | null
 }
 
 const TICK_MS = 15_000
@@ -53,23 +57,21 @@ function buildTargets(appts: Appt[], tasks: Task[], reminders: Reminder[]): Targ
       source: 'appt',
       title: a.title,
       color: KIND_COLOR[a.kind],
-      startAt: apptStartMs(a),
       lead: a.reminderMinutes ?? 10,
       hour: a.start,
+      nextStartAt: (from) => apptNextMs(a, from),
     })
   }
   for (const t of tasks) {
-    if (t.status === 'done') continue
-    const due = taskDueMs(t)
-    if (due == null || t.dueTime == null) continue
+    if (t.status === 'done' || t.dueTime == null) continue
     out.push({
       refId: t.id,
       source: 'task',
       title: t.title,
       color: PRIORITY_COLOR[t.priority],
-      startAt: due,
       lead: t.reminderMinutes ?? 15,
       hour: t.dueTime,
+      nextStartAt: (from) => taskNextMs(t, from),
     })
   }
   for (const r of reminders) {
@@ -79,9 +81,9 @@ function buildTargets(appts: Appt[], tasks: Task[], reminders: Reminder[]): Targ
       source: 'reminder',
       title: r.title,
       color: REMINDER_COLOR,
-      startAt: reminderMs(r),
       lead: 0, // the reminder time IS the ping time
       hour: r.time,
+      nextStartAt: (from) => reminderNextMs(r, from),
     })
   }
   return out
@@ -129,11 +131,21 @@ export function useReminders(
     if (!enabledRef.current) return
     const now = Date.now()
     for (const tg of targetsRef.current) {
-      const remindAt = tg.startAt - tg.lead * 60_000
-      const soonKey = `${tg.source}:${tg.refId}:soon`
-      const nowKey = `${tg.source}:${tg.refId}:now`
+      // Recompute per tick, not once: this is what makes a recurring item's
+      // target roll forward to next week's/tomorrow's occurrence on its own
+      // instead of firing only for its first-ever occurrence. Looking from
+      // `now - lead` finds whichever occurrence's own lead window we're
+      // currently inside (or about to be), not a stale earlier one.
+      const startAt = tg.nextStartAt(now - tg.lead * 60_000)
+      if (startAt == null) continue
+      const remindAt = startAt - tg.lead * 60_000
+      // Keyed by occurrence, not just the item — otherwise a recurring
+      // item's "soon"/"now" nudge would only ever fire once, the first time
+      // its dedupe key got marked fired, and never again for later occurrences.
+      const soonKey = `${tg.source}:${tg.refId}:${startAt}:soon`
+      const nowKey = `${tg.source}:${tg.refId}:${startAt}:now`
 
-      if (!fired.current.has(soonKey) && now >= remindAt && now < tg.startAt) {
+      if (!fired.current.has(soonKey) && now >= remindAt && now < startAt) {
         fired.current.add(soonKey)
         emit(
           {
@@ -143,13 +155,13 @@ export function useReminders(
             title: tg.title,
             color: tg.color,
             stage: 'soon',
-            body: `${tg.source === 'task' ? 'Due' : 'Starts'} at ${hhmm(tg.hour)} · ${untilLabel(tg.startAt, now)}`,
+            body: `${tg.source === 'task' ? 'Due' : 'Starts'} at ${hhmm(tg.hour)} · ${untilLabel(startAt, now)}`,
           },
           true,
         )
       }
 
-      if (!fired.current.has(nowKey) && now >= tg.startAt && now < tg.startAt + 5 * 60_000) {
+      if (!fired.current.has(nowKey) && now >= startAt && now < startAt + 5 * 60_000) {
         fired.current.add(nowKey)
         emit(
           {
@@ -185,15 +197,19 @@ export function useReminders(
   const scheduled = useMemo<ScheduledReminder[]>(() => {
     const now = Date.now()
     return targets
-      .map((tg) => ({
-        refId: tg.refId,
-        source: tg.source,
-        title: tg.title,
-        color: tg.color,
-        fireAt: tg.startAt - tg.lead * 60_000,
-        startAt: tg.startAt,
-      }))
-      .filter((r) => r.startAt >= now)
+      .map((tg) => {
+        const startAt = tg.nextStartAt(now)
+        if (startAt == null) return null
+        return {
+          refId: tg.refId,
+          source: tg.source,
+          title: tg.title,
+          color: tg.color,
+          fireAt: startAt - tg.lead * 60_000,
+          startAt,
+        }
+      })
+      .filter((r): r is ScheduledReminder => r != null)
       .sort((a, b) => a.fireAt - b.fireAt)
       .slice(0, 4)
   }, [targets])

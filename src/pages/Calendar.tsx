@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { addDays, addMonths, format, isSameDay, startOfWeek } from 'date-fns'
-import { Bell, BellOff, CalendarDays, CheckSquare, ChevronLeft, ChevronRight, Clock, MapPin } from 'lucide-react'
+import { Bell, BellOff, CalendarDays, CheckSquare, ChevronLeft, ChevronRight, Clock, MapPin, Repeat } from 'lucide-react'
 import {
   KIND_COLOR,
   PRIORITY_COLOR,
@@ -14,7 +14,17 @@ import { Panel } from '@/components/ui/Panel'
 import { Modal } from '@/components/ui/Modal'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { cn } from '@/lib/cn'
-import { TODAY, apptDate, dayOffsetOf, hhmm, offsetDate, parseHM } from '@/features/calendar/util'
+import {
+  TODAY,
+  apptDate,
+  apptOccursOn,
+  dayOffsetOf,
+  hhmm,
+  offsetDate,
+  parseHM,
+  reminderOccursOn,
+  taskOccursOn,
+} from '@/features/calendar/util'
 import { buildAgenda, type AgendaItem } from '@/features/calendar/agenda'
 import { cronScheduleLabel } from '@/features/calendar/cron'
 import { AgendaList } from '@/features/calendar/AgendaList'
@@ -24,6 +34,7 @@ import { MonthView } from '@/features/calendar/MonthView'
 import { MiniMonthPicker } from '@/features/calendar/MiniMonthPicker'
 import { useIsDesktop } from '@/lib/useMediaQuery'
 import { DayDetailModal } from '@/features/calendar/DayDetailModal'
+import { RecurrenceField } from '@/features/calendar/RecurrenceField'
 import { CronDetailModal } from '@/features/calendar/CronDetailModal'
 import { CronEditModal } from '@/features/calendar/CronEditModal'
 import { ReminderModal } from '@/features/calendar/ReminderModal'
@@ -80,15 +91,13 @@ export function Calendar() {
   const days = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)), [weekStart])
   const month = useMemo(() => addMonths(TODAY, monthOffset), [monthOffset])
   const selectedDay = useMemo(() => offsetDate(dayOffset), [dayOffset])
-  // Which days have anything on them at all — used to put a hint dot on the
-  // date-picker's month grid while browsing.
-  const markedDays = useMemo(() => {
-    const set = new Set<string>()
-    for (const a of appts) set.add(format(apptDate(a), 'yyyy-MM-dd'))
-    for (const t of tasks) if (t.dayOffset != null) set.add(format(offsetDate(t.dayOffset), 'yyyy-MM-dd'))
-    for (const r of reminders) set.add(format(offsetDate(r.dayOffset), 'yyyy-MM-dd'))
-    return set
-  }, [appts, tasks, reminders])
+  // Whether a day (any day, not just ones near today — the picker browses
+  // other months) has anything on it, recurring items included — the
+  // date-picker's hint dot.
+  const isDayMarked = (day: Date) =>
+    appts.some((a) => apptOccursOn(a, day)) ||
+    tasks.some((t) => taskOccursOn(t, day)) ||
+    reminders.some((r) => reminderOccursOn(r, day))
 
   const upNext = useMemo(
     () => buildAgenda({ appts, tasks, reminders, crons }, 6),
@@ -257,7 +266,7 @@ export function Calendar() {
                       <div className="absolute right-0 top-full z-40 mt-2 animate-fade-in">
                         <MiniMonthPicker
                           value={selectedDay}
-                          markedDays={markedDays}
+                          isDayMarked={isDayMarked}
                           onSelect={(d) => {
                             setDayOffset(dayOffsetOf(d))
                             setDatePickerOpen(false)
@@ -459,14 +468,10 @@ function WeekGrid({
           </div>
           {/* day columns — double-click empty space to add a reminder at that time */}
           {days.map((d) => {
-            const dayAppts = appts.filter((a) => isSameDay(apptDate(a), d))
-            const dayReminders = reminders.filter((r) => !r.done && isSameDay(offsetDate(r.dayOffset), d))
+            const dayAppts = appts.filter((a) => apptOccursOn(a, d))
+            const dayReminders = reminders.filter((r) => !r.done && reminderOccursOn(r, d))
             const dayTasks = tasks.filter(
-              (t) =>
-                t.status !== 'done' &&
-                t.dayOffset != null &&
-                t.dueTime != null &&
-                isSameDay(offsetDate(t.dayOffset), d),
+              (t) => t.status !== 'done' && t.dueTime != null && taskOccursOn(t, d),
             )
             return (
               <div
@@ -545,7 +550,10 @@ function ApptBlock({ appt, onClick }: { appt: Appt; onClick: () => void }) {
       className="absolute left-0.5 right-0.5 overflow-hidden border-l-2 px-1.5 py-1 text-left transition-all hover:z-10 hover:brightness-125"
       style={{ top, height, backgroundColor: `${color}22`, borderColor: color }}
     >
-      <div className="truncate text-[11px] font-medium text-text">{appt.title}</div>
+      <div className="flex items-center gap-1 truncate text-[11px] font-medium text-text">
+        {appt.recurrence && <Repeat size={9} className="shrink-0 text-dim" />}
+        {appt.title}
+      </div>
       <div className="truncate text-[9px] text-dim">{hhmm(appt.start)}–{hhmm(appt.end)}</div>
     </button>
   )
@@ -626,6 +634,8 @@ function EditModal({ appt, onClose, onSave }: { appt: Appt | null; onClose: () =
           </select>
         </div>
       </div>
+
+      <RecurrenceField value={draft.recurrence} onChange={(recurrence) => setDraft({ ...draft, recurrence })} />
 
       <label className="label mb-1 block">Location</label>
       <input
