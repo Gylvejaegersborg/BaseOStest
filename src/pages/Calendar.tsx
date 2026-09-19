@@ -41,7 +41,6 @@ import { ReminderModal } from '@/features/calendar/ReminderModal'
 import { TaskPanel, TaskModal } from '@/features/calendar/TaskPanel'
 import { RemindersPanel } from '@/features/calendar/RemindersPanel'
 import { useCalendar } from '@/features/calendar/CalendarContext'
-import { OverflowDebugger } from '@/features/calendar/OverflowDebugger'
 
 const DAY_START = 7
 const DAY_END = 22
@@ -173,7 +172,12 @@ export function Calendar() {
   return (
     <div className="flex h-full flex-col overflow-y-auto overflow-x-hidden lg:flex-row lg:overflow-hidden">
       {/* Calendar grid */}
-      <div className="flex h-[72vh] min-w-0 flex-col lg:h-auto lg:flex-1">
+      {/* max-h, not a fixed h — a light day (Day view with few/no items) used
+       *  to still reserve the full 72vh, leaving a big empty gap below its
+       *  short content before the aside panels underneath. max-height still
+       *  caps a busy day/Week's grid so the toolbar above stays put while
+       *  that scrolls internally, but a short day now just shrinks to fit. */}
+      <div className="flex max-h-[72vh] min-w-0 flex-col lg:h-auto lg:flex-1">
         <div className="flex flex-wrap items-center justify-between gap-1.5 border-b border-line px-2 py-2 sm:gap-2 sm:px-4">
           <div className="flex items-center gap-3">
             <h1 className="font-display text-lg tracking-wider text-text">CALENDAR</h1>
@@ -411,7 +415,6 @@ export function Calendar() {
           setDayDetail(null)
         }}
       />
-      <OverflowDebugger />
     </div>
   )
 }
