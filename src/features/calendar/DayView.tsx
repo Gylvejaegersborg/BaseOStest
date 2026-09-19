@@ -94,8 +94,12 @@ export function DayView({
 
   const dayLabel = today ? 'Today' : isYesterday(date) ? 'Yesterday' : isTomorrow(date) ? 'Tomorrow' : format(date, 'EEEE')
 
+  // No bottom padding on the root below — the Calendar page's own gap-3
+  // between the calendar region and the aside already provides that space;
+  // this used to add its own on top, which is what made the boundary below
+  // a light day read as a bigger gap than anywhere else.
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-2.5 sm:p-3">
+    <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-2.5 pt-2.5 sm:px-3 sm:pt-3">
       {/* Hero */}
       <div className="hud-corners relative mb-3 border border-line bg-panel/60 p-3 text-accent sm:p-4">
         <div className="flex flex-wrap items-end justify-between gap-2">
