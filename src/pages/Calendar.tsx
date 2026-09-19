@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { addDays, addMonths, format, isSameDay, startOfWeek } from 'date-fns'
-import { Bell, BellOff, CheckSquare, ChevronLeft, ChevronRight, Clock, MapPin } from 'lucide-react'
+import { Bell, BellOff, CalendarDays, CheckSquare, ChevronLeft, ChevronRight, Clock, MapPin } from 'lucide-react'
 import {
   KIND_COLOR,
   PRIORITY_COLOR,
@@ -21,6 +21,8 @@ import { AgendaList } from '@/features/calendar/AgendaList'
 import { DateField } from '@/features/calendar/DateField'
 import { DayView } from '@/features/calendar/DayView'
 import { MonthView } from '@/features/calendar/MonthView'
+import { MiniMonthPicker } from '@/features/calendar/MiniMonthPicker'
+import { useIsDesktop } from '@/lib/useMediaQuery'
 import { DayDetailModal } from '@/features/calendar/DayDetailModal'
 import { CronDetailModal } from '@/features/calendar/CronDetailModal'
 import { CronEditModal } from '@/features/calendar/CronEditModal'
@@ -51,9 +53,18 @@ export function Calendar() {
     remindersEngine,
   } = useCalendar()
 
-  const [view, setView] = useState<'day' | 'week' | 'month'>('week')
+  // Desktop keeps week as the default (room for the full 7-day grid); mobile
+  // opens straight to Day — sideways-scrolling through a cramped week grid
+  // on a phone was the thing this whole pass was meant to fix.
+  const isDesktop = useIsDesktop()
+  const [view, setView] = useState<'day' | 'week' | 'month'>(() => (isDesktop ? 'week' : 'day'))
   const [weekOffset, setWeekOffset] = useState(0)
   const [monthOffset, setMonthOffset] = useState(0)
+  // Day view used to be hardcoded to today with no way to move off it; this
+  // is what makes it a real "date selector" (day-step or jump-to-date, which
+  // can cross a month boundary) instead of a fixed readout.
+  const [dayOffset, setDayOffset] = useState(0)
+  const [datePickerOpen, setDatePickerOpen] = useState(false)
 
   const [editing, setEditing] = useState<Appt | null>(null)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
@@ -68,6 +79,16 @@ export function Calendar() {
   )
   const days = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)), [weekStart])
   const month = useMemo(() => addMonths(TODAY, monthOffset), [monthOffset])
+  const selectedDay = useMemo(() => offsetDate(dayOffset), [dayOffset])
+  // Which days have anything on them at all — used to put a hint dot on the
+  // date-picker's month grid while browsing.
+  const markedDays = useMemo(() => {
+    const set = new Set<string>()
+    for (const a of appts) set.add(format(apptDate(a), 'yyyy-MM-dd'))
+    for (const t of tasks) if (t.dayOffset != null) set.add(format(offsetDate(t.dayOffset), 'yyyy-MM-dd'))
+    for (const r of reminders) set.add(format(offsetDate(r.dayOffset), 'yyyy-MM-dd'))
+    return set
+  }, [appts, tasks, reminders])
 
   const upNext = useMemo(
     () => buildAgenda({ appts, tasks, reminders, crons }, 6),
@@ -148,7 +169,7 @@ export function Calendar() {
             <h1 className="font-display text-lg tracking-wider text-text">CALENDAR</h1>
             <span className="text-xs text-dim">
               {view === 'day'
-                ? format(TODAY, 'EEEE dd MMM yyyy')
+                ? format(selectedDay, 'EEEE dd MMM yyyy')
                 : view === 'week'
                   ? `${format(weekStart, 'dd MMM')} – ${format(addDays(weekStart, 6), 'dd MMM yyyy')}`
                   : format(month, 'MMMM yyyy')}
@@ -181,34 +202,79 @@ export function Calendar() {
             >
               {remindersEngine.enabled ? <Bell size={14} /> : <BellOff size={14} />}
             </button>
-            {/* Period nav — day view is fixed to today, so no prev/next */}
-            {view !== 'day' && (
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => (view === 'week' ? setWeekOffset((w) => w - 1) : setMonthOffset((m) => m - 1))}
-                  className="border border-line p-1 text-dim hover:text-text"
-                >
-                  <ChevronLeft size={14} />
-                </button>
-                <button
-                  onClick={() => (view === 'week' ? setWeekOffset(0) : setMonthOffset(0))}
-                  className="border border-line px-2 py-1 text-[11px] uppercase tracking-wider text-dim hover:text-text"
-                >
-                  Today
-                </button>
-                <button
-                  onClick={() => (view === 'week' ? setWeekOffset((w) => w + 1) : setMonthOffset((m) => m + 1))}
-                  className="border border-line p-1 text-dim hover:text-text"
-                >
-                  <ChevronRight size={14} />
-                </button>
-              </div>
-            )}
+            {/* Period nav — day view now steps through real dates instead of
+             *  being pinned to today, same shape as week/month's prev/today/next. */}
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() =>
+                  view === 'day'
+                    ? setDayOffset((d) => d - 1)
+                    : view === 'week'
+                      ? setWeekOffset((w) => w - 1)
+                      : setMonthOffset((m) => m - 1)
+                }
+                className="border border-line p-1 text-dim hover:text-text"
+              >
+                <ChevronLeft size={14} />
+              </button>
+              <button
+                onClick={() =>
+                  view === 'day' ? setDayOffset(0) : view === 'week' ? setWeekOffset(0) : setMonthOffset(0)
+                }
+                className="border border-line px-2 py-1 text-[11px] uppercase tracking-wider text-dim hover:text-text"
+              >
+                Today
+              </button>
+              <button
+                onClick={() =>
+                  view === 'day'
+                    ? setDayOffset((d) => d + 1)
+                    : view === 'week'
+                      ? setWeekOffset((w) => w + 1)
+                      : setMonthOffset((m) => m + 1)
+                }
+                className="border border-line p-1 text-dim hover:text-text"
+              >
+                <ChevronRight size={14} />
+              </button>
+              {/* Jump straight to any date, crossing months — the piece day
+               *  stepping alone can't do. */}
+              {view === 'day' && (
+                <div className="relative">
+                  <button
+                    onClick={() => setDatePickerOpen((o) => !o)}
+                    title="Pick a date"
+                    className={cn(
+                      'border border-line p-1',
+                      datePickerOpen ? 'text-accent' : 'text-dim hover:text-text',
+                    )}
+                  >
+                    <CalendarDays size={14} />
+                  </button>
+                  {datePickerOpen && (
+                    <>
+                      <div className="fixed inset-0 z-30" onClick={() => setDatePickerOpen(false)} />
+                      <div className="absolute right-0 top-full z-40 mt-2 animate-fade-in">
+                        <MiniMonthPicker
+                          value={selectedDay}
+                          markedDays={markedDays}
+                          onSelect={(d) => {
+                            setDayOffset(dayOffsetOf(d))
+                            setDatePickerOpen(false)
+                          }}
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {view === 'day' ? (
           <DayView
+            date={selectedDay}
             appts={appts}
             tasks={tasks}
             reminders={reminders}
@@ -254,13 +320,17 @@ export function Calendar() {
           onSelect={(item) => openScheduled(item.source, item.refId)}
         />
 
-        <Panel title="Up Next" code="AGENDA" accent="#f0a020" bodyClassName="p-2">
+        {/* Day view's own agenda panel already covers "what's next" and the
+         *  agent-run list for today, so these two would just be the same
+         *  information twice in the stacked mobile layout — hidden there,
+         *  still shown on desktop where there's room for both. */}
+        <Panel title="Up Next" code="AGENDA" accent="#f0a020" bodyClassName="p-2" className={cn(view === 'day' && 'hidden lg:flex')}>
           <AgendaList items={upNext} onSelect={openAgendaItem} emptyText="Nothing upcoming." />
         </Panel>
 
         <TaskPanel tasks={tasks} onToggle={toggleTask} onEdit={setEditingTask} onAdd={addTask} />
 
-        <Panel title="AI Cron Jobs" code="AGT" accent="#c77591" bodyClassName="p-2">
+        <Panel title="AI Cron Jobs" code="AGT" accent="#c77591" bodyClassName="p-2" className={cn(view === 'day' && 'hidden lg:flex')}>
           <div className="space-y-1.5">
             {crons.map((c) => (
               <button
