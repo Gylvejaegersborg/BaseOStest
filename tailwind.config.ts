@@ -8,12 +8,14 @@ export default {
         // Base neutral scale (design tokens, revised) — shifted off the original
         // blue-leaning grays toward true neutral-warm per direct feedback; the
         // "general blue-ish tint" was the base itself, not just a weak context
-        // wash fighting it. Same lightness steps as before, hue removed.
-        bg: '#0c0b0a',
-        panel: '#171513',
-        'panel-2': '#1d1b18',
-        line: '#2a2724',
-        'line-2': '#363330',
+        // wash fighting it. Same lightness steps as before, hue removed. Nudged
+        // a touch cool again afterward — pure neutral-warm read as flat/dusty;
+        // this is a few points of blue back in, not a reversal of that decision.
+        bg: '#0a0b0d',
+        panel: '#141518',
+        'panel-2': '#1a1b1d',
+        line: '#26272a',
+        'line-2': '#313337',
         text: '#c8d2dc',
         dim: '#6b7785',
         // Accent (revised) — moved off the teal/cyan that had become the de
@@ -74,12 +76,13 @@ export default {
         'isark-coral': '#FFB48A',
         // Elevation surface ramp (design tokens, Phase 0) — real luminance steps for the
         // new depth system, additive alongside bg/panel/panel-2. surface-0 mirrors `bg`.
-        // Same warm-neutral revision as the base scale above.
-        'surface-0': '#0c0b0a',
-        'surface-1': '#1a1815',
-        'surface-2': '#221f1b',
-        'surface-3': '#2a2621',
-        'surface-4': '#322d27',
+        // Same warm-neutral revision as the base scale above, then the same small
+        // cool-again nudge.
+        'surface-0': '#0a0b0d',
+        'surface-1': '#17181a',
+        'surface-2': '#1e1f22',
+        'surface-3': '#25262a',
+        'surface-4': '#2c2d32',
       },
       fontFamily: {
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
@@ -116,12 +119,12 @@ export default {
       boxShadow: {
         // Two tones from the accent ramp (a light ring, a deeper blur)
         // instead of one flat hue at two opacities — real tonal depth.
-        glow: '0 0 0 1px rgba(212,150,173,0.3), 0 0 14px -2px rgba(145,48,74,0.4)',
-        'glow-magenta': '0 0 0 1px rgba(224,64,138,0.25), 0 0 14px -2px rgba(224,64,138,0.35)',
+        glow: '0 0 0 1px rgba(212,150,173,0.35), 0 0 18px -2px rgba(145,48,74,0.5)',
+        'glow-magenta': '0 0 0 1px rgba(224,64,138,0.3), 0 0 18px -2px rgba(224,64,138,0.42)',
         // Elevation shadows (design tokens, Phase 0) — pairs with surface-3/surface-4 for
         // summoned and contained panels.
-        'elevation-3': '0 8px 24px -8px rgba(0,0,0,0.45)',
-        'elevation-4': '0 16px 40px -12px rgba(0,0,0,0.55)',
+        'elevation-3': '0 8px 26px -8px rgba(0,0,0,0.5)',
+        'elevation-4': '0 18px 44px -12px rgba(0,0,0,0.6)',
       },
       keyframes: {
         twinkle: {

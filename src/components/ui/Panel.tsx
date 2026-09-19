@@ -68,9 +68,9 @@ export function Panel({
       style={{
         ...(accent
           ? {
-              borderColor: `${accent}33`,
-              backgroundImage: `linear-gradient(160deg, ${light}14 0%, transparent 55%)`,
-              boxShadow: `inset 0 1px 0 0 ${light}26, 0 12px 28px -20px ${deep}55`,
+              borderColor: `${accent}40`,
+              backgroundImage: `linear-gradient(160deg, ${light}1e 0%, transparent 55%)`,
+              boxShadow: `inset 0 1px 0 0 ${light}30, 0 12px 28px -20px ${deep}66`,
             }
           : undefined),
         ...style,
