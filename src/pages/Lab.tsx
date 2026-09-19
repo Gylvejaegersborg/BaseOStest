@@ -101,7 +101,7 @@ export function Lab() {
     <div className="flex h-full">
       <div className="min-w-0 flex-1 overflow-y-auto p-4 sm:p-6">
         <div className="mb-5">
-          <h1 className="font-display text-2xl tracking-wider text-text">LAB</h1>
+          <h1 className="font-display text-lg tracking-wider text-text">LAB</h1>
           <p className="text-xs text-dim">Pages and apps you have built. Preview, launch and poke them.</p>
         </div>
         <div className="flex flex-col gap-5">
@@ -120,7 +120,7 @@ export function Lab() {
                   <span className="text-[10px] text-dim">{modules.length}</span>
                 </button>
                 {!collapsed && (
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3 xl:grid-cols-3">
                     {modules.map((m) => (
                       <ModuleCard key={m.id} mod={m} active={m.id === selectedId} onClick={() => openModule(m.id)} />
                     ))}
@@ -499,7 +499,7 @@ function ModuleCard({ mod, active, onClick }: { mod: LabModule; active: boolean;
         active ? 'border-accent/60' : 'border-line hover:border-line-2',
       )}
     >
-      <div className="relative aspect-video w-full overflow-hidden border-b border-line bg-bg/60">
+      <div className="relative h-24 w-full overflow-hidden border-b border-line bg-bg/60 sm:aspect-video sm:h-auto">
         <MiniPreview mod={mod} />
         <span
           className="absolute right-2 top-2 flex items-center gap-1 border bg-bg/80 px-1.5 py-0.5 text-[9px] uppercase tracking-wider"

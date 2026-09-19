@@ -75,9 +75,9 @@ export function Projects() {
        *  above) so ProjectPopup/backdrop below can be absolute inset-0 and
        *  sit flush against the page edges — same edge-to-edge docking as
        *  Home's HUD panel, instead of being inset by the page's own padding. */}
-      <div className="flex h-full min-h-0 flex-col p-6">
+      <div className="flex h-full min-h-0 flex-col p-4 sm:p-6">
         <div className="mb-4 shrink-0">
-          <h1 className="font-display text-2xl tracking-wider text-text">PROJECT OVERVIEW</h1>
+          <h1 className="font-display text-lg tracking-wider text-text">PROJECT OVERVIEW</h1>
           <p className="text-xs text-dim">
             {projects.length} projects · drag a card (desktop) or use the ‹ › arrows to change status, click for detail.
           </p>
