@@ -116,9 +116,17 @@ export function DayView({
         </div>
       </div>
 
-      <div className={cn('grid gap-3', today && 'lg:grid-cols-2')}>
-        {/* Day's agenda */}
-        <Panel title={dayLabel} code="AGENDA" accent="#f0a020" bodyClassName="p-2">
+      <div className={cn('grid min-w-0 gap-3', today && 'lg:grid-cols-2')}>
+        {/* Day's agenda. `min-w-0` here and on every grid child below is load-
+         *  bearing, not decorative — grid items default to `min-width: auto`,
+         *  which means a track refuses to shrink below its content's intrinsic
+         *  width even though the container has none of its own explicit
+         *  sizing to blow past. That's what was actually causing panels to
+         *  render wider than the viewport (clipped, not scrollable, once the
+         *  ancestor overflow-x-hidden landed) — not any single element being
+         *  "too wide," but the grid item never being told it's allowed to be
+         *  narrower than its content's natural size in the first place. */}
+        <Panel title={dayLabel} code="AGENDA" accent="#f0a020" bodyClassName="p-2" className="min-w-0">
           {dayAppts.length ? (
             <div className="space-y-1">
               {dayAppts.map((a, i) => (
@@ -193,6 +201,7 @@ export function DayView({
               code="AGT"
               accent="#c77591"
               bodyClassName="p-2"
+              className="min-w-0"
               right={<Bot size={13} className="text-dim" />}
             >
               <div className="space-y-1.5">
@@ -285,6 +294,7 @@ function WikipediaCard() {
       code="WIKI"
       accent="#c8d2dc"
       bodyClassName="p-3"
+      className="min-w-0"
       right={
         <button onClick={reroll} title="Reroll" className="text-dim hover:text-text">
           <RefreshCw size={13} className={status === 'loading' ? 'animate-spin' : ''} />
@@ -337,6 +347,7 @@ function TrysilCard({ now }: { now: Date }) {
       code="TN"
       accent="#46d369"
       bodyClassName="p-3"
+      className="min-w-0"
       right={
         <button onClick={() => setOffset((o) => o + 1)} title="Another place" className="text-dim hover:text-text">
           <Shuffle size={13} />
