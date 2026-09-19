@@ -4,7 +4,6 @@ import {
   endOfMonth,
   endOfWeek,
   format,
-  isSameDay,
   isSameMonth,
   isToday,
   startOfMonth,
@@ -12,7 +11,7 @@ import {
 } from 'date-fns'
 import { KIND_COLOR, PRIORITY_COLOR, type Appt, type Task } from '@/data/calendar'
 import { cn } from '@/lib/cn'
-import { apptDate, hhmm, offsetDate } from './util'
+import { apptOccursOn, hhmm, taskOccursOn } from './util'
 
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
@@ -50,12 +49,8 @@ export function MonthView({ month, appts, tasks, onSelectDay, onSelectAppt }: Mo
         {days.map((day) => {
           const inMonth = isSameMonth(day, month)
           const today = isToday(day)
-          const dayAppts = appts
-            .filter((a) => isSameDay(apptDate(a), day))
-            .sort((a, b) => a.start - b.start)
-          const dayTasks = tasks.filter(
-            (t) => t.dayOffset != null && t.status !== 'done' && isSameDay(offsetDate(t.dayOffset), day),
-          )
+          const dayAppts = appts.filter((a) => apptOccursOn(a, day)).sort((a, b) => a.start - b.start)
+          const dayTasks = tasks.filter((t) => t.status !== 'done' && taskOccursOn(t, day))
 
           return (
             <button

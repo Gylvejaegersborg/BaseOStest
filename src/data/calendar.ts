@@ -1,7 +1,24 @@
+export type RecurrenceFreq = 'daily' | 'weekly' | 'monthly'
+
+export interface Recurrence {
+  freq: RecurrenceFreq
+  /** Day this recurrence stops after (inclusive), as a dayOffset from today —
+   *  same unit as `dayOffset` everywhere else in this file. Open-ended (repeats
+   *  forever) when unset. */
+  until?: number
+}
+
+export const RECURRENCE_LABEL: Record<RecurrenceFreq, string> = {
+  daily: 'Daily',
+  weekly: 'Weekly',
+  monthly: 'Monthly',
+}
+
 export interface Appt {
   id: string
   title: string
-  // day offset from "today" (0 = today), local hours in 24h
+  // day offset from "today" (0 = today), local hours in 24h — the first/anchor
+  // occurrence; `recurrence` (if set) repeats it forward from here.
   dayOffset: number
   start: number // e.g. 9.5 = 09:30
   end: number
@@ -10,6 +27,7 @@ export interface Appt {
   notes?: string
   // minutes before start to fire a reminder (default 10)
   reminderMinutes?: number
+  recurrence?: Recurrence
 }
 
 export const KIND_COLOR: Record<Appt['kind'], string> = {
@@ -61,6 +79,7 @@ export interface Task {
   // minutes before dueTime to fire a reminder (default 15)
   reminderMinutes?: number
   subtasks?: Subtask[]
+  recurrence?: Recurrence
 }
 
 export const PRIORITY_COLOR: Record<TaskPriority, string> = {
@@ -244,6 +263,7 @@ export interface Reminder {
   time: number // fractional 24h hour — the moment to ping
   notes?: string
   done?: boolean
+  recurrence?: Recurrence
 }
 
 export const REMINDERS: Reminder[] = [

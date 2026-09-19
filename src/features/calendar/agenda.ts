@@ -11,7 +11,7 @@ import {
   type Reminder,
   type Task,
 } from '@/data/calendar'
-import { apptDate, apptStartMs, offsetDate, reminderMs, taskDueMs } from './util'
+import { apptNextMs, reminderNextMs, taskNextMs } from './util'
 import { CRON_STATUS_COLOR, cronNextRunMs } from './cron'
 
 export const APPTS_KEY = 'os:calendar:appts'
@@ -61,13 +61,18 @@ export function buildAgenda(src: AgendaSources, limit = 6, from = Date.now()): A
   const items: AgendaItem[] = []
 
   for (const a of src.appts) {
+    // Recurring items resolve to their next occurrence on/after `from`
+    // rather than their original anchor date — that's the whole point of a
+    // recurring appt still showing up in "what's next" after its first run.
+    const when = apptNextMs(a, from)
+    if (when == null) continue
     items.push({
       id: `appt:${a.id}`,
       source: 'appt',
       title: a.title,
       color: KIND_COLOR[a.kind],
-      when: apptStartMs(a),
-      date: apptDate(a),
+      when,
+      date: new Date(when),
       hour: a.start,
       endHour: a.end,
       raw: a,
@@ -76,15 +81,15 @@ export function buildAgenda(src: AgendaSources, limit = 6, from = Date.now()): A
 
   for (const t of src.tasks) {
     if (t.status === 'done') continue
-    const when = taskDueMs(t)
-    if (when == null || t.dueTime == null || t.dayOffset == null) continue
+    const when = taskNextMs(t, from)
+    if (when == null || t.dueTime == null) continue
     items.push({
       id: `task:${t.id}`,
       source: 'task',
       title: t.title,
       color: PRIORITY_COLOR[t.priority],
       when,
-      date: offsetDate(t.dayOffset),
+      date: new Date(when),
       hour: t.dueTime,
       raw: t,
     })
@@ -92,13 +97,15 @@ export function buildAgenda(src: AgendaSources, limit = 6, from = Date.now()): A
 
   for (const r of src.reminders) {
     if (r.done) continue
+    const when = reminderNextMs(r, from)
+    if (when == null) continue
     items.push({
       id: `reminder:${r.id}`,
       source: 'reminder',
       title: r.title,
       color: REMINDER_COLOR,
-      when: reminderMs(r),
-      date: offsetDate(r.dayOffset),
+      when,
+      date: new Date(when),
       hour: r.time,
       raw: r,
     })
