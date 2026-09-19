@@ -37,6 +37,16 @@ export function Ops() {
   const [selfLatency, setSelfLatency] = useState<number | null>(null)
   const seed = useRef(12)
   const logScrollRef = useRef<HTMLDivElement>(null)
+  // Click-to-expand: every ops row can reveal extra detail on click. One set
+  // of ids works across all four panels since ids (s1, d1, e1, agent id) are
+  // globally unique.
+  const [expanded, setExpanded] = useState<Set<string>>(new Set())
+  const toggle = (id: string) =>
+    setExpanded((prev) => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
 
   useEffect(() => {
     const id = window.setInterval(() => {
@@ -89,7 +99,7 @@ export function Ops() {
         <Panel title="Services" code="HEALTH" accent="#e05c67" className="mb-3 rounded-none" bodyClassName="p-2">
           <div className="space-y-1.5">
             {SERVICES.map((s) => (
-              <ServiceRow key={s.id} svc={s} />
+              <ServiceRow key={s.id} svc={s} open={expanded.has(s.id)} onToggle={() => toggle(s.id)} />
             ))}
           </div>
         </Panel>
@@ -98,17 +108,30 @@ export function Ops() {
           <div className="space-y-1.5">
             {DEVICES.map((d) => {
               const Icon = DEVICE_ICON[d.kind] ?? Cpu
+              const open = expanded.has(d.id)
               return (
-                <div key={d.id} className="flex items-center gap-2 border border-line bg-bg/30 px-2 py-1.5">
-                  <Icon size={14} className={d.online ? 'text-neon-green' : 'text-danger'} />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 text-xs text-text">
-                      {d.name}
-                      <StatusDot color={d.online ? '#46d369' : '#ff5566'} pulse={d.online} size={5} />
+                <button
+                  key={d.id}
+                  onClick={() => toggle(d.id)}
+                  className="w-full border border-line bg-bg/30 px-2 py-1.5 text-left transition-colors hover:border-line-2"
+                >
+                  <div className="flex items-center gap-2">
+                    <Icon size={14} className={d.online ? 'text-neon-green' : 'text-danger'} />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 text-xs text-text">
+                        {d.name}
+                        <StatusDot color={d.online ? '#46d369' : '#ff5566'} pulse={d.online} size={5} />
+                      </div>
+                      <div className="truncate text-[10px] text-dim">{d.detail}</div>
                     </div>
-                    <div className="truncate text-[10px] text-dim">{d.detail}</div>
                   </div>
-                </div>
+                  {open && (
+                    <div className="mt-1.5 space-y-0.5 border-t border-line pt-1.5 text-[10px] text-dim">
+                      <div>ip: <span className="text-text/80">{d.ip}</span></div>
+                      <div>last seen: <span className="text-text/80">{d.lastSeen}</span></div>
+                    </div>
+                  )}
+                </button>
               )
             })}
           </div>
@@ -137,32 +160,59 @@ export function Ops() {
       <div className="lg:col-span-1">
         <Panel title="Errors & Warnings" code="ALERT" accent="#ff5566" className="mb-3 rounded-none" bodyClassName="p-2">
           <div className="space-y-1.5">
-            {OPS_ERRORS.map((e) => (
-              <div key={e.id} className="border-l-2 bg-bg/30 px-2 py-1.5" style={{ borderColor: SEV_COLOR[e.severity] }}>
-                <div className="flex items-center justify-between text-[10px]">
-                  <span className="flex items-center gap-1 uppercase tracking-wider" style={{ color: SEV_COLOR[e.severity] }}>
-                    <AlertTriangle size={10} /> {e.severity} · {e.source}
-                  </span>
-                  <span className="text-dim">{e.ago}</span>
-                </div>
-                <div className="text-xs text-text/85">{e.message}</div>
-              </div>
-            ))}
+            {OPS_ERRORS.map((e) => {
+              const open = expanded.has(e.id)
+              return (
+                <button
+                  key={e.id}
+                  onClick={() => toggle(e.id)}
+                  className="w-full border-l-2 bg-bg/30 px-2 py-1.5 text-left transition-colors hover:bg-bg/50"
+                  style={{ borderColor: SEV_COLOR[e.severity] }}
+                >
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="flex items-center gap-1 uppercase tracking-wider" style={{ color: SEV_COLOR[e.severity] }}>
+                      <AlertTriangle size={10} /> {e.severity} · {e.source}
+                    </span>
+                    <span className="text-dim">{e.ago}</span>
+                  </div>
+                  <div className="text-xs text-text/85">{e.message}</div>
+                  {open && (
+                    <div className="mt-1.5 border-t border-line pt-1.5 text-[10px] text-dim">{e.context}</div>
+                  )}
+                </button>
+              )
+            })}
           </div>
         </Panel>
 
         <Panel title="Agent Health" code="AGT" accent="#e0408a" className="rounded-none" bodyClassName="p-2">
           <div className="space-y-1.5">
-            {AGENTS.map((a) => (
-              <div key={a.id} className="flex items-center gap-2 border border-line bg-bg/30 px-2 py-1.5">
-                <StatusDot color={a.status === 'offline' ? '#ff5566' : a.color} pulse={a.status === 'working'} size={6} />
-                <span className="w-20 truncate text-xs text-text">{a.name}</span>
-                <div className="h-1.5 flex-1 bg-bg">
-                  <div className="h-full" style={{ width: `${a.stats.load * 100}%`, backgroundColor: a.color }} />
-                </div>
-                <span className="w-10 text-right text-[10px] tabular-nums text-dim">{Math.round(a.stats.load * 100)}%</span>
-              </div>
-            ))}
+            {AGENTS.map((a) => {
+              const open = expanded.has(a.id)
+              return (
+                <button
+                  key={a.id}
+                  onClick={() => toggle(a.id)}
+                  className="w-full border border-line bg-bg/30 px-2 py-1.5 text-left transition-colors hover:border-line-2"
+                >
+                  <div className="flex items-center gap-2">
+                    <StatusDot color={a.status === 'offline' ? '#ff5566' : a.color} pulse={a.status === 'working'} size={6} />
+                    <span className="w-20 truncate text-xs text-text">{a.name}</span>
+                    <div className="h-1.5 flex-1 bg-bg">
+                      <div className="h-full" style={{ width: `${a.stats.load * 100}%`, backgroundColor: a.color }} />
+                    </div>
+                    <span className="w-10 text-right text-[10px] tabular-nums text-dim">{Math.round(a.stats.load * 100)}%</span>
+                  </div>
+                  {open && (
+                    <div className="mt-1.5 grid grid-cols-3 gap-1 border-t border-line pt-1.5 text-[10px] text-dim">
+                      <div>tasks: <span className="text-text/80">{a.stats.tasksDone}</span></div>
+                      <div>tokens: <span className="text-text/80">{a.stats.tokens}</span></div>
+                      <div>uptime: <span className="text-text/80">{a.stats.uptime}</span></div>
+                    </div>
+                  )}
+                </button>
+              )
+            })}
           </div>
         </Panel>
       </div>
@@ -170,24 +220,33 @@ export function Ops() {
   )
 }
 
-function ServiceRow({ svc }: { svc: ServiceStatus }) {
+function ServiceRow({ svc, open, onToggle }: { svc: ServiceStatus; open: boolean; onToggle: () => void }) {
   const color = STATE_COLOR[svc.state]
   const max = Math.max(...svc.spark)
   return (
-    <div className="flex items-center gap-2 border border-line bg-bg/30 px-2 py-1.5">
-      <StatusDot color={color} pulse={svc.state !== 'down'} size={6} />
-      <span className="w-28 truncate text-xs text-text">{svc.name}</span>
-      <svg viewBox="0 0 64 18" className="h-4 flex-1" preserveAspectRatio="none">
-        <polyline
-          fill="none"
-          stroke={color}
-          strokeWidth={1}
-          points={svc.spark.map((v, i) => `${(i / (svc.spark.length - 1)) * 64},${18 - (v / max) * 16}`).join(' ')}
-        />
-      </svg>
-      <span className="w-12 text-right text-[10px] tabular-nums" style={{ color }}>
-        {svc.state === 'down' ? '—' : `${svc.latency}ms`}
-      </span>
-    </div>
+    <button onClick={onToggle} className="w-full border border-line bg-bg/30 px-2 py-1.5 text-left transition-colors hover:border-line-2">
+      <div className="flex items-center gap-2">
+        <StatusDot color={color} pulse={svc.state !== 'down'} size={6} />
+        <span className="w-28 truncate text-xs text-text">{svc.name}</span>
+        <svg viewBox="0 0 64 18" className="h-4 flex-1" preserveAspectRatio="none">
+          <polyline
+            fill="none"
+            stroke={color}
+            strokeWidth={1}
+            points={svc.spark.map((v, i) => `${(i / (svc.spark.length - 1)) * 64},${18 - (v / max) * 16}`).join(' ')}
+          />
+        </svg>
+        <span className="w-12 text-right text-[10px] tabular-nums" style={{ color }}>
+          {svc.state === 'down' ? '—' : `${svc.latency}ms`}
+        </span>
+      </div>
+      {open && (
+        <div className="mt-1.5 grid grid-cols-3 gap-1 border-t border-line pt-1.5 text-[10px] text-dim">
+          <div className="truncate">endpoint: <span className="text-text/80">{svc.endpoint}</span></div>
+          <div>uptime: <span className="text-text/80">{svc.uptime}</span></div>
+          <div>errors: <span className="text-text/80">{svc.errorRate}</span></div>
+        </div>
+      )}
+    </button>
   )
 }
