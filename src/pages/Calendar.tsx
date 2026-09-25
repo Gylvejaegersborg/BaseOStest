@@ -169,8 +169,15 @@ export function Calendar() {
   const createReminderAt = (dayOffset: number, time: number) =>
     setEditingReminder({ id: `new-${Date.now()}`, title: '', dayOffset, time })
 
+  // gap-3 below (mobile only) is the single source of spacing between the
+  // calendar region and the aside below it — Day view's own bottom padding
+  // and the aside's own top padding used to each add their own ~10-12px on
+  // top of each other, stacking into a visibly bigger gap there than the
+  // gap-3 used between panels anywhere else. Both were trimmed to not
+  // double up (see their own comments) so this one gap is the only thing
+  // drawing the space.
   return (
-    <div className="flex h-full flex-col overflow-y-auto overflow-x-hidden lg:flex-row lg:overflow-hidden">
+    <div className="flex h-full flex-col gap-3 overflow-y-auto overflow-x-hidden lg:flex-row lg:gap-0 lg:overflow-hidden">
       {/* Calendar grid */}
       {/* max-h, not a fixed h — a light day (Day view with few/no items) used
        *  to still reserve the full 72vh, leaving a big empty gap below its
@@ -327,7 +334,19 @@ export function Calendar() {
       </div>
 
       {/* Side panels */}
-      <aside className="flex w-full shrink-0 flex-col gap-3 overflow-y-auto overflow-x-hidden border-t border-line bg-panel/30 p-3 lg:w-[320px] lg:border-l lg:border-t-0">
+      {/* No border-t on mobile — every panel inside (and the calendar panel
+       *  above) already draws its own border box, so this extra full-width
+       *  divider line just read as a stray line sitting between two panels
+       *  once the calendar region stopped reserving a fixed 72vh (nothing
+       *  filled the space that used to visually justify a section boundary
+       *  there). Desktop keeps its own border-l — that one's an actual
+       *  persistent sidebar edge, not a leftover from the old spacing. */}
+      {/* No top padding on mobile — the outer gap-3 above already provides
+       *  the boundary space; adding this region's own top padding on top of
+       *  that was the other half of the double-counted gap. Desktop still
+       *  wants it (sits beside, not below, so there's no outer gap doing
+       *  that job there). */}
+      <aside className="flex w-full shrink-0 flex-col gap-3 overflow-y-auto overflow-x-hidden bg-panel/30 px-3 pb-3 lg:p-3 lg:w-[320px] lg:border-l">
         <RemindersPanel
           enabled={remindersEngine.enabled}
           permission={remindersEngine.permission}
