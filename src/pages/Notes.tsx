@@ -1,433 +1,856 @@
-import { useMemo, useState } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-import { Check, ChevronLeft, FileText, Hash, Pencil, Plus, Trash2, Wand2, X } from 'lucide-react'
-import { NOTES, NOTE_FOLDERS, NOTE_TAGS, type Note } from '@/data/notes'
-import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
-import { NOTES_STORAGE as STORAGE, loadJSON, saveJSON, titleFromBody } from '@/features/notes/notesStore'
-import { SearchInput } from '@/components/ui/SearchInput'
-import { relTime } from '@/lib/time'
+import {
+  ArrowLeft,
+  ArrowRight,
+  ChevronLeft,
+  ChevronsDownUp,
+  ChevronsUpDown,
+  Clipboard,
+  Copy,
+  CornerUpLeft,
+  FilePlus,
+  FileText,
+  FolderInput,
+  FolderPlus,
+  Hash,
+  Link2,
+  LocateFixed,
+  MoreHorizontal,
+  Pencil,
+  Plus,
+  Search,
+  SlidersHorizontal,
+  Trash2,
+  X,
+} from 'lucide-react'
+import type { Note } from '@/data/notes'
+import {
+  createFolder,
+  createNote,
+  deleteFolder,
+  deleteNote,
+  duplicateFolder,
+  duplicateNote,
+  loadJSON,
+  moveFolder,
+  moveNote,
+  renameNote,
+  saveJSON,
+  setTags,
+  updateBody,
+  useVault,
+} from '@/features/notes/notesStore'
+import {
+  baseName,
+  backlinks,
+  cleanTag,
+  hasTag,
+  inlineTags,
+  isEmptyQuery,
+  isWithin,
+  joinPath,
+  matchesQuery,
+  normFolder,
+  notePath,
+  noteTags,
+  parentOf,
+  parseQuery,
+  parseWikiTarget,
+  resolveNote,
+} from '@/features/notes/vault'
+import {
+  DEFAULT_VIEW,
+  FileTree,
+  SORT_LABELS,
+  type ExplorerView,
+  type SortMode,
+  type TreeTarget,
+} from '@/features/notes/FileTree'
+import { ContextMenu, type MenuItem, type MenuState } from '@/features/notes/ContextMenu'
+import { TagBar } from '@/features/notes/TagBar'
+import { useResizablePanel } from '@/components/ui/useResizablePanel'
+import { ResizeHandle } from '@/components/ui/ResizeHandle'
 import { cn } from '@/lib/cn'
 
-// Suggest tags based on which known keywords appear in the body. Adds to the
-// existing list rather than replacing — manual additions are preserved.
-function autotag(body: string, existing: string[]): string[] {
-  const lower = ` ${body.toLowerCase()} `
-  const out = new Set(existing)
-  for (const t of NOTE_TAGS) {
-    if (lower.includes(t.toLowerCase())) out.add(t)
-  }
-  return [...out]
+// CodeMirror is sizeable — load it only when the Notes page opens.
+const NoteEditor = lazy(() => import('@/features/notes/editor/NoteEditor'))
+
+const UI = {
+  view: 'os:notes:view',
+  expanded: 'os:notes:expanded',
+  last: 'os:notes:last',
+  width: 'os:notes:sidebar-width',
 }
 
-export function Notes() {
-  const [query, setQuery] = useState('')
-  const [tag, setTag] = useState<string | null>(null)
-  const [editing, setEditing] = useState(false)
-  const [mobileView, setMobileView] = useState<'list' | 'note'>('list')
+const copy = (text: string) => void navigator.clipboard?.writeText(text).catch(() => {})
 
-  const [drafts, setDrafts] = useState<Record<string, string>>(() => loadJSON(STORAGE.drafts, {}))
-  const [userNotes, setUserNotes] = useState<Note[]>(() => loadJSON<Note[]>(STORAGE.userNotes, []))
-  const [deleted, setDeleted] = useState<string[]>(() => loadJSON<string[]>(STORAGE.deleted, []))
-  const [tagsOverride, setTagsOverride] = useState<Record<string, string[]>>(() =>
-    loadJSON(STORAGE.tags, {}),
+export function Notes() {
+  const { notes, folders } = useVault()
+  const [searchParams] = useSearchParams()
+  const pageRef = useRef<HTMLDivElement>(null)
+  const titleRef = useRef<HTMLInputElement>(null)
+
+  // ---- explorer state ------------------------------------------------------
+  const [query, setQuery] = useState('')
+  const [tagFilter, setTagFilter] = useState<string[]>([])
+  const [tagsOpen, setTagsOpen] = useState(false)
+  const [viewOpen, setViewOpen] = useState(false)
+  const [view, setViewState] = useState<ExplorerView>(() => ({ ...DEFAULT_VIEW, ...loadJSON(UI.view, {}) }))
+  const [expanded, setExpandedState] = useState<Set<string>>(() => new Set(loadJSON<string[]>(UI.expanded, [])))
+  const [focusedFolder, setFocusedFolder] = useState<string | null>(null)
+  const [renaming, setRenaming] = useState<TreeTarget | null>(null)
+  const [menu, setMenu] = useState<MenuState | null>(null)
+  const [mobileView, setMobileView] = useState<'list' | 'note'>('list')
+  const sidebar = useResizablePanel({ defaultWidth: 290, min: 210, max: 520, edge: 'right', storageKey: UI.width })
+
+  const setView = (patch: Partial<ExplorerView>) =>
+    setViewState((v) => {
+      const next = { ...v, ...patch }
+      saveJSON(UI.view, next)
+      return next
+    })
+  const setExpanded = (fn: (s: Set<string>) => Set<string>) =>
+    setExpandedState((s) => {
+      const next = fn(new Set(s))
+      saveJSON(UI.expanded, [...next])
+      return next
+    })
+  const toggleFolder = (path: string, open?: boolean) =>
+    setExpanded((s) => {
+      if (open ?? !s.has(path)) s.add(path)
+      else s.delete(path)
+      return s
+    })
+  const reveal = (folder: string) =>
+    setExpanded((s) => {
+      for (let f = folder; f; f = parentOf(f)) s.add(f)
+      return s
+    })
+
+  // ---- navigation (with back/forward history) ------------------------------
+  const [hist, setHist] = useState<{ stack: string[]; index: number }>(() => {
+    const wanted = searchParams.get('note') ?? loadJSON<string | null>(UI.last, null)
+    const first = notes.find((n) => n.id === wanted) ?? notes.find((n) => n.id === 'vault-welcome') ?? notes[0]
+    return { stack: first ? [first.id] : [], index: 0 }
+  })
+  const selected = notes.find((n) => n.id === hist.stack[hist.index]) ?? null
+  const [jump, setJump] = useState<{ heading: string; nonce: number } | null>(null)
+  const [freshId, setFreshId] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (selected) {
+      saveJSON(UI.last, selected.id)
+      reveal(selected.folder)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected?.id])
+
+  const openNote = useCallback((id: string, opts?: { heading?: string | null }) => {
+    setHist((h) => (h.stack[h.index] === id ? h : { stack: [...h.stack.slice(0, h.index + 1), id], index: h.index + 1 }))
+    setMobileView('note')
+    setJump(opts?.heading ? { heading: opts.heading, nonce: Date.now() } : null)
+  }, [])
+  const canBack = hist.index > 0
+  const canForward = hist.index < hist.stack.length - 1
+  const goBack = () => setHist((h) => ({ ...h, index: Math.max(0, h.index - 1) }))
+  const goForward = () => setHist((h) => ({ ...h, index: Math.min(h.stack.length - 1, h.index + 1) }))
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!e.altKey || e.ctrlKey || e.metaKey) return
+      if (e.key === 'ArrowLeft') setHist((h) => ({ ...h, index: Math.max(0, h.index - 1) }))
+      else if (e.key === 'ArrowRight') setHist((h) => ({ ...h, index: Math.min(h.stack.length - 1, h.index + 1) }))
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
+  // The history may point at a deleted note — fall back to something real.
+  useEffect(() => {
+    if (!selected && notes.length) setHist({ stack: [notes[0].id], index: 0 })
+  }, [selected, notes])
+
+  // ---- derived -------------------------------------------------------------
+  const tagMap = useMemo(() => new Map(notes.map((n) => [n.id, noteTags(n)])), [notes])
+  const tagsOf = useCallback((n: Note) => tagMap.get(n.id) ?? n.tags, [tagMap])
+  const vaultTags = useMemo(() => {
+    const counts = new Map<string, number>()
+    for (const tags of tagMap.values()) for (const t of tags) counts.set(t, (counts.get(t) ?? 0) + 1)
+    return [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+  }, [tagMap])
+
+  const parsed = useMemo(() => parseQuery(query), [query])
+  const filtering = !isEmptyQuery(parsed) || tagFilter.length > 0
+  const filtered = useMemo(
+    () =>
+      filtering
+        ? notes.filter((n) => matchesQuery(n, parsed, tagsOf(n)) && tagFilter.every((t) => hasTag(tagsOf(n), t)))
+        : notes,
+    [notes, parsed, tagFilter, filtering, tagsOf],
   )
 
-  const overlay = useOsOverlay()
-  const allNotes = useMemo<Note[]>(() => {
-    const del = new Set(deleted)
-    // Agent-authored notes (overlay) sit alongside the user's and the seed notes.
-    return mergeById([...userNotes, ...NOTES], overlay.notes)
-      .filter((n) => !del.has(n.id))
-      .map((n) => ({ ...n, tags: tagsOverride[n.id] ?? n.tags }))
-  }, [userNotes, deleted, tagsOverride, overlay.notes])
+  const links = useMemo(() => (selected ? backlinks(notes, selected) : []), [notes, selected])
+  const words = useMemo(() => selected?.body.match(/\S+/g)?.length ?? 0, [selected?.body])
 
-  const [searchParams] = useSearchParams()
-  const [selectedId, setSelectedId] = useState<string>(() => {
-    const param = searchParams.get('note')
-    return param && allNotes.some((n) => n.id === param) ? param : allNotes[0]?.id ?? ''
-  })
-  const selected = allNotes.find((n) => n.id === selectedId) ?? allNotes[0]
-  const body = selected ? drafts[selected.id] ?? selected.body : ''
-  const displayTitle = selected ? titleFromBody(body, selected.title) : ''
-  const currentTags = selected?.tags ?? []
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    return allNotes.filter((n) => {
-      if (tag && !n.tags.includes(tag)) return false
-      if (!q) return true
-      return n.title.toLowerCase().includes(q) || n.body.toLowerCase().includes(q) || n.tags.some((t) => t.includes(q))
-    })
-  }, [allNotes, query, tag])
-
-  const grouped = useMemo(() => {
-    const map = new Map<string, Note[]>()
-    for (const n of filtered) {
-      const arr = map.get(n.folder) ?? []
-      arr.push(n)
-      map.set(n.folder, arr)
-    }
-    return [...map.entries()]
-  }, [filtered])
-
-  // ---- mutations -----------------------------------------------------------
-
-  const updateBody = (id: string, next: string) => {
-    const map = { ...drafts, [id]: next }
-    setDrafts(map)
-    saveJSON(STORAGE.drafts, map)
+  // ---- actions -------------------------------------------------------------
+  const newNote = (folder = focusedFolder ?? '') => {
+    const id = createNote(notes, { folder })
+    reveal(folder)
+    setFreshId(id)
+    openNote(id)
   }
 
-  const updateTags = (id: string, next: string[]) => {
-    const map = { ...tagsOverride, [id]: next }
-    setTagsOverride(map)
-    saveJSON(STORAGE.tags, map)
+  const newFolder = (parent = focusedFolder ?? '') => {
+    const path = createFolder(folders, parent)
+    reveal(parent)
+    setFocusedFolder(path)
+    setRenaming({ kind: 'folder', path })
   }
 
-  const addNote = () => {
-    const id = `note-user-${Date.now()}`
-    const folder = NOTE_FOLDERS.includes('Journal') ? 'Journal' : NOTE_FOLDERS[0]
-    const note: Note = {
-      id,
-      title: 'Untitled',
-      folder,
-      tags: [],
-      updated: new Date().toISOString(),
-      body: '# Untitled\n\nStart typing…',
-    }
-    const next = [note, ...userNotes]
-    setUserNotes(next)
-    saveJSON(STORAGE.userNotes, next)
-    setSelectedId(id)
-    setMobileView('note')
-    setEditing(true)
-  }
-
-  const deleteNote = (id: string) => {
-    if (!window.confirm('Delete this note? This cannot be undone.')) return
-    // Drop drafts and tag overrides for the dead note.
-    const nextDrafts = { ...drafts }
-    delete nextDrafts[id]
-    const nextTags = { ...tagsOverride }
-    delete nextTags[id]
-    setDrafts(nextDrafts)
-    saveJSON(STORAGE.drafts, nextDrafts)
-    setTagsOverride(nextTags)
-    saveJSON(STORAGE.tags, nextTags)
-
-    if (id.startsWith('note-user-')) {
-      const next = userNotes.filter((n) => n.id !== id)
-      setUserNotes(next)
-      saveJSON(STORAGE.userNotes, next)
-    } else {
-      const next = [...deleted, id]
-      setDeleted(next)
-      saveJSON(STORAGE.deleted, next)
-    }
-    setEditing(false)
-    // pick the next available note
-    const remaining = allNotes.filter((n) => n.id !== id)
-    setSelectedId(remaining[0]?.id ?? '')
+  const filterByTag = (t: string) => {
+    setTagFilter([cleanTag(t)])
+    setTagsOpen(true)
     setMobileView('list')
   }
 
-  const finishEditing = () => {
-    if (selected) {
-      const suggested = autotag(body, currentTags)
-      if (suggested.length !== currentTags.length) {
-        updateTags(selected.id, suggested)
-      }
+  const removeNote = (id: string) => {
+    const note = notes.find((n) => n.id === id)
+    if (!note || !window.confirm(`Delete "${note.title}"? This cannot be undone.`)) return
+    deleteNote(id)
+    if (selected?.id === id) {
+      const next = notes.find((n) => n.id !== id && n.folder === note.folder) ?? notes.find((n) => n.id !== id)
+      if (next) openNote(next.id)
+      setMobileView('list')
     }
-    setEditing(false)
   }
 
-  const addTag = (t: string) => {
-    if (!selected) return
-    const clean = t.trim().toLowerCase().replace(/^#/, '')
-    if (!clean) return
-    if (currentTags.includes(clean)) return
-    updateTags(selected.id, [...currentTags, clean])
+  const removeFolder = (path: string) => {
+    const inside = notes.filter((n) => isWithin(n.folder, path)).length
+    const msg = inside
+      ? `Delete the folder "${path}" and the ${inside} note${inside === 1 ? '' : 's'} in it? This cannot be undone.`
+      : `Delete the folder "${path}"?`
+    if (!window.confirm(msg)) return
+    deleteFolder(notes, path)
+    if (focusedFolder && isWithin(focusedFolder, path)) setFocusedFolder(null)
   }
 
-  const removeTag = (t: string) => {
-    if (!selected) return
-    updateTags(selected.id, currentTags.filter((x) => x !== t))
+  const remapExpanded = (from: string, to: string) =>
+    setExpanded((s) => new Set([...s].map((f) => (isWithin(f, from) ? to + f.slice(from.length) : f))))
+
+  const relocateFolder = (path: string, dest: string) => {
+    const moved = moveFolder(notes, path, dest)
+    if (!moved) return
+    remapExpanded(path, moved)
+    reveal(parentOf(moved))
+    if (focusedFolder && isWithin(focusedFolder, path)) setFocusedFolder(moved + focusedFolder.slice(path.length))
   }
+
+  const finishRename = (value: string | null) => {
+    const target = renaming
+    setRenaming(null)
+    if (!target || value == null) return
+    if (target.kind === 'note') renameNote(notes, target.id, value)
+    else {
+      const name = value.replace(/\//g, '-').trim()
+      if (name && name !== baseName(target.path)) relocateFolder(target.path, joinPath(parentOf(target.path), name))
+    }
+  }
+
+  const commitTitle = (value: string) => {
+    if (!selected) return
+    const final = renameNote(notes, selected.id, value)
+    if (titleRef.current && titleRef.current.value !== final) titleRef.current.value = final
+  }
+
+  const openWiki = (raw: string) => {
+    const { note, heading } = parseWikiTarget(raw)
+    if (!note) {
+      if (heading) setJump({ heading, nonce: Date.now() })
+      return
+    }
+    const hit = resolveNote(notes, note, selected)
+    if (hit) return openNote(hit.id, { heading })
+    // Unresolved link → create the note, like Obsidian.
+    const path = normFolder(note)
+    const folder = path.includes('/') ? parentOf(path) : selected?.folder ?? ''
+    const id = createNote(notes, { folder, title: baseName(path) })
+    reveal(folder)
+    openNote(id)
+  }
+
+  const autotag = () => {
+    if (!selected) return
+    const words = new Set(selected.body.toLowerCase().match(/[\p{L}\p{N}_\-/]+/gu) ?? [])
+    const found = vaultTags.map(([t]) => t).filter((t) => words.has(t) || words.has(baseName(t)))
+    setTags(selected.id, [...new Set([...selected.tags, ...found.filter((t) => !inlineTags(selected.body).includes(t))])])
+  }
+
+  // ---- menus ---------------------------------------------------------------
+  const folderTargets = (current: string, onPick: (folder: string) => void, exclude?: string): MenuItem[] => [
+    { label: 'Vault root', checked: current === '', disabled: current === '', onSelect: () => onPick('') },
+    ...[...folders]
+      .filter((f) => !exclude || !isWithin(f, exclude))
+      .sort((a, b) => a.localeCompare(b))
+      .map((f) => ({ label: f, checked: f === current, disabled: f === current, onSelect: () => onPick(f) })),
+  ]
+
+  const noteMenu = (note: Note, fromHeader = false): MenuItem[] => {
+    const tags = tagsOf(note)
+    return [
+      { kind: 'header', label: notePath(note), mono: true },
+      ...(!fromHeader ? [{ label: 'Open', icon: <FileText size={13} />, onSelect: () => openNote(note.id) }] : []),
+      { kind: 'separator' },
+      {
+        label: 'Rename',
+        icon: <Pencil size={13} />,
+        hint: fromHeader ? undefined : 'F2',
+        onSelect: () =>
+          fromHeader ? titleRef.current?.select() : (reveal(note.folder), setRenaming({ kind: 'note', id: note.id })),
+      },
+      {
+        label: 'Duplicate',
+        icon: <Copy size={13} />,
+        onSelect: () => {
+          const id = duplicateNote(notes, note.id)
+          if (id) openNote(id)
+        },
+      },
+      {
+        label: 'Move to',
+        icon: <FolderInput size={13} />,
+        submenu: folderTargets(note.folder, (f) => {
+          moveNote(notes, note.id, f)
+          reveal(f)
+        }),
+      },
+      { kind: 'separator' },
+      { label: 'Copy link', icon: <Link2 size={13} />, onSelect: () => copy(`[[${note.title}]]`) },
+      { label: 'Copy path', icon: <Clipboard size={13} />, onSelect: () => copy(notePath(note)) },
+      {
+        label: 'Reveal in explorer',
+        icon: <LocateFixed size={13} />,
+        onSelect: () => {
+          setQuery('')
+          setTagFilter([])
+          reveal(note.folder)
+          setMobileView('list')
+          window.setTimeout(() => {
+            pageRef.current?.querySelector('[role="treeitem"][aria-selected="true"]')?.scrollIntoView({ block: 'center' })
+          }, 50)
+        },
+      },
+      {
+        label: 'View tags',
+        icon: <Hash size={13} />,
+        submenu: tags.length
+          ? tags.map((t) => ({ label: `#${t}`, onSelect: () => filterByTag(t) }))
+          : [{ label: 'No tags', disabled: true }],
+      },
+      { kind: 'separator' },
+      { label: 'Delete', icon: <Trash2 size={13} />, danger: true, hint: fromHeader ? undefined : 'Del', onSelect: () => removeNote(note.id) },
+    ]
+  }
+
+  const setAllFolders = (open: boolean, within?: string) =>
+    setExpanded((s) => {
+      for (const f of folders) if (!within || isWithin(f, within)) open ? s.add(f) : s.delete(f)
+      return s
+    })
+
+  const folderMenu = (path: string): MenuItem[] => [
+    { kind: 'header', label: `${path}/`, mono: true },
+    { label: 'New note', icon: <FilePlus size={13} />, onSelect: () => newNote(path) },
+    { label: 'New folder', icon: <FolderPlus size={13} />, onSelect: () => newFolder(path) },
+    { kind: 'separator' },
+    { label: 'Rename', icon: <Pencil size={13} />, hint: 'F2', onSelect: () => setRenaming({ kind: 'folder', path }) },
+    {
+      label: 'Duplicate',
+      icon: <Copy size={13} />,
+      onSelect: () => {
+        const dest = duplicateFolder(notes, folders, path)
+        reveal(dest)
+      },
+    },
+    { label: 'Move to', icon: <FolderInput size={13} />, submenu: folderTargets(parentOf(path), (f) => relocateFolder(path, joinPath(f, baseName(path))), path) },
+    { kind: 'separator' },
+    { label: 'Copy path', icon: <Clipboard size={13} />, onSelect: () => copy(path) },
+    { label: 'Expand all inside', icon: <ChevronsUpDown size={13} />, onSelect: () => (toggleFolder(path, true), setAllFolders(true, path)) },
+    { label: 'Collapse all inside', icon: <ChevronsDownUp size={13} />, onSelect: () => setAllFolders(false, path) },
+    { kind: 'separator' },
+    { label: 'Delete', icon: <Trash2 size={13} />, danger: true, hint: 'Del', onSelect: () => removeFolder(path) },
+  ]
+
+  const sortItems = (): MenuItem[] =>
+    (Object.keys(SORT_LABELS) as SortMode[]).map((s) => ({ label: SORT_LABELS[s], checked: view.sort === s, onSelect: () => setView({ sort: s }) }))
+
+  const blankMenu = (): MenuItem[] => [
+    { label: 'New note', icon: <FilePlus size={13} />, onSelect: () => newNote('') },
+    { label: 'New folder', icon: <FolderPlus size={13} />, onSelect: () => newFolder('') },
+    { kind: 'separator' },
+    { label: 'Sort by', submenu: sortItems() },
+    {
+      label: 'Layout',
+      submenu: [
+        { label: 'Folder tree', checked: view.layout === 'tree', onSelect: () => setView({ layout: 'tree' }) },
+        { label: 'Flat list', checked: view.layout === 'flat', onSelect: () => setView({ layout: 'flat' }) },
+      ],
+    },
+    { kind: 'separator' },
+    { label: 'Expand all', icon: <ChevronsUpDown size={13} />, onSelect: () => setAllFolders(true) },
+    { label: 'Collapse all', icon: <ChevronsDownUp size={13} />, onSelect: () => setAllFolders(false) },
+  ]
+
+  const openMenu = (e: ReactMouseEvent, target: TreeTarget | null) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!target) return setMenu({ x: e.clientX, y: e.clientY, items: blankMenu() })
+    if (target.kind === 'folder') return setMenu({ x: e.clientX, y: e.clientY, items: folderMenu(target.path) })
+    const note = notes.find((n) => n.id === target.id)
+    if (note) setMenu({ x: e.clientX, y: e.clientY, items: noteMenu(note) })
+  }
+
+  const requestDelete = (t: TreeTarget) => (t.kind === 'note' ? removeNote(t.id) : removeFolder(t.path))
+
+  // Focus + select the title of a freshly created note, like Obsidian.
+  useEffect(() => {
+    if (freshId && selected?.id === freshId) {
+      titleRef.current?.focus()
+      titleRef.current?.select()
+    }
+  }, [freshId, selected?.id])
 
   // ---- render --------------------------------------------------------------
-
   return (
-    <div className="relative flex h-full overflow-hidden">
+    <div ref={pageRef} className="relative flex h-full overflow-hidden">
       {/* Warm atmosphere wash (Phase 5, page-specific patterns) — Notes is the
           system's warmest context tint, distinct from Workbench/Ops' cool-alert
           register; a wash behind the content, not a full repaint. */}
       <div
         className="pointer-events-none absolute inset-0 z-0"
         style={{
-          // Reverted to the original strength per feedback — the doubled
-          // alpha (tried alongside the base-color fix) read as too harsh a
-          // brown once the base itself was no longer fighting it.
           background:
             'radial-gradient(circle at 12% -10%, rgba(240,160,32,0.07), transparent 45%), radial-gradient(circle at 90% 105%, rgba(224,180,120,0.05), transparent 50%)',
         }}
       />
-      {/* Browser */}
+
+      {/* Explorer */}
       <aside
+        style={{ '--sb': `${sidebar.width}px` } as React.CSSProperties}
         className={cn(
-          'relative z-10 w-full shrink-0 flex-col border-r border-line bg-panel/40 lg:flex lg:w-[300px]',
+          'relative z-10 w-full shrink-0 flex-col bg-panel/40 lg:flex lg:w-[var(--sb)]',
           mobileView === 'note' ? 'hidden' : 'flex',
         )}
       >
-        <div className="border-b border-line p-3">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="label">Notes</span>
-            <button
-              onClick={addNote}
-              title="New note"
-              className="flex items-center gap-1 border border-line px-2 py-1 text-[10px] uppercase tracking-wider text-dim hover:border-accent/60 hover:text-accent"
+        <div className="relative border-b border-line p-2">
+          <div className="flex items-center gap-1">
+            <div className="relative flex min-w-0 flex-1 items-center">
+              <Search size={13} className="pointer-events-none absolute left-2 text-dim" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Escape' && setQuery('')}
+                placeholder="Search…"
+                title={`Search ${notes.length} notes — supports tag:, path:, file: and "quoted phrases"`}
+                className="h-7 w-full rounded-control border border-line bg-bg/60 pl-7 pr-6 font-read text-[12px] text-text placeholder:text-dim focus:border-accent/60 focus:outline-none"
+              />
+              {query && (
+                <button onClick={() => setQuery('')} className="absolute right-1.5 text-dim hover:text-text" aria-label="Clear search">
+                  <X size={12} />
+                </button>
+              )}
+            </div>
+            <ToolButton
+              title="Tags"
+              active={tagsOpen || tagFilter.length > 0}
+              onClick={() => {
+                setTagsOpen((o) => !o)
+                setViewOpen(false)
+              }}
             >
-              <Plus size={11} /> New
-            </button>
+              <Hash size={14} />
+              {tagFilter.length > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-accent px-0.5 text-[9px] text-bg">
+                  {tagFilter.length}
+                </span>
+              )}
+            </ToolButton>
+            <ToolButton
+              title="Sort and view options"
+              active={viewOpen}
+              onClick={() => {
+                setViewOpen((o) => !o)
+                setTagsOpen(false)
+              }}
+            >
+              <SlidersHorizontal size={14} />
+            </ToolButton>
+            <ToolButton title="New folder" onClick={() => newFolder()}>
+              <FolderPlus size={14} />
+            </ToolButton>
+            <ToolButton title="New note" onClick={() => newNote()} accent>
+              <Plus size={15} />
+            </ToolButton>
           </div>
-          <SearchInput value={query} onChange={setQuery} placeholder={`search ${allNotes.length} notes…`} />
-          <div className="mt-2 flex flex-wrap gap-1">
-            {NOTE_TAGS.slice(0, 8).map((t) => (
-              <button
-                key={t}
-                onClick={() => setTag(tag === t ? null : t)}
-                className={cn(
-                  'border px-1.5 py-0.5 text-[10px] uppercase tracking-wider transition-colors',
-                  tag === t ? 'border-accent/60 text-accent' : 'border-line text-dim hover:text-text',
+
+          {tagsOpen && (
+            <div className="mt-2 max-h-48 overflow-y-auto">
+              <div className="mb-1 flex items-center justify-between font-read text-[11px] text-dim">
+                <span>{vaultTags.length} tags · click to filter</span>
+                {tagFilter.length > 0 && (
+                  <button onClick={() => setTagFilter([])} className="hover:text-accent">
+                    clear
+                  </button>
                 )}
-              >
-                #{t}
-              </button>
-            ))}
-          </div>
-          <div className="mt-2 text-[10px] tracking-wider text-dim">
-            {filtered.length} / {allNotes.length} notes
-          </div>
+              </div>
+              <div className="flex flex-wrap gap-1">
+                {vaultTags.map(([t, count]) => {
+                  const on = tagFilter.includes(t)
+                  return (
+                    <button
+                      key={t}
+                      onClick={() => setTagFilter((f) => (on ? f.filter((x) => x !== t) : [...f, t]))}
+                      className={cn(
+                        'rounded-full px-2 py-0.5 font-read text-[11px] transition-colors',
+                        on ? 'bg-accent/30 text-text' : 'bg-panel-2 text-text/70 hover:text-text',
+                      )}
+                    >
+                      #{t} <span className="text-dim">{count}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+          {!tagsOpen && tagFilter.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1">
+              {tagFilter.map((t) => (
+                <span key={t} className="inline-flex items-center gap-1 rounded-full bg-accent/20 py-0.5 pl-2 pr-1 font-read text-[11px] text-text">
+                  #{t}
+                  <button onClick={() => setTagFilter((f) => f.filter((x) => x !== t))} aria-label={`Remove filter ${t}`}>
+                    <X size={10} />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+
+          {viewOpen && (
+            <ViewOptions
+              view={view}
+              onChange={setView}
+              onExpandAll={() => setAllFolders(true)}
+              onCollapseAll={() => setAllFolders(false)}
+              onClose={() => setViewOpen(false)}
+            />
+          )}
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto">
-          {grouped.map(([folder, items]) => (
-            <div key={folder}>
-              <div className="sticky top-0 z-10 flex items-center gap-1.5 bg-panel/95 px-3 py-1.5 backdrop-blur">
-                <FileText size={11} className="text-dim" />
-                <span className="label">{folder}</span>
-                <span className="text-[10px] text-dim">[{items.length}]</span>
-              </div>
-              {items.map((n) => (
-                <button
-                  key={n.id}
-                  onClick={() => {
-                    setSelectedId(n.id)
-                    setMobileView('note')
-                    setEditing(false)
-                  }}
-                  className={cn(
-                    'flex w-full flex-col gap-0.5 border-l-2 px-3 py-2 text-left transition-colors',
-                    n.id === selectedId
-                      ? 'border-accent bg-accent/5'
-                      : 'border-transparent hover:bg-panel-2/50',
-                  )}
-                >
-                  <span className="truncate text-xs text-text">
-                    <Highlight text={titleFromBody(drafts[n.id] ?? n.body, n.title)} q={query} />
-                  </span>
-                  <span className="flex items-center gap-2 text-[10px] text-dim">
-                    <span>{relTime(new Date(n.updated))}</span>
-                    <span className="truncate">{n.tags.map((t) => `#${t}`).join(' ')}</span>
-                  </span>
-                </button>
-              ))}
-            </div>
-          ))}
-          {!filtered.length && <div className="p-4 text-xs text-dim">No notes match.</div>}
+          <FileTree
+            notes={filtered}
+            folders={folders}
+            filtering={filtering}
+            highlight={parsed.terms[0] ?? parsed.files[0] ?? ''}
+            activeId={selected?.id ?? null}
+            focusedFolder={focusedFolder}
+            view={view}
+            expanded={expanded}
+            renaming={renaming}
+            tagsOf={tagsOf}
+            onToggleFolder={toggleFolder}
+            onOpenNote={(id) => openNote(id)}
+            onFocusFolder={setFocusedFolder}
+            onContextMenu={openMenu}
+            onRequestRename={setRenaming}
+            onRequestDelete={requestDelete}
+            onRenameDone={finishRename}
+            onMoveNote={(id, folder) => {
+              moveNote(notes, id, folder)
+              reveal(folder)
+            }}
+            onMoveFolder={(path, parent) => relocateFolder(path, joinPath(parent, baseName(path)))}
+          />
+          {filtering && !filtered.length && <div className="p-4 font-read text-xs text-dim">No notes match.</div>}
         </div>
       </aside>
+      <ResizeHandle onMouseDown={sidebar.onMouseDown} className="relative z-10 hidden border-r border-line lg:block" />
 
-      {/* Editor / preview */}
-      <section
-        className={cn(
-          'relative z-10 min-w-0 flex-1 flex-col lg:flex',
-          mobileView === 'list' ? 'hidden' : 'flex',
-        )}
-      >
+      {/* Note */}
+      <section className={cn('relative z-10 min-w-0 flex-1 flex-col lg:flex', mobileView === 'list' ? 'hidden' : 'flex')}>
         {!selected ? (
-          <EmptyState onCreate={addNote} />
+          <EmptyState onCreate={() => newNote('')} />
         ) : (
           <>
-            <div className="flex items-center justify-between border-b border-line px-4 py-2">
-              <div className="flex min-w-0 items-center gap-2">
-                <button
-                  onClick={() => setMobileView('list')}
-                  className="text-dim hover:text-text lg:hidden"
-                  aria-label="Back to list"
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                <Hash size={13} className="text-dim" />
-                <span className="truncate font-display text-text">{displayTitle}</span>
-                <span className="hidden text-[10px] text-dim sm:inline">· {selected.folder}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={editing ? finishEditing : () => setEditing(true)}
-                  className={cn(
-                    'flex items-center gap-1 border px-2.5 py-1 text-[11px] uppercase tracking-wider transition-colors',
-                    editing ? 'border-accent/60 bg-accent/10 text-accent' : 'border-line text-dim hover:text-text',
-                  )}
-                >
-                  {editing ? (
-                    <>
-                      <Check size={12} /> Done
-                    </>
-                  ) : (
-                    <>
-                      <Pencil size={12} /> Edit
-                    </>
-                  )}
-                </button>
-                <button
-                  onClick={() => deleteNote(selected.id)}
-                  title="Delete note"
-                  className="flex items-center gap-1 border border-line p-1.5 text-dim transition-colors hover:border-danger/60 hover:text-danger"
-                >
-                  <Trash2 size={13} />
-                </button>
-              </div>
+            <div className="flex items-center gap-1 border-b border-line px-2 py-1.5">
+              <button
+                onClick={() => setMobileView('list')}
+                className="rounded-control p-1 text-dim hover:text-text lg:hidden"
+                aria-label="Back to list"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <ToolButton title="Back (Alt+←)" onClick={goBack} disabled={!canBack}>
+                <ArrowLeft size={14} />
+              </ToolButton>
+              <ToolButton title="Forward (Alt+→)" onClick={goForward} disabled={!canForward}>
+                <ArrowRight size={14} />
+              </ToolButton>
+              <input
+                key={`${selected.id}:${selected.title}`}
+                ref={titleRef}
+                defaultValue={selected.title}
+                spellCheck={false}
+                aria-label="Note title"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === 'ArrowDown') {
+                    e.preventDefault()
+                    commitTitle(e.currentTarget.value)
+                    setFreshId(null)
+                    pageRef.current?.querySelector<HTMLElement>('.cm-content')?.focus()
+                  } else if (e.key === 'Escape') {
+                    e.currentTarget.value = selected.title
+                    e.currentTarget.blur()
+                  }
+                }}
+                onBlur={(e) => {
+                  commitTitle(e.currentTarget.value)
+                  setFreshId(null)
+                }}
+                className="min-w-0 flex-1 rounded-control border border-transparent bg-transparent px-2 py-0.5 font-read text-[15px] font-semibold text-text outline-none transition-colors hover:border-line focus:border-accent/50 focus:bg-bg/40"
+              />
+              <ToolButton
+                title="More options"
+                onClick={(e) => {
+                  const r = e.currentTarget.getBoundingClientRect()
+                  setMenu({ x: r.right - 200, y: r.bottom + 4, items: noteMenu(selected, true) })
+                }}
+              >
+                <MoreHorizontal size={15} />
+              </ToolButton>
             </div>
 
-            {/* Editor body */}
             <div className="min-h-0 flex-1">
-              {editing ? (
-                <textarea
-                  autoFocus
-                  value={body}
-                  onChange={(e) => updateBody(selected.id, e.target.value)}
-                  onBlur={finishEditing}
-                  spellCheck={false}
-                  // Raw markdown stays monospace on purpose — source syntax
-                  // reads better aligned, even though the rendered preview
-                  // below uses Notes' calmer `read` typeface.
-                  className="h-full w-full resize-none bg-bg/40 p-8 text-sm leading-relaxed text-text/90 outline-none"
+              <Suspense fallback={<div className="h-full" />}>
+                <NoteEditor
+                  noteId={selected.id}
+                  value={selected.body}
+                  notes={notes}
+                  onChange={(body) => updateBody(selected.id, body)}
+                  onOpenWiki={openWiki}
+                  onOpenTag={filterByTag}
+                  jump={jump}
+                  focusOnOpen={false}
                 />
-              ) : (
-                <div
-                  onClick={() => setEditing(true)}
-                  title="Click to edit"
-                  className="h-full cursor-text overflow-y-auto p-8"
-                >
-                  <article className="prose-term prose-read mx-auto w-full max-w-3xl">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{body}</ReactMarkdown>
-                  </article>
-                </div>
-              )}
+              </Suspense>
             </div>
 
-            {/* Tag footer */}
             <TagBar
-              tags={currentTags}
-              onAdd={addTag}
-              onRemove={removeTag}
-              onAutotag={() => updateTags(selected.id, autotag(body, currentTags))}
+              tags={selected.tags}
+              inlineTags={inlineTags(selected.body)}
+              vaultTags={vaultTags}
+              onAdd={(t) => setTags(selected.id, [...selected.tags, t])}
+              onRemove={(t) => setTags(selected.id, selected.tags.filter((x) => x !== t))}
+              onAutotag={autotag}
+              onTagClick={filterByTag}
+              right={<FooterStats words={words} chars={selected.body.length} links={links} onOpen={(id) => openNote(id)} />}
             />
           </>
         )}
       </section>
+
+      <ContextMenu menu={menu} onClose={() => setMenu(null)} />
     </div>
   )
 }
 
-function TagBar({
-  tags,
-  onAdd,
-  onRemove,
-  onAutotag,
+function ToolButton({
+  children,
+  title,
+  onClick,
+  active,
+  accent,
+  disabled,
 }: {
-  tags: string[]
-  onAdd: (t: string) => void
-  onRemove: (t: string) => void
-  onAutotag: () => void
+  children: React.ReactNode
+  title: string
+  onClick: (e: ReactMouseEvent<HTMLButtonElement>) => void
+  active?: boolean
+  accent?: boolean
+  disabled?: boolean
 }) {
-  const [draft, setDraft] = useState('')
-  const submit = () => {
-    if (!draft.trim()) return
-    onAdd(draft)
-    setDraft('')
-  }
   return (
-    <div className="flex flex-wrap items-center gap-1.5 border-t border-line bg-panel/40 px-3 py-2">
-      <span className="label mr-1">Tags</span>
-      {tags.map((t) => (
-        <span
-          key={t}
-          className="inline-flex items-center gap-1 border border-accent/40 bg-accent/10 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-accent"
+    <button
+      title={title}
+      aria-label={title}
+      onClick={onClick}
+      disabled={disabled}
+      className={cn(
+        'relative flex h-7 w-7 shrink-0 items-center justify-center rounded-control transition-colors disabled:opacity-30 disabled:hover:bg-transparent',
+        accent
+          ? 'bg-accent/15 text-accent hover:bg-accent/25'
+          : active
+            ? 'bg-panel-2 text-accent'
+            : 'text-dim hover:bg-panel-2 hover:text-text',
+      )}
+    >
+      {children}
+    </button>
+  )
+}
+
+function ViewOptions({
+  view,
+  onChange,
+  onExpandAll,
+  onCollapseAll,
+  onClose,
+}: {
+  view: ExplorerView
+  onChange: (patch: Partial<ExplorerView>) => void
+  onExpandAll: () => void
+  onCollapseAll: () => void
+  onClose: () => void
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as HTMLElement
+      if (!ref.current?.contains(t) && !t.closest('[title="Sort and view options"]')) onClose()
+    }
+    window.addEventListener('mousedown', onDown)
+    return () => window.removeEventListener('mousedown', onDown)
+  }, [onClose])
+
+  const Seg = <T extends string>({ value, options, set }: { value: T; options: [T, string][]; set: (v: T) => void }) => (
+    <div className="flex rounded-control border border-line p-0.5">
+      {options.map(([v, label]) => (
+        <button
+          key={v}
+          onClick={() => set(v)}
+          className={cn('flex-1 rounded-sm px-2 py-0.5 text-[11px]', value === v ? 'bg-accent/20 text-text' : 'text-dim hover:text-text')}
         >
-          #{t}
-          <button onClick={() => onRemove(t)} className="text-accent/70 hover:text-danger" aria-label={`Remove tag ${t}`}>
-            <X size={10} />
-          </button>
-        </span>
+          {label}
+        </button>
       ))}
-      <input
-        value={draft}
-        onChange={(e) => setDraft(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault()
-            submit()
-          } else if (e.key === ',' || e.key === ' ') {
-            // allow space/comma as quick separators
-            if (draft.trim()) {
-              e.preventDefault()
-              submit()
-            }
-          }
-        }}
-        onBlur={submit}
-        placeholder="add tag…"
-        className="min-w-[80px] flex-1 bg-transparent px-1 py-0.5 text-[11px] text-text placeholder:text-dim focus:outline-none"
-      />
+    </div>
+  )
+
+  return (
+    <div
+      ref={ref}
+      className="absolute left-2 right-2 top-full z-30 mt-1 space-y-2.5 rounded-panel border border-line-2 bg-panel p-3 font-read text-[12px] shadow-[0_12px_32px_rgba(0,0,0,0.5)]"
+    >
+      <div>
+        <div className="mb-1 text-[11px] text-dim">Sort by</div>
+        <select
+          value={view.sort}
+          onChange={(e) => onChange({ sort: e.target.value as SortMode })}
+          className="w-full rounded-control border border-line bg-bg px-2 py-1 text-[12px] text-text focus:border-accent/60 focus:outline-none"
+        >
+          {(Object.keys(SORT_LABELS) as SortMode[]).map((s) => (
+            <option key={s} value={s}>
+              {SORT_LABELS[s]}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <div className="mb-1 text-[11px] text-dim">Layout</div>
+        <Seg value={view.layout} options={[['tree', 'Folders'], ['flat', 'Flat list']]} set={(layout) => onChange({ layout })} />
+      </div>
+      <div>
+        <div className="mb-1 text-[11px] text-dim">Density</div>
+        <Seg value={view.density} options={[['compact', 'Compact'], ['detailed', 'Detailed']]} set={(density) => onChange({ density })} />
+      </div>
+      <label className="flex cursor-pointer items-center justify-between text-text/85">
+        Show tags in list
+        <input
+          type="checkbox"
+          checked={view.showTags}
+          onChange={(e) => onChange({ showTags: e.target.checked })}
+          className="accent-[#c77591]"
+        />
+      </label>
+      <div className="flex gap-1.5 pt-0.5">
+        <button onClick={onExpandAll} className="flex flex-1 items-center justify-center gap-1 rounded-control border border-line py-1 text-[11px] text-dim hover:text-text">
+          <ChevronsUpDown size={12} /> Expand all
+        </button>
+        <button onClick={onCollapseAll} className="flex flex-1 items-center justify-center gap-1 rounded-control border border-line py-1 text-[11px] text-dim hover:text-text">
+          <ChevronsDownUp size={12} /> Collapse all
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function FooterStats({
+  words,
+  chars,
+  links,
+  onOpen,
+}: {
+  words: number
+  chars: number
+  links: Note[]
+  onOpen: (id: string) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!open) return
+    const onDown = (e: MouseEvent) => !ref.current?.contains(e.target as Node) && setOpen(false)
+    window.addEventListener('mousedown', onDown)
+    return () => window.removeEventListener('mousedown', onDown)
+  }, [open])
+
+  return (
+    <div ref={ref} className="relative ml-1 flex items-center gap-3 text-[11px] text-dim">
       <button
-        onClick={onAutotag}
-        title="Suggest tags from the note body"
-        className="ml-auto flex items-center gap-1 border border-line px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-dim hover:border-accent/60 hover:text-accent"
+        onClick={() => setOpen((o) => !o)}
+        disabled={!links.length}
+        title="Notes that link here"
+        className="flex items-center gap-1 rounded-control px-1.5 py-0.5 hover:bg-panel-2 hover:text-text disabled:hover:bg-transparent disabled:hover:text-dim"
       >
-        <Wand2 size={10} /> Auto
+        <CornerUpLeft size={11} /> {links.length} backlink{links.length === 1 ? '' : 's'}
       </button>
+      <span className="hidden sm:inline">
+        {words} words · {chars} chars
+      </span>
+      {open && links.length > 0 && (
+        <div className="absolute bottom-full right-0 z-30 mb-2 w-64 rounded-panel border border-line-2 bg-panel py-1 shadow-[0_12px_32px_rgba(0,0,0,0.5)]">
+          <div className="px-3 py-1 text-[11px] text-dim">Linked mentions</div>
+          {links.map((n) => (
+            <button
+              key={n.id}
+              onClick={() => {
+                setOpen(false)
+                onOpen(n.id)
+              }}
+              className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] text-text/85 hover:bg-panel-2 hover:text-text"
+            >
+              <FileText size={12} className="shrink-0 text-dim" />
+              <span className="truncate">{n.title}</span>
+              {n.folder && <span className="ml-auto shrink-0 truncate text-[10px] text-dim">{n.folder}</span>}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
 
 function EmptyState({ onCreate }: { onCreate: () => void }) {
   return (
-    <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-dim">
-      <div className="font-display text-base">No notes</div>
+    <div className="flex h-full flex-col items-center justify-center gap-3 text-center font-read text-dim">
+      <div className="text-base text-text">No note open</div>
       <p className="max-w-xs text-xs">Your vault is empty. Create the first note to get going.</p>
       <button
         onClick={onCreate}
-        className="flex items-center gap-1 border border-accent/60 bg-accent/10 px-3 py-1.5 text-xs uppercase tracking-wider text-accent"
+        className="flex items-center gap-1 rounded-control bg-accent/15 px-3 py-1.5 text-xs text-accent hover:bg-accent/25"
       >
         <Plus size={12} /> New note
       </button>
     </div>
-  )
-}
-
-function Highlight({ text, q }: { text: string; q: string }) {
-  const term = q.trim()
-  if (!term) return <>{text}</>
-  const idx = text.toLowerCase().indexOf(term.toLowerCase())
-  if (idx === -1) return <>{text}</>
-  return (
-    <>
-      {text.slice(0, idx)}
-      <mark className="bg-accent/30 text-text">{text.slice(idx, idx + term.length)}</mark>
-      {text.slice(idx + term.length)}
-    </>
   )
 }

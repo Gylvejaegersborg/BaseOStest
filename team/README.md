@@ -74,6 +74,11 @@ Prefix agent-created ids with `os-` so they never collide with built-in items. T
 an existing project/song/lab item, reuse its existing id and include only the fields you
 change plus `id`.
 
+Notes: the Notes tab shows `title` in its own title bar, so start `body` with the content
+itself, not a `# <title>` heading. `folder` can be a nested path (`Team/Meetings`).
+Obsidian syntax works in `body`: `[[Note title]]` links, `#tags`, `> [!note]` callouts,
+`- [ ]` tasks.
+
 ## JSON shapes (contract — keep these exact)
 
 ### state/agents.json
