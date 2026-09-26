@@ -1,32 +1,28 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { addDays, addMonths, format, isSameDay, startOfWeek } from 'date-fns'
-import { Bell, BellOff, CalendarDays, CheckSquare, ChevronLeft, ChevronRight, Clock, MapPin, Repeat } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { addDays, addMonths, endOfMonth, format, getISOWeek, isSameDay, startOfMonth, startOfWeek } from 'date-fns'
 import {
-  KIND_COLOR,
-  PRIORITY_COLOR,
-  REMINDER_COLOR,
-  type Appt,
-  type CronJob,
-  type Reminder,
-  type Task,
-} from '@/data/calendar'
+  Bell,
+  BellOff,
+  CalendarDays,
+  CheckSquare,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Cpu,
+  Filter,
+  MapPin,
+  Maximize2,
+  Repeat,
+  Trash2,
+} from 'lucide-react'
+import { KIND_COLOR, PRIORITY_COLOR, PRIORITY_LABEL, cronVisible, type Appt, type CronJob, type Task } from '@/data/calendar'
 import { Panel } from '@/components/ui/Panel'
 import { Modal } from '@/components/ui/Modal'
-import { StatusDot } from '@/components/ui/StatusDot'
 import { cn } from '@/lib/cn'
-import {
-  TODAY,
-  apptDate,
-  apptOccursOn,
-  dayOffsetOf,
-  hhmm,
-  offsetDate,
-  parseHM,
-  reminderOccursOn,
-  taskOccursOn,
-} from '@/features/calendar/util'
+import { TODAY, apptDate, apptOccursOn, dayOffsetOf, hhmm, offsetDate, parseHM, taskOccursOn } from '@/features/calendar/util'
 import { buildAgenda, type AgendaItem } from '@/features/calendar/agenda'
-import { cronScheduleLabel } from '@/features/calendar/cron'
+import { CRON_STATUS_COLOR } from '@/features/calendar/cron'
 import { AgendaList } from '@/features/calendar/AgendaList'
 import { DateField } from '@/features/calendar/DateField'
 import { DayView } from '@/features/calendar/DayView'
@@ -37,173 +33,201 @@ import { DayDetailModal } from '@/features/calendar/DayDetailModal'
 import { RecurrenceField } from '@/features/calendar/RecurrenceField'
 import { CronDetailModal } from '@/features/calendar/CronDetailModal'
 import { CronEditModal } from '@/features/calendar/CronEditModal'
-import { ReminderModal } from '@/features/calendar/ReminderModal'
-import { TaskPanel, TaskModal } from '@/features/calendar/TaskPanel'
+import { CronManager } from '@/features/calendar/CronManager'
+import { SourceIcon, TaskPanel, TaskModal } from '@/features/calendar/TaskPanel'
 import { RemindersPanel } from '@/features/calendar/RemindersPanel'
 import { useCalendar } from '@/features/calendar/CalendarContext'
 import { layoutOverlaps } from '@/features/calendar/overlap'
 
-const DAY_START = 7
-const DAY_END = 22
-const HOUR_PX = 46
+// The whole day, midnight to midnight — a todo at 23:59 must be reachable.
+const DAY_START = 0
+const DAY_END = 24
+const HOURS = DAY_END - DAY_START
+
+type Layer = 'events' | 'todos' | 'crons'
+type Filters = Record<Layer, boolean>
+const FILTER_KEY = 'os:calendar:filter'
+const LAYERS: { id: Layer; label: string; color: string }[] = [
+  { id: 'events', label: 'Events', color: '#36e0c8' },
+  { id: 'todos', label: 'Todos', color: '#46d369' },
+  { id: 'crons', label: 'AI crons', color: '#c77591' },
+]
+
+type TablePanel = 'notify' | 'upnext' | 'todos' | 'crons'
+
+function loadFilters(): Filters {
+  try {
+    return { events: true, todos: true, crons: true, ...JSON.parse(localStorage.getItem(FILTER_KEY) ?? '{}') }
+  } catch {
+    return { events: true, todos: true, crons: true }
+  }
+}
+
+/** Fractional hours a cron job runs at on any given day. */
+function cronRunHours(c: CronJob): number[] {
+  const s = c.schedule
+  if (s.type === 'daily') return [s.hour]
+  const step = s.type === 'everyHours' ? s.n : s.n / 60
+  if (step <= 0) return []
+  const out: number[] = []
+  for (let h = step; h < 24 && out.length < 288; h += step) out.push(h)
+  return [0, ...out]
+}
 
 export function Calendar() {
-  // Calendar data + reminder engine live in the app-wide CalendarProvider so
-  // reminders keep firing regardless of which page is open.
-  const {
-    appts,
-    tasks,
-    reminders,
-    crons,
-    saveAppt,
-    toggleTask,
-    saveTask,
-    deleteTask,
-    saveReminder,
-    deleteReminder,
-    saveCron,
-    remindersEngine,
-  } = useCalendar()
+  // Calendar data + notification engine live in the app-wide CalendarProvider
+  // so pings keep firing regardless of which page is open.
+  const { appts, tasks, crons, saveAppt, deleteAppt, toggleTask, saveTask, deleteTask, saveCron, deleteCron, remindersEngine } =
+    useCalendar()
+  const navigate = useNavigate()
 
-  // Desktop keeps week as the default (room for the full 7-day grid); mobile
-  // opens straight to Day — sideways-scrolling through a cramped week grid
-  // on a phone was the thing this whole pass was meant to fix.
+  // Desktop defaults to week (room for the 7-day grid); phones open on Day.
   const isDesktop = useIsDesktop()
   const [view, setView] = useState<'day' | 'week' | 'month'>(() => (isDesktop ? 'week' : 'day'))
   const [weekOffset, setWeekOffset] = useState(0)
   const [monthOffset, setMonthOffset] = useState(0)
-  // Day view used to be hardcoded to today with no way to move off it; this
-  // is what makes it a real "date selector" (day-step or jump-to-date, which
-  // can cross a month boundary) instead of a fixed readout.
   const [dayOffset, setDayOffset] = useState(0)
   const [datePickerOpen, setDatePickerOpen] = useState(false)
+  const [filterOpen, setFilterOpen] = useState(false)
+  const [filters, setFilters] = useState<Filters>(loadFilters)
+  const toggleLayer = (l: Layer) =>
+    setFilters((f) => {
+      const next = { ...f, [l]: !f[l] }
+      try {
+        localStorage.setItem(FILTER_KEY, JSON.stringify(next))
+      } catch {
+        /* per-session then */
+      }
+      return next
+    })
 
+  // Pop-ups stack like Ops: the full-view table stays open underneath the
+  // item you open from it, so closing the item returns to the table.
+  const [table, setTable] = useState<TablePanel | null>(null)
   const [editing, setEditing] = useState<Appt | null>(null)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
-  const [editingReminder, setEditingReminder] = useState<Reminder | null>(null)
-  const [cronJob, setCronJob] = useState<CronJob | null>(null)
+  const [cronId, setCronId] = useState<string | null>(null)
   const [editingCron, setEditingCron] = useState<CronJob | null>(null)
   const [dayDetail, setDayDetail] = useState<Date | null>(null)
+  const cronJob = crons.find((c) => c.id === cronId) ?? null
 
-  const weekStart = useMemo(
-    () => addDays(startOfWeek(TODAY, { weekStartsOn: 1 }), weekOffset * 7),
-    [weekOffset],
-  )
+  const weekStart = useMemo(() => addDays(startOfWeek(TODAY, { weekStartsOn: 1 }), weekOffset * 7), [weekOffset])
   const days = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)), [weekStart])
   const month = useMemo(() => addMonths(TODAY, monthOffset), [monthOffset])
   const selectedDay = useMemo(() => offsetDate(dayOffset), [dayOffset])
-  // Whether a day (any day, not just ones near today — the picker browses
-  // other months) has anything on it, recurring items included — the
-  // date-picker's hint dot.
-  const isDayMarked = (day: Date) =>
-    appts.some((a) => apptOccursOn(a, day)) ||
-    tasks.some((t) => taskOccursOn(t, day)) ||
-    reminders.some((r) => reminderOccursOn(r, day))
 
-  const upNext = useMemo(
-    () => buildAgenda({ appts, tasks, reminders, crons }, 6),
-    [appts, tasks, reminders, crons],
+  // What the views draw, after the layer filter.
+  const shownAppts = filters.events ? appts : []
+  const shownTasks = filters.todos ? tasks : []
+  const shownCrons = filters.crons ? crons : []
+
+  const isDayMarked = (day: Date) =>
+    shownAppts.some((a) => apptOccursOn(a, day)) || shownTasks.some((t) => t.status !== 'done' && taskOccursOn(t, day))
+
+  const agendaSrc = useMemo(
+    () => ({ appts: shownAppts, tasks: shownTasks, crons: shownCrons.filter(cronVisible) }),
+    [shownAppts, shownTasks, shownCrons],
   )
+  const upNext = useMemo(() => buildAgenda(agendaSrc, 6), [agendaSrc])
 
   const openAgendaItem = (item: AgendaItem) => {
     if (item.source === 'appt') setEditing(item.raw as Appt)
     else if (item.source === 'task') setEditingTask(item.raw as Task)
-    else if (item.source === 'reminder') setEditingReminder(item.raw as Reminder)
-    else setCronJob(item.raw as CronJob)
+    else setCronId((item.raw as CronJob).id)
   }
 
-  // Resolve a scheduled ping back to its source entity and open its editor.
-  const openScheduled = (source: 'appt' | 'task' | 'reminder', refId: string) => {
+  const openScheduled = (source: 'appt' | 'task', refId: string) => {
     if (source === 'appt') {
       const a = appts.find((x) => x.id === refId)
       if (a) setEditing(a)
-    } else if (source === 'task') {
+    } else {
       const t = tasks.find((x) => x.id === refId)
       if (t) setEditingTask(t)
-    } else {
-      const r = reminders.find((x) => x.id === refId)
-      if (r) setEditingReminder(r)
     }
   }
 
-  // Wrap the context mutators so the editor modals close on save/delete.
-  const handleSaveAppt = (a: Appt) => {
-    saveAppt(a)
-    setEditing(null)
-  }
-  const handleSaveTask = (t: Task) => {
-    saveTask(t)
+  const openSource = (t: Task) => {
     setEditingTask(null)
-  }
-  const handleDeleteTask = (id: string) => {
-    deleteTask(id)
-    setEditingTask(null)
-  }
-  const handleSaveReminder = (r: Reminder) => {
-    saveReminder(r)
-    setEditingReminder(null)
-  }
-  const handleDeleteReminder = (id: string) => {
-    deleteReminder(id)
-    setEditingReminder(null)
-  }
-  const handleSaveCron = (c: CronJob) => {
-    saveCron(c)
-    setEditingCron(null)
+    setTable(null)
+    if (t.source === 'project' && t.sourceRef?.projectId) navigate(`/projects?project=${encodeURIComponent(t.sourceRef.projectId)}`)
+    else if (t.source === 'note' && t.sourceRef?.noteId) navigate(`/notes?note=${encodeURIComponent(t.sourceRef.noteId)}`)
   }
 
   const addTask = () =>
+    setEditingTask({ id: `new-${Date.now()}`, title: '', status: 'todo', priority: 'med', dayOffset: 0, notify: false, source: 'manual' })
+
+  // "Remind me" = a timed todo that pings at its time.
+  const addTimedTodo = (title: string, day: number, time: number) =>
+    saveTask({
+      id: `t-${Date.now()}`,
+      title,
+      status: 'todo',
+      priority: 'low',
+      dayOffset: day,
+      dueTime: time,
+      notify: true,
+      reminderMinutes: 0,
+      source: 'manual',
+    })
+
+  // Double-click empty grid space → new timed todo at that day + time.
+  const createTodoAt = (day: number, time: number) =>
     setEditingTask({
       id: `new-${Date.now()}`,
       title: '',
       status: 'todo',
-      priority: 'med',
-      dayOffset: 0,
-      reminderMinutes: 15,
+      priority: 'low',
+      dayOffset: day,
+      dueTime: time,
+      notify: true,
+      reminderMinutes: 0,
+      source: 'manual',
     })
 
-  // Quick-add a reminder from the panel (no modal — straight to the list).
-  const addReminderQuick = (title: string, dayOffset: number, time: number) =>
-    saveReminder({ id: `r-${Date.now()}`, title, dayOffset, time })
+  const jumpToWeekOf = (d: Date) => {
+    const base = startOfWeek(TODAY, { weekStartsOn: 1 })
+    const target = startOfWeek(d, { weekStartsOn: 1 })
+    setWeekOffset(Math.round((target.getTime() - base.getTime()) / (7 * 86_400_000)))
+  }
 
-  // Double-click empty grid space → new reminder prefilled to that day + time.
-  const createReminderAt = (dayOffset: number, time: number) =>
-    setEditingReminder({ id: `new-${Date.now()}`, title: '', dayOffset, time })
+  const weekLabel =
+    view === 'week'
+      ? `W${getISOWeek(weekStart)}`
+      : view === 'month'
+        ? `W${getISOWeek(startOfMonth(month))}–${getISOWeek(endOfMonth(month))}`
+        : `W${getISOWeek(selectedDay)}`
 
-  // gap-3 below (mobile only) is the single source of spacing between the
-  // calendar region and the aside below it — Day view's own bottom padding
-  // and the aside's own top padding used to each add their own ~10-12px on
-  // top of each other, stacking into a visibly bigger gap there than the
-  // gap-3 used between panels anywhere else. Both were trimmed to not
-  // double up (see their own comments) so this one gap is the only thing
-  // drawing the space.
+  const step = (dir: -1 | 1) =>
+    view === 'day' ? setDayOffset((d) => d + dir) : view === 'week' ? setWeekOffset((w) => w + dir) : setMonthOffset((m) => m + dir)
+
+  const activeLayers = LAYERS.filter((l) => filters[l.id]).length
+
   return (
     <div className="flex h-full flex-col gap-3 overflow-y-auto overflow-x-hidden lg:flex-row lg:gap-0 lg:overflow-hidden">
-      {/* Calendar grid */}
-      {/* max-h, not a fixed h — a light day (Day view with few/no items) used
-       *  to still reserve the full 72vh, leaving a big empty gap below its
-       *  short content before the aside panels underneath. max-height still
-       *  caps a busy day/Week's grid so the toolbar above stays put while
-       *  that scrolls internally, but a short day now just shrinks to fit. */}
-      <div className="flex max-h-[72vh] min-w-0 flex-col lg:h-auto lg:max-h-none lg:min-h-0 lg:flex-1">
+      {/* Calendar region. Week/month cap their height on phones (the grid
+       *  scrolls inside); Day view grows with its content so the whole page
+       *  scrolls as one — agenda, todos and panels alike. */}
+      <div
+        className={cn(
+          'flex min-w-0 flex-col lg:h-auto lg:max-h-none lg:min-h-0 lg:flex-1',
+          view !== 'day' && 'max-h-[78vh]',
+        )}
+      >
         <div className="flex flex-wrap items-center justify-between gap-1.5 border-b border-line px-2 py-2 sm:gap-2 sm:px-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-baseline gap-2">
             <h1 className="font-display text-lg tracking-wider text-text">CALENDAR</h1>
             <span className="text-xs text-dim">
               {view === 'day'
-                ? format(selectedDay, 'EEEE dd MMM yyyy')
+                ? format(selectedDay, 'EEE dd MMM yyyy')
                 : view === 'week'
                   ? `${format(weekStart, 'dd MMM')} – ${format(addDays(weekStart, 6), 'dd MMM yyyy')}`
                   : format(month, 'MMMM yyyy')}
             </span>
+            <span className="border border-line px-1 font-display text-[10px] tabular-nums text-accent" title="ISO week number">
+              {weekLabel}
+            </span>
           </div>
-          {/* flex-wrap here too — at the narrowest phone widths (320px) the
-           *  view toggle + bell + nav group no longer fit on one line even
-           *  after the outer row wraps around the title; wrapping again
-           *  keeps this row's own overflow from pushing the whole page into
-           *  horizontal scroll instead of just breaking onto a second line. */}
           <div className="flex flex-wrap items-center gap-1.5">
-            {/* View toggle */}
             <div className="flex border border-line">
               {(['day', 'week', 'month'] as const).map((v) => (
                 <button
@@ -218,90 +242,101 @@ export function Calendar() {
                 </button>
               ))}
             </div>
-            {/* Reminder bell */}
+            {/* Layer filter */}
+            <div className="relative">
+              <button
+                onClick={() => setFilterOpen((o) => !o)}
+                title="Show / hide events, todos, crons"
+                className={cn(
+                  'flex items-center gap-1 border border-line p-1.5',
+                  filterOpen || activeLayers < LAYERS.length ? 'text-accent' : 'text-dim hover:text-text',
+                )}
+              >
+                <Filter size={13} />
+                {activeLayers < LAYERS.length && <span className="text-[9px] tabular-nums">{activeLayers}</span>}
+              </button>
+              {filterOpen && (
+                <>
+                  <div className="fixed inset-0 z-30" onClick={() => setFilterOpen(false)} />
+                  <div className="absolute right-0 top-full z-40 mt-2 w-44 animate-fade-in border border-line-2 bg-panel p-1.5 shadow-glow">
+                    <div className="label mb-1 px-1">Show</div>
+                    {LAYERS.map((l) => (
+                      <label key={l.id} className="flex cursor-pointer items-center gap-2 px-1 py-1 text-xs text-text hover:bg-panel-2/60">
+                        <input type="checkbox" checked={filters[l.id]} onChange={() => toggleLayer(l.id)} className="size-3.5" style={{ accentColor: l.color }} />
+                        <span className="h-2 w-2 shrink-0" style={{ backgroundColor: l.color }} />
+                        {l.label}
+                      </label>
+                    ))}
+                    <div className="mt-1 flex gap-1 border-t border-line px-1 pt-1.5 text-[10px] uppercase tracking-wider">
+                      {LAYERS.map((l) => (
+                        <button
+                          key={l.id}
+                          onClick={() => {
+                            const next = { events: false, todos: false, crons: false, [l.id]: true } as Filters
+                            setFilters(next)
+                            try {
+                              localStorage.setItem(FILTER_KEY, JSON.stringify(next))
+                            } catch {
+                              /* ignore */
+                            }
+                          }}
+                          className="text-dim hover:text-text"
+                          title={`Only ${l.label.toLowerCase()}`}
+                        >
+                          only {l.id}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
             <button
               onClick={remindersEngine.toggleEnabled}
-              title={remindersEngine.enabled ? 'Mute reminders' : 'Enable reminders'}
-              className={cn(
-                'border border-line p-1.5',
-                remindersEngine.enabled ? 'text-accent' : 'text-dim hover:text-text',
-              )}
+              title={remindersEngine.enabled ? 'Mute notifications' : 'Enable notifications'}
+              className={cn('border border-line p-1.5', remindersEngine.enabled ? 'text-accent' : 'text-dim hover:text-text')}
             >
-              {remindersEngine.enabled ? <Bell size={14} /> : <BellOff size={14} />}
+              {remindersEngine.enabled ? <Bell size={13} /> : <BellOff size={13} />}
             </button>
-            {/* Period nav — day view now steps through real dates instead of
-             *  being pinned to today, same shape as week/month's prev/today/next. */}
             <div className="flex items-center gap-0.5 sm:gap-1">
-              <button
-                onClick={() =>
-                  view === 'day'
-                    ? setDayOffset((d) => d - 1)
-                    : view === 'week'
-                      ? setWeekOffset((w) => w - 1)
-                      : setMonthOffset((m) => m - 1)
-                }
-                className="border border-line p-1 text-dim hover:text-text"
-              >
+              <button onClick={() => step(-1)} className="border border-line p-1 text-dim hover:text-text">
                 <ChevronLeft size={14} />
               </button>
               <button
-                onClick={() =>
-                  view === 'day' ? setDayOffset(0) : view === 'week' ? setWeekOffset(0) : setMonthOffset(0)
-                }
+                onClick={() => (view === 'day' ? setDayOffset(0) : view === 'week' ? setWeekOffset(0) : setMonthOffset(0))}
                 className="border border-line px-2 py-1 text-[11px] uppercase tracking-wider text-dim hover:text-text"
               >
                 Today
               </button>
-              <button
-                onClick={() =>
-                  view === 'day'
-                    ? setDayOffset((d) => d + 1)
-                    : view === 'week'
-                      ? setWeekOffset((w) => w + 1)
-                      : setMonthOffset((m) => m + 1)
-                }
-                className="border border-line p-1 text-dim hover:text-text"
-              >
+              <button onClick={() => step(1)} className="border border-line p-1 text-dim hover:text-text">
                 <ChevronRight size={14} />
               </button>
-              {/* Jump straight to any date, crossing months — the piece day
-               *  stepping alone can't do. */}
-              {(
-                <div className="relative">
-                  <button
-                    onClick={() => setDatePickerOpen((o) => !o)}
-                    title={view === 'day' ? 'Pick a date' : view === 'week' ? 'Jump to a week' : 'Jump to a month'}
-                    className={cn(
-                      'border border-line p-1',
-                      datePickerOpen ? 'text-accent' : 'text-dim hover:text-text',
-                    )}
-                  >
-                    <CalendarDays size={14} />
-                  </button>
-                  {datePickerOpen && (
-                    <>
-                      <div className="fixed inset-0 z-30" onClick={() => setDatePickerOpen(false)} />
-                      <div className="absolute right-0 top-full z-40 mt-2 animate-fade-in">
-                        <MiniMonthPicker
-                          value={view === 'day' ? selectedDay : view === 'week' ? weekStart : month}
-                          isDayMarked={isDayMarked}
-                          onSelect={(d) => {
-                            if (view === 'day') setDayOffset(dayOffsetOf(d))
-                            else if (view === 'week') {
-                              const base = startOfWeek(TODAY, { weekStartsOn: 1 })
-                              const target = startOfWeek(d, { weekStartsOn: 1 })
-                              setWeekOffset(Math.round((target.getTime() - base.getTime()) / (7 * 86_400_000)))
-                            } else {
-                              setMonthOffset((d.getFullYear() - TODAY.getFullYear()) * 12 + d.getMonth() - TODAY.getMonth())
-                            }
-                            setDatePickerOpen(false)
-                          }}
-                        />
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
+              <div className="relative">
+                <button
+                  onClick={() => setDatePickerOpen((o) => !o)}
+                  title={view === 'day' ? 'Pick a date' : view === 'week' ? 'Jump to a week' : 'Jump to a month'}
+                  className={cn('border border-line p-1', datePickerOpen ? 'text-accent' : 'text-dim hover:text-text')}
+                >
+                  <CalendarDays size={14} />
+                </button>
+                {datePickerOpen && (
+                  <>
+                    <div className="fixed inset-0 z-30" onClick={() => setDatePickerOpen(false)} />
+                    <div className="absolute right-0 top-full z-40 mt-2 animate-fade-in">
+                      <MiniMonthPicker
+                        value={view === 'day' ? selectedDay : view === 'week' ? weekStart : month}
+                        isDayMarked={isDayMarked}
+                        onSelect={(d) => {
+                          if (view === 'day') setDayOffset(dayOffsetOf(d))
+                          else if (view === 'week') jumpToWeekOf(d)
+                          else setMonthOffset((d.getFullYear() - TODAY.getFullYear()) * 12 + d.getMonth() - TODAY.getMonth())
+                          setDatePickerOpen(false)
+                        }}
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -309,52 +344,32 @@ export function Calendar() {
         {view === 'day' ? (
           <DayView
             date={selectedDay}
-            appts={appts}
-            tasks={tasks}
-            reminders={reminders}
-            crons={crons}
+            appts={shownAppts}
+            tasks={shownTasks}
+            crons={shownCrons}
             onSelectAppt={setEditing}
             onSelectTask={setEditingTask}
             onToggleTask={toggleTask}
-            onSelectReminder={setEditingReminder}
-            onSelectCron={setCronJob}
+            onSelectCron={(c) => setCronId(c.id)}
           />
         ) : view === 'week' ? (
           <WeekGrid
             days={days}
-            appts={appts}
-            tasks={tasks}
-            reminders={reminders}
+            appts={shownAppts}
+            tasks={shownTasks}
+            crons={shownCrons.filter(cronVisible)}
             onSelectAppt={setEditing}
             onSelectTask={setEditingTask}
-            onSelectReminder={setEditingReminder}
-            onCreateAt={createReminderAt}
+            onSelectCron={(c) => setCronId(c.id)}
+            onCreateAt={createTodoAt}
           />
         ) : (
-          <MonthView
-            month={month}
-            appts={appts}
-            tasks={tasks}
-            onSelectDay={setDayDetail}
-            onSelectAppt={setEditing}
-          />
+          <MonthView month={month} appts={shownAppts} tasks={shownTasks} onSelectDay={setDayDetail} onSelectAppt={setEditing} />
         )}
       </div>
 
-      {/* Side panels */}
-      {/* No border-t on mobile — every panel inside (and the calendar panel
-       *  above) already draws its own border box, so this extra full-width
-       *  divider line just read as a stray line sitting between two panels
-       *  once the calendar region stopped reserving a fixed 72vh (nothing
-       *  filled the space that used to visually justify a section boundary
-       *  there). Desktop keeps its own border-l — that one's an actual
-       *  persistent sidebar edge, not a leftover from the old spacing. */}
-      {/* No top padding on mobile — the outer gap-3 above already provides
-       *  the boundary space; adding this region's own top padding on top of
-       *  that was the other half of the double-counted gap. Desktop still
-       *  wants it (sits beside, not below, so there's no outer gap doing
-       *  that job there). */}
-      <aside className="flex w-full shrink-0 flex-col gap-3 overflow-y-auto overflow-x-hidden bg-panel/30 px-3 pb-3 lg:p-3 lg:w-[320px] lg:border-l">
+      {/* Side panels — each opens a full view, like Ops. */}
+      <aside className="flex w-full shrink-0 flex-col gap-3 overflow-x-hidden bg-panel/30 px-3 pb-3 lg:w-[320px] lg:overflow-y-auto lg:border-l lg:p-3">
         <RemindersPanel
           enabled={remindersEngine.enabled}
           permission={remindersEngine.permission}
@@ -362,87 +377,260 @@ export function Calendar() {
           onToggle={remindersEngine.toggleEnabled}
           onEnableNotifications={remindersEngine.enableNotifications}
           onTest={remindersEngine.testNudge}
-          onAddReminder={addReminderQuick}
+          onAddReminder={addTimedTodo}
           onSelect={(item) => openScheduled(item.source, item.refId)}
+          onExpand={() => setTable('notify')}
         />
 
-        {/* Day view's own agenda panel already covers "what's next" and the
-         *  agent-run list for today, so these two would just be the same
-         *  information twice in the stacked mobile layout — hidden there,
-         *  still shown on desktop where there's room for both. */}
-        <Panel title="Up Next" code="AGENDA" accent="#f0a020" bodyClassName="p-2" className={cn(view === 'day' && 'hidden lg:flex')}>
+        {/* Day view's own agenda already covers "what's next" on phones. */}
+        <Panel
+          title="Up Next"
+          code="AGENDA"
+          accent="#f0a020"
+          bodyClassName="p-2"
+          className={cn(view === 'day' && 'hidden lg:flex')}
+          right={<ExpandBtn onClick={() => setTable('upnext')} />}
+        >
           <AgendaList items={upNext} onSelect={openAgendaItem} emptyText="Nothing upcoming." />
         </Panel>
 
-        <TaskPanel tasks={tasks} onToggle={toggleTask} onEdit={setEditingTask} onAdd={addTask} />
+        <TaskPanel tasks={tasks} onToggle={toggleTask} onEdit={setEditingTask} onAdd={addTask} onExpand={() => setTable('todos')} />
 
-        <Panel title="AI Cron Jobs" code="AGT" accent="#c77591" bodyClassName="p-2" className={cn(view === 'day' && 'hidden lg:flex')}>
-          <div className="space-y-1.5">
-            {crons.map((c) => (
-              <button
-                key={c.id}
-                onClick={() => setCronJob(c)}
-                className="flex w-full items-center gap-2 border border-line bg-bg/30 px-2 py-1.5 text-left transition-colors hover:bg-panel-2/60"
-              >
-                <StatusDot
-                  color={c.status === 'warn' ? '#f0a020' : c.status === 'running' ? '#36e0c8' : '#46d369'}
-                  pulse={c.status === 'running'}
-                  size={6}
-                />
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-xs text-text">{c.name}</div>
-                  <div className="text-[10px] text-dim">
-                    {c.owner} · {cronScheduleLabel(c.schedule)}
-                  </div>
-                </div>
-                <span className="text-[9px] text-dim">{c.lastRun}</span>
-              </button>
-            ))}
-          </div>
+        <Panel title="AI Cron Jobs" code="AGT" accent="#c77591" bodyClassName="p-2" right={<ExpandBtn onClick={() => setTable('crons')} />}>
+          <CronManager variant="panel" />
         </Panel>
       </aside>
 
-      <EditModal appt={editing} onClose={() => setEditing(null)} onSave={handleSaveAppt} />
-      <TaskModal task={editingTask} onClose={() => setEditingTask(null)} onSave={handleSaveTask} onDelete={handleDeleteTask} />
-      <ReminderModal
-        reminder={editingReminder}
-        onClose={() => setEditingReminder(null)}
-        onSave={handleSaveReminder}
-        onDelete={handleDeleteReminder}
-      />
-      <CronDetailModal
-        job={cronJob}
-        onClose={() => setCronJob(null)}
-        onEdit={(c) => {
-          setCronJob(null)
-          setEditingCron(c)
-        }}
-      />
-      <CronEditModal job={editingCron} onClose={() => setEditingCron(null)} onSave={handleSaveCron} />
+      {/* Full-view tables (parent pop-ups) */}
+      <Modal
+        open={table === 'notify'}
+        onClose={() => setTable(null)}
+        title="Notifications"
+        code="PUSH"
+        accent="#9b7bff"
+        width={640}
+      >
+        <p className="mb-2 text-[11px] text-dim">Everything that will ping next — events before they start, todos with a notify time.</p>
+        <table className="w-full text-left text-[11px]">
+          <thead className="text-[9px] uppercase tracking-wider text-dim">
+            <tr className="border-b border-line">
+              <th className="px-2 py-1.5 font-normal">Pings at</th>
+              <th className="px-2 py-1.5 font-normal">What</th>
+              <th className="px-2 py-1.5 font-normal">Kind</th>
+              <th className="px-2 py-1.5 font-normal">Starts</th>
+            </tr>
+          </thead>
+          <tbody>
+            {remindersEngine.scheduled.map((r) => (
+              <tr
+                key={`${r.source}:${r.refId}`}
+                onClick={() => openScheduled(r.source, r.refId)}
+                className="cursor-pointer border-b border-line/40 hover:bg-panel-2/60"
+              >
+                <td className="px-2 py-1.5 tabular-nums text-dim">{format(r.fireAt, 'EEE dd MMM HH:mm')}</td>
+                <td className="px-2 py-1.5 text-text">
+                  <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full" style={{ backgroundColor: r.color }} />
+                  {r.title}
+                </td>
+                <td className="px-2 py-1.5 text-dim">{r.source === 'task' ? 'todo' : 'event'}</td>
+                <td className="px-2 py-1.5 tabular-nums text-dim">{format(r.startAt, 'HH:mm')}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {!remindersEngine.scheduled.length && <div className="p-3 text-xs text-dim">Nothing will ping soon.</div>}
+      </Modal>
+
+      <Modal open={table === 'upnext'} onClose={() => setTable(null)} title="Up Next" code="AGENDA" accent="#f0a020" width={640}>
+        <UpNextTable items={buildAgenda(agendaSrc, 40)} onSelect={openAgendaItem} />
+      </Modal>
+
+      <Modal open={table === 'todos'} onClose={() => setTable(null)} title="Todo" code="TODO" accent="#46d369" width={760}>
+        <TodoTable tasks={tasks} onToggle={toggleTask} onOpen={setEditingTask} onAdd={addTask} />
+      </Modal>
+
+      <Modal open={table === 'crons'} onClose={() => setTable(null)} title="AI Cron Jobs" code="AGT" accent="#c77591" width={760}>
+        <CronManager variant="table" />
+      </Modal>
+
+      {/* Item pop-ups (children) — rendered after the tables so they stack on top. */}
       <DayDetailModal
         day={dayDetail}
-        appts={appts}
-        tasks={tasks}
-        reminders={reminders}
+        appts={shownAppts}
+        tasks={shownTasks}
         onClose={() => setDayDetail(null)}
-        onSelectAppt={(a) => {
-          setDayDetail(null)
-          setEditing(a)
-        }}
-        onSelectReminder={(r) => {
-          setDayDetail(null)
-          setEditingReminder(r)
-        }}
+        onSelectAppt={setEditing}
+        onSelectTask={setEditingTask}
         onToggleTask={toggleTask}
         onOpenWeek={(d) => {
-          const wkStart = startOfWeek(TODAY, { weekStartsOn: 1 })
-          const target = startOfWeek(d, { weekStartsOn: 1 })
-          setWeekOffset(Math.round((target.getTime() - wkStart.getTime()) / (7 * 86_400_000)))
+          jumpToWeekOf(d)
           setView('week')
           setDayDetail(null)
         }}
       />
+      <EditModal
+        appt={editing}
+        onClose={() => setEditing(null)}
+        onSave={(a) => {
+          saveAppt(a)
+          setEditing(null)
+        }}
+        onDelete={(id) => {
+          deleteAppt(id)
+          setEditing(null)
+        }}
+      />
+      <TaskModal
+        task={editingTask}
+        onClose={() => setEditingTask(null)}
+        onSave={(t) => {
+          saveTask(t)
+          setEditingTask(null)
+        }}
+        onDelete={(id) => {
+          deleteTask(id)
+          setEditingTask(null)
+        }}
+        onOpenSource={openSource}
+      />
+      <CronDetailModal job={cronJob} onClose={() => setCronId(null)} onEdit={(c) => setEditingCron(c)} />
+      <CronEditModal
+        job={editingCron}
+        onClose={() => setEditingCron(null)}
+        onSave={(c) => {
+          saveCron(c)
+          setEditingCron(null)
+        }}
+        onDelete={(id) => {
+          deleteCron(id)
+          setEditingCron(null)
+          setCronId(null)
+        }}
+      />
     </div>
+  )
+}
+
+function ExpandBtn({ onClick }: { onClick: () => void }) {
+  return (
+    <button onClick={onClick} title="Open full view" className="text-dim hover:text-text">
+      <Maximize2 size={12} />
+    </button>
+  )
+}
+
+function UpNextTable({ items, onSelect }: { items: AgendaItem[]; onSelect: (i: AgendaItem) => void }) {
+  return (
+    <>
+      <table className="w-full text-left text-[11px]">
+        <thead className="text-[9px] uppercase tracking-wider text-dim">
+          <tr className="border-b border-line">
+            <th className="px-2 py-1.5 font-normal">When</th>
+            <th className="px-2 py-1.5 font-normal">What</th>
+            <th className="px-2 py-1.5 font-normal">Kind</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((it) => (
+            <tr key={`${it.id}:${it.when}`} onClick={() => onSelect(it)} className="cursor-pointer border-b border-line/40 hover:bg-panel-2/60">
+              <td className="px-2 py-1.5 tabular-nums text-dim">{format(it.when, 'EEE dd MMM HH:mm')}</td>
+              <td className="px-2 py-1.5 text-text">
+                <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full" style={{ backgroundColor: it.color }} />
+                {it.title}
+              </td>
+              <td className="px-2 py-1.5 text-dim">{it.source === 'appt' ? 'event' : it.source === 'task' ? 'todo' : 'cron'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {!items.length && <div className="p-3 text-xs text-dim">Nothing upcoming.</div>}
+    </>
+  )
+}
+
+type SourceFilter = 'all' | 'manual' | 'project' | 'note'
+
+function TodoTable({
+  tasks,
+  onToggle,
+  onOpen,
+  onAdd,
+}: {
+  tasks: Task[]
+  onToggle: (t: Task) => void
+  onOpen: (t: Task) => void
+  onAdd: () => void
+}) {
+  const [src, setSrc] = useState<SourceFilter>('all')
+  const [showDone, setShowDone] = useState(false)
+  const count = (s: SourceFilter) => tasks.filter((t) => t.status !== 'done' && (s === 'all' || (t.source ?? 'manual') === s)).length
+  const rows = tasks
+    .filter((t) => (showDone || t.status !== 'done') && (src === 'all' || (t.source ?? 'manual') === src))
+    .sort((a, b) => (a.dayOffset ?? 999) - (b.dayOffset ?? 999) || (a.dueTime ?? 99) - (b.dueTime ?? 99))
+  return (
+    <>
+      <div className="mb-2 flex flex-wrap items-center gap-1 text-[10px]">
+        {(['all', 'manual', 'project', 'note'] as const).map((s) => (
+          <button
+            key={s}
+            onClick={() => setSrc(s)}
+            className={cn('border px-1.5 py-0.5 uppercase tracking-wider', src === s ? 'border-line-2 text-text' : 'border-line text-dim hover:text-text')}
+          >
+            {s === 'project' ? 'projects' : s === 'note' ? 'notes' : s} {count(s)}
+          </button>
+        ))}
+        <label className="ml-2 flex items-center gap-1 text-dim">
+          <input type="checkbox" checked={showDone} onChange={(e) => setShowDone(e.target.checked)} className="size-3" /> done
+        </label>
+        <button onClick={onAdd} className="ml-auto border border-line px-2 py-0.5 uppercase tracking-wider text-dim hover:text-text">
+          + Add
+        </button>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[520px] text-left text-[11px]">
+          <thead className="text-[9px] uppercase tracking-wider text-dim">
+            <tr className="border-b border-line">
+              <th className="w-6 px-2 py-1.5" />
+              <th className="px-2 py-1.5 font-normal">Todo</th>
+              <th className="px-2 py-1.5 font-normal">From</th>
+              <th className="px-2 py-1.5 font-normal">Due</th>
+              <th className="px-2 py-1.5 font-normal">Priority</th>
+              <th className="px-2 py-1.5 font-normal">Notify</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((t) => (
+              <tr key={t.id} onClick={() => onOpen(t)} className="cursor-pointer border-b border-line/40 hover:bg-panel-2/60">
+                <td className="px-2 py-1.5" onClick={(e) => e.stopPropagation()}>
+                  <input type="checkbox" checked={t.status === 'done'} onChange={() => onToggle(t)} className="size-3.5 accent-neon-green" />
+                </td>
+                <td className={cn('px-2 py-1.5', t.status === 'done' ? 'text-dim line-through' : 'text-text')}>{t.title}</td>
+                <td className="px-2 py-1.5 text-dim">
+                  <span className="flex items-center gap-1">
+                    <SourceIcon task={t} size={10} />
+                    {t.source === 'project' ? 'project' : t.source === 'note' ? 'note' : 'manual'}
+                  </span>
+                </td>
+                <td className="px-2 py-1.5 tabular-nums text-dim">
+                  {t.dayOffset == null ? '—' : format(offsetDate(t.dayOffset), 'EEE dd MMM')}
+                  {t.dueTime != null && ` ${hhmm(t.dueTime)}`}
+                  {t.recurrence && <Repeat size={9} className="ml-1 inline" />}
+                </td>
+                <td className="px-2 py-1.5" style={{ color: PRIORITY_COLOR[t.priority] }}>
+                  {PRIORITY_LABEL[t.priority]}
+                </td>
+                <td className="px-2 py-1.5 text-dim">{t.dueTime != null && t.notify !== false ? <Bell size={11} /> : '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {!rows.length && <div className="p-3 text-xs text-dim">Nothing here.</div>}
+      </div>
+      <p className="mt-2 text-[10px] text-dim">
+        Project todos are each project's planned next moves; note todos are checkboxes with a date (<code>📅 2026-10-01</code> or{' '}
+        <code>due:2026-10-01</code>). Ticking one here ticks it at the source.
+      </p>
+    </>
   )
 }
 
@@ -450,55 +638,58 @@ function WeekGrid({
   days,
   appts,
   tasks,
-  reminders,
+  crons,
   onSelectAppt,
   onSelectTask,
-  onSelectReminder,
+  onSelectCron,
   onCreateAt,
 }: {
   days: Date[]
   appts: Appt[]
   tasks: Task[]
-  reminders: Reminder[]
+  crons: CronJob[]
   onSelectAppt: (a: Appt) => void
   onSelectTask: (t: Task) => void
-  onSelectReminder: (r: Reminder) => void
+  onSelectCron: (c: CronJob) => void
   onCreateAt: (dayOffset: number, hour: number) => void
 }) {
-  // The hour height scales so the whole day fits the available height (no
-  // inner scrolling on a normal screen), within readable limits.
+  // All 24 hours are in the grid; the hour height fits ~16h on screen and the
+  // grid opens scrolled to the working part of the day (or just before now).
   const scrollRef = useRef<HTMLDivElement>(null)
-  const [hourPx, setHourPx] = useState(HOUR_PX)
+  const [hourPx, setHourPx] = useState(40)
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
-    const fit = () => {
-      const avail = el.clientHeight - 44 // day header row
-      setHourPx(Math.max(26, Math.min(56, Math.floor(avail / (DAY_END - DAY_START)))))
-    }
+    const fit = () => setHourPx(Math.max(26, Math.min(56, Math.floor((el.clientHeight - 44) / 16))))
     fit()
     const ro = new ResizeObserver(fit)
     ro.observe(el)
     return () => ro.disconnect()
   }, [])
+  const scrolled = useRef(false)
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el || scrolled.current) return
+    scrolled.current = true
+    const h = new Date().getHours()
+    el.scrollTop = Math.max(0, Math.min(7, h - 1)) * hourPx
+  }, [hourPx])
 
-  // Translate a vertical click position in a day column into a fractional hour,
-  // snapped to the nearest 15 minutes.
   const hourFromClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect()
-    const y = e.clientY - rect.top
-    const raw = DAY_START + y / hourPx
-    const snapped = Math.round(raw * 4) / 4
-    return Math.min(DAY_END - 0.25, Math.max(DAY_START, snapped))
+    const raw = DAY_START + (e.clientY - rect.top) / hourPx
+    return Math.min(DAY_END - 0.25, Math.max(DAY_START, Math.round(raw * 4) / 4))
   }
 
   const now = new Date()
   const nowHour = now.getHours() + now.getMinutes() / 60
+  const gridH = HOURS * hourPx
+  // Moments (todos, cron runs) get a half-hour slot, kept inside the grid.
+  const slotTop = (h: number, height: number) => Math.min((h - DAY_START) * hourPx, gridH - height - 1)
 
   return (
     <div ref={scrollRef} className="min-h-0 flex-1 overflow-auto">
       <div className="min-w-[720px] lg:min-w-0">
-        {/* Day headers */}
         <div className="sticky top-0 z-20 flex border-b border-line bg-bg pr-3" style={{ paddingLeft: 44 }}>
           {days.map((d) => {
             const today = isSameDay(d, TODAY)
@@ -511,57 +702,68 @@ function WeekGrid({
           })}
         </div>
 
-        {/* Time grid */}
-        <div className="relative flex pr-3" style={{ height: (DAY_END - DAY_START) * hourPx }}>
-          {/* hour labels */}
+        <div className="relative flex pr-3" style={{ height: gridH }}>
           <div className="w-[44px] shrink-0">
-            {Array.from({ length: DAY_END - DAY_START }, (_, i) => (
+            {Array.from({ length: HOURS }, (_, i) => (
               <div key={i} className="relative border-t border-line/60" style={{ height: hourPx }}>
-                <span className="absolute -top-2 left-1 text-[9px] tabular-nums text-dim">
-                  {String(DAY_START + i).padStart(2, '0')}:00
-                </span>
+                {i > 0 && (
+                  <span className="absolute -top-2 left-1 text-[9px] tabular-nums text-dim">{String(DAY_START + i).padStart(2, '0')}:00</span>
+                )}
               </div>
             ))}
           </div>
-          {/* day columns — double-click empty space to add a reminder at that time */}
           {days.map((d) => {
             const dayAppts = appts.filter((a) => apptOccursOn(a, d))
-            const dayReminders = reminders.filter((r) => !r.done && reminderOccursOn(r, d))
-            const dayTasks = tasks.filter(
-              (t) => t.status !== 'done' && t.dueTime != null && taskOccursOn(t, d),
-            )
-            // Tasks and reminders are moments; give them a 30-minute slot so
-            // they take part in the side-by-side split instead of overlapping.
+            const dayTasks = tasks.filter((t) => t.status !== 'done' && t.dueTime != null && taskOccursOn(t, d))
+            const runs = crons.flatMap((c) => cronRunHours(c).map((h) => ({ c, h })))
             const placed = layoutOverlaps([
               ...dayAppts.map((a) => ({ id: `a:${a.id}`, start: a.start, end: Math.max(a.end, a.start + 0.5) })),
               ...dayTasks.map((t) => ({ id: `t:${t.id}`, start: t.dueTime!, end: t.dueTime! + 0.5 })),
-              ...dayReminders.map((r) => ({ id: `r:${r.id}`, start: r.time, end: r.time + 0.5 })),
+              ...runs.map(({ c, h }) => ({ id: `c:${c.id}:${h}`, start: h, end: h + 0.5 })),
             ])
             const box = (key: string) => {
               const p = placed.get(key) ?? { col: 0, cols: 1 }
               return { left: `calc(${(p.col / p.cols) * 100}% + 2px)`, width: `calc(${100 / p.cols}% - 4px)` }
             }
             const isToday = isSameDay(d, TODAY)
+            const momentH = Math.max(14, hourPx / 2 - 2)
             return (
               <div
                 key={d.toISOString()}
                 className="relative flex-1 cursor-cell border-l border-line/60"
                 onDoubleClick={(e) => onCreateAt(dayOffsetOf(d), hourFromClick(e))}
-                title="Double-click to add a reminder"
+                title="Double-click to add a timed todo"
               >
-                {Array.from({ length: DAY_END - DAY_START }, (_, i) => (
+                {Array.from({ length: HOURS }, (_, i) => (
                   <div key={i} className="border-t border-line/40" style={{ height: hourPx }} />
                 ))}
                 {dayAppts.map((a) => (
-                  <ApptBlock key={a.id} appt={a} hourPx={hourPx} pos={box(`a:${a.id}`)} onClick={() => onSelectAppt(a)} />
+                  <ApptBlock key={a.id} appt={a} hourPx={hourPx} gridH={gridH} pos={box(`a:${a.id}`)} onClick={() => onSelectAppt(a)} />
                 ))}
                 {dayTasks.map((t) => (
-                  <TaskMarker key={t.id} task={t} hourPx={hourPx} pos={box(`t:${t.id}`)} onClick={() => onSelectTask(t)} />
+                  <Moment
+                    key={t.id}
+                    color={PRIORITY_COLOR[t.priority]}
+                    icon={<CheckSquare size={9} className="shrink-0" />}
+                    label={t.title}
+                    title={`${t.title} · ${hhmm(t.dueTime!)}`}
+                    style={{ ...box(`t:${t.id}`), top: slotTop(t.dueTime!, momentH) + 1, height: momentH }}
+                    onClick={() => onSelectTask(t)}
+                  />
                 ))}
-                {dayReminders.map((r) => (
-                  <ReminderMarker key={r.id} reminder={r} hourPx={hourPx} pos={box(`r:${r.id}`)} onClick={() => onSelectReminder(r)} />
+                {runs.map(({ c, h }) => (
+                  <Moment
+                    key={`${c.id}:${h}`}
+                    color={CRON_STATUS_COLOR[c.status]}
+                    icon={<Cpu size={9} className="shrink-0" />}
+                    label={c.name}
+                    title={`${c.name} · ${hhmm(h)} · ${c.owner}`}
+                    dashed
+                    style={{ ...box(`c:${c.id}:${h}`), top: slotTop(h, momentH) + 1, height: momentH }}
+                    onClick={() => onSelectCron(c)}
+                  />
                 ))}
-                {isToday && nowHour >= DAY_START && nowHour <= DAY_END && (
+                {isToday && (
                   <div className="pointer-events-none absolute inset-x-0 z-20 border-t border-accent" style={{ top: (nowHour - DAY_START) * hourPx }}>
                     <span className="absolute -left-1 -top-1 h-2 w-2 rounded-full bg-accent" />
                   </div>
@@ -577,49 +779,43 @@ function WeekGrid({
 
 type Pos = { left: string; width: string }
 
-function ReminderMarker({ reminder, hourPx, pos, onClick }: { reminder: Reminder; hourPx: number; pos: Pos; onClick: () => void }) {
-  const top = (reminder.time - DAY_START) * hourPx
+function Moment({
+  color,
+  icon,
+  label,
+  title,
+  style,
+  dashed,
+  onClick,
+}: {
+  color: string
+  icon: React.ReactNode
+  label: string
+  title: string
+  style: React.CSSProperties
+  dashed?: boolean
+  onClick: () => void
+}) {
   return (
     <button
       onClick={onClick}
       onDoubleClick={(e) => e.stopPropagation()}
-      title={`${reminder.title} · ${hhmm(reminder.time)}`}
-      className="absolute z-10 flex items-center gap-1 overflow-hidden border px-1 text-[9px] leading-none hover:z-30 hover:brightness-125"
-      style={{
-        ...pos,
-        top: top + 1,
-        height: Math.max(14, hourPx / 2 - 2),
-        color: REMINDER_COLOR,
-        borderColor: `${REMINDER_COLOR}66`,
-        backgroundColor: '#11141b',
-      }}
+      title={title}
+      className={cn(
+        'absolute z-10 flex items-center gap-1 overflow-hidden border px-1 text-[9px] leading-none hover:z-30 hover:brightness-125',
+        dashed && 'border-dashed',
+      )}
+      style={{ ...style, color, borderColor: `${color}66`, backgroundColor: '#11141b' }}
     >
-      <Bell size={9} className="shrink-0" />
-      <span className="truncate">{reminder.title}</span>
+      {icon}
+      <span className="truncate">{label}</span>
     </button>
   )
 }
 
-function TaskMarker({ task, hourPx, pos, onClick }: { task: Task; hourPx: number; pos: Pos; onClick: () => void }) {
-  const color = PRIORITY_COLOR[task.priority]
-  const top = (task.dueTime! - DAY_START) * hourPx
-  return (
-    <button
-      onClick={onClick}
-      onDoubleClick={(e) => e.stopPropagation()}
-      title={`${task.title} · due ${hhmm(task.dueTime!)}`}
-      className="absolute z-10 flex items-center gap-1 overflow-hidden border px-1 text-[9px] leading-none hover:z-30 hover:brightness-125"
-      style={{ ...pos, top: top + 1, height: Math.max(14, hourPx / 2 - 2), color, borderColor: `${color}66`, backgroundColor: '#11141b' }}
-    >
-      <CheckSquare size={9} className="shrink-0" />
-      <span className="truncate">{task.title}</span>
-    </button>
-  )
-}
-
-function ApptBlock({ appt, hourPx, pos, onClick }: { appt: Appt; hourPx: number; pos: Pos; onClick: () => void }) {
+function ApptBlock({ appt, hourPx, gridH, pos, onClick }: { appt: Appt; hourPx: number; gridH: number; pos: Pos; onClick: () => void }) {
   const top = (appt.start - DAY_START) * hourPx
-  const height = Math.max(16, (appt.end - appt.start) * hourPx - 2)
+  const height = Math.min(Math.max(16, (appt.end - appt.start) * hourPx - 2), gridH - top)
   const color = KIND_COLOR[appt.kind]
   return (
     <button
@@ -633,12 +829,26 @@ function ApptBlock({ appt, hourPx, pos, onClick }: { appt: Appt; hourPx: number;
         {appt.recurrence && <Repeat size={9} className="shrink-0 text-dim" />}
         {appt.title}
       </div>
-      {height > 26 && <div className="truncate text-[9px] leading-tight text-dim">{hhmm(appt.start)}–{hhmm(appt.end)}</div>}
+      {height > 26 && (
+        <div className="truncate text-[9px] leading-tight text-dim">
+          {hhmm(appt.start)}–{hhmm(appt.end)}
+        </div>
+      )}
     </button>
   )
 }
 
-function EditModal({ appt, onClose, onSave }: { appt: Appt | null; onClose: () => void; onSave: (a: Appt) => void }) {
+function EditModal({
+  appt,
+  onClose,
+  onSave,
+  onDelete,
+}: {
+  appt: Appt | null
+  onClose: () => void
+  onSave: (a: Appt) => void
+  onDelete: (id: string) => void
+}) {
   const [draft, setDraft] = useState<Appt | null>(appt)
   if (appt && (!draft || draft.id !== appt.id)) setDraft(appt)
   if (!appt || !draft) return null
@@ -743,6 +953,15 @@ function EditModal({ appt, onClose, onSave }: { appt: Appt | null; onClose: () =
           )}
         </span>
         <div className="flex gap-2">
+          {!draft.id.startsWith('new') && (
+            <button
+              onClick={() => confirm(`Delete “${draft.title}”?`) && onDelete(draft.id)}
+              title="Delete"
+              className="border border-line px-2 py-1.5 text-dim hover:text-danger"
+            >
+              <Trash2 size={12} />
+            </button>
+          )}
           <button onClick={onClose} className="border border-line px-3 py-1.5 uppercase tracking-wider hover:text-text">
             Cancel
           </button>

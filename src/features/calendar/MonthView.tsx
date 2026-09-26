@@ -4,6 +4,7 @@ import {
   endOfMonth,
   endOfWeek,
   format,
+  getISOWeek,
   isSameMonth,
   isToday,
   startOfMonth,
@@ -14,6 +15,7 @@ import { cn } from '@/lib/cn'
 import { apptOccursOn, hhmm, taskOccursOn } from './util'
 
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+const COLS = '26px repeat(7, minmax(0, 1fr))'
 
 interface MonthViewProps {
   month: Date
@@ -33,7 +35,10 @@ export function MonthView({ month, appts, tasks, onSelectDay, onSelectAppt }: Mo
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       {/* Weekday header */}
-      <div className="grid grid-cols-7 border-b border-line">
+      <div className="grid border-b border-line" style={{ gridTemplateColumns: COLS }}>
+        <div className="py-2 text-center text-[9px] uppercase tracking-wider text-dim" title="ISO week number">
+          Wk
+        </div>
         {WEEKDAYS.map((d) => (
           <div key={d} className="py-2 text-center text-[10px] uppercase tracking-wider text-dim">
             {d}
@@ -43,16 +48,16 @@ export function MonthView({ month, appts, tasks, onSelectDay, onSelectAppt }: Mo
 
       {/* Day grid */}
       <div
-        className="grid min-h-0 flex-1 grid-cols-7 overflow-auto"
-        style={{ gridAutoRows: 'minmax(72px, 1fr)' }}
+        className="grid min-h-0 flex-1 overflow-auto"
+        style={{ gridAutoRows: 'minmax(72px, 1fr)', gridTemplateColumns: COLS }}
       >
-        {days.map((day) => {
+        {days.flatMap((day, i) => {
           const inMonth = isSameMonth(day, month)
           const today = isToday(day)
           const dayAppts = appts.filter((a) => apptOccursOn(a, day)).sort((a, b) => a.start - b.start)
           const dayTasks = tasks.filter((t) => t.status !== 'done' && taskOccursOn(t, day))
 
-          return (
+          const cell = (
             <button
               key={day.toISOString()}
               onClick={() => onSelectDay(day)}
@@ -110,6 +115,16 @@ export function MonthView({ month, appts, tasks, onSelectDay, onSelectAppt }: Mo
               </div>
             </button>
           )
+          if (i % 7) return [cell]
+          return [
+            <div
+              key={`wk-${day.toISOString()}`}
+              className="flex justify-center border-b border-r border-line/50 pt-2 font-display text-[10px] tabular-nums text-dim"
+            >
+              {getISOWeek(day)}
+            </div>,
+            cell,
+          ]
         })}
       </div>
     </div>

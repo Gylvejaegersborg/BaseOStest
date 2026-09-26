@@ -18,6 +18,8 @@ export interface NoteEditorProps {
   noteId: string
   value: string
   notes: Note[]
+  /** Project names — [[links]] can point at projects too. */
+  projects?: { id: string; name: string }[]
   onChange: (body: string) => void
   onOpenWiki: (target: string) => void
   onOpenTag: (tag: string) => void
@@ -133,11 +135,16 @@ export function NoteEditor(props: NoteEditorProps) {
       for (const n of notes) titleCount.set(n.title.toLowerCase(), (titleCount.get(n.title.toLowerCase()) ?? 0) + 1)
       return {
         from: m.from + open,
-        options: notes.map((n) => {
-          const ambiguous = (titleCount.get(n.title.toLowerCase()) ?? 0) > 1
-          const text = ambiguous && n.folder ? `${n.folder}/${n.title}` : n.title
-          return { label: n.title, detail: n.folder || 'vault root', apply: applyWiki(text) }
-        }),
+        options: [
+          ...notes.map((n) => {
+            const ambiguous = (titleCount.get(n.title.toLowerCase()) ?? 0) > 1
+            const text = ambiguous && n.folder ? `${n.folder}/${n.title}` : n.title
+            return { label: n.title, detail: n.folder || 'vault root', apply: applyWiki(text) }
+          }),
+          ...(latest.current.projects ?? [])
+            .filter((p) => !titleCount.has(p.name.toLowerCase()))
+            .map((p) => ({ label: p.name, detail: 'project', apply: applyWiki(p.name) })),
+        ],
         validFor: /^[^\]|#\n]*$/,
       }
     }
@@ -184,7 +191,10 @@ export function NoteEditor(props: NoteEditorProps) {
         openWiki: (t) => latest.current.onOpenWiki(t),
         openTag: (t) => latest.current.onOpenTag(t),
         openUrl: (url) => window.open(url, '_blank', 'noopener,noreferrer'),
-        resolves: (note) => !note || !!resolveNote(latest.current.notes, note, currentNote()),
+        resolves: (note) =>
+          !note ||
+          !!resolveNote(latest.current.notes, note, currentNote()) ||
+          !!latest.current.projects?.some((p) => p.name.toLowerCase() === note.trim().toLowerCase()),
       }),
       keymap.of([
         { key: 'Mod-b', run: wrap('**') },

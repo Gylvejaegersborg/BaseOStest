@@ -1,7 +1,7 @@
 import { useMemo, useSyncExternalStore } from 'react'
 import { PROJECTS, type Project, type ProjectStatus } from '@/data/projects'
 import type { SectionId } from '@/data/sections'
-import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
+import { useOsOverlay, mergeById } from '@/features/overlay/osOverlay'
 import type { PropValue } from '@/features/notes/frontmatter'
 import { reportError } from '@/lib/errorBus'
 

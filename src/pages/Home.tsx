@@ -5,7 +5,7 @@ import { ConstellationScene } from '@/features/constellation/ConstellationScene'
 import type { Body } from '@/features/constellation/layout'
 import { detectWebGL } from '@/features/constellation/webgl'
 import { sectionById } from '@/data/sections'
-import { HomeAgenda } from '@/features/calendar/HomeAgenda'
+import { HomeTimeline } from '@/features/calendar/HomeTimeline'
 
 export function Home() {
   const navigate = useNavigate()
@@ -42,8 +42,8 @@ export function Home() {
 
       <ConstellationScene activeKey={hover?.key ?? null} focusTarget={null} onHover={setHover} onSelect={onSelect} />
 
-      {/* Up Next agenda — appointments + timed tasks, shared with the Calendar */}
-      <HomeAgenda />
+      {/* Up Next — a slim timeline strip along the bottom, clear of the suns */}
+      <HomeTimeline />
     </div>
   )
 }

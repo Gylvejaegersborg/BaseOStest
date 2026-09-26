@@ -178,6 +178,15 @@ export const LAB_MODULES: LabModule[] = [
     stack: ['React', 'TypeScript'],
   },
   {
+    id: 'weather',
+    name: 'Weather',
+    kind: 'Forecast',
+    group: 'sandbox',
+    status: 'live',
+    description: 'Oslo, Hamar and Trysil — MET, Open-Meteo, air quality, roads, cameras and space weather in one honest forecast.',
+    stack: ['React', 'TypeScript', 'MET API'],
+  },
+  {
     id: 'sudoku',
     name: 'Sudoku',
     kind: 'Mini-game',

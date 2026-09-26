@@ -7,6 +7,8 @@ import { EventsTab } from './EventsTab'
 import { MemoryTab } from './MemoryTab'
 import { FileRevisionsTab } from './FileRevisionsTab'
 import { NotesTab } from './NotesTab'
+import { TeamsTab } from './TeamsTab'
+import { CronManager } from '@/features/calendar/CronManager'
 import { STRIP_TABS, type StripTab } from './WorkbenchTopStrip'
 import { useResizablePanel } from '@/components/ui/useResizablePanel'
 import { ResizeHandle } from '@/components/ui/ResizeHandle'
@@ -80,6 +82,8 @@ export function RightPanel({
             {tab === 'memory' && <MemoryTab agentId={agentId} />}
             {tab === 'files' && <FileRevisionsTab />}
             {tab === 'notes' && <NotesTab dockedNoteId={dockedNoteId} onSelectNote={onSelectNote} />}
+            {tab === 'crons' && <CronManager variant="table" className="p-3" />}
+            {tab === 'teams' && <TeamsTab />}
           </div>
         </aside>
       </div>

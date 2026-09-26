@@ -3,25 +3,20 @@
 React + TypeScript + Vite SPA (`src/`), Discord bridge (`server/`), weather proxy (`weather-proxy/`).
 Build: `npm run typecheck && npm run build`. Path alias `@/` → `src/`.
 
-## Team agent runs (GitHub Actions)
+## Agents
 
-If you are running inside a `team-*` workflow (env `TEAM_RUN=1`), you are part of the
-ISΛRK artist management team. Hard rules:
+The ISΛRK agent team (Hemera, Nyx, Aether, Hermes, Theia, Mnemosyne, Argus, Claude) runs in
+Agent-OS (github.com/gylvejaegersborg/agent-os), not in GitHub Actions. BaseSpace reaches the
+gateway through the dev server's `/agent-os` proxy (see `vite.config.ts`).
 
-- Read `team/README.md` first — it is the schema contract for everything under `team/`.
-- Write ONLY under `team/`. Never touch `src/`, `server/`, `.github/`, `scripts/` or any
-  other path in a team run.
-- Never call external APIs, never publish anything. Anything outward-facing (uploads,
-  posts, emails) is drafted under `team/drafts/` and queued as a `pending` entry in
-  `team/approvals/queue.json`. Publishing happens only via the separate, user-approved
-  `team-publish` workflow.
-- To surface work in ISΛRK's dashboard (notes, reminders, projects, song tracker, beat
-  library/store, lab), write `team/os/overlay.json`. That is INTERNAL to the user's own
-  OS and is NOT approval-gated — only outward-facing publishing is. See `team/README.md`.
-- Keep every JSON file valid and matching the shapes in `team/README.md` — a validation
-  step runs after you and the workflow fails if you break a shape.
-- Be honest. You cannot hear audio: beat analysis means interpreting the extracted
-  `features` in `team/inbox/*.json`, and you say so when relevant. Never invent metrics,
-  stream counts or industry facts; mark assumptions as assumptions.
-- The user (ISΛRK) reads `team/briefs/latest.md` daily. Write it for a human: short,
-  concrete, decisions first, pending approvals clearly listed.
+- Teams and agent folders are a BaseSpace concern: `src/features/workbench/teams.ts`.
+- Agents read BaseSpace through the snapshot BaseSpace pushes to the gateway
+  (`POST /basespace/snapshot`, built in `src/features/agentos/snapshot.ts`).
+- Agents write into BaseSpace through the overlay (`GET /basespace/overlay`,
+  `src/features/overlay/osOverlay.tsx`). That is internal to the user's own OS and is not
+  approval-gated. Anything outward-facing (uploads, posts, emails) goes through Agent-OS
+  approvals — never published directly.
+- The old GitHub team's output lives in `public/team-archive.json` (Notes → Team, plus its
+  open board items imported once as todos). It is history; don't add to it.
+- Be honest: agents can't hear audio, don't invent metrics or stream counts, and mark
+  assumptions as assumptions.

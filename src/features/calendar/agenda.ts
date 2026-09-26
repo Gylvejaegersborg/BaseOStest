@@ -3,15 +3,12 @@ import {
   CRON_JOBS,
   KIND_COLOR,
   PRIORITY_COLOR,
-  REMINDERS,
-  REMINDER_COLOR,
   TASKS,
   type Appt,
   type CronJob,
-  type Reminder,
   type Task,
 } from '@/data/calendar'
-import { apptNextMs, reminderNextMs, taskNextMs } from './util'
+import { apptNextMs, taskNextMs } from './util'
 import { CRON_STATUS_COLOR, cronNextRunMs } from './cron'
 
 export const APPTS_KEY = 'os:calendar:appts'
@@ -30,32 +27,30 @@ export function loadJSON<T>(key: string, fallback: T): T {
 
 export const loadAppts = (): Appt[] => loadJSON(APPTS_KEY, APPOINTMENTS)
 export const loadTasks = (): Task[] => loadJSON(TASKS_KEY, TASKS)
-export const loadReminders = (): Reminder[] => loadJSON(REMINDERS_KEY, REMINDERS)
 export const loadCrons = (): CronJob[] => loadJSON(CRONS_KEY, CRON_JOBS)
 
 export interface AgendaSources {
   appts: Appt[]
   tasks: Task[]
-  reminders: Reminder[]
   crons: CronJob[]
 }
 
 export interface AgendaItem {
   id: string
-  source: 'appt' | 'task' | 'reminder' | 'cron'
+  source: 'appt' | 'task' | 'cron'
   title: string
   color: string
   when: number // ms timestamp of the next occurrence
   date: Date
   hour: number // fractional hour, for display
   endHour?: number // appts only
-  raw: Appt | Task | Reminder | CronJob
+  raw: Appt | Task | CronJob
 }
 
 /**
- * Merge appointments, timed tasks, standalone reminders and cron jobs into a
+ * Merge appointments, timed todos and cron jobs into a
  * single time-ordered agenda of upcoming items. Tasks without a due day+time are
- * excluded (nothing to schedule); done tasks/reminders are skipped.
+ * excluded (nothing to schedule); done todos are skipped.
  */
 export function buildAgenda(src: AgendaSources, limit = 6, from = Date.now()): AgendaItem[] {
   const items: AgendaItem[] = []
@@ -92,22 +87,6 @@ export function buildAgenda(src: AgendaSources, limit = 6, from = Date.now()): A
       date: new Date(when),
       hour: t.dueTime,
       raw: t,
-    })
-  }
-
-  for (const r of src.reminders) {
-    if (r.done) continue
-    const when = reminderNextMs(r, from)
-    if (when == null) continue
-    items.push({
-      id: `reminder:${r.id}`,
-      source: 'reminder',
-      title: r.title,
-      color: REMINDER_COLOR,
-      when,
-      date: new Date(when),
-      hour: r.time,
-      raw: r,
     })
   }
 

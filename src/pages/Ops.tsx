@@ -70,7 +70,7 @@ type Detail =
   | { kind: 'device'; item: DeviceConn }
   | { kind: 'issue'; item: Issue }
   | { kind: 'agent'; item: Agent }
-  | { kind: 'log'; index: number }
+  | { kind: 'log'; line: LogLine }
   | { kind: 'table'; panel: 'services' | 'devices' | 'issues' | 'agents' }
 
 async function ping(url: string): Promise<number> {
@@ -102,7 +102,13 @@ export function Ops() {
   const [online, setOnline] = useState(navigator.onLine)
   const [selfLatency, setSelfLatency] = useState<number | null>(null)
   const [sevFilter, setSevFilter] = useState<Severity | 'all'>('all')
-  const [detail, setDetail] = useState<Detail | null>(null)
+  // Pop-ups stack: opening one from inside another pushes it, and closing
+  // it returns to the parent instead of closing everything.
+  const [stack, setStack] = useState<Detail[]>([])
+  const detail = stack[stack.length - 1] ?? null
+  const setDetail = (d: Detail | null) => setStack(d ? [d] : [])
+  const pushDetail = (d: Detail) => setStack((st) => [...st, d])
+  const popDetail = () => setStack((st) => st.slice(0, -1))
   const seed = useRef(16)
   const logScrollRef = useRef<HTMLDivElement>(null)
 
@@ -145,11 +151,15 @@ export function Ops() {
   const shownLogs = logFilter ? allLogs.filter((l) => l.source === logFilter) : allLogs
   const logSources = useMemo(() => [...new Set(allLogs.map((l) => l.source))].sort(), [allLogs])
 
+  // Stick to the bottom while the reader is at the bottom; leave their
+  // scroll position alone once they've scrolled up. Keyed on the last line
+  // (the length stops changing once the buffer is full).
+  const stick = useRef(true)
+  const lastLine = shownLogs[shownLogs.length - 1]
   useEffect(() => {
     const el = logScrollRef.current
-    if (!el) return
-    if (el.scrollHeight - el.scrollTop - el.clientHeight < 60) el.scrollTop = el.scrollHeight
-  }, [shownLogs.length])
+    if (el && stick.current) el.scrollTop = el.scrollHeight
+  }, [lastLine])
 
   const issues = useMemo<Issue[]>(
     () => [
@@ -287,11 +297,18 @@ export function Ops() {
               ))}
             </select>
           </div>
-          <div ref={logScrollRef} className="min-h-0 flex-1 overflow-y-auto p-1.5 text-[11px] leading-relaxed">
+          <div
+            ref={logScrollRef}
+            onScroll={(e) => {
+              const el = e.currentTarget
+              stick.current = el.scrollHeight - el.scrollTop - el.clientHeight < 40
+            }}
+            className="min-h-0 flex-1 overflow-y-auto p-1.5 text-[11px] leading-relaxed"
+          >
             {shownLogs.map((l, i) => (
               <button
                 key={i}
-                onClick={() => setDetail({ kind: 'log', index: allLogs.indexOf(l) })}
+                onClick={() => setDetail({ kind: 'log', line: l })}
                 className="flex w-full gap-2 whitespace-nowrap px-1 text-left hover:bg-panel-2/60"
               >
                 <span className="tabular-nums text-dim">{l.time}</span>
@@ -365,9 +382,10 @@ export function Ops() {
 
       {detail && (
         <DetailModal
+          key={stack.length}
           detail={detail}
-          onClose={() => setDetail(null)}
-          open={setDetail}
+          onClose={popDetail}
+          open={pushDetail}
           issues={issues}
           agents={agents}
           logs={allLogs}
@@ -380,6 +398,59 @@ export function Ops() {
 }
 
 // ---- small pieces -----------------------------------------------------------
+
+/** Clickable log lines. Follows new lines only while scrolled to the bottom. */
+function LogList({
+  lines,
+  onOpen,
+  current,
+  className,
+  follow = true,
+}: {
+  lines: LogLine[]
+  onOpen: (l: LogLine) => void
+  current?: LogLine
+  className?: string
+  follow?: boolean
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  const stick = useRef(true)
+  const last = lines[lines.length - 1]
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    if (!follow) {
+      const cur = el.querySelector<HTMLElement>('[data-current]')
+      if (cur) el.scrollTop = cur.offsetTop - el.clientHeight / 2
+      return
+    }
+    if (stick.current) el.scrollTop = el.scrollHeight
+  }, [last, follow])
+  return (
+    <div
+      ref={ref}
+      onScroll={(e) => {
+        const el = e.currentTarget
+        stick.current = el.scrollHeight - el.scrollTop - el.clientHeight < 30
+      }}
+      className={cn('relative overflow-y-auto border border-line bg-bg/40 p-1.5 text-[11px]', className)}
+    >
+      {lines.map((l, j) => (
+        <button
+          key={`${l.time}-${l.source}-${j}`}
+          data-current={l === current || undefined}
+          onClick={() => onOpen(l)}
+          className={cn('flex w-full gap-2 whitespace-nowrap px-1 text-left hover:bg-panel-2/60', l === current && 'bg-amber/15')}
+        >
+          <span className="tabular-nums text-dim">{l.time}</span>
+          <span className="text-accent">[{l.source}]</span>
+          <span className="truncate text-text/80">{l.text}</span>
+        </button>
+      ))}
+      {!lines.length && <div className="text-dim">No lines from this source yet.</div>}
+    </div>
+  )
+}
 
 function Stat({ label, children, onClick }: { label: string; children: ReactNode; onClick?: () => void }) {
   return (
@@ -516,7 +587,9 @@ function DetailModal({
 }) {
   const [pingResult, setPingResult] = useState<string | null>(null)
 
-  const RelatedBlock = ({ source }: { source: string }) => {
+  // A plain function, not a component defined in render — a component
+  // defined here remounts on every log tick, which reset its scroll.
+  const relatedBlock = (source: string) => {
     const r = related(source)
     return (
       <>
@@ -529,15 +602,7 @@ function DetailModal({
           </div>
         </Section>
         <Section title={`Recent log lines (${r.logs.length})`}>
-          <div className="max-h-40 overflow-y-auto border border-line bg-bg/40 p-1.5 text-[11px]">
-            {r.logs.map((l, i) => (
-              <div key={i} className="flex gap-2 whitespace-nowrap">
-                <span className="tabular-nums text-dim">{l.time}</span>
-                <span className="truncate text-text/80">{l.text}</span>
-              </div>
-            ))}
-            {!r.logs.length && <div className="text-dim">No lines from this source yet.</div>}
-          </div>
+          <LogList lines={r.logs} onOpen={(l) => open({ kind: 'log', line: l })} className="max-h-40" />
         </Section>
       </>
     )
@@ -590,7 +655,7 @@ function DetailModal({
               {pingResult && <span className="ml-2 text-dim">· {pingResult}</span>}
             </div>
           </Section>
-          <RelatedBlock source={s.name} />
+          {relatedBlock(s.name)}
           <Raw value={s} />
         </>
       )
@@ -611,7 +676,7 @@ function DetailModal({
           <Section title="Detail">
             <div className="border border-line bg-bg/40 px-2 py-1 text-xs text-text/85">{d.detail}</div>
           </Section>
-          <RelatedBlock source={d.name} />
+          {relatedBlock(d.name)}
           <Raw value={d} />
         </>
       )
@@ -661,7 +726,7 @@ function DetailModal({
               </button>
             )}
           </div>
-          <RelatedBlock source={e.source} />
+          {relatedBlock(e.source)}
         </>
       )
       break
@@ -691,32 +756,31 @@ function DetailModal({
           <Section title="Current task">
             <div className="border border-line bg-bg/40 px-2 py-1 text-xs text-text/85">{a.task || '—'}</div>
           </Section>
-          <RelatedBlock source={a.id} />
+          {relatedBlock(a.id)}
           <Raw value={a} />
         </>
       )
       break
     }
     case 'log': {
-      const i = detail.index
-      const line = logs[i]
-      title = line ? `[${line.source}] ${line.time}` : 'Log'
+      const target = detail.line
+      const i = logs.findIndex((l) => l === target || (l.time === target.time && l.source === target.source && l.text === target.text))
+      const line = logs[i] ?? target
+      title = `[${line.source}] ${line.time}`
       accent = '#f0a020'
-      body = line && (
+      body = (
         <>
           <div className="border border-line bg-bg/40 px-2 py-1.5 text-sm text-text">{line.text}</div>
           <Section title="Surrounding lines">
-            <div className="max-h-64 overflow-y-auto border border-line bg-bg/40 p-1.5 text-[11px]">
-              {logs.slice(Math.max(0, i - 8), i + 9).map((l, j) => (
-                <div key={j} className={cn('flex gap-2 whitespace-nowrap px-1', l === line && 'bg-amber/15')}>
-                  <span className="tabular-nums text-dim">{l.time}</span>
-                  <span className="text-accent">[{l.source}]</span>
-                  <span className="text-text/80">{l.text}</span>
-                </div>
-              ))}
-            </div>
+            <LogList
+              lines={i >= 0 ? logs.slice(Math.max(0, i - 8), i + 9) : [line]}
+              current={line}
+              onOpen={(l) => l !== line && open({ kind: 'log', line: l })}
+              className="max-h-64"
+              follow={false}
+            />
           </Section>
-          <RelatedBlock source={line.source} />
+          {relatedBlock(line.source)}
         </>
       )
       break

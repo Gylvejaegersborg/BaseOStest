@@ -6,7 +6,6 @@ import {
   FolderKanban,
   FlaskConical,
   Activity,
-  CloudSun,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -94,15 +93,7 @@ export const SECTIONS: Section[] = [
     blurb: 'Errors, uptime, agent health and every device connection.',
     accent: '#ff5566',
   },
-  {
-    id: 'weather',
-    label: 'Weather',
-    code: 'MET.08',
-    route: '/weather',
-    icon: CloudSun,
-    blurb: 'Oslo, Hamar and Trysil — many feeds, one honest forecast.',
-    accent: '#58b6f0',
-  },
+
 ]
 
 export const NAV_SECTIONS = SECTIONS.filter((s) => s.id !== 'home')

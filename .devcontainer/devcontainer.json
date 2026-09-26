@@ -2,15 +2,22 @@
   "name": "Personal OS",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
 
+  // Docker inside the Codespace, for the optional Hindsight memory service
+  // (start.sh runs it when an LLM key secret is set).
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+
   // Install deps + clone/install agent-os once on first create (setup.sh);
   // start the agent-os gateway + BaseOStest's dev server on every start
   // (start.sh) — see both scripts for what each step does and why.
   "postCreateCommand": "bash .devcontainer/setup.sh",
   "postStartCommand": "bash .devcontainer/start.sh",
 
-  // Forward Vite's port (auto-opens in the browser) and the Agent-OS
-  // gateway's port (does NOT auto-open — it's an API, not a page).
-  "forwardPorts": [5173, 8787],
+  // Forward Vite's port (auto-opens in the browser). The Agent-OS gateway
+  // (8787) is reached through Vite's /agent-os proxy, so it doesn't need to
+  // be public; it's still forwarded for direct debugging.
+  "forwardPorts": [5173, 8787, 9999],
   "portsAttributes": {
     "5173": {
       "label": "Personal OS",
@@ -19,9 +26,13 @@
     },
     "8787": {
       "label": "Agent-OS gateway",
-      "onAutoForward": "notify",
-      "protocol": "http",
-      "visibility": "public"
+      "onAutoForward": "silent",
+      "protocol": "http"
+    },
+    "9999": {
+      "label": "Hindsight memory UI",
+      "onAutoForward": "silent",
+      "protocol": "http"
     }
   },
 

@@ -5,7 +5,6 @@ import { AgentRail } from '@/features/workbench/AgentRail'
 import { AgentWorkspace } from '@/features/workbench/AgentWorkspace'
 import { WorkbenchTopStrip, type StripTab } from '@/features/workbench/WorkbenchTopStrip'
 import { RightPanel } from '@/features/workbench/RightPanel'
-import { TeamTab } from '@/features/workbench/TeamTab'
 import { NewFlowModal } from '@/features/workbench/NewFlowModal'
 import { SettingsModal } from '@/features/workbench/SettingsModal'
 import { useAgentOsContext } from '@/features/agentos/AgentOsProvider'
@@ -38,7 +37,7 @@ export function Workbench() {
   })
   const [activePanel, setActivePanel] = useState<StripTab | null>(() => {
     const param = searchParams.get('panel')
-    return param === 'team' ? 'team' : null
+    return param === 'team' || param === 'teams' ? 'teams' : param === 'crons' ? 'crons' : null
   })
   const [activeFlowId, setActiveFlowId] = useState<string | null>(null)
   const [activeFlowSteps, setActiveFlowSteps] = useState<FlowStepInput[]>([])
@@ -56,8 +55,6 @@ export function Workbench() {
   const selectAgent = (id: string) => {
     setSelectedAgentId(id)
     setSearchParams({ agent: id }, { replace: true })
-    // Picking an agent takes priority over the full-width Team view.
-    setActivePanel((cur) => (cur === 'team' ? null : cur))
   }
 
   const selectFlow = (id: string | null, steps: FlowStepInput[]) => {
@@ -74,10 +71,10 @@ export function Workbench() {
   const backToRail = () => {
     setSelectedAgentId(null)
     setSearchParams({}, { replace: true })
-    setActivePanel((cur) => (cur === 'team' ? null : cur))
   }
 
-  const railFocused = !selectedAgentId && activePanel !== 'team'
+  // On phones the rail is home until an agent is picked or a panel opened.
+  const railFocused = !selectedAgentId && !activePanel
 
   return (
     <div className="flex h-full">
@@ -86,26 +83,7 @@ export function Workbench() {
       </div>
 
       <div className={cn('min-w-0 flex-1 flex-col', railFocused ? 'hidden lg:flex' : 'flex')}>
-        {activePanel === 'team' ? (
-          <>
-            <WorkbenchTopStrip
-              left={
-                <span className="flex items-center gap-2 text-xs text-dim">
-                  <button onClick={backToRail} className="text-dim hover:text-text lg:hidden" title="Back to agents">
-                    <ChevronLeft size={14} />
-                  </button>
-                  Team
-                </span>
-              }
-              activePanel={activePanel}
-              onSelectTab={selectTab}
-              onOpenSettings={() => setSettingsOpen(true)}
-            />
-            <div className="min-h-0 flex-1">
-              <TeamTab />
-            </div>
-          </>
-        ) : selectedAgentId ? (
+        {selectedAgentId ? (
           <AgentWorkspace
             key={selectedAgentId}
             agentId={selectedAgentId}
@@ -123,7 +101,14 @@ export function Workbench() {
         ) : (
           <>
             <WorkbenchTopStrip
-              left={<span className="text-xs text-dim">All agents</span>}
+              left={
+                <span className="flex items-center gap-2 text-xs text-dim">
+                  <button onClick={() => setActivePanel(null)} className="text-dim hover:text-text lg:hidden" title="Back to agents">
+                    <ChevronLeft size={14} />
+                  </button>
+                  All agents
+                </span>
+              }
               activePanel={activePanel}
               onSelectTab={selectTab}
               onOpenSettings={() => setSettingsOpen(true)}

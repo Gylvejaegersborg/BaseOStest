@@ -3,8 +3,10 @@ import type { CronJob, CronSchedule } from '@/data/calendar'
 import { Modal } from '@/components/ui/Modal'
 import { hhmm, parseHM } from './util'
 import { CRON_STATUS_COLOR } from './cron'
+import { cronVisible } from '@/data/calendar'
+import { useAgentOsContext } from '@/features/agentos/AgentOsProvider'
+import { isRealAgent } from '@/data/agents'
 
-const OWNERS: CronJob['owner'][] = ['Claude', 'Hemera', 'Nyx']
 const STATUSES: CronJob['status'][] = ['ok', 'running', 'warn']
 const STATUS_LABEL: Record<CronJob['status'], string> = {
   ok: 'Healthy',
@@ -16,11 +18,15 @@ export function CronEditModal({
   job,
   onClose,
   onSave,
+  onDelete,
 }: {
   job: CronJob | null
   onClose: () => void
   onSave: (c: CronJob) => void
+  onDelete?: (id: string) => void
 }) {
+  const { agents } = useAgentOsContext()
+  const owners = [...new Set([...agents.filter(isRealAgent).map((a) => a.name), job?.owner ?? ''].filter(Boolean))]
   const [draft, setDraft] = useState<CronJob | null>(job)
   if (job && (!draft || draft.id !== job.id)) setDraft(job)
   if (!job || !draft) return null
@@ -30,7 +36,7 @@ export function CronEditModal({
   const setSchedule = (s: CronSchedule) => setDraft({ ...draft, schedule: s })
 
   return (
-    <Modal open={!!job} onClose={onClose} title="Edit cron job" code={`CRON.${draft.id.toUpperCase()}`} accent={color} width={480}>
+    <Modal open={!!job} onClose={onClose} title={job.name ? 'Edit cron job' : 'New cron job'} code={`CRON.${draft.id.toUpperCase()}`} accent={color} width={480}>
       <label className="label mb-1 block">Name</label>
       <input
         value={draft.name}
@@ -44,10 +50,10 @@ export function CronEditModal({
           <label className="label mb-1 block">Owner</label>
           <select
             value={draft.owner}
-            onChange={(e) => set({ owner: e.target.value as CronJob['owner'] })}
+            onChange={(e) => set({ owner: e.target.value })}
             className="w-full border border-line bg-bg/60 px-2 py-1.5 text-sm text-text focus:border-accent/60 focus:outline-none"
           >
-            {OWNERS.map((o) => (
+            {owners.map((o) => (
               <option key={o} value={o}>
                 {o}
               </option>
@@ -119,10 +125,28 @@ export function CronEditModal({
         value={draft.description ?? ''}
         onChange={(e) => set({ description: e.target.value })}
         rows={3}
-        className="mb-4 w-full resize-none border border-line bg-bg/60 px-2 py-1.5 text-sm text-text focus:border-accent/60 focus:outline-none"
+        className="mb-3 w-full resize-none border border-line bg-bg/60 px-2 py-1.5 text-sm text-text focus:border-accent/60 focus:outline-none"
       />
 
+      <label className="mb-4 flex cursor-pointer items-center gap-2 text-xs text-text/85">
+        <input
+          type="checkbox"
+          checked={cronVisible(draft)}
+          onChange={(e) => set({ showInCalendar: e.target.checked })}
+          className="size-3.5 accent-accent"
+        />
+        Show its runs in the calendar
+      </label>
+
       <div className="flex justify-end gap-2 text-xs text-dim">
+        {onDelete && job.name && (
+          <button
+            onClick={() => window.confirm(`Delete the cron job "${job.name}"?`) && onDelete(job.id)}
+            className="mr-auto border border-line px-3 py-1.5 uppercase tracking-wider hover:text-danger"
+          >
+            Delete
+          </button>
+        )}
         <button onClick={onClose} className="border border-line px-3 py-1.5 uppercase tracking-wider hover:text-text">
           Cancel
         </button>

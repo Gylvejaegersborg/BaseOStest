@@ -58,6 +58,21 @@ async function deleteJSON<T>(path: string, timeoutMs = 5000): Promise<T> {
   return res.json() as Promise<T>
 }
 
+// ---- BaseSpace bridge ------------------------------------------------------
+// The agents' view of BaseSpace (a snapshot BaseSpace pushes) and BaseSpace's
+// view of what the agents added (the overlay). See agent-os's
+// gateway/basespace.ts.
+
+/** What the agents have added to BaseSpace (notes, todos, projects, …). */
+export function fetchOverlay<T>(): Promise<T> {
+  return getJSON<T>('/basespace/overlay')
+}
+
+/** Push BaseSpace's current state for the agents to read. */
+export function pushSnapshot(snapshot: unknown): Promise<{ ok: true; savedAt: string; bytes: number }> {
+  return writeJSON('POST', '/basespace/snapshot', snapshot, 15000)
+}
+
 export async function fetchAgents(): Promise<AgentOsAgent[]> {
   const { agents } = await getJSON<{ agents: AgentOsAgent[] }>('/agents')
   return agents

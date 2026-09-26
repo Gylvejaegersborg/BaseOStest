@@ -29,14 +29,21 @@ export function Scene3D({ activeKey, focusTarget, onHover, onSelect }: Props) {
     [],
   )
 
-  // Phones start zoomed out to roughly 60% so the whole map fits a narrow
-  // portrait viewport (camera distance ÷ 0.6).
-  const narrow = useMemo(() => typeof window !== 'undefined' && window.innerWidth < 768, [])
+  // On narrow (phone) screens the camera starts far enough back for the
+  // whole map (~40 world units wide) to span ~90% of the screen width:
+  // horizontal half-FOV = atan(tan(fov/2) · aspect).
+  const startDist = useMemo(() => {
+    if (typeof window === 'undefined' || window.innerWidth >= 768) return 26
+    const aspect = window.innerWidth / Math.max(1, window.innerHeight - 110)
+    const halfTan = Math.tan((50 / 2) * (Math.PI / 180)) * aspect
+    return Math.max(26, 20 / (0.9 * halfTan))
+  }, [])
+  const narrow = startDist > 26
 
   return (
     <Canvas
       className="absolute inset-0 touch-none"
-      camera={{ position: narrow ? [0, 10, 43] : [0, 6, 26], fov: 50, near: 0.1, far: 500 }}
+      camera={{ position: narrow ? [0, startDist * 0.2, startDist] : [0, 6, 26], fov: 50, near: 0.1, far: 500 }}
       // Cap device pixel ratio lower on touch/coarse-pointer devices — most
       // phones report a devicePixelRatio of 2-3, and rendering bloom +
       // antialiasing at full native res on integrated mobile GPUs is the
@@ -47,7 +54,7 @@ export function Scene3D({ activeKey, focusTarget, onHover, onSelect }: Props) {
     >
       <Suspense fallback={null}>
         <color attach="background" args={['#05070a']} />
-        <fog attach="fog" args={['#05070a', 40, 110]} />
+        <fog attach="fog" args={['#05070a', narrow ? startDist + 10 : 40, narrow ? startDist + 90 : 110]} />
 
         <ambientLight intensity={0.42} />
         <hemisphereLight args={['#22364a', '#05070a', 0.35]} />
@@ -79,7 +86,7 @@ export function Scene3D({ activeKey, focusTarget, onHover, onSelect }: Props) {
           zoomSpeed={0.8}
           panSpeed={0.6}
           minDistance={isTouch ? 5 : 4}
-          maxDistance={70}
+          maxDistance={Math.max(70, startDist + 20)}
           touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }}
           // Touch: one-finger rotate, two-finger dolly/pan. Damping/rotate
           // speed above are tuned softer on coarse-pointer devices so drags

@@ -4,16 +4,14 @@ import { Bell, BookOpen, Bot, ExternalLink, MapPin, RefreshCw, Repeat, Shuffle, 
 import {
   KIND_COLOR,
   PRIORITY_COLOR,
-  REMINDER_COLOR,
   type Appt,
   type CronJob,
-  type Reminder,
   type Task,
 } from '@/data/calendar'
 import { Panel } from '@/components/ui/Panel'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { cn } from '@/lib/cn'
-import { apptOccursOn, hhmm, reminderOccursOn, taskOccursOn } from './util'
+import { apptOccursOn, hhmm, taskOccursOn } from './util'
 import { cronScheduleLabel, CRON_STATUS_COLOR } from './cron'
 import { dailyTrysilPlace, trysilUrl } from './trysil'
 import { useDailyWikipedia, RANDOM_FALLBACK } from './useDailyWikipedia'
@@ -26,12 +24,10 @@ interface DayViewProps {
   date: Date
   appts: Appt[]
   tasks: Task[]
-  reminders: Reminder[]
   crons: CronJob[]
   onSelectAppt: (a: Appt) => void
   onSelectTask: (t: Task) => void
   onToggleTask: (t: Task) => void
-  onSelectReminder: (r: Reminder) => void
   onSelectCron: (c: CronJob) => void
 }
 
@@ -39,8 +35,15 @@ interface DayViewProps {
 function useNow() {
   const [now, setNow] = useState(() => new Date())
   useEffect(() => {
-    const id = window.setInterval(() => setNow(new Date()), 60_000)
-    return () => window.clearInterval(id)
+    // Tick exactly on each minute boundary — a plain 60s interval started
+    // mid-minute showed the clock up to a minute late.
+    let id: number
+    const tick = () => {
+      setNow(new Date())
+      id = window.setTimeout(tick, 60_000 - (Date.now() % 60_000) + 50)
+    }
+    id = window.setTimeout(tick, 60_000 - (Date.now() % 60_000) + 50)
+    return () => window.clearTimeout(id)
   }, [])
   return now
 }
@@ -56,12 +59,10 @@ export function DayView({
   date,
   appts,
   tasks,
-  reminders,
   crons,
   onSelectAppt,
   onSelectTask,
   onToggleTask,
-  onSelectReminder,
   onSelectCron,
 }: DayViewProps) {
   const now = useNow()
@@ -80,10 +81,6 @@ export function DayView({
     () => tasks.filter((t) => taskOccursOn(t, date)).sort((a, b) => (a.dueTime ?? 99) - (b.dueTime ?? 99)),
     [tasks, date],
   )
-  const dayReminders = useMemo(
-    () => reminders.filter((r) => reminderOccursOn(r, date)).sort((a, b) => a.time - b.time),
-    [reminders, date],
-  )
 
   const tasksOpen = dayTasks.filter((t) => t.status !== 'done').length
   const tasksDone = dayTasks.length - tasksOpen
@@ -99,7 +96,7 @@ export function DayView({
   // this used to add its own on top, which is what made the boundary below
   // a light day read as a bigger gap than anywhere else.
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-2.5 pt-2.5 sm:px-3 sm:pt-3">
+    <div className="overflow-x-hidden px-2.5 pt-2.5 sm:px-3 sm:pt-3 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
       {/* Hero */}
       <div className="hud-corners relative mb-3 border border-line bg-panel/60 px-3 py-2 text-accent sm:px-4 sm:py-3">
         <div className="flex flex-wrap items-end justify-between gap-2">
@@ -150,7 +147,7 @@ export function DayView({
             <Empty>Nothing on the agenda {today ? 'today' : dayLabel.toLowerCase()}.</Empty>
           )}
 
-          {(dayTasks.length > 0 || dayReminders.length > 0) && (
+          {dayTasks.length > 0 && (
             <div className="mt-3 border-t border-line pt-2">
               <div className="label mb-1.5">Due {today ? 'today' : dayLabel.toLowerCase()}</div>
               <div className="space-y-1">
@@ -171,23 +168,10 @@ export function DayView({
                         {t.title}
                       </span>
                     </button>
+                    {t.dueTime != null && t.notify !== false && <Bell size={10} className="shrink-0 text-dim" />}
+                    {t.recurrence && <Repeat size={9} className="shrink-0 text-dim" />}
                     {t.dueTime != null && <span className="text-[10px] tabular-nums text-dim">{hhmm(t.dueTime)}</span>}
                   </div>
-                ))}
-                {dayReminders.map((r) => (
-                  <button
-                    key={r.id}
-                    onClick={() => onSelectReminder(r)}
-                    className="flex w-full items-center gap-2 border-l-2 bg-bg/40 px-2 py-1.5 text-left hover:bg-panel-2/60"
-                    style={{ borderColor: REMINDER_COLOR }}
-                  >
-                    <Bell size={12} style={{ color: REMINDER_COLOR }} className="shrink-0" />
-                    <span className={cn('min-w-0 flex-1 truncate text-xs', r.done ? 'text-dim line-through' : 'text-text')}>
-                      {r.title}
-                    </span>
-                    {r.recurrence && <Repeat size={9} className="shrink-0 text-dim" />}
-                    <span className="text-[10px] tabular-nums text-dim">{hhmm(r.time)}</span>
-                  </button>
                 ))}
               </div>
             </div>

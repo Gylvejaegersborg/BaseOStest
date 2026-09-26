@@ -21,6 +21,7 @@ import {
   Pencil,
   Plus,
   ScanSearch,
+  Sparkles,
   Search,
   SlidersHorizontal,
   Table2,
@@ -50,10 +51,9 @@ import {
 import { splitFrontmatter, withProps, type PropValue } from '@/features/notes/frontmatter'
 import { PropertiesPanel } from '@/features/notes/PropertiesPanel'
 import { Omnisearch } from '@/features/notes/Omnisearch'
-import { MENU_EVENT, type MenuRequest } from '@/features/notes/menuBus'
 import type { NoteEditorApi } from '@/features/notes/editor/NoteEditor'
 import type { PageCommand } from '@/features/notes/editor/slashCommands'
-import { useGlobalProps, useGlobalTags } from '@/features/connections/connections'
+import { useGlobalProps, useGlobalTags, useLinkGraph } from '@/features/connections/connections'
 import { createProject, patchProject, setProjectProp, setStatus as setProjectStatus, useProjects } from '@/features/projects/store'
 import { STATUS_META, type ProjectStatus } from '@/data/projects'
 import {
@@ -123,7 +123,8 @@ export function Notes() {
   const [focusedFolder, setFocusedFolder] = useState<string | null>(null)
   const [renaming, setRenaming] = useState<TreeTarget | null>(null)
   const [menu, setMenu] = useState<MenuState | null>(null)
-  const [mobileView, setMobileView] = useState<'list' | 'note'>('list')
+  // A deep link (?note=…, e.g. from a project) opens straight to the note on phones.
+  const [mobileView, setMobileView] = useState<'list' | 'note'>(() => (new URLSearchParams(window.location.search).get('note') ? 'note' : 'list'))
   const sidebar = useResizablePanel({ defaultWidth: 290, min: 210, max: 520, edge: 'right', storageKey: UI.width })
 
   const setView = (patch: Partial<ExplorerView>) =>
@@ -157,6 +158,19 @@ export function Notes() {
     return { stack: first ? [first.id] : [], index: 0 }
   })
   const selected = notes.find((n) => n.id === hist.stack[hist.index]) ?? null
+  // The wanted note may be an archived Team note that loads a moment after
+  // the page — open it once it shows up.
+  const pendingWanted = useRef<string | null>(null)
+  if (pendingWanted.current === null) {
+    const wanted = searchParams.get('note') ?? loadJSON<string | null>(UI.last, null)
+    pendingWanted.current = wanted && !notes.some((n) => n.id === wanted) ? wanted : ''
+  }
+  useEffect(() => {
+    const id = pendingWanted.current
+    if (!id || !notes.some((n) => n.id === id)) return
+    pendingWanted.current = ''
+    setHist({ stack: [id], index: 0 })
+  }, [notes])
   const [jump, setJump] = useState<{ heading?: string; text?: string; nonce: number } | null>(null)
   const [freshId, setFreshId] = useState<string | null>(null)
 
@@ -181,12 +195,6 @@ export function Notes() {
     noteScroll.current?.scrollTo({ top: 0 })
   }, [selected?.id])
 
-  // Editor widgets and the canvas open this page's context menu via an event.
-  useEffect(() => {
-    const onMenu = (e: Event) => setMenu((e as CustomEvent<MenuRequest>).detail)
-    window.addEventListener(MENU_EVENT, onMenu)
-    return () => window.removeEventListener(MENU_EVENT, onMenu)
-  }, [])
 
   // Ctrl/Cmd+Shift+F: search inside every note.
   useEffect(() => {
@@ -255,6 +263,9 @@ export function Notes() {
   // Projects as note-shaped rows so a base can list them (source: projects).
   const projects = useProjects()
   const projectIds = useMemo(() => new Set(projects.map((p) => p.id)), [projects])
+  const projectNames = useMemo(() => projects.map((p) => ({ id: p.id, name: p.name })), [projects])
+  const graph = useLinkGraph()
+  const projectBacklinks = useMemo(() => (selected ? graph.projectsLinkingTo(selected.id) : []), [graph, selected])
   const projectRows = useMemo<Note[]>(
     () =>
       projects.map((p) => ({
@@ -383,6 +394,9 @@ export function Notes() {
     }
     const hit = resolveNote(notes, note, selected)
     if (hit) return openNote(hit.id, { heading })
+    // Notes and projects link to each other: a project name opens it.
+    const project = projects.find((p) => p.name.toLowerCase() === note.trim().toLowerCase())
+    if (project) return navigate(`/projects?project=${encodeURIComponent(project.id)}`)
     // Unresolved link → create the note, like Obsidian.
     const path = normFolder(note)
     const folder = path.includes('/') ? parentOf(path) : selected?.folder ?? ''
@@ -829,6 +843,7 @@ export function Notes() {
                           noteId={selected.id}
                           value={fm.content}
                           notes={notes}
+                          projects={projectNames}
                           onChange={(content) => updateBody(selected.id, splitFrontmatter(selected.body).block + content)}
                           onOpenWiki={openWiki}
                           onOpenTag={filterByTag}
@@ -850,7 +865,16 @@ export function Notes() {
                   onRemove={(t) => setTags(selected, selected.tags.filter((x) => x !== t))}
                   onAutotag={autotag}
                   onTagClick={filterByTag}
-                  right={<FooterStats words={words} chars={fm.content.length} links={links} onOpen={(id) => openNote(id)} />}
+                  right={
+                    <FooterStats
+                      words={words}
+                      chars={fm.content.length}
+                      links={links}
+                      projectLinks={projectBacklinks}
+                      onOpen={(id) => openNote(id)}
+                      onOpenProject={(id) => navigate(`/projects?project=${encodeURIComponent(id)}`)}
+                    />
+                  }
                 />
               </>
             )}
@@ -993,13 +1017,18 @@ function FooterStats({
   words,
   chars,
   links,
+  projectLinks,
   onOpen,
+  onOpenProject,
 }: {
   words: number
   chars: number
   links: Note[]
+  projectLinks: { id: string; name: string }[]
   onOpen: (id: string) => void
+  onOpenProject: (id: string) => void
 }) {
+  const total = links.length + projectLinks.length
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -1013,16 +1042,16 @@ function FooterStats({
     <div ref={ref} className="relative ml-1 flex items-center gap-3 text-[11px] text-dim">
       <button
         onClick={() => setOpen((o) => !o)}
-        disabled={!links.length}
-        title="Notes that link here"
+        disabled={!total}
+        title="Notes and projects that link here"
         className="flex items-center gap-1 rounded-control px-1.5 py-0.5 hover:bg-panel-2 hover:text-text disabled:hover:bg-transparent disabled:hover:text-dim"
       >
-        <CornerUpLeft size={11} /> {links.length} backlink{links.length === 1 ? '' : 's'}
+        <CornerUpLeft size={11} /> {total} backlink{total === 1 ? '' : 's'}
       </button>
       <span className="hidden sm:inline">
         {words} words · {chars} chars
       </span>
-      {open && links.length > 0 && (
+      {open && total > 0 && (
         <div className="absolute bottom-full right-0 z-30 mb-2 w-64 rounded-panel border border-line-2 bg-panel py-1 shadow-[0_12px_32px_rgba(0,0,0,0.5)]">
           <div className="px-3 py-1 text-[11px] text-dim">Linked mentions</div>
           {links.map((n) => (
@@ -1037,6 +1066,20 @@ function FooterStats({
               <FileText size={12} className="shrink-0 text-dim" />
               <span className="truncate">{n.title}</span>
               {n.folder && <span className="ml-auto shrink-0 truncate text-[10px] text-dim">{n.folder}</span>}
+            </button>
+          ))}
+          {projectLinks.map((p) => (
+            <button
+              key={p.id}
+              onClick={() => {
+                setOpen(false)
+                onOpenProject(p.id)
+              }}
+              className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] text-text/85 hover:bg-panel-2 hover:text-text"
+            >
+              <Sparkles size={12} className="shrink-0 text-accent/70" />
+              <span className="truncate">{p.name}</span>
+              <span className="ml-auto shrink-0 text-[10px] text-dim">project</span>
             </button>
           ))}
         </div>

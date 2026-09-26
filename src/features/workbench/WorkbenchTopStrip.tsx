@@ -1,9 +1,9 @@
 import { useState, type ReactNode } from 'react'
-import { ListChecks, Workflow, FileStack, ShieldCheck, Activity as ActivityIcon, Brain, History, Briefcase, StickyNote, Settings, LayoutPanelLeft } from 'lucide-react'
+import { ListChecks, Workflow, FileStack, ShieldCheck, Activity as ActivityIcon, Brain, History, Users, StickyNote, Settings, LayoutPanelLeft, Timer } from 'lucide-react'
 import { Tabs, type TabItem } from '@/components/ui/Tabs'
 import { cn } from '@/lib/cn'
 
-export type StripTab = 'tasks' | 'flow' | 'artifacts' | 'approvals' | 'events' | 'memory' | 'files' | 'notes' | 'team'
+export type StripTab = 'tasks' | 'flow' | 'artifacts' | 'approvals' | 'events' | 'memory' | 'files' | 'notes' | 'teams' | 'crons'
 
 export const STRIP_TABS: TabItem<StripTab>[] = [
   { id: 'tasks', label: 'Tasks', icon: ListChecks },
@@ -14,16 +14,11 @@ export const STRIP_TABS: TabItem<StripTab>[] = [
   { id: 'memory', label: 'Memory', icon: Brain },
   { id: 'files', label: 'Files', icon: History },
   { id: 'notes', label: 'Notes', icon: StickyNote },
+  { id: 'crons', label: 'Crons', icon: Timer },
+  { id: 'teams', label: 'Teams', icon: Users },
 ]
 
-/** Team is its own group, not just an eighth runtime-state tab — it's the
- *  management/oversight surface (brief, board, approvals queue, intake,
- *  reports, meetings) merged in from the old standalone Team page (IA
- *  decision, Phase 4), so it's visually separated by a divider rather than
- *  appended into the agent-runtime row above. */
-export const TEAM_STRIP_TAB: TabItem<StripTab> = { id: 'team', label: 'Team', icon: Briefcase }
-
-const ALL_TABS = [...STRIP_TABS, TEAM_STRIP_TAB]
+const ALL_TABS = STRIP_TABS
 
 /**
  * The workbench's single top strip — replaces the old two-bar layout
@@ -35,9 +30,9 @@ const ALL_TABS = [...STRIP_TABS, TEAM_STRIP_TAB]
  * New Flow lives inside the Flow tab itself (FlowTab.tsx), not here — it's
  * an action scoped to that panel's own content, not a global strip action.
  *
- * Responsive pass (Phase 6): nine separate icon buttons plus Settings
+ * Responsive pass (Phase 6): ten separate icon buttons plus Settings
  * don't fit a phone-width bar next to the agent identity and its own back
- * control. Below `lg`, the nine collapse into one "Panels" overflow
+ * control. Below `lg`, they collapse into one "Panels" overflow
  * button with a dropdown list — the tabs themselves are runtime state,
  * not navigation, so folding them behind one control loses nothing a
  * mobile user reaches for constantly.
@@ -61,8 +56,6 @@ export function WorkbenchTopStrip({
       <div className="flex shrink-0 items-center gap-1">
         <div className="hidden items-center gap-1 lg:flex">
           <Tabs tabs={STRIP_TABS} active={activePanel} onChange={onSelectTab} />
-          <div className="mx-1 h-4 w-px bg-line" />
-          <Tabs tabs={[TEAM_STRIP_TAB]} active={activePanel} onChange={onSelectTab} />
         </div>
 
         <div className="relative lg:hidden">

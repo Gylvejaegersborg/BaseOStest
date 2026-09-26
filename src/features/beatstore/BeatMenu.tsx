@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { Search, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { BEATS, MOODS, type Beat, formatDuration, formatPlays } from '@/data/beats'
-import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
+import { useOsOverlay, mergeById } from '@/features/overlay/osOverlay'
 
 interface BeatMenuProps {
   open: boolean

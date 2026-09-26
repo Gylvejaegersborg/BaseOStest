@@ -1,5 +1,5 @@
 import { addDays, addMonths, differenceInCalendarDays, isSameDay, startOfDay } from 'date-fns'
-import type { Appt, Recurrence, Reminder, Task } from '@/data/calendar'
+import type { Appt, Recurrence, Task } from '@/data/calendar'
 
 // Captured once at module load. Appt/Task dayOffsets are relative to this day.
 export const TODAY = new Date()
@@ -63,10 +63,6 @@ export function taskOccursOn(t: Task, day: Date): boolean {
   return t.dayOffset != null && occursOnDay(t.dayOffset, t.recurrence, day)
 }
 
-export function reminderOccursOn(r: Reminder, day: Date): boolean {
-  return occursOnDay(r.dayOffset, r.recurrence, day)
-}
-
 /** Next timestamp (ms) an anchor+hour+recurrence occurs at or after `from`.
  *  Non-recurring items just resolve to their single occurrence regardless of
  *  `from` — callers that need "only if upcoming" already filter on that
@@ -97,10 +93,6 @@ export function taskNextMs(t: Task, from = Date.now()): number | null {
   return nextOccurrenceMs(t.dayOffset, t.dueTime, t.recurrence, from)
 }
 
-export function reminderNextMs(r: Reminder, from = Date.now()): number | null {
-  return nextOccurrenceMs(r.dayOffset, r.time, r.recurrence, from)
-}
-
 export function apptStartMs(a: Appt): number {
   return atHour(offsetDate(a.dayOffset), a.start).getTime()
 }
@@ -109,11 +101,6 @@ export function apptStartMs(a: Appt): number {
 export function taskDueMs(t: Task): number | null {
   if (t.dayOffset == null || t.dueTime == null) return null
   return atHour(offsetDate(t.dayOffset), t.dueTime).getTime()
-}
-
-/** Absolute ping time for a standalone reminder. */
-export function reminderMs(r: Reminder): number {
-  return atHour(offsetDate(r.dayOffset), r.time).getTime()
 }
 
 /** "in 12 min", "in 2h 5m", "now" — for a future timestamp relative to `from`. */

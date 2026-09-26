@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import type { Note } from '@/data/notes'
 import { useVault } from '@/features/notes/notesStore'
 import { inferType, type PropType } from '@/features/notes/frontmatter'
-import { cleanTag, noteTags } from '@/features/notes/vault'
+import { cleanTag, noteTags, parseWikiTarget, resolveNote, wikiTargets } from '@/features/notes/vault'
 import { useProjects, type ProjectView } from '@/features/projects/store'
 
 // The connective layer of BaseSpace: one tag namespace and one property
@@ -66,4 +66,58 @@ export function useGlobalProps() {
       suggestions: (key: string) => [...(values.get(key) ?? [])].sort(),
     }
   }, [notes, projects, propTypes])
+}
+
+// ---- links between notes and projects ------------------------------------
+
+export type LinkHit = { kind: 'note'; note: Note } | { kind: 'project'; project: ProjectView }
+
+/** A `[[target]]` resolves to a note first (paths, titles, aliases), then to
+ *  a project by name — so notes and projects can link to each other. */
+export function resolveLink(notes: Note[], projects: ProjectView[], target: string, from?: Note | null): LinkHit | null {
+  const note = resolveNote(notes, target, from)
+  if (note) return { kind: 'note', note }
+  const name = parseWikiTarget(target).note.trim().toLowerCase()
+  const project = projects.find((p) => p.name.toLowerCase() === name)
+  return project ? { kind: 'project', project } : null
+}
+
+/** All text a project carries that can hold [[links]]. */
+export function projectText(p: ProjectView): string {
+  const props = Object.values(p.props ?? {}).flatMap((v) => (Array.isArray(v) ? v : v == null ? [] : [String(v)]))
+  return [p.tagline, p.what, ...p.history.map((h) => h.text), ...props].join('\n')
+}
+
+export function useLinkGraph() {
+  const { notes } = useVault()
+  const projects = useProjects()
+  return useMemo(() => {
+    const resolve = (target: string, from?: Note | null) => resolveLink(notes, projects, target, from)
+    /** Projects whose text links to this note. */
+    const projectsLinkingTo = (noteId: string) =>
+      projects.filter((p) => wikiTargets(projectText(p)).some((t) => resolve(t)?.kind === 'note' && (resolve(t) as { note: Note }).note.id === noteId))
+    /** Notes whose text links to this project. */
+    const notesLinkingToProject = (projectId: string) =>
+      notes.filter((n) =>
+        wikiTargets(n.body).some((t) => {
+          const hit = resolve(t, n)
+          return hit?.kind === 'project' && hit.project.id === projectId
+        }),
+      )
+    /** Everything a project's own text links to. */
+    const linksFromProject = (p: ProjectView): LinkHit[] => {
+      const seen = new Set<string>()
+      const out: LinkHit[] = []
+      for (const t of wikiTargets(projectText(p))) {
+        const hit = resolve(t)
+        const id = hit ? (hit.kind === 'note' ? hit.note.id : hit.project.id) : null
+        if (hit && id && id !== p.id && !seen.has(id)) {
+          seen.add(id)
+          out.push(hit)
+        }
+      }
+      return out
+    }
+    return { notes, projects, resolve, projectsLinkingTo, notesLinkingToProject, linksFromProject }
+  }, [notes, projects])
 }
