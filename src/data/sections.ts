@@ -73,7 +73,7 @@ export const SECTIONS: Section[] = [
     code: 'PRJ.04',
     route: '/projects',
     icon: FolderKanban,
-    blurb: 'Status, last move, next move — what each project actually is.',
+    blurb: 'Status, history, tags and properties — every project, connected.',
     accent: '#e0408a',
   },
   {

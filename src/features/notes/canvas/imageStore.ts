@@ -1,3 +1,5 @@
+import { reportError } from '@/lib/errorBus'
+
 // Canvas images live in IndexedDB (localStorage is far too small for
 // pictures); canvas nodes reference them as `idb:<key>`.
 
@@ -41,7 +43,10 @@ export function imageUrl(src: string): Promise<string | null> {
           req.onerror = () => resolve(null)
         }),
     )
-    .catch(() => null)
+    .catch((e) => {
+      reportError({ source: 'canvas', message: `Could not load image ${src}: ${(e as Error)?.message ?? e}` })
+      return null
+    })
   urls.set(src, p)
   return p
 }

@@ -101,15 +101,15 @@ export function DayView({
   return (
     <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-2.5 pt-2.5 sm:px-3 sm:pt-3">
       {/* Hero */}
-      <div className="hud-corners relative mb-3 border border-line bg-panel/60 p-3 text-accent sm:p-4">
+      <div className="hud-corners relative mb-3 border border-line bg-panel/60 px-3 py-2 text-accent sm:px-4 sm:py-3">
         <div className="flex flex-wrap items-end justify-between gap-2">
           <div>
             <div className="label text-dim">{today ? greeting(now.getHours()) : dayLabel}</div>
-            <h2 className="font-display text-xl tracking-wide text-text sm:text-2xl">{format(date, 'EEEE')}</h2>
+            <h2 className="font-display text-lg tracking-wide text-text sm:text-xl">{format(date, 'EEEE')}</h2>
             <div className="text-sm text-dim">{format(date, 'dd MMMM yyyy')}</div>
           </div>
           <div className="text-right">
-            {today && <div className="font-display text-2xl tabular-nums text-accent sm:text-3xl">{format(now, 'HH:mm')}</div>}
+            {today && <div className="font-display text-xl tabular-nums text-accent sm:text-2xl">{format(now, 'HH:mm')}</div>}
             <div className="mt-1 text-[11px] text-dim">
               {dayAppts.length} events
               {today && ` · ${upcomingCount} upcoming`}

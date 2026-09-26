@@ -79,6 +79,10 @@ itself, not a `# <title>` heading. `folder` can be a nested path (`Team/Meetings
 Obsidian syntax works in `body`: `[[Note title]]` links, `#tags`, `> [!note]` callouts,
 `- [ ]` tasks.
 
+Projects: `lastMove` and `nextMove` still work, and now appear in the project's history
+(a move, and an open "next move"). Project tags share one namespace with note tags, so a
+tag links notes and projects together.
+
 ## JSON shapes (contract — keep these exact)
 
 ### state/agents.json

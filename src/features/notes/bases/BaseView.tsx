@@ -28,6 +28,7 @@ type Panel = 'sort' | 'filter' | 'props' | 'group' | 'formulas'
 export function BaseView({
   base,
   notes,
+  projectRows = [],
   propTypes,
   suggestions,
   onChange,
@@ -39,11 +40,14 @@ export function BaseView({
 }: {
   base: Note
   notes: Note[]
+  /** Projects as note-shaped rows (folder "Projects"), for views whose
+   *  source includes projects. */
+  projectRows?: Note[]
   propTypes: Record<string, PropType>
   suggestions: (key: string) => string[]
   onChange: (body: string) => void
   onOpenNote: (id: string) => void
-  onCreateNote: (folder: string, props: Record<string, PropValue>) => void
+  onCreateNote: (folder: string, props: Record<string, PropValue>, source: 'notes' | 'projects') => void
   onSetProp: (note: Note, key: string, value: PropValue | undefined) => void
   onOpenWiki: (target: string) => void
   onTagClick: (tag: string) => void
@@ -61,7 +65,12 @@ export function BaseView({
     save({ ...config, views: config.views.map((v) => (v.id === view.id ? { ...v, ...patch } : v)) })
 
   const get = useMemo(() => makeGetter(config.formulas), [config.formulas])
-  const rows = useMemo(() => runView(view, notes, get, base.id), [view, notes, get, base.id])
+  const source = view.source ?? 'notes'
+  const records = useMemo(
+    () => (source === 'notes' ? notes : source === 'projects' ? projectRows : [...notes, ...projectRows]),
+    [source, notes, projectRows],
+  )
+  const rows = useMemo(() => runView(view, records, get, base.id), [view, records, get, base.id])
   const groups = useMemo(() => groupRows(rows, view.groupBy, get), [rows, view.groupBy, get])
   const propIds = useMemo(() => allPropIds(propTypes, config.formulas), [propTypes, config.formulas])
 
@@ -113,7 +122,7 @@ export function BaseView({
       const n = Number(f.value)
       props[noteKey(f.prop)] = f.value !== '' && !Number.isNaN(n) ? n : f.value
     }
-    onCreateNote(folderFilter?.value ?? base.folder, props)
+    onCreateNote(folderFilter?.value ?? base.folder, props, source === 'projects' ? 'projects' : 'notes')
   }
 
   const toggleSort = (prop: string) => {
@@ -187,6 +196,16 @@ export function BaseView({
           <Plus size={13} />
         </button>
         <div className="ml-auto flex items-center gap-0.5">
+          <select
+            value={source}
+            onChange={(e) => updateView({ source: e.target.value as View['source'] })}
+            title="What this view lists"
+            className="mr-1 rounded-control border border-line bg-bg px-1.5 py-1 text-[12px] text-text focus:border-accent/60 focus:outline-none"
+          >
+            <option value="notes">Notes</option>
+            <option value="projects">Projects</option>
+            <option value="all">Notes + projects</option>
+          </select>
           <span className="mr-2 text-[11px] text-dim">
             {rows.length} result{rows.length === 1 ? '' : 's'}
           </span>
@@ -293,7 +312,7 @@ export function BaseView({
         )}
         {!rows.length && <div className="p-6 text-center text-[12px] text-dim">No notes match this view's filters.</div>}
         <button onClick={newNote} className="flex w-full items-center gap-1.5 px-3 py-2 text-left text-[12px] text-dim hover:bg-panel-2/40 hover:text-text">
-          <Plus size={12} /> New note
+          <Plus size={12} /> {source === 'projects' ? 'New project' : 'New note'}
         </button>
       </div>
     </div>

@@ -46,6 +46,8 @@ export interface BaseView {
   columns: string[]
   /** Cards view: property holding an image URL, or null for none. */
   cardImage?: string | null
+  /** Which records the view lists: notes (default), projects, or both. */
+  source?: 'notes' | 'projects' | 'all'
 }
 
 export interface BaseConfig {

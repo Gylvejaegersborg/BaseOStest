@@ -414,7 +414,7 @@ function TextValue({
   )
 }
 
-function ListEditor({
+export function ListEditor({
   tags,
   values,
   suggestions,
