@@ -16,6 +16,8 @@ export interface Project {
   what: string
   lastMove: string
   nextMove: string
+  /** Further open plans beyond nextMove. */
+  extraPlans?: string[]
   progress: number // 0-100
   tags: string[]
   links?: { label: string; href: string }[]
@@ -107,6 +109,9 @@ export const PROJECTS: Project[] = [
     what: 'A home server that hosts the agents, the vault API, copyparty and eventually this dashboard — reachable from anywhere.',
     lastMove: 'Containerised the agent runtimes.',
     nextMove: 'Add remote tunnel + watchtower auto-updates.',
+    extraPlans: [
+      'Move BaseSpace + Agent-OS here from the Codespace, then set up Hindsight agent memory: run ghcr.io/vectorize-io/hindsight (needs an LLM key), set HINDSIGHT_URL=http://127.0.0.1:8888 for the gateway. Steps in agent-os README → "Hindsight". Left out of the Codespace (docker-in-docker broke its build).',
+    ],
     progress: 58,
     tags: ['infra', 'server'],
     timeline: [
