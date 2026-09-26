@@ -60,30 +60,11 @@ else
   echo "[start] Ollama not installed (postCreateCommand didn't run?) — falling back to whatever env vars/stub model resolve."
 fi
 
-# Hindsight (optional long-term agent memory, see agent-os's README). It
-# needs an LLM key of its own for fact extraction, so it only starts when a
-# Codespace secret provides one: HINDSIGHT_LLM_API_KEY, or OPENAI_API_KEY.
-# One container with an embedded Postgres; data persists in a docker volume.
-HINDSIGHT_KEY="${HINDSIGHT_LLM_API_KEY:-${OPENAI_API_KEY:-}}"
-if [ -n "$HINDSIGHT_KEY" ] && command -v docker >/dev/null 2>&1; then
-  if ! docker ps --format '{{.Names}}' | grep -qx hindsight; then
-    echo "[start] Starting Hindsight memory (first run pulls the image)…"
-    docker rm -f hindsight >/dev/null 2>&1 || true
-    docker run -d --name hindsight --restart unless-stopped -p 8888:8888 -p 9999:9999 \
-      -e HINDSIGHT_API_LLM_API_KEY="$HINDSIGHT_KEY" \
-      -v hindsight-data:/home/hindsight/.pg0 \
-      ghcr.io/vectorize-io/hindsight:latest >/tmp/hindsight.log 2>&1 || echo "[start] Hindsight failed to start — see /tmp/hindsight.log"
-  fi
-  export HINDSIGHT_URL="http://127.0.0.1:8888"
-else
-  echo "[start] Hindsight off (set a HINDSIGHT_LLM_API_KEY or OPENAI_API_KEY Codespace secret to enable it)."
-fi
-
 if [ -d "$AGENT_OS_DIR" ]; then
   echo "[start] Starting Agent-OS gateway on :$GATEWAY_PORT…"
   # Falls back further to a deterministic stub model with zero config at
   # all (see agent-os's gateway/cli.ts) if even Ollama isn't reachable.
-  (cd "$AGENT_OS_DIR" && AGENT_OS_GATEWAY_PORT="$GATEWAY_PORT" OLLAMA_MODEL="$OLLAMA_MODEL" BASEOS_REPO_DIR="$BASEOS_REPO_DIR" HINDSIGHT_URL="${HINDSIGHT_URL:-}" nohup npm run gateway > /tmp/agent-os-gateway.log 2>&1 &)
+  (cd "$AGENT_OS_DIR" && AGENT_OS_GATEWAY_PORT="$GATEWAY_PORT" OLLAMA_MODEL="$OLLAMA_MODEL" BASEOS_REPO_DIR="$BASEOS_REPO_DIR" nohup npm run gateway > /tmp/agent-os-gateway.log 2>&1 &)
 else
   echo "[start] agent-os not found at $AGENT_OS_DIR (postCreateCommand didn't run?) — Workbench will fall back to mock data."
 fi

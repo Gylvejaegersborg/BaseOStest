@@ -123,6 +123,7 @@ function seedHistory(p: Project): HistoryEntry[] {
   if (p.lastMove && !texts.has(p.lastMove.trim()))
     out.push({ id: `seed:${p.id}:last:${hash(p.lastMove)}`, date: newest, kind: 'move', text: p.lastMove, seed: true })
   if (p.nextMove) out.push({ id: `seed:${p.id}:next:${hash(p.nextMove)}`, date: newest, kind: 'plan', text: p.nextMove, seed: true })
+  for (const plan of p.extraPlans ?? []) out.push({ id: `seed:${p.id}:plan:${hash(plan)}`, date: newest, kind: 'plan', text: plan, seed: true })
   return out
 }
 
