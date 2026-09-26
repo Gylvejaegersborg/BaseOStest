@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Mic, Paperclip, Send, Square, X, Bot, AlertTriangle, Eye, StickyNote, FileUp, FileText } from 'lucide-react'
+import { Mic, Paperclip, Send, Square, X, Bot, AlertTriangle, Eye, StickyNote, FileUp, FileText, ShieldCheck } from 'lucide-react'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { cn } from '@/lib/cn'
 import type { Agent } from '@/data/agents'
@@ -246,6 +246,19 @@ function MessageRow({
   agentName: string
   onSendToNotes: (text: string) => void
 }) {
+  if (msg.role === 'system') {
+    const approved = msg.text.startsWith('Approved')
+    return (
+      <div className="flex items-center gap-2 text-[10px] text-dim">
+        <span className="h-px flex-1 bg-line" />
+        <ShieldCheck size={11} className={approved ? 'text-neon-green' : 'text-danger'} />
+        <span className="max-w-[80%] truncate" title={msg.text}>
+          {approved ? 'Approved in Approvals' : 'Rejected in Approvals'} · {msg.text.replace(/^(Approved|Rejected): /, '').split('. ')[0]}
+        </span>
+        <span className="h-px flex-1 bg-line" />
+      </div>
+    )
+  }
   const isUser = msg.role === 'user'
   return (
     <div className={cn('group flex gap-3', isUser && 'flex-row-reverse')}>

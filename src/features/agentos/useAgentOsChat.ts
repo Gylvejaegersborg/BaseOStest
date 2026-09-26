@@ -13,7 +13,8 @@ import {
 
 export interface ChatMessage {
   id: string
-  role: 'user' | 'assistant'
+  /** 'system' = a note from the harness (e.g. an approval decision), not something you typed. */
+  role: 'user' | 'assistant' | 'system'
   text: string
   time: string
 }
@@ -35,7 +36,17 @@ function fmtTime(): string {
 function toChatMessages(history: { role: string; content: string }[]): ChatMessage[] {
   return history
     .filter((m) => m.role === 'user' || m.role === 'assistant')
-    .map((m, i) => ({ id: `h${i}`, role: m.role as 'user' | 'assistant', text: m.content, time: '' }))
+    .map((m, i) => {
+      // The gateway resumes a chat after an Approvals decision with a
+      // "[Approvals] …" turn — show it as a system note, not as you.
+      const system = m.role === 'user' && m.content.startsWith('[Approvals] ')
+      return {
+        id: `h${i}`,
+        role: system ? ('system' as const) : (m.role as 'user' | 'assistant'),
+        text: system ? m.content.slice('[Approvals] '.length) : m.content,
+        time: '',
+      }
+    })
 }
 
 /**
