@@ -13,7 +13,7 @@ interface RecurrenceFieldProps {
  *  the item doesn't recur. */
 export function RecurrenceField({ value, onChange }: RecurrenceFieldProps) {
   return (
-    <div className="mb-3 grid grid-cols-2 gap-2">
+    <div className="mb-3 grid grid-cols-2 gap-2 [&>*]:min-w-0">
       <div>
         <label className="label mb-1 block">Repeat</label>
         <select

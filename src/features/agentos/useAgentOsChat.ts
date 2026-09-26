@@ -174,8 +174,10 @@ export function useAgentOsChat(agentId: string) {
       } finally {
         setStreaming(false)
         setWorkingOn(null)
-        refreshHistory(id)
-        refreshSessions()
+        // Best-effort refreshes — a dropped connection here shouldn't surface
+        // as an unhandled rejection; the next action retries anyway.
+        refreshHistory(id).catch(() => {})
+        refreshSessions().catch(() => {})
       }
     },
     [connection, refreshHistory, refreshSessions],

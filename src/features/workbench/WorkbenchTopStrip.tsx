@@ -2,6 +2,8 @@ import { useState, type ReactNode } from 'react'
 import { ListChecks, Workflow, FileStack, ShieldCheck, Activity as ActivityIcon, Brain, History, Users, StickyNote, Settings, LayoutPanelLeft, Timer } from 'lucide-react'
 import { Tabs, type TabItem } from '@/components/ui/Tabs'
 import { cn } from '@/lib/cn'
+import { Glow } from '@/components/ui/Glow'
+import { useAgentOsApprovals } from '@/features/agentos/useAgentOsApprovals'
 
 export type StripTab = 'tasks' | 'flow' | 'artifacts' | 'approvals' | 'events' | 'memory' | 'files' | 'notes' | 'teams' | 'crons'
 
@@ -49,24 +51,30 @@ export function WorkbenchTopStrip({
   onOpenSettings: () => void
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
+  // Something is waiting on the operator — flag Approvals (and, on phones,
+  // the Panels button that hides it) with the nav rail's glow.
+  const { approvals } = useAgentOsApprovals()
+  const pending = approvals.length
+  const APPROVAL_GLOW = '#f0a020'
 
   return (
     <div className="flex items-center justify-between gap-3 border-b border-line px-3 py-2">
       <div className="min-w-0 flex-1">{left}</div>
       <div className="flex shrink-0 items-center gap-1">
         <div className="hidden items-center gap-1 lg:flex">
-          <Tabs tabs={STRIP_TABS} active={activePanel} onChange={onSelectTab} />
+          <Tabs tabs={STRIP_TABS} active={activePanel} onChange={onSelectTab} glow={pending ? { approvals: APPROVAL_GLOW } : undefined} />
         </div>
 
         <div className="relative lg:hidden">
           <button
             onClick={() => setMenuOpen((o) => !o)}
-            title="Panels"
+            title={pending ? `Panels — ${pending} approval${pending > 1 ? 's' : ''} waiting` : 'Panels'}
             className={cn(
-              'flex items-center gap-1.5 border p-2 transition-colors',
+              'relative flex items-center gap-1.5 border p-2 transition-colors',
               activePanel || menuOpen ? 'border-accent/40 bg-accent/10 text-accent' : 'border-transparent text-dim hover:border-line hover:text-text',
             )}
           >
+            {pending > 0 && <Glow color={APPROVAL_GLOW} />}
             <LayoutPanelLeft size={14} />
           </button>
           {menuOpen && (
@@ -79,12 +87,14 @@ export function WorkbenchTopStrip({
                     setMenuOpen(false)
                   }}
                   className={cn(
-                    'flex w-full items-center gap-2 px-3 py-2 text-left text-xs hover:bg-panel-2',
+                    'relative flex w-full items-center gap-2 px-3 py-2 text-left text-xs hover:bg-panel-2',
                     activePanel === t.id ? 'text-accent' : 'text-text',
                   )}
                 >
+                  {t.id === 'approvals' && pending > 0 && <Glow color={APPROVAL_GLOW} className="rounded-none" />}
                   {t.icon && <t.icon size={13} />}
                   {t.label}
+                  {t.id === 'approvals' && pending > 0 && <span className="ml-auto tabular-nums text-amber">{pending}</span>}
                 </button>
               ))}
             </div>

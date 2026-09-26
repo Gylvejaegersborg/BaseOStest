@@ -5,6 +5,7 @@ import { isRealAgent } from '@/data/agents'
 import { useAgentOsContext } from '@/features/agentos/AgentOsProvider'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { clock, shortDate } from '@/lib/time'
+import { NotificationBell } from './NotificationBell'
 
 export function TopBar() {
   const [now, setNow] = useState(new Date())
@@ -36,7 +37,10 @@ export function TopBar() {
           {online} agents online
         </span>
         <span className="hidden sm:inline">{shortDate(now)}</span>
-        <span className="tabular-nums text-text">{clock(now)}</span>
+        <span className="flex items-center gap-2">
+          <NotificationBell />
+          <span className="tabular-nums text-text">{clock(now)}</span>
+        </span>
       </div>
     </header>
   )
