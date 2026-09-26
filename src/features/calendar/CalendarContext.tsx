@@ -1,6 +1,6 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { REMINDERS, type Appt, type CronJob, type Reminder, type Task } from '@/data/calendar'
-import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
+import { useOsOverlay, mergeById } from '@/features/overlay/osOverlay'
 import { useNotesList, updateBody } from '@/features/notes/notesStore'
 import { contentOf } from '@/features/notes/frontmatter'
 import { completePlan, useProjects } from '@/features/projects/store'
@@ -35,6 +35,16 @@ interface CalendarContextValue {
 const CalendarContext = createContext<CalendarContextValue | null>(null)
 
 const MERGED_KEY = 'os:calendar:reminders-merged'
+const TEAM_TODOS_KEY = 'os:calendar:team-todos-imported'
+
+interface TeamBoardItem {
+  id: string
+  title: string
+  owner: string
+  status: string
+  due?: string | null
+  notes?: string
+}
 
 /** A reminder is a timed todo that notifies at its time. */
 export function reminderToTask(r: Reminder): Task {
@@ -187,6 +197,32 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
     },
     [persistTasks],
   )
+
+  // One-time: the retired GitHub team's open board items become todos.
+  useEffect(() => {
+    if (localStorage.getItem(TEAM_TODOS_KEY)) return
+    fetch(`${import.meta.env.BASE_URL}team-archive.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((a: { todos?: TeamBoardItem[] } | null) => {
+        if (!a?.todos) return
+        const imported: Task[] = a.todos.map((t) => ({
+          id: t.id,
+          title: t.title,
+          status: t.status === 'doing' ? 'doing' : 'todo',
+          priority: t.owner === 'user' ? 'high' : 'med',
+          dayOffset: t.due ? dayOffsetOf(new Date(`${t.due}T12:00:00`)) : undefined,
+          notify: false,
+          notes: `From the GitHub team board (owner: ${t.owner}).${t.notes ? ` ${t.notes}` : ''}`,
+          source: 'manual',
+        }))
+        setTasks((list) => {
+          const ids = new Set(list.map((x) => x.id))
+          return persistTasks([...list, ...imported.filter((x) => !ids.has(x.id))])
+        })
+        localStorage.setItem(TEAM_TODOS_KEY, '1')
+      })
+      .catch(() => {})
+  }, [persistTasks])
 
   const deleteTask = useCallback((id: string) => setTasks((list) => persistTasks(list.filter((t) => t.id !== id))), [persistTasks])
 

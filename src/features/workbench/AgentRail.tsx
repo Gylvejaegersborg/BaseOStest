@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Plus, Pencil, ChevronsLeft, ChevronsRight } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { Plus, Pencil, ChevronsLeft, ChevronsRight, ChevronDown, ChevronRight, Users, FolderInput } from 'lucide-react'
 import type { Agent } from '@/data/agents'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { useAgentOsContext } from '@/features/agentos/AgentOsProvider'
@@ -8,6 +8,9 @@ import { AgentEditorModal } from './AgentEditorModal'
 import { useResizablePanel } from '@/components/ui/useResizablePanel'
 import { ResizeHandle } from '@/components/ui/ResizeHandle'
 import { cn } from '@/lib/cn'
+import { openContextMenu } from '@/features/notes/menuBus'
+import type { MenuItem } from '@/features/notes/ContextMenu'
+import { folderOf, setActiveTeam, setFolder, toggleCollapsed as toggleFolder, toggleMember, useTeams } from './teams'
 
 const STATUS_COLOR: Record<Agent['status'], string> = {
   working: '#46d369',
@@ -56,7 +59,57 @@ export function AgentRail({ selectedAgentId, onSelect }: { selectedAgentId: stri
   })
   // The two nyx-w* sub-agents are presentational-only (no real Agent-OS
   // identity) — see Chat.tsx's own CHAT_AGENTS filter for the same rule.
-  const realAgents = agents.filter((a) => !a.id.includes('-w'))
+  const allAgents = agents.filter((a) => !a.id.includes('-w'))
+  const teams = useTeams()
+  const activeTeam = teams.teams.find((t) => t.id === teams.activeTeam) ?? null
+  const realAgents = activeTeam ? allAgents.filter((a) => activeTeam.members.includes(a.id)) : allAgents
+  // Folders = what kind of work the agent does (see teams.ts), sorted by name.
+  const grouped = useMemo(() => {
+    const m = new Map<string, Agent[]>()
+    for (const a of realAgents) {
+      const f = folderOf(a.id, a.role)
+      m.set(f, [...(m.get(f) ?? []), a])
+    }
+    return [...m.entries()].sort(([a], [b]) => a.localeCompare(b))
+    // teams.folders drives folderOf
+  }, [realAgents, teams.folders]) // eslint-disable-line react-hooks/exhaustive-deps
+  const folderNames = [...new Set(allAgents.map((a) => folderOf(a.id, a.role)))].sort()
+
+  // Right-click (or long-press) an agent: edit, team membership, folder.
+  const agentMenu = (e: React.MouseEvent, a: Agent) => {
+    e.preventDefault()
+    const items: MenuItem[] = [
+      { kind: 'header', label: a.name },
+      { label: 'Open', onSelect: () => onSelect(a.id) },
+      { label: 'Edit agent…', icon: <Pencil size={12} />, onSelect: () => openEdit(a) },
+      { kind: 'separator' },
+      {
+        label: 'Teams',
+        icon: <Users size={12} />,
+        submenu: teams.teams.map((t) => ({
+          label: t.name,
+          checked: t.members.includes(a.id),
+          onSelect: () => toggleMember(t.id, a.id),
+        })),
+      },
+      {
+        label: 'Move to folder',
+        icon: <FolderInput size={12} />,
+        submenu: [
+          ...folderNames.map((f) => ({ label: f, checked: folderOf(a.id, a.role) === f, onSelect: () => setFolder(a.id, f) })),
+          { kind: 'separator' as const },
+          {
+            label: 'New folder…',
+            onSelect: () => {
+              const name = window.prompt('Folder name')
+              if (name?.trim()) setFolder(a.id, name)
+            },
+          },
+        ],
+      },
+    ]
+    openContextMenu(e.clientX, e.clientY, items)
+  }
 
   const toggleCollapsed = () => {
     setCollapsed((c) => {
@@ -134,6 +187,23 @@ export function AgentRail({ selectedAgentId, onSelect }: { selectedAgentId: stri
             <Plus size={14} />
           </button>
         </div>
+        {/* Team selector — filters the list; agents can be in several teams. */}
+        <div className="border-b border-line px-2 py-1.5">
+          <select
+            value={teams.activeTeam ?? ''}
+            onChange={(e) => setActiveTeam(e.target.value || null)}
+            className="w-full border border-line bg-bg/60 px-1.5 py-1 text-xs text-text focus:border-accent/60 focus:outline-none"
+            style={activeTeam ? { color: activeTeam.color } : undefined}
+            title="Show one team"
+          >
+            <option value="">All agents ({allAgents.length})</option>
+            {teams.teams.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name} ({t.members.length})
+              </option>
+            ))}
+          </select>
+        </div>
         {connection !== 'live' && (
           <p className="border-b border-line px-3 py-2 text-[10px] leading-relaxed text-dim">
             No live Agent-OS gateway ({connection}) — creating or editing an agent here will fail until one is
@@ -141,33 +211,51 @@ export function AgentRail({ selectedAgentId, onSelect }: { selectedAgentId: stri
           </p>
         )}
         <div className="flex-1 overflow-y-auto">
-          {realAgents.map((a) => (
-            <div
-              key={a.id}
-              className={cn(
-                'group flex w-full items-center gap-2 border-l-2 px-3 py-2.5 transition-colors',
-                a.id === selectedAgentId ? 'bg-panel-2 text-text' : 'border-transparent text-dim hover:bg-panel-2/50 hover:text-text',
-              )}
-              style={a.id === selectedAgentId ? { borderColor: a.color } : undefined}
-            >
-              <button onClick={() => onSelect(a.id)} className="flex min-w-0 flex-1 items-center gap-2 text-left">
-                <StatusDot color={STATUS_COLOR[a.status]} pulse={a.status === 'working'} size={7} />
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm" style={{ color: a.id === selectedAgentId ? a.color : undefined }}>
-                    {a.name}
-                  </span>
-                  <span className="block truncate text-[10px] text-dim">{a.role}</span>
-                </span>
-              </button>
-              <button
-                onClick={() => openEdit(a)}
-                title={`Edit ${a.name}`}
-                className="shrink-0 text-dim opacity-40 hover:text-accent group-hover:opacity-100"
-              >
-                <Pencil size={12} />
-              </button>
-            </div>
-          ))}
+          {grouped.map(([folder, list]) => {
+            const closed = teams.collapsed.includes(folder)
+            return (
+              <div key={folder}>
+                <button
+                  onClick={() => toggleFolder(folder)}
+                  className="flex w-full items-center gap-1 px-2 pb-1 pt-2 text-left text-[10px] uppercase tracking-wider text-dim hover:text-text"
+                >
+                  {closed ? <ChevronRight size={11} /> : <ChevronDown size={11} />}
+                  <span className="flex-1 truncate">{folder}</span>
+                  <span className="tabular-nums">{list.length}</span>
+                </button>
+                {!closed &&
+                  list.map((a) => (
+                    <button
+                      key={a.id}
+                      onClick={() => onSelect(a.id)}
+                      onContextMenu={(e) => agentMenu(e, a)}
+                      title="Right-click for edit, teams and folder"
+                      className={cn(
+                        'flex w-full items-center gap-2 border-l-2 px-3 py-2 text-left transition-colors',
+                        a.id === selectedAgentId ? 'bg-panel-2 text-text' : 'border-transparent text-dim hover:bg-panel-2/50 hover:text-text',
+                      )}
+                      style={a.id === selectedAgentId ? { borderColor: a.color } : undefined}
+                    >
+                      <StatusDot color={STATUS_COLOR[a.status]} pulse={a.status === 'working'} size={7} />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm" style={{ color: a.id === selectedAgentId ? a.color : undefined }}>
+                          {a.name}
+                        </span>
+                        <span className="block truncate text-[10px] text-dim">{a.role}</span>
+                      </span>
+                      <span className="flex shrink-0 gap-0.5">
+                        {teams.teams
+                          .filter((t) => t.members.includes(a.id))
+                          .map((t) => (
+                            <span key={t.id} title={t.name} className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: t.color }} />
+                          ))}
+                      </span>
+                    </button>
+                  ))}
+              </div>
+            )
+          })}
+          {!grouped.length && <p className="px-3 py-3 text-[11px] text-dim">No agents in this team yet — right-click an agent to add it.</p>}
         </div>
 
         {modal}

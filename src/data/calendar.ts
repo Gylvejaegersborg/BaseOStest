@@ -148,6 +148,8 @@ export interface CronJob {
   /** Show its runs in the calendar's time grid. Defaults to on for daily
    *  and ≥6-hourly jobs, off for frequent ones (they'd fill the grid). */
   showInCalendar?: boolean
+  /** Team this job belongs to (e.g. its standup), when it's a team job. */
+  team?: string
   lastRun: string
   status: 'ok' | 'running' | 'warn'
   description?: string

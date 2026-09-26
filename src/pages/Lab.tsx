@@ -1,7 +1,7 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
 import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe, Gauge, Music2, Download, Workflow, Grid3x3, Film, Anchor, ClipboardCheck, Scissors, Stethoscope, Signature, ChevronDown } from 'lucide-react'
 import { LAB_MODULES, LAB_GROUPS, type LabModule, type LabGroup } from '@/data/labs'
-import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
+import { useOsOverlay, mergeById } from '@/features/overlay/osOverlay'
 import { Panel } from '@/components/ui/Panel'
 import { Modal } from '@/components/ui/Modal'
 import { Badge } from '@/components/ui/Badge'

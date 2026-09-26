@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { ArrowRight, Cloud, Instagram, Mail, Pause, Play, X, Youtube } from 'lucide-react'
 import { BEATS, CONTACT_EMAIL, formatPlays, type Beat } from '@/data/beats'
 import { useBeatPlayer } from '../beatstore/useBeatPlayer'
-import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
+import { useOsOverlay, mergeById } from '@/features/overlay/osOverlay'
 import { cn } from '@/lib/cn'
 
 interface ArtistWebPageProps {

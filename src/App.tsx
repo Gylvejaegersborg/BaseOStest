@@ -29,7 +29,7 @@ function SudokuRedirect() {
  *  Team tab (IA decision, Phase 4), so old /team links open Workbench with
  *  that tab pre-selected instead of landing on a dead route. */
 function TeamRedirect() {
-  return <Navigate to="/workbench?panel=team" replace />
+  return <Navigate to="/workbench?panel=teams" replace />
 }
 
 const router = createBrowserRouter([

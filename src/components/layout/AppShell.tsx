@@ -8,7 +8,8 @@ import { TopBar } from './TopBar'
 import { StatusBar } from './StatusBar'
 import { CalendarProvider, useCalendar } from '@/features/calendar/CalendarContext'
 import { NudgeStack } from '@/features/calendar/NudgeStack'
-import { OsOverlayProvider } from '@/features/team/osOverlay'
+import { SnapshotSync } from '@/features/agentos/snapshot'
+import { OsOverlayProvider } from '@/features/overlay/osOverlay'
 import { AgentOsProvider } from '@/features/agentos/AgentOsProvider'
 import { sectionForPath } from '@/data/sections'
 
@@ -73,6 +74,7 @@ export function AppShell() {
       </div>
       <GlobalNudges />
       <GlobalContextMenu />
+      <SnapshotSync />
       </AgentOsProvider>
       </CalendarProvider>
     </OsOverlayProvider>

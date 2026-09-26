@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Check, ChevronRight, ListChecks, Music2, Plus, X } from 'lucide-react'
 import { Badge } from '@/components/ui/Badge'
 import { cn } from '@/lib/cn'
-import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
+import { useOsOverlay, mergeById } from '@/features/overlay/osOverlay'
 import {
   RECENT_RELEASES,
   SONG_PROJECTS,

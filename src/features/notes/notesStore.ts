@@ -1,6 +1,6 @@
 import { useMemo, useSyncExternalStore } from 'react'
 import { NOTES, NOTE_FOLDERS, type Note } from '@/data/notes'
-import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
+import { useOsOverlay, mergeById } from '@/features/overlay/osOverlay'
 import { reportError } from '@/lib/errorBus'
 import {
   allFolders,
@@ -126,6 +126,22 @@ function emit() {
   listeners.forEach((l) => l())
 }
 
+// The retired GitHub team's output (briefs, meeting minutes, reports,
+// drafts, agent logs) — a static file merged in like the seed notes, so
+// 1.5 MB of history never lands in localStorage. Edits go to drafts as usual.
+let archive: Note[] = []
+if (typeof window !== 'undefined' && typeof fetch === 'function') {
+  fetch(`${import.meta.env.BASE_URL}team-archive.json`)
+    .then((r) => (r.ok ? r.json() : null))
+    .then((a: { notes?: Note[] } | null) => {
+      if (!a?.notes?.length) return
+      archive = a.notes
+      state = { ...state }
+      emit()
+    })
+    .catch(() => {})
+}
+
 function commit(patch: Partial<VaultState>) {
   state = { ...state, ...patch }
   for (const key of Object.keys(patch) as Key[]) saveJSON(NOTES_STORAGE[key], state[key])
@@ -149,7 +165,7 @@ function subscribe(listener: () => void) {
 
 function derive(s: VaultState, overlayNotes: Note[]): Note[] {
   const del = new Set(s.deleted)
-  return mergeById([...s.userNotes, ...NOTES], overlayNotes)
+  return mergeById([...s.userNotes, ...NOTES, ...archive], overlayNotes)
     .filter((n) => !del.has(n.id))
     .map((n) => {
       const m = s.meta[n.id] ?? {}

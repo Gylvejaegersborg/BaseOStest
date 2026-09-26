@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { BEATS, CONTACT_EMAIL, formatPrice, type Beat, type CartItem, type LicenseTier } from '@/data/beats'
-import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
+import { useOsOverlay, mergeById } from '@/features/overlay/osOverlay'
 import { useBeatPlayer } from './useBeatPlayer'
 import { BeatStoreNav, type StoreView } from './BeatStoreNav'
 import { BeatsView } from './views/BeatsView'

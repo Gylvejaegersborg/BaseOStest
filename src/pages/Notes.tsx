@@ -158,6 +158,19 @@ export function Notes() {
     return { stack: first ? [first.id] : [], index: 0 }
   })
   const selected = notes.find((n) => n.id === hist.stack[hist.index]) ?? null
+  // The wanted note may be an archived Team note that loads a moment after
+  // the page — open it once it shows up.
+  const pendingWanted = useRef<string | null>(null)
+  if (pendingWanted.current === null) {
+    const wanted = searchParams.get('note') ?? loadJSON<string | null>(UI.last, null)
+    pendingWanted.current = wanted && !notes.some((n) => n.id === wanted) ? wanted : ''
+  }
+  useEffect(() => {
+    const id = pendingWanted.current
+    if (!id || !notes.some((n) => n.id === id)) return
+    pendingWanted.current = ''
+    setHist({ stack: [id], index: 0 })
+  }, [notes])
   const [jump, setJump] = useState<{ heading?: string; text?: string; nonce: number } | null>(null)
   const [freshId, setFreshId] = useState<string | null>(null)
 
