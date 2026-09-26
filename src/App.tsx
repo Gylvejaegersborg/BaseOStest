@@ -1,4 +1,3 @@
-import { Suspense, lazy } from 'react'
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import { AppShell } from './components/layout/AppShell'
 import { Home } from './pages/Home'
@@ -9,7 +8,6 @@ import { Projects } from './pages/Projects'
 import { Lab } from './pages/Lab'
 import { Ops } from './pages/Ops'
 
-const Weather = lazy(() => import('./pages/Weather').then((m) => ({ default: m.Weather })))
 
 /** Chat and Meeting Room are retired in favor of the single Workbench
  *  page — these keep old bookmarks/links (Team's "open a chat with X")
@@ -47,14 +45,7 @@ const router = createBrowserRouter([
       { path: 'lab', element: <Lab /> },
       { path: 'ops', element: <Ops /> },
       { path: 'team', element: <TeamRedirect /> },
-      {
-        path: 'weather',
-        element: (
-          <Suspense fallback={<div className="h-full w-full bg-bg" />}>
-            <Weather />
-          </Suspense>
-        ),
-      },
+      { path: 'weather', element: <Navigate to="/lab?open=weather" replace /> },
       { path: 'sudoku', element: <SudokuRedirect /> },
     ],
   },

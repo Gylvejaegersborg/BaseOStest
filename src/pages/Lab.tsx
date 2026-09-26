@@ -1,6 +1,7 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
-import { ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe, Gauge, Music2, Download, Workflow, Grid3x3, Film, Anchor, ClipboardCheck, Scissors, Stethoscope, Signature, ChevronDown } from 'lucide-react'
+import { CloudSun, X, ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe, Gauge, Music2, Download, Workflow, Grid3x3, Film, Anchor, ClipboardCheck, Scissors, Stethoscope, Signature, ChevronDown } from 'lucide-react'
 import { LAB_MODULES, LAB_GROUPS, type LabModule, type LabGroup } from '@/data/labs'
+import { useSearchParams } from 'react-router-dom'
 import { useOsOverlay, mergeById } from '@/features/overlay/osOverlay'
 import { Panel } from '@/components/ui/Panel'
 import { Modal } from '@/components/ui/Modal'
@@ -58,10 +59,16 @@ const SignlyPage = lazy(() =>
   import('@/features/signly/SignlyPage').then((m) => ({ default: m.SignlyPage })),
 )
 
+const WeatherPage = lazy(() => import('@/pages/Weather').then((m) => ({ default: m.Weather })))
+
 const STATUS_COLOR = { live: '#46d369', staging: '#f0a020', local: '#36e0c8' } as const
 
 export function Lab() {
-  const [selectedId, setSelectedId] = useState(LAB_MODULES[0].id)
+  // ?open=<module> (e.g. the old /weather route) selects and launches it.
+  const [searchParams] = useSearchParams()
+  const openParam = searchParams.get('open')
+  const [selectedId, setSelectedId] = useState(() => (openParam && LAB_MODULES.some((m) => m.id === openParam) ? openParam : LAB_MODULES[0].id))
+  const [weatherOpen, setWeatherOpen] = useState(openParam === 'weather')
   const [mobileOpen, setMobileOpen] = useState(false)
   const [storeOpen, setStoreOpen] = useState(false)
   const [dbOpen, setDbOpen] = useState(false)
@@ -146,6 +153,7 @@ export function Lab() {
           onOpenYtDlp={() => setYtdlpOpen(true)}
           onOpenN8n={() => setN8nOpen(true)}
           onOpenSudoku={() => setSudokuOpen(true)}
+          onOpenWeather={() => setWeatherOpen(true)}
           onOpenReelroom={() => setReelroomOpen(true)}
           onOpenTidewriter={() => setTidewriterOpen(true)}
           onOpenClearscope={() => setClearscopeOpen(true)}
@@ -177,6 +185,7 @@ export function Lab() {
             onOpenYtDlp={() => setYtdlpOpen(true)}
             onOpenN8n={() => setN8nOpen(true)}
             onOpenSudoku={() => setSudokuOpen(true)}
+            onOpenWeather={() => setWeatherOpen(true)}
             onOpenReelroom={() => setReelroomOpen(true)}
             onOpenTidewriter={() => setTidewriterOpen(true)}
             onOpenClearscope={() => setClearscopeOpen(true)}
@@ -248,6 +257,24 @@ export function Lab() {
         </Suspense>
       )}
 
+      {weatherOpen && (
+        <div className="fixed inset-0 z-50 flex flex-col bg-bg animate-fade-in">
+          <div className="flex items-center justify-between border-b border-line px-3 py-2">
+            <span className="flex items-center gap-2 font-display text-sm tracking-wider text-text">
+              <CloudSun size={14} className="text-accent" /> WEATHER
+            </span>
+            <button onClick={() => setWeatherOpen(false)} title="Close" className="text-dim hover:text-text">
+              <X size={16} />
+            </button>
+          </div>
+          <div className="min-h-0 flex-1">
+            <Suspense fallback={<div className="h-full w-full bg-bg" />}>
+              <WeatherPage />
+            </Suspense>
+          </div>
+        </div>
+      )}
+
       {sudokuOpen && (
         <Suspense fallback={null}>
           <SudokuPage onClose={() => setSudokuOpen(false)} />
@@ -306,6 +333,7 @@ function ModuleDetail({
   onOpenYtDlp,
   onOpenN8n,
   onOpenSudoku,
+  onOpenWeather,
   onOpenReelroom,
   onOpenTidewriter,
   onOpenClearscope,
@@ -325,6 +353,7 @@ function ModuleDetail({
   onOpenYtDlp?: () => void
   onOpenN8n?: () => void
   onOpenSudoku?: () => void
+  onOpenWeather?: () => void
   onOpenReelroom?: () => void
   onOpenTidewriter?: () => void
   onOpenClearscope?: () => void
@@ -414,6 +443,14 @@ function ModuleDetail({
             className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
           >
             Open Dashboard <Workflow size={13} />
+          </button>
+        )}
+        {mod.id === 'weather' && onOpenWeather && (
+          <button
+            onClick={onOpenWeather}
+            className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
+          >
+            Open Weather <CloudSun size={13} />
           </button>
         )}
         {mod.id === 'sudoku' && onOpenSudoku && (

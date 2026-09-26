@@ -74,9 +74,6 @@ export const SUN_LINKS: [SectionId, SectionId][] = [
   ['projects', 'calendar'],
   ['projects', 'workbench'],
   ['projects', 'lab'],
-  ['projects', 'weather'],
-  ['weather', 'lab'],
-  ['weather', 'workbench'],
 ]
 
 export function buildBodies(): { suns: Body[]; planets: Body[] } {
