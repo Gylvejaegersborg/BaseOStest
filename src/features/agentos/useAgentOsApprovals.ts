@@ -41,11 +41,11 @@ export function useAgentOsApprovalsSource() {
   }, [refresh])
 
   const act = useCallback(
-    async (id: string, decision: 'approve' | 'reject') => {
+    async (id: string, decision: 'approve' | 'reject', always?: 'tool' | 'exact') => {
       setBusyId(id)
       setError('')
       try {
-        await resolveApproval(id, decision, 'dashboard-user')
+        await resolveApproval(id, decision, 'dashboard-user', always)
         await refresh()
       } catch (err) {
         setError((err as Error)?.message ?? `Could not ${decision} the request`)

@@ -37,10 +37,8 @@ export function TopBar() {
           {online} agents online
         </span>
         <span className="hidden sm:inline">{shortDate(now)}</span>
-        <span className="flex items-center gap-2">
-          <NotificationBell />
-          <span className="tabular-nums text-text">{clock(now)}</span>
-        </span>
+        <span className="tabular-nums text-text">{clock(now)}</span>
+        <NotificationBell />
       </div>
     </header>
   )

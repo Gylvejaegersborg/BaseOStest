@@ -31,8 +31,8 @@ export function MobileTopBar() {
         {section.label}
       </span>
       <span className="flex items-center gap-2">
-        <NotificationBell />
         <span className="tabular-nums text-xs text-dim">{clock(now)}</span>
+        <NotificationBell />
       </span>
     </header>
   )

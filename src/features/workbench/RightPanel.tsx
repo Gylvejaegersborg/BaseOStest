@@ -38,6 +38,7 @@ export function RightPanel({
   dockedNoteId,
   onSelectNote,
   onNewFlow,
+  focusApprovalId,
 }: {
   tab: StripTab
   agentId: string | null
@@ -48,6 +49,8 @@ export function RightPanel({
   dockedNoteId: string | null
   onSelectNote: (id: string | null) => void
   onNewFlow: () => void
+  /** Approval decision to open in the Approvals tab. */
+  focusApprovalId?: string | null
 }) {
   const label = STRIP_TABS.find((t) => t.id === tab)?.label ?? tab
   const { width, onMouseDown } = useResizablePanel({
@@ -77,7 +80,7 @@ export function RightPanel({
             {tab === 'tasks' && <TasksTab agentId={agentId} />}
             {tab === 'flow' && <FlowTab flowId={flowId} steps={flowSteps} onSelectFlow={onSelectFlow} onNewFlow={onNewFlow} />}
             {tab === 'artifacts' && <ArtifactsTab agentId={agentId} />}
-            {tab === 'approvals' && <ApprovalsTab />}
+            {tab === 'approvals' && <ApprovalsTab focusId={focusApprovalId} />}
             {tab === 'events' && <EventsTab agentId={agentId} />}
             {tab === 'memory' && <MemoryTab agentId={agentId} />}
             {tab === 'files' && <FileRevisionsTab />}

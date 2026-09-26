@@ -30,10 +30,13 @@ export function ConversationPane({
   agent,
   chat,
   onDockNote,
+  onShowApproval,
 }: {
   agent: Agent
   chat: ReturnType<typeof useAgentOsChat>
   onDockNote: (id: string | null) => void
+  /** Opens the Approvals panel on one decision (the chat's system lines). */
+  onShowApproval?: (id: string) => void
 }) {
   const [draft, setDraft] = useState('')
   const [pending, setPending] = useState<Attachment[]>([])
@@ -109,7 +112,7 @@ export function ConversationPane({
           <p className="text-center text-xs text-dim">Session open. Type a message to start.</p>
         )}
         {chat.messages.map((m) => (
-          <MessageRow key={m.id} msg={m} agentColor={agent.color} agentName={agent.name} onSendToNotes={sendToNotes} />
+          <MessageRow key={m.id} msg={m} agentColor={agent.color} agentName={agent.name} onSendToNotes={sendToNotes} onShowApproval={onShowApproval} />
         ))}
         {chat.streaming && chat.streamingText && (
           <MessageRow
@@ -240,23 +243,34 @@ function MessageRow({
   agentColor,
   agentName,
   onSendToNotes,
+  onShowApproval,
 }: {
   msg: ChatMessage
   agentColor: string
   agentName: string
   onSendToNotes: (text: string) => void
+  onShowApproval?: (id: string) => void
 }) {
   if (msg.role === 'system') {
-    const approved = msg.text.startsWith('Approved')
+    // "Approved <id>: shell {…}. Go ahead…" (older gateways omit the id)
+    const m = /^(Approved|Rejected)(?: (\S+))?: (.*?)\. (?:Go ahead|Don't run)/s.exec(msg.text)
+    const approved = (m?.[1] ?? msg.text).startsWith('Approved')
+    const id = m?.[2]
+    const call = m?.[3] ?? msg.text
     return (
-      <div className="flex items-center gap-2 text-[10px] text-dim">
+      <button
+        onClick={() => id && onShowApproval?.(id)}
+        disabled={!id || !onShowApproval}
+        title={id ? 'Show the full request in Approvals' : call}
+        className="flex w-full items-center gap-2 text-[10px] text-dim enabled:hover:text-text"
+      >
         <span className="h-px flex-1 bg-line" />
         <ShieldCheck size={11} className={approved ? 'text-neon-green' : 'text-danger'} />
-        <span className="max-w-[80%] truncate" title={msg.text}>
-          {approved ? 'Approved in Approvals' : 'Rejected in Approvals'} · {msg.text.replace(/^(Approved|Rejected): /, '').split('. ')[0]}
+        <span className="max-w-[80%] truncate">
+          {approved ? 'Approved in Approvals' : 'Rejected in Approvals'} · {call}
         </span>
         <span className="h-px flex-1 bg-line" />
-      </div>
+      </button>
     )
   }
   const isUser = msg.role === 'user'
