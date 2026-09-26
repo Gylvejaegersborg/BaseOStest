@@ -50,19 +50,29 @@ export function OsOverlayProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false
-    fetchOverlay<Partial<OsOverlay>>()
-      .then((data) => {
-        if (cancelled) return
-        // Tolerate missing keys / hand edits: fill any absent array.
-        setOverlay({ ...EMPTY_OVERLAY, ...data })
-        setLoaded(true)
-      })
-      .catch(() => {
-        // No gateway / unreachable / nothing written yet — stay on local data.
-        if (!cancelled) setLoaded(false)
-      })
+    let last = ''
+    const load = () =>
+      fetchOverlay<Partial<OsOverlay>>()
+        .then((data) => {
+          if (cancelled) return
+          // Tolerate missing keys / hand edits: fill any absent array.
+          const next = { ...EMPTY_OVERLAY, ...data }
+          const key = JSON.stringify(next)
+          if (key !== last) {
+            last = key
+            setOverlay(next)
+          }
+          setLoaded(true)
+        })
+        .catch(() => {
+          // No gateway / unreachable / nothing written yet — stay on local data.
+        })
+    void load()
+    // Agents add things while BaseSpace is open — pick them up.
+    const id = window.setInterval(load, 30_000)
     return () => {
       cancelled = true
+      window.clearInterval(id)
     }
   }, [])
 

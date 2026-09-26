@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { REMINDERS, type Appt, type CronJob, type Reminder, type Task } from '@/data/calendar'
 import { useOsOverlay, mergeById } from '@/features/overlay/osOverlay'
 import { useNotesList, updateBody } from '@/features/notes/notesStore'
@@ -92,6 +92,7 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
   const [appts, setAppts] = useState<Appt[]>(() => loadAppts())
   const [tasks, setTasks] = useState<Task[]>(initialTasks)
   const [crons, setCrons] = useState<CronJob[]>(() => loadCrons())
+  const mergedRef = useRef<Task[]>([])
 
   const persist = <T,>(key: string) => (next: T[]) => {
     try {
@@ -176,7 +177,9 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
   const toggleTask = useCallback(
     (task: Task) => {
       if (task.source === 'project' || task.source === 'note') return completeDerived(task)
-      setTasks((list) => persistTasks(list.map((t) => (t.id === task.id ? { ...t, status: t.status === 'done' ? 'todo' : 'done' } : t))))
+      const flipped = { ...task, status: task.status === 'done' ? ('todo' as const) : ('done' as const) }
+      // Agent-added todos aren't in the local list yet — ticking one keeps a local copy.
+      setTasks((list) => persistTasks(list.some((t) => t.id === task.id) ? list.map((t) => (t.id === task.id ? flipped : t)) : [...list, flipped]))
     },
     [persistTasks, completeDerived],
   )
@@ -185,7 +188,16 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
     (id: string) => {
       const d = derived.find((t) => t.id === id)
       if (d) return completeDerived(d)
-      setTasks((list) => persistTasks(list.map((t) => (t.id === id ? { ...t, status: 'done' } : t))))
+      const task = mergedRef.current.find((t) => t.id === id)
+      setTasks((list) =>
+        persistTasks(
+          list.some((t) => t.id === id)
+            ? list.map((t) => (t.id === id ? { ...t, status: 'done' } : t))
+            : task
+              ? [...list, { ...task, status: 'done' }]
+              : list,
+        ),
+      )
     },
     [persistTasks, derived, completeDerived],
   )
@@ -237,10 +249,26 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
   // read-only; user-created items live in (and persist to) localStorage.
   const overlay = useOsOverlay()
   const mergedTasks = useMemo(
-    () => [...mergeById(tasks, [...overlay.tasks, ...overlay.reminders.map(reminderToTask)]), ...derived],
+    () => [
+      // Agent-added todos first; a local copy (the user ticked or edited one)
+      // wins over the agent's version.
+      ...mergeById(
+        [
+          // Agents give todos a real date (due: YYYY-MM-DD); the calendar works in day offsets.
+          ...overlay.tasks.map((t) => {
+            const due = (t as Task & { due?: string }).due
+            return due && t.dayOffset == null ? { ...t, dayOffset: dayOffsetOf(new Date(`${due}T12:00:00`)) } : t
+          }),
+          ...overlay.reminders.map(reminderToTask),
+        ],
+        tasks,
+      ),
+      ...derived,
+    ],
     [tasks, overlay.tasks, overlay.reminders, derived],
   )
 
+  mergedRef.current = mergedTasks
   const remindersEngine = useReminders(appts, mergedTasks, { onCompleteTask: completeTask })
 
   return (
