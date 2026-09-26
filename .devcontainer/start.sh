@@ -84,5 +84,15 @@ if [ -n "${CODESPACE_NAME:-}" ]; then
   echo "[start]   the gateway has no login of its own, so a Private port's GitHub-auth redirect breaks plain fetch() calls to it."
 fi
 
+# setup.sh only installs deps once, when the Codespace is created — so a
+# later pull that adds a package (e.g. new editor/search libraries) would
+# leave Vite failing with "Failed to resolve import". Re-install whenever
+# the lockfile is newer than what's installed; a no-op on normal restarts.
+if [ ! -f node_modules/.package-lock.json ] || [ package-lock.json -nt node_modules/.package-lock.json ]; then
+  echo "[start] Dependencies changed since last install — running npm install…"
+  npm install
+  touch node_modules/.package-lock.json
+fi
+
 echo "[start] Starting BaseOStest dev server…"
 exec npm run dev -- --host 0.0.0.0
