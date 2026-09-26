@@ -3,9 +3,11 @@
   "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
 
   // Docker inside the Codespace, for the optional Hindsight memory service
-  // (start.sh runs it when an LLM key secret is set).
+  // (start.sh runs it when an LLM key secret is set). moby:false because the
+  // node:22 image is Debian trixie, which has no moby packages — the feature
+  // installs Docker CE instead.
   "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+    "ghcr.io/devcontainers/features/docker-in-docker:2": { "moby": false }
   },
 
   // Install deps + clone/install agent-os once on first create (setup.sh);
