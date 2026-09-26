@@ -193,6 +193,12 @@ export default {
           '0%, 100%': { opacity: '0.15' },
           '50%': { opacity: '0.5' },
         },
+        // Stronger sibling for small controls (Glow): a button-sized wash at
+        // ambient-pulse's opacity is barely visible.
+        'glow-pulse': {
+          '0%, 100%': { opacity: '0.45' },
+          '50%': { opacity: '1' },
+        },
         // Section cross-fade (navigation model, Phase 3) — the "you moved
         // to a different room" orientation cue on top-level route changes.
         'cross-fade': {
@@ -231,6 +237,7 @@ export default {
         glow: 'glow 3.2s ease-in-out infinite',
         'glow-soft': 'glow-soft 6s ease-in-out infinite',
         'ambient-pulse': 'ambient-pulse 3s ease-in-out infinite',
+        'glow-pulse': 'glow-pulse 2.4s ease-in-out infinite',
         'cross-fade': 'cross-fade 220ms cubic-bezier(0.2, 0, 0, 1)',
         'settle-forward': 'settle-forward 280ms cubic-bezier(0.34, 1.2, 0.64, 1)',
         'sheet-up': 'sheet-up 220ms cubic-bezier(0.2, 0, 0, 1)',

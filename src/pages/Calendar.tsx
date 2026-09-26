@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import { addDays, addMonths, endOfMonth, format, getISOWeek, isSameDay, startOfMonth, startOfWeek } from 'date-fns'
 import {
   Bell,
-  BellOff,
   CalendarDays,
   CheckSquare,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
   Clock,
   Cpu,
   Filter,
@@ -35,7 +36,6 @@ import { CronDetailModal } from '@/features/calendar/CronDetailModal'
 import { CronEditModal } from '@/features/calendar/CronEditModal'
 import { CronManager } from '@/features/calendar/CronManager'
 import { SourceIcon, TaskPanel, TaskModal } from '@/features/calendar/TaskPanel'
-import { RemindersPanel } from '@/features/calendar/RemindersPanel'
 import { useCalendar } from '@/features/calendar/CalendarContext'
 import { layoutOverlaps } from '@/features/calendar/overlap'
 
@@ -53,7 +53,7 @@ const LAYERS: { id: Layer; label: string; color: string }[] = [
   { id: 'crons', label: 'AI crons', color: '#c77591' },
 ]
 
-type TablePanel = 'notify' | 'upnext' | 'todos' | 'crons'
+type TablePanel = 'upnext' | 'todos' | 'crons'
 
 function loadFilters(): Filters {
   try {
@@ -77,7 +77,7 @@ function cronRunHours(c: CronJob): number[] {
 export function Calendar() {
   // Calendar data + notification engine live in the app-wide CalendarProvider
   // so pings keep firing regardless of which page is open.
-  const { appts, tasks, crons, saveAppt, deleteAppt, toggleTask, saveTask, deleteTask, saveCron, deleteCron, remindersEngine } =
+  const { appts, tasks, crons, saveAppt, deleteAppt, toggleTask, saveTask, deleteTask, saveCron, deleteCron } =
     useCalendar()
   const navigate = useNavigate()
 
@@ -136,15 +136,6 @@ export function Calendar() {
     else setCronId((item.raw as CronJob).id)
   }
 
-  const openScheduled = (source: 'appt' | 'task', refId: string) => {
-    if (source === 'appt') {
-      const a = appts.find((x) => x.id === refId)
-      if (a) setEditing(a)
-    } else {
-      const t = tasks.find((x) => x.id === refId)
-      if (t) setEditingTask(t)
-    }
-  }
 
   const openSource = (t: Task) => {
     setEditingTask(null)
@@ -156,19 +147,6 @@ export function Calendar() {
   const addTask = () =>
     setEditingTask({ id: `new-${Date.now()}`, title: '', status: 'todo', priority: 'med', dayOffset: 0, notify: false, source: 'manual' })
 
-  // "Remind me" = a timed todo that pings at its time.
-  const addTimedTodo = (title: string, day: number, time: number) =>
-    saveTask({
-      id: `t-${Date.now()}`,
-      title,
-      status: 'todo',
-      priority: 'low',
-      dayOffset: day,
-      dueTime: time,
-      notify: true,
-      reminderMinutes: 0,
-      source: 'manual',
-    })
 
   // Double-click empty grid space → new timed todo at that day + time.
   const createTodoAt = (day: number, time: number) =>
@@ -291,13 +269,6 @@ export function Calendar() {
                 </>
               )}
             </div>
-            <button
-              onClick={remindersEngine.toggleEnabled}
-              title={remindersEngine.enabled ? 'Mute notifications' : 'Enable notifications'}
-              className={cn('border border-line p-1.5', remindersEngine.enabled ? 'text-accent' : 'text-dim hover:text-text')}
-            >
-              {remindersEngine.enabled ? <Bell size={13} /> : <BellOff size={13} />}
-            </button>
             <div className="flex items-center gap-0.5 sm:gap-1">
               <button onClick={() => step(-1)} className="border border-line p-1 text-dim hover:text-text">
                 <ChevronLeft size={14} />
@@ -370,17 +341,6 @@ export function Calendar() {
 
       {/* Side panels — each opens a full view, like Ops. */}
       <aside className="flex w-full shrink-0 flex-col gap-3 overflow-x-hidden bg-panel/30 px-3 pb-3 lg:w-[320px] lg:overflow-y-auto lg:border-l lg:p-3">
-        <RemindersPanel
-          enabled={remindersEngine.enabled}
-          permission={remindersEngine.permission}
-          scheduled={remindersEngine.scheduled}
-          onToggle={remindersEngine.toggleEnabled}
-          onEnableNotifications={remindersEngine.enableNotifications}
-          onTest={remindersEngine.testNudge}
-          onAddReminder={addTimedTodo}
-          onSelect={(item) => openScheduled(item.source, item.refId)}
-          onExpand={() => setTable('notify')}
-        />
 
         {/* Day view's own agenda already covers "what's next" on phones. */}
         <Panel
@@ -402,44 +362,6 @@ export function Calendar() {
       </aside>
 
       {/* Full-view tables (parent pop-ups) */}
-      <Modal
-        open={table === 'notify'}
-        onClose={() => setTable(null)}
-        title="Notifications"
-        code="PUSH"
-        accent="#9b7bff"
-        width={640}
-      >
-        <p className="mb-2 text-[11px] text-dim">Everything that will ping next — events before they start, todos with a notify time.</p>
-        <table className="w-full text-left text-[11px]">
-          <thead className="text-[9px] uppercase tracking-wider text-dim">
-            <tr className="border-b border-line">
-              <th className="px-2 py-1.5 font-normal">Pings at</th>
-              <th className="px-2 py-1.5 font-normal">What</th>
-              <th className="px-2 py-1.5 font-normal">Kind</th>
-              <th className="px-2 py-1.5 font-normal">Starts</th>
-            </tr>
-          </thead>
-          <tbody>
-            {remindersEngine.scheduled.map((r) => (
-              <tr
-                key={`${r.source}:${r.refId}`}
-                onClick={() => openScheduled(r.source, r.refId)}
-                className="cursor-pointer border-b border-line/40 hover:bg-panel-2/60"
-              >
-                <td className="px-2 py-1.5 tabular-nums text-dim">{format(r.fireAt, 'EEE dd MMM HH:mm')}</td>
-                <td className="px-2 py-1.5 text-text">
-                  <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full" style={{ backgroundColor: r.color }} />
-                  {r.title}
-                </td>
-                <td className="px-2 py-1.5 text-dim">{r.source === 'task' ? 'todo' : 'event'}</td>
-                <td className="px-2 py-1.5 tabular-nums text-dim">{format(r.startAt, 'HH:mm')}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {!remindersEngine.scheduled.length && <div className="p-3 text-xs text-dim">Nothing will ping soon.</div>}
-      </Modal>
 
       <Modal open={table === 'upnext'} onClose={() => setTable(null)} title="Up Next" code="AGENDA" accent="#f0a020" width={640}>
         <UpNextTable items={buildAgenda(agendaSrc, 40)} onSelect={openAgendaItem} />
@@ -549,6 +471,8 @@ function UpNextTable({ items, onSelect }: { items: AgendaItem[]; onSelect: (i: A
 }
 
 type SourceFilter = 'all' | 'manual' | 'project' | 'note'
+type SortKey = 'title' | 'source' | 'due' | 'priority' | 'notify'
+const PRIORITY_RANK = { high: 0, med: 1, low: 2 } as const
 
 function TodoTable({
   tasks,
@@ -564,9 +488,27 @@ function TodoTable({
   const [src, setSrc] = useState<SourceFilter>('all')
   const [showDone, setShowDone] = useState(false)
   const count = (s: SourceFilter) => tasks.filter((t) => t.status !== 'done' && (s === 'all' || (t.source ?? 'manual') === s)).length
+  const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({ key: 'due', dir: 1 })
+  const sortBy = (key: SortKey) => setSort((cur) => (cur.key === key ? { key, dir: cur.dir === 1 ? -1 : 1 } : { key, dir: 1 }))
+  const byDue = (a: Task, b: Task) => (a.dayOffset ?? 999) - (b.dayOffset ?? 999) || (a.dueTime ?? 99) - (b.dueTime ?? 99)
+  const cmp: Record<SortKey, (a: Task, b: Task) => number> = {
+    title: (a, b) => a.title.localeCompare(b.title),
+    source: (a, b) => (a.source ?? 'manual').localeCompare(b.source ?? 'manual'),
+    due: byDue,
+    priority: (a, b) => PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority],
+    notify: (a, b) => Number(b.dueTime != null && b.notify !== false) - Number(a.dueTime != null && a.notify !== false),
+  }
   const rows = tasks
     .filter((t) => (showDone || t.status !== 'done') && (src === 'all' || (t.source ?? 'manual') === src))
-    .sort((a, b) => (a.dayOffset ?? 999) - (b.dayOffset ?? 999) || (a.dueTime ?? 99) - (b.dueTime ?? 99))
+    .sort((a, b) => sort.dir * cmp[sort.key](a, b) || byDue(a, b))
+  const Th = ({ k, children }: { k: SortKey; children: string }) => (
+    <th className="px-2 py-1.5 font-normal">
+      <button onClick={() => sortBy(k)} className={cn('flex items-center gap-0.5 uppercase tracking-wider', sort.key === k ? 'text-text' : 'hover:text-text')}>
+        {children}
+        {sort.key === k && (sort.dir === 1 ? <ChevronUp size={10} /> : <ChevronDown size={10} />)}
+      </button>
+    </th>
+  )
   return (
     <>
       <div className="mb-2 flex flex-wrap items-center gap-1 text-[10px]">
@@ -591,11 +533,11 @@ function TodoTable({
           <thead className="text-[9px] uppercase tracking-wider text-dim">
             <tr className="border-b border-line">
               <th className="w-6 px-2 py-1.5" />
-              <th className="px-2 py-1.5 font-normal">Todo</th>
-              <th className="px-2 py-1.5 font-normal">From</th>
-              <th className="px-2 py-1.5 font-normal">Due</th>
-              <th className="px-2 py-1.5 font-normal">Priority</th>
-              <th className="px-2 py-1.5 font-normal">Notify</th>
+              <Th k="title">Todo</Th>
+              <Th k="source">From</Th>
+              <Th k="due">Due</Th>
+              <Th k="priority">Priority</Th>
+              <Th k="notify">Notify</Th>
             </tr>
           </thead>
           <tbody>
@@ -611,7 +553,7 @@ function TodoTable({
                     {t.source === 'project' ? 'project' : t.source === 'note' ? 'note' : 'manual'}
                   </span>
                 </td>
-                <td className="px-2 py-1.5 tabular-nums text-dim">
+                <td className="whitespace-nowrap px-2 py-1.5 tabular-nums text-dim">
                   {t.dayOffset == null ? '—' : format(offsetDate(t.dayOffset), 'EEE dd MMM')}
                   {t.dueTime != null && ` ${hhmm(t.dueTime)}`}
                   {t.recurrence && <Repeat size={9} className="ml-1 inline" />}
@@ -688,7 +630,9 @@ function WeekGrid({
   const slotTop = (h: number, height: number) => Math.min((h - DAY_START) * hourPx, gridH - height - 1)
 
   return (
-    <div ref={scrollRef} className="min-h-0 flex-1 overflow-auto">
+    // overscroll-contain: on phones the page around the grid also scrolls,
+    // and without it a flick at the grid's top edge moves the page instead.
+    <div ref={scrollRef} className="min-h-0 flex-1 overflow-auto overscroll-contain">
       <div className="min-w-[720px] lg:min-w-0">
         <div className="sticky top-0 z-20 flex border-b border-line bg-bg pr-3" style={{ paddingLeft: 44 }}>
           {days.map((d) => {
@@ -706,9 +650,11 @@ function WeekGrid({
           <div className="w-[44px] shrink-0">
             {Array.from({ length: HOURS }, (_, i) => (
               <div key={i} className="relative border-t border-line/60" style={{ height: hourPx }}>
-                {i > 0 && (
-                  <span className="absolute -top-2 left-1 text-[9px] tabular-nums text-dim">{String(DAY_START + i).padStart(2, '0')}:00</span>
-                )}
+                {/* Labels sit on their hour line; midnight's goes just inside the
+                 *  grid so the top of the day is visibly the top. */}
+                <span className={cn('absolute left-1 text-[9px] tabular-nums text-dim', i === 0 ? 'top-0.5' : '-top-2')}>
+                  {String(DAY_START + i).padStart(2, '0')}:00
+                </span>
               </div>
             ))}
           </div>
@@ -866,7 +812,7 @@ function EditModal({
       <label className="label mb-1 block">Date</label>
       <DateField value={draft.dayOffset} onChange={(d) => setDraft({ ...draft, dayOffset: d ?? 0 })} className="mb-3 w-full" />
 
-      <div className="mb-3 grid grid-cols-2 gap-2">
+      <div className="mb-3 grid grid-cols-2 gap-2 [&>*]:min-w-0">
         <div>
           <label className="label mb-1 block">Start</label>
           <input
@@ -893,7 +839,7 @@ function EditModal({
         </div>
       </div>
 
-      <div className="mb-3 grid grid-cols-2 gap-2">
+      <div className="mb-3 grid grid-cols-2 gap-2 [&>*]:min-w-0">
         <div>
           <label className="label mb-1 block">Kind</label>
           <select

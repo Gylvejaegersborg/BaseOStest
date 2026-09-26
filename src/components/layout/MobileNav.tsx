@@ -5,6 +5,7 @@ import { SECTIONS, sectionForPath, type SectionId } from '@/data/sections'
 import { clock } from '@/lib/time'
 import { useAgentActivitySignal } from '@/features/agentos/useAgentActivitySignal'
 import { cn } from '@/lib/cn'
+import { NotificationBell } from './NotificationBell'
 
 /** Mobile's four reach-for-away-from-desk surfaces (workspace-model
  *  decision) — the rest live under More. Home is deliberately not here:
@@ -29,7 +30,10 @@ export function MobileTopBar() {
       <span className="font-display text-base tracking-wider" style={{ color: section.accent }}>
         {section.label}
       </span>
-      <span className="tabular-nums text-xs text-dim">{clock(now)}</span>
+      <span className="flex items-center gap-2">
+        <NotificationBell />
+        <span className="tabular-nums text-xs text-dim">{clock(now)}</span>
+      </span>
     </header>
   )
 }

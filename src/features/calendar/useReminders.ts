@@ -181,7 +181,9 @@ export function useReminders(
     return targets
       .map((tg) => {
         const startAt = tg.nextStartAt(now)
-        if (startAt == null) return null
+        // One-off items resolve to their only occurrence even once it's
+        // past — those aren't upcoming pings.
+        if (startAt == null || startAt < now) return null
         return {
           refId: tg.refId,
           source: tg.source,

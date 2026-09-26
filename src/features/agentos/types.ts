@@ -9,6 +9,8 @@ export type AgentOsStatus = 'active' | 'idle'
 export interface AgentOsMetrics {
   tasks: { total: number; successRate: number | null; failureRate: number | null }
   turnLatency: { sampleCount: number; avgMs: number | null }
+  /** Absent on gateways older than the usage metrics. */
+  usage?: { turns: number; turnsWithUsage: number; inputTokens: number; outputTokens: number; lastTurnAt: string | null }
 }
 
 export interface AgentOsAgent {
