@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
-import { SECTIONS, sectionForPath, type SectionId } from '@/data/sections'
+import { NavLink } from 'react-router-dom'
+import { SECTIONS, type SectionId } from '@/data/sections'
 import { useAgentActivitySignal } from '@/features/agentos/useAgentActivitySignal'
 import { useSectionShortcuts } from './useSectionShortcuts'
 import { cn } from '@/lib/cn'
@@ -9,19 +9,15 @@ import { shade } from '@/lib/color'
 const KEYBOARD_PIN_MS = 1500
 
 /**
- * The persistent nav rail (desktop shell, Phase 2). Collapses to a
- * minimal always-visible sliver — one thin accent-colored mark per
- * section, so relative position/color is still glanceable — and expands
- * to the full icon+label rail on hover-proximity or a Shift+[number]
- * jump. Nothing is ever fully hidden, so switching sections never means
- * hunting for a trigger zone; the sliver's tick marks always tell you
- * where things are before you commit to opening it.
+ * The nav rail (desktop shell). Fully hidden by default — it takes no
+ * layout space. Hovering the left edge of the screen (an invisible
+ * hot-zone strip), focusing into it, or a Shift+[number] jump slides the
+ * icon+label rail in over the content without pushing or squeezing it.
  */
 export function NavBar({ className }: { className?: string }) {
   const [hovered, setHovered] = useState(false)
   const [pinned, setPinned] = useState(false)
   const pinTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const location = useLocation()
   const { ambient, actionable } = useAgentActivitySignal()
 
   const expanded = hovered || pinned
@@ -42,43 +38,21 @@ export function NavBar({ className }: { className?: string }) {
 
   return (
     <div
-      className={cn('relative h-full shrink-0', className)}
+      className={cn('fixed inset-y-0 left-0 z-40', className)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onFocus={() => setHovered(true)}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) setHovered(false)
+      }}
     >
-      {/* Always-visible sliver — reserves layout space so expanding never reflows content. */}
-      <div className="flex h-full w-2 flex-col items-center gap-0.5 border-r border-line bg-panel/60 py-3">
-        {SECTIONS.map((s) => {
-          const isActive = s.id === sectionForPath(location.pathname).id
-          const { ambient: sectionAmbient, actionable: sectionActionable } = signalFor(s.id)
-          return (
-            <NavLink
-              key={s.id}
-              to={s.route}
-              end={s.route === '/'}
-              aria-label={s.label}
-              className="flex w-full flex-1 items-center justify-center"
-            >
-              <span
-                className={cn(
-                  'block w-0.5 rounded-full transition-all',
-                  isActive ? 'h-3.5 opacity-100' : 'h-2 opacity-40',
-                  sectionAmbient && 'animate-ambient-pulse',
-                )}
-                style={{ backgroundColor: s.accent }}
-              />
-              {sectionActionable > 0 && (
-                <span className="absolute left-1.5 h-1 w-1 rounded-full bg-danger" style={{ marginTop: '-10px' }} />
-              )}
-            </NavLink>
-          )
-        })}
-      </div>
+      {/* Invisible hot zone along the screen's left edge — takes no layout space. */}
+      <div className="h-full w-2" aria-hidden />
 
       {/* Expanded overlay — floats above content, doesn't push layout. */}
       <nav
         className={cn(
-          'absolute left-0 top-0 z-40 flex h-full w-[68px] flex-col items-stretch border-r border-line bg-panel/95 py-3 shadow-elevation-3 backdrop-blur-sm transition-transform duration-fast ease-standard',
+          'absolute left-0 top-0 flex h-full w-[68px] flex-col items-stretch border-r border-line bg-panel/95 py-3 shadow-elevation-3 backdrop-blur-sm transition-transform duration-fast ease-standard',
           expanded ? 'translate-x-0' : '-translate-x-full',
         )}
       >
