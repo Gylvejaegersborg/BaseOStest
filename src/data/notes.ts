@@ -1,13 +1,22 @@
+import { stringifyYaml, type Props } from '@/features/notes/frontmatter'
+
 export interface Note {
   id: string
   title: string
   /** Slash-separated folder path ("Music/Mixing"); '' is the vault root. */
   folder: string
+  /** Legacy/agent tag list. Tags normally live in the `tags` property
+   *  (frontmatter); the store merges both into the derived `tags`. */
   tags: string[]
   updated: string // ISO date
   created?: string // ISO date — falls back to `updated` when absent
-  /** Markdown body. The title lives in `title`, not in a leading `# H1`. */
+  /** 'markdown' (default), or a canvas/base whose body is JSON. */
+  kind?: 'markdown' | 'canvas' | 'base'
+  /** Markdown body, starting with an optional YAML frontmatter block
+   *  (properties). The title lives in `title`, not in a leading `# H1`. */
   body: string
+  /** Parsed frontmatter — derived by the store, never persisted. */
+  props?: Props
 }
 
 // A small demo vault. Each note shows off one piece of the Obsidian-style
@@ -21,6 +30,9 @@ interface Seed {
   tags: string[]
   /** Minutes before "now" — keeps the modified/created sorts meaningful. */
   ago: number
+  kind?: Note['kind']
+  /** Frontmatter properties (tags are added from `tags`). */
+  props?: Props
   body: string
 }
 
@@ -46,6 +58,13 @@ Every note below shows one feature:
 - [[Tables and code]]: rendered tables and highlighted code blocks
 - [[Tags]]: inline #tags and nested tags like #music/mixing
 - [[Shortcuts]]: keyboard shortcuts for the editor and the explorer
+- [[Slash commands]]: type \`/\` to insert tables, code blocks, callouts and new notes
+- [[Properties]]: note metadata, shown at the top of a note
+- [[Song catalog]]: a **base**. It turns properties into a table and cards you can sort, filter and edit
+- [[Release plan]]: a **canvas** with cards, arrows, shapes and hand drawing
+
+## Search the whole vault
+Press **Ctrl/Cmd + Shift + F** (or the magnifier in the explorer) to search inside every note at once. It finds words even when you don't know which note mentions them, and it tolerates typos.
 
 ## The explorer
 The left panel is a folder tree. **Right-click** anything in it for more options: rename, duplicate, move, copy path, view tags, delete. **Drag** notes and folders to move them. The sliders button changes sorting and layout.
@@ -164,7 +183,12 @@ The **backlinks** button at the bottom right of each note lists every note that 
     tags: ['guide', 'reference'],
     ago: 190,
     body: `## Tables
-Tables render as tables. Click one to edit its markdown.
+Tables render as tables, and you edit them in place like in Confluence:
+
+- **Click a cell** to edit it. **Tab** moves to the next cell, **Enter** to the cell below, and **Esc** finishes
+- **Hover the table** for the **+** bars: the bottom one adds a row, the right one adds a column
+- **Right-click a cell** to insert or delete rows and columns, or change alignment
+- Move into the table with the arrow keys to see its raw markdown
 
 | Plugin | Stage | Notes |
 | --- | --- | --- |
@@ -194,7 +218,7 @@ docker compose up -d copyparty
     ago: 230,
     body: `Tags come from two places:
 
-1. **The tag bar** at the bottom of each note. Start typing and it suggests tags that already exist.
+1. **The \`tags\` property**, edited in [[Properties]] or in the tag bar at the bottom of each note. Start typing and it suggests tags that already exist.
 2. **Inline tags** in the text, like #idea or #beats. Nested tags use a slash: #music/mixing.
 
 Click an inline tag to filter the explorer by it. The **#** button next to the search box shows every tag in the vault, with note counts.
@@ -224,6 +248,8 @@ Search also understands operators:
 | \`Ctrl/Cmd + Z\` / \`Shift + Z\` | Undo / redo |
 | \`Tab\` / \`Shift + Tab\` | Indent / outdent |
 | \`Ctrl/Cmd + click\` | Follow the link under the cursor |
+| \`/\` | Slash commands (see [[Slash commands]]) |
+| \`Ctrl/Cmd + Shift + F\` | Search inside every note |
 
 ## Explorer
 | Keys | Action |
@@ -232,6 +258,183 @@ Search also understands operators:
 | \`Right-click\` | Context menu |
 | \`Alt + ←\` / \`Alt + →\` | Back / forward through visited notes |
 `,
+  },
+  {
+    id: 'vault-slash',
+    title: 'Slash commands',
+    folder: 'Guides',
+    tags: ['guide'],
+    ago: 35,
+    body: `Type \`/\` at the start of a line, or after a space, to open the command menu. Keep typing to filter it, then press **Enter**.
+
+| Command | Inserts |
+| --- | --- |
+| \`/table\` | A 3×3 table, ready to edit |
+| \`/code\` | A fenced code block |
+| \`/callout\`, \`/tip\`, \`/warning\` | A callout |
+| \`/task\`, \`/bullet\`, \`/numbered\` | Lists |
+| \`/h1\`, \`/h2\`, \`/h3\` | Headings |
+| \`/divider\`, \`/quote\`, \`/image\` | Blocks |
+| \`/link\`, \`/embed\` | A \`[[link]]\` with note suggestions |
+| \`/date\`, \`/time\` | Today's date or the current time |
+| \`/property\` | Adds a property to this note |
+| \`/new note\` | Creates a new note and opens it |
+| \`/link to new note\` | Creates a note and links to it here |
+| \`/new canvas\`, \`/new base\` | Creates a canvas or a base |
+
+Try it on the empty line below:
+
+`,
+  },
+  {
+    id: 'vault-properties',
+    title: 'Properties',
+    folder: 'Guides',
+    tags: ['guide', 'reference'],
+    ago: 55,
+    props: { aliases: ['Frontmatter', 'Metadata'], status: 'reference', rating: 5, reviewed: true, updated: '2026-09-26' },
+    body: `Properties are structured data at the top of a note, like the panel above this text. They are stored as YAML frontmatter, the same way Obsidian stores them, so the notes stay portable.
+
+- **Click a value** to edit it. Each property has a type: text, list, number, checkbox, date or date & time
+- **Click a property's icon** to change its type, rename it or remove it
+- **+ Add property** suggests property names already used in the vault
+- \`tags\` is a property too. The tag bar at the bottom edits the same list
+- \`aliases\` gives a note other names, so [[Frontmatter]] also links here
+
+Properties power [[Song catalog]], a **base** that lists notes as a table or as cards.
+`,
+  },
+  {
+    id: 'vault-song-neon',
+    title: 'Neon Rain',
+    folder: 'Music/Songs',
+    tags: ['single'],
+    ago: 90,
+    props: { status: 'mixing', bpm: 128, key: 'F minor', release: '2026-10-24', rating: 4, featured: true, cover: '/notes/waveform.svg' },
+    body: `Lead single. The vocal chain is in [[Vocal chain]].
+
+- [ ] Recall the mix after the car test
+- [ ] Print stems for the remix pack
+`,
+  },
+  {
+    id: 'vault-song-glass',
+    title: 'Glass Hearts',
+    folder: 'Music/Songs',
+    tags: ['single'],
+    ago: 400,
+    props: { status: 'recording', bpm: 140, key: 'A minor', release: '2026-12-05', rating: 3, featured: false },
+    body: `Needs a second verse. The hook is in the voice memo from Tuesday.
+`,
+  },
+  {
+    id: 'vault-song-tide',
+    title: 'Low Tide',
+    folder: 'Music/Songs',
+    tags: ['album'],
+    ago: 3000,
+    props: { status: 'released', bpm: 92, key: 'D major', release: '2026-06-14', rating: 5, featured: true },
+    body: `Out now. Released following the [[Release checklist]].
+`,
+  },
+  {
+    id: 'vault-song-static',
+    title: 'Static Bloom',
+    folder: 'Music/Songs',
+    tags: ['idea'],
+    ago: 1500,
+    props: { status: 'idea', bpm: 170, key: 'C# minor', rating: 2, featured: false },
+    body: `Half-time drum and bass sketch. Might become a B-side.
+`,
+  },
+  {
+    id: 'vault-songs-base',
+    title: 'Song catalog',
+    folder: 'Music',
+    tags: [],
+    ago: 60,
+    kind: 'base',
+    body: JSON.stringify(
+      {
+        formulas: {
+          countdown: 'if(empty(release), "–", if(daysUntil(release) >= 0, daysUntil(release) + " days", "out"))',
+          stars: 'repeat("★", rating)',
+        },
+        views: [
+          {
+            id: 'view-table',
+            name: 'All songs',
+            type: 'table',
+            filters: [{ prop: 'file.folder', op: 'starts with', value: 'Music/Songs' }],
+            match: 'all',
+            sort: [{ prop: 'release', dir: 'asc' }],
+            groupBy: null,
+            columns: ['file.name', 'status', 'bpm', 'key', 'release', 'formula.countdown', 'formula.stars', 'featured'],
+          },
+          {
+            id: 'view-board',
+            name: 'Board',
+            type: 'cards',
+            filters: [{ prop: 'file.folder', op: 'starts with', value: 'Music/Songs' }],
+            match: 'all',
+            sort: [{ prop: 'rating', dir: 'desc' }],
+            groupBy: 'status',
+            columns: ['file.name', 'bpm', 'key', 'formula.stars'],
+            cardImage: 'cover',
+          },
+          {
+            id: 'view-fast',
+            name: 'Fast (>120 BPM)',
+            type: 'table',
+            filters: [
+              { prop: 'file.folder', op: 'starts with', value: 'Music/Songs' },
+              { prop: 'bpm', op: '>', value: '120' },
+            ],
+            match: 'all',
+            sort: [{ prop: 'bpm', dir: 'desc' }],
+            groupBy: null,
+            columns: ['file.name', 'bpm', 'status'],
+          },
+        ],
+      },
+      null,
+      2,
+    ),
+  },
+  {
+    id: 'vault-release-canvas',
+    title: 'Release plan',
+    folder: 'Music/Releases',
+    tags: [],
+    ago: 45,
+    kind: 'canvas',
+    body: JSON.stringify(
+      {
+        nodes: [
+          { id: 'g1', type: 'group', x: -40, y: -60, width: 860, height: 380, label: 'Neon Rain rollout', color: '6' },
+          { id: 'n1', type: 'text', x: 0, y: 0, width: 240, height: 130, text: '## Week 1\nTeaser clips and a pre-save link', color: '5' },
+          { id: 'n2', type: 'text', x: 300, y: 0, width: 240, height: 160, text: '## Week 2\n**Release day**\n- Canvas loop live\n- Update the artist page' },
+          { id: 'n3', type: 'file', x: 580, y: 0, width: 220, height: 260, noteId: 'vault-release-checklist' },
+          { id: 'n4', type: 'text', x: 300, y: 205, width: 240, height: 100, text: 'Double-click empty space to add a card. Drag the dots on a card edge to connect it.', color: '3' },
+          { id: 'n5', type: 'link', x: 0, y: 190, width: 240, height: 90, url: 'https://help.obsidian.md/Plugins/Canvas' },
+        ],
+        edges: [
+          { id: 'e1', fromNode: 'n1', fromSide: 'right', toNode: 'n2', toSide: 'left', label: 'then' },
+          { id: 'e2', fromNode: 'n2', fromSide: 'right', toNode: 'n3', toSide: 'left' },
+        ],
+        strokes: [
+          { id: 's1', tool: 'pen', color: '#e0b8c5', width: 3, points: [20, 360, 60, 372, 110, 366, 160, 380, 210, 370, 260, 384] },
+          { id: 's2', tool: 'highlighter', color: '#f0a020', width: 14, points: [300, 150, 420, 150, 520, 152] },
+        ],
+        shapes: [
+          { id: 'sh1', type: 'ellipse', x1: 560, y1: 350, x2: 760, y2: 430, color: '#53bed2', width: 2 },
+          { id: 'sh2', type: 'arrow', x1: 480, y1: 400, x2: 555, y2: 392, color: '#53bed2', width: 2 },
+        ],
+        viewport: { x: 120, y: 140, zoom: 0.9 },
+      },
+      null,
+      2,
+    ),
   },
   {
     id: 'vault-vocal-chain',
@@ -341,9 +544,13 @@ This paragraph folds away with its heading.
 
 function generate(): Note[] {
   const now = Date.now()
-  return SEEDS.map(({ ago, ...s }) => {
+  return SEEDS.map(({ ago, props, tags, ...s }) => {
     const iso = new Date(now - ago * 60 * 1000).toISOString()
-    return { ...s, updated: iso, created: iso }
+    if (s.kind && s.kind !== 'markdown') return { ...s, tags, updated: iso, created: iso }
+    // Tags live in the frontmatter, like any other property.
+    const all = { ...(tags.length ? { tags } : {}), ...props }
+    const body = Object.keys(all).length ? `---\n${stringifyYaml(all)}\n---\n${s.body}` : s.body
+    return { ...s, body, tags: [], updated: iso, created: iso }
   })
 }
 

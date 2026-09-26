@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, type MutableRefObject } from 'react'
 import { Annotation, EditorSelection, EditorState, type Extension } from '@codemirror/state'
 import { EditorView, drawSelection, dropCursor, keymap, placeholder } from '@codemirror/view'
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands'
@@ -12,6 +12,7 @@ import { noteTags, parseWikiTarget, resolveNote } from '../vault'
 import { obsidianSyntax } from './syntax'
 import { livePreview, previewHandlers, refreshLinks, setFocus, toggleTask } from './livePreview'
 import { editorTheme, markdownHighlight } from './theme'
+import { inCode, slashSource, type RunPageCommand } from './slashCommands'
 
 export interface NoteEditorProps {
   noteId: string
@@ -20,11 +21,21 @@ export interface NoteEditorProps {
   onChange: (body: string) => void
   onOpenWiki: (target: string) => void
   onOpenTag: (tag: string) => void
-  /** Scroll to (and put the cursor on) a heading — set when following a
-   *  [[Note#Heading]] link. `nonce` re-triggers the same heading. */
-  jump?: { heading: string; nonce: number } | null
+  /** Scroll to (and select) a heading — following a [[Note#Heading]]
+   *  link — or the first occurrence of some text (a vault-search hit).
+   *  `nonce` re-triggers the same jump. */
+  jump?: { heading?: string; text?: string; nonce: number } | null
   /** Focus the editor when this note opens (e.g. a freshly created note). */
   focusOnOpen?: boolean
+  /** Slash commands that reach outside the editor (new notes, properties). */
+  onCommand?: RunPageCommand
+  /** Imperative handle for the page (focus, e.g. clicking below the text). */
+  apiRef?: MutableRefObject<NoteEditorApi | null>
+}
+
+export interface NoteEditorApi {
+  focus: () => void
+  focusEnd: () => void
 }
 
 /** Marks transactions that sync the doc from props, so they don't echo back
@@ -135,7 +146,7 @@ export function NoteEditor(props: NoteEditorProps) {
       const m = ctx.matchBefore(/(?:^|[\s(])#[\p{L}\p{N}_\-/]+/u)
       if (!m) return null
       const from = m.from + m.text.indexOf('#') + 1
-      if (syntaxIsCode(ctx.state, from)) return null
+      if (inCode(ctx.state, from)) return null
       // Count from the other notes plus this note's saved text minus the
       // tag being typed — otherwise the half-typed tag suggests itself.
       const typing = ctx.state.sliceDoc(from, ctx.pos).toLowerCase()
@@ -159,7 +170,10 @@ export function NoteEditor(props: NoteEditorProps) {
       markdown({ base: markdownLanguage, codeLanguages: languages, extensions: obsidianSyntax, completeHTMLTags: false }),
       markdownLanguage.data.of({ closeBrackets: { brackets: ['(', '['] } }),
       closeBrackets(),
-      autocompletion({ override: [wikiSource, tagSource], icons: false }),
+      autocompletion({
+        override: [slashSource(() => (cmd) => latest.current.onCommand?.(cmd)), wikiSource, tagSource],
+        icons: false,
+      }),
       search({ top: true }),
       foldGutter({ openText: '⌄', closedText: '›' }),
       placeholder('Start writing…'),
@@ -205,6 +219,15 @@ export function NoteEditor(props: NoteEditorProps) {
   useEffect(() => {
     const view = new EditorView({ state: stateFor(props.noteId, props.value), parent: host.current! })
     viewRef.current = view
+    if (props.apiRef) {
+      props.apiRef.current = {
+        focus: () => view.focus(),
+        focusEnd: () => {
+          view.dispatch({ selection: { anchor: view.state.doc.length } })
+          view.focus()
+        },
+      }
+    }
     if (props.focusOnOpen) view.focus()
     return () => {
       view.destroy()
@@ -221,7 +244,6 @@ export function NoteEditor(props: NoteEditorProps) {
     states.current.set(shownId.current, view.state)
     shownId.current = props.noteId
     view.setState(stateFor(props.noteId, props.value))
-    view.scrollDOM.scrollTop = 0
     if (props.focusOnOpen) view.focus()
     view.dispatch({ effects: setFocus.of(view.hasFocus) })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -244,8 +266,19 @@ export function NoteEditor(props: NoteEditorProps) {
   useEffect(() => {
     const view = viewRef.current
     if (!view || !props.jump) return
-    const wanted = props.jump.heading.trim().toLowerCase()
     const doc = view.state.doc
+    if (props.jump.text) {
+      const idx = doc.toString().toLowerCase().indexOf(props.jump.text.toLowerCase())
+      if (idx !== -1) {
+        view.dispatch({
+          selection: { anchor: idx, head: idx + props.jump.text.length },
+          effects: EditorView.scrollIntoView(idx, { y: 'center' }),
+        })
+        view.focus()
+      }
+      return
+    }
+    const wanted = (props.jump.heading ?? '').trim().toLowerCase()
     for (let i = 1; i <= doc.lines; i++) {
       const line = doc.line(i)
       const m = /^#{1,6}\s+(.+?)\s*#*\s*$/.exec(line.text)
@@ -260,17 +293,7 @@ export function NoteEditor(props: NoteEditorProps) {
     }
   }, [props.jump])
 
-  return <div ref={host} className="h-full min-h-0" />
-}
-
-function syntaxIsCode(state: EditorState, pos: number): boolean {
-  const line = state.doc.lineAt(pos)
-  // Cheap check: inside inline code on this line, or inside a fenced block.
-  const before = line.text.slice(0, pos - line.from)
-  if ((before.match(/`/g)?.length ?? 0) % 2 === 1) return true
-  let fences = 0
-  for (let i = 1; i < line.number; i++) if (/^\s*(```|~~~)/.test(state.doc.line(i).text)) fences++
-  return fences % 2 === 1
+  return <div ref={host} />
 }
 
 export default NoteEditor

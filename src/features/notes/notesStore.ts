@@ -14,6 +14,9 @@ import {
   uniqueTitle,
   WIKILINK_RE,
 } from './vault'
+import { asList, inferType, setProp, splitFrontmatter, withProps, type PropType, type PropValue } from './frontmatter'
+import { defaultBase } from './bases/types'
+import { emptyCanvas } from './canvas/types'
 
 export const NOTES_STORAGE = {
   drafts: 'os:notes:drafts',
@@ -24,6 +27,8 @@ export const NOTES_STORAGE = {
   meta: 'os:notes:meta',
   /** Explicitly created folders — so empty folders survive. */
   folders: 'os:notes:folders',
+  /** Property name → type, vault-wide (like Obsidian's types.json). */
+  propTypes: 'os:notes:proptypes',
   /** Bumped when stored bodies/titles need a one-time migration. */
   schema: 'os:notes:schema',
 }
@@ -70,6 +75,7 @@ interface VaultState {
   tags: Record<string, string[]>
   meta: Record<string, NoteMeta>
   folders: string[]
+  propTypes: Record<string, PropType>
 }
 
 type Key = keyof VaultState
@@ -82,6 +88,7 @@ function read(): VaultState {
     tags: loadJSON(NOTES_STORAGE.tags, {}),
     meta: loadJSON(NOTES_STORAGE.meta, {}),
     folders: loadJSON<string[]>(NOTES_STORAGE.folders, []),
+    propTypes: loadJSON(NOTES_STORAGE.propTypes, {}),
   }
 }
 
@@ -152,12 +159,20 @@ function derive(s: VaultState, overlayNotes: Note[]): Note[] {
         const h = splitLeadingH1(body)
         if (h && h.title.toLowerCase() === title.trim().toLowerCase()) body = h.rest
       }
+      const kind = n.kind ?? 'markdown'
+      const props = kind === 'markdown' ? splitFrontmatter(body).props : {}
+      // Tags: the `tags` property, plus any legacy/agent tag list (an
+      // override of [] means the list has been folded into the property).
+      const legacy = s.tags[n.id] ?? n.tags ?? []
+      const tags = [...new Set([...asList(props.tags).map((t) => t.replace(/^#/, '').toLowerCase()), ...legacy])]
       return {
         ...n,
+        kind,
         title,
         body,
+        props,
         folder: normFolder(m.folder ?? n.folder),
-        tags: s.tags[n.id] ?? n.tags ?? [],
+        tags,
         updated: m.updated ?? n.updated,
         created: m.created ?? n.created ?? n.updated,
       }
@@ -168,6 +183,8 @@ export interface Vault {
   notes: Note[]
   /** Every folder path, including empty and implied ancestor folders. */
   folders: string[]
+  /** Every property name in use, with its type. */
+  propTypes: Record<string, PropType>
 }
 
 export function useVault(): Vault {
@@ -175,7 +192,9 @@ export function useVault(): Vault {
   const overlay = useOsOverlay()
   return useMemo(() => {
     const notes = derive(s, overlay.notes)
-    return { notes, folders: allFolders(notes, s.folders) }
+    const propTypes: Record<string, PropType> = {}
+    for (const n of notes) for (const [k, v] of Object.entries(n.props ?? {})) propTypes[k] ??= inferType(k, v)
+    return { notes, folders: allFolders(notes, s.folders), propTypes: { ...propTypes, ...s.propTypes } }
   }, [s, overlay.notes])
 }
 
@@ -199,18 +218,50 @@ export function updateBody(id: string, body: string) {
   commit({ drafts: { ...state.drafts, [id]: body }, meta: patchMeta(id, { updated: now() }) })
 }
 
-export function setTags(id: string, tags: string[]) {
-  commit({ tags: { ...state.tags, [id]: tags } })
+/** Writes the note's tag list into its `tags` property (dropping any
+ *  legacy tag list, which is now folded in). */
+export function setTags(note: Note, tags: string[]) {
+  const clean = [...new Set(tags)]
+  const body = setProp(note.body, 'tags', clean.length ? clean : undefined)
+  commit({
+    drafts: { ...state.drafts, [note.id]: body },
+    tags: { ...state.tags, [note.id]: [] },
+    meta: patchMeta(note.id, { updated: now() }),
+  })
+}
+
+/** Sets (or with `undefined` removes) one property on a note. */
+export function setProperty(note: Note, key: string, value: PropValue | undefined) {
+  if (key === 'tags') return setTags(note, value === undefined ? [] : asList(value))
+  updateBody(note.id, setProp(note.body, key, value))
+}
+
+/** Renames a property on one note, keeping its position. */
+export function renameProperty(note: Note, from: string, to: string) {
+  const { props } = splitFrontmatter(note.body)
+  if (!(from in props) || !to.trim() || to in props) return
+  const next = Object.fromEntries(Object.entries(props).map(([k, v]) => (k === from ? [to.trim(), v] : [k, v])))
+  updateBody(note.id, withProps(note.body, next))
+}
+
+/** Sets a property's type vault-wide (like Obsidian's types.json). */
+export function setPropType(key: string, type: PropType) {
+  commit({ propTypes: { ...state.propTypes, [key]: type } })
 }
 
 export function createNote(
   notes: Note[],
-  opts: { folder?: string; title?: string; body?: string } = {},
+  opts: { folder?: string; title?: string; body?: string; kind?: Note['kind'] } = {},
 ): string {
   const folder = normFolder(opts.folder)
-  const title = uniqueTitle(notes, folder, opts.title?.trim() || 'Untitled')
+  const kind = opts.kind ?? 'markdown'
+  const fallback = kind === 'canvas' ? 'Untitled canvas' : kind === 'base' ? 'Untitled base' : 'Untitled'
+  const title = uniqueTitle(notes, folder, opts.title?.trim() || fallback)
   const ts = now()
-  const note: Note = { id: newId(), title, folder, tags: [], updated: ts, created: ts, body: opts.body ?? '' }
+  const body =
+    opts.body ??
+    (kind === 'canvas' ? JSON.stringify(emptyCanvas()) : kind === 'base' ? JSON.stringify(defaultBase(), null, 2) : '')
+  const note: Note = { id: newId(), title, folder, tags: [], updated: ts, created: ts, body, kind }
   commit({ userNotes: [note, ...state.userNotes] })
   return note.id
 }
@@ -219,9 +270,13 @@ export function duplicateNote(notes: Note[], id: string, folder?: string): strin
   const src = notes.find((n) => n.id === id)
   if (!src) return null
   const target = folder ?? src.folder
-  const copyId = createNote(notes, { folder: target, title: folder == null ? `${src.title} copy` : src.title, body: src.body })
-  if (src.tags.length) setTags(copyId, [...src.tags])
-  return copyId
+  return createNote(notes, {
+    folder: target,
+    title: folder == null ? `${src.title} copy` : src.title,
+    // Fold any legacy tags into the copy's properties.
+    body: src.kind === 'markdown' && src.tags.length ? setProp(src.body, 'tags', src.tags) : src.body,
+    kind: src.kind,
+  })
 }
 
 function dropNotes(ids: string[]) {
@@ -309,8 +364,8 @@ export function duplicateFolder(notes: Note[], folders: string[], path: string):
   let working = notes
   for (const n of notes.filter((x) => isWithin(x.folder, src))) {
     const folder = dest + n.folder.slice(src.length)
-    const id = createNote(working, { folder, title: n.title, body: n.body })
-    if (n.tags.length) setTags(id, [...n.tags])
+    const body = n.kind === 'markdown' && n.tags.length ? setProp(n.body, 'tags', n.tags) : n.body
+    const id = createNote(working, { folder, title: n.title, body, kind: n.kind })
     working = [...working, { ...n, id, folder }]
   }
   return dest

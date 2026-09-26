@@ -1,4 +1,5 @@
 import type { Note } from '@/data/notes'
+import { asList, contentOf } from './frontmatter'
 
 // Pure vault helpers — paths, the folder tree, wikilink resolution, tag
 // extraction and search. No React, no storage; notesStore and the editor
@@ -33,8 +34,10 @@ export function isWithin(path: string, folder: string): boolean {
 }
 
 /** The Obsidian-style vault path of a note, e.g. "Music/Mixing/Vocal chain.md". */
-export function notePath(n: Pick<Note, 'folder' | 'title'>): string {
-  return `${joinPath(n.folder, n.title)}.md`
+export const EXT: Record<NonNullable<Note['kind']>, string> = { markdown: 'md', canvas: 'canvas', base: 'base' }
+
+export function notePath(n: Pick<Note, 'folder' | 'title' | 'kind'>): string {
+  return `${joinPath(n.folder, n.title)}.${EXT[n.kind ?? 'markdown']}`
 }
 
 /** Every folder that exists — explicit (possibly empty) ones plus those
@@ -110,7 +113,11 @@ export function resolveNote(notes: Note[], target: string, from?: Note | null): 
   const byPath = notes.find((n) => joinPath(n.folder, n.title).toLowerCase() === t)
   if (byPath) return byPath
   const name = baseName(t)
-  const matches = notes.filter((n) => n.title.toLowerCase() === name)
+  let matches = notes.filter((n) => n.title.toLowerCase() === name)
+  if (!matches.length) {
+    // Obsidian's `aliases` property makes a note linkable by other names.
+    matches = notes.filter((n) => asList(n.props?.aliases).some((a) => a.toLowerCase() === name))
+  }
   if (!matches.length) return null
   if (t.includes('/')) {
     // Partial path ("Mixing/Vocal chain") — match the folder suffix.
@@ -156,7 +163,7 @@ export function cleanTag(raw: string): string {
 
 /** Inline #tags in a body, skipping code blocks, inline code and headings. */
 export function inlineTags(body: string): string[] {
-  const text = body.replace(/```[\s\S]*?(```|$)/g, ' ').replace(/`[^`\n]*`/g, ' ')
+  const text = contentOf(body).replace(/```[\s\S]*?(```|$)/g, ' ').replace(/`[^`\n]*`/g, ' ')
   const out = new Set<string>()
   const re = new RegExp(`(^|[\\s(])#(${TAG_BODY.source})`, 'gu')
   let m: RegExpExecArray | null
