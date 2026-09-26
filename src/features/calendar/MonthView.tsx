@@ -44,7 +44,7 @@ export function MonthView({ month, appts, tasks, onSelectDay, onSelectAppt }: Mo
       {/* Day grid */}
       <div
         className="grid min-h-0 flex-1 grid-cols-7 overflow-auto"
-        style={{ gridAutoRows: 'minmax(96px, 1fr)' }}
+        style={{ gridAutoRows: 'minmax(72px, 1fr)' }}
       >
         {days.map((day) => {
           const inMonth = isSameMonth(day, month)

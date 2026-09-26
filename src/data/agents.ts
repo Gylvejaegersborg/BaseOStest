@@ -7,6 +7,8 @@ export interface Agent {
   status: 'working' | 'idle' | 'thinking' | 'offline'
   task: string
   stats: { tasksDone: number; tokens: string; uptime: string; load: number }
+  /** Live metrics from a connected Agent-OS gateway (absent in mock mode). */
+  live?: { tasks: number; successRate: number | null; failureRate: number | null; avgTurnMs: number | null }
   // canned lines the agent "says" in the room feed
   chatter: string[]
 }

@@ -1,5 +1,5 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import {
   ArrowLeft,
   ArrowRight,
@@ -53,6 +53,9 @@ import { Omnisearch } from '@/features/notes/Omnisearch'
 import { MENU_EVENT, type MenuRequest } from '@/features/notes/menuBus'
 import type { NoteEditorApi } from '@/features/notes/editor/NoteEditor'
 import type { PageCommand } from '@/features/notes/editor/slashCommands'
+import { useGlobalProps, useGlobalTags } from '@/features/connections/connections'
+import { createProject, patchProject, setProjectProp, setStatus as setProjectStatus, useProjects } from '@/features/projects/store'
+import { STATUS_META, type ProjectStatus } from '@/data/projects'
 import {
   baseName,
   backlinks,
@@ -100,8 +103,9 @@ const UI = {
 const copy = (text: string) => void navigator.clipboard?.writeText(text).catch(() => {})
 
 export function Notes() {
-  const { notes, folders, propTypes } = useVault()
+  const { notes, folders } = useVault()
   const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
   const pageRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLInputElement>(null)
   const editorApi = useRef<NoteEditorApi | null>(null)
@@ -239,18 +243,42 @@ export function Notes() {
   const fm = useMemo(() => splitFrontmatter(selected?.body ?? ''), [selected?.body])
   const words = useMemo(() => fm.content.match(/\S+/g)?.length ?? 0, [fm.content])
 
-  /** Values already used for each property — list autocomplete. */
-  const propValues = useMemo(() => {
-    const map = new Map<string, Set<string>>()
-    for (const n of notes)
-      for (const [k, v] of Object.entries(n.props ?? {})) {
-        const set = map.get(k) ?? new Set<string>()
-        for (const x of Array.isArray(v) ? v : v == null || typeof v === 'boolean' ? [] : [String(v)]) set.add(x)
-        map.set(k, set)
-      }
-    return map
-  }, [notes])
-  const suggestions = useCallback((key: string) => [...(propValues.get(key) ?? [])].sort(), [propValues])
+  // Property types/values and tags are shared with projects (connections).
+  const { propTypes, suggestions } = useGlobalProps()
+  const { all: globalTags } = useGlobalTags()
+  /** Tag suggestions: the vault's tags plus tags only projects use. */
+  const tagPool = useMemo<[string, number][]>(() => {
+    const seen = new Set(vaultTags.map(([t]) => t))
+    return [...vaultTags, ...globalTags.filter((g) => !seen.has(g.tag)).map((g) => [g.tag, g.projects.length] as [string, number])]
+  }, [vaultTags, globalTags])
+
+  // Projects as note-shaped rows so a base can list them (source: projects).
+  const projects = useProjects()
+  const projectIds = useMemo(() => new Set(projects.map((p) => p.id)), [projects])
+  const projectRows = useMemo<Note[]>(
+    () =>
+      projects.map((p) => ({
+        id: p.id,
+        title: p.name,
+        folder: 'Projects',
+        tags: p.tags,
+        updated: p.updatedAt,
+        created: p.createdAt,
+        body: p.what,
+        kind: 'markdown',
+        props: { status: p.status, section: p.sectionId, tagline: p.tagline, ...p.props },
+      })),
+    [projects],
+  )
+  const setRowProp = (row: Note, key: string, value: PropValue | undefined) => {
+    const project = projects.find((p) => p.id === row.id)
+    if (!project) return setProperty(row, key, value)
+    if (key === 'status' && typeof value === 'string' && value in STATUS_META)
+      return setProjectStatus(project, value as ProjectStatus, Object.fromEntries(Object.entries(STATUS_META).map(([k, m]) => [k, m.label])) as Record<ProjectStatus, string>)
+    if (key === 'tagline') return patchProject(project.id, { tagline: value == null ? '' : String(value) })
+    if (key === 'section') return
+    setProjectProp(project.id, key, value)
+  }
 
   // ---- actions -------------------------------------------------------------
   const newNote = (folder = focusedFolder ?? '', kind: Note['kind'] = 'markdown', body?: string) => {
@@ -752,9 +780,17 @@ export function Notes() {
                     propTypes={propTypes}
                     suggestions={suggestions}
                     onChange={(body) => updateBody(selected.id, body)}
-                    onOpenNote={(id) => openNote(id)}
-                    onCreateNote={(folder, props: Record<string, PropValue>) => newNote(folder, 'markdown', withProps('', props))}
-                    onSetProp={setProperty}
+                    projectRows={projectRows}
+                    onOpenNote={(id) => (projectIds.has(id) ? navigate(`/projects?project=${encodeURIComponent(id)}`) : openNote(id))}
+                    onCreateNote={(folder, props: Record<string, PropValue>, source) => {
+                      if (source === 'projects') {
+                        const { status, ...rest } = props
+                        const id = createProject({ status: typeof status === 'string' && status in STATUS_META ? (status as ProjectStatus) : undefined })
+                        for (const [k, v] of Object.entries(rest)) setProjectProp(id, k, v)
+                        navigate(`/projects?project=${encodeURIComponent(id)}`)
+                      } else newNote(folder, 'markdown', withProps('', props))
+                    }}
+                    onSetProp={setRowProp}
                     onOpenWiki={openWiki}
                     onTagClick={filterByTag}
                   />
@@ -779,7 +815,7 @@ export function Notes() {
                       note={selected}
                       propTypes={propTypes}
                       suggestions={suggestions}
-                      vaultTags={vaultTags}
+                      vaultTags={tagPool}
                       addNonce={addPropNonce}
                       onSet={(key, value) => setProperty(selected, key, value)}
                       onRename={(from, to) => renameProperty(selected, from, to)}
@@ -809,7 +845,7 @@ export function Notes() {
                 <TagBar
                   tags={selected.tags}
                   inlineTags={inlineTags(selected.body)}
-                  vaultTags={vaultTags}
+                  vaultTags={tagPool}
                   onAdd={(t) => setTags(selected, [...selected.tags, t])}
                   onRemove={(t) => setTags(selected, selected.tags.filter((x) => x !== t))}
                   onAutotag={autotag}

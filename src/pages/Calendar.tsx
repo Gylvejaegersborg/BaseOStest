@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { addDays, addMonths, format, isSameDay, startOfWeek } from 'date-fns'
 import { Bell, BellOff, CalendarDays, CheckSquare, ChevronLeft, ChevronRight, Clock, MapPin, Repeat } from 'lucide-react'
 import {
@@ -41,6 +41,7 @@ import { ReminderModal } from '@/features/calendar/ReminderModal'
 import { TaskPanel, TaskModal } from '@/features/calendar/TaskPanel'
 import { RemindersPanel } from '@/features/calendar/RemindersPanel'
 import { useCalendar } from '@/features/calendar/CalendarContext'
+import { layoutOverlaps } from '@/features/calendar/overlap'
 
 const DAY_START = 7
 const DAY_END = 22
@@ -184,7 +185,7 @@ export function Calendar() {
        *  short content before the aside panels underneath. max-height still
        *  caps a busy day/Week's grid so the toolbar above stays put while
        *  that scrolls internally, but a short day now just shrinks to fit. */}
-      <div className="flex max-h-[72vh] min-w-0 flex-col lg:h-auto lg:flex-1">
+      <div className="flex max-h-[72vh] min-w-0 flex-col lg:h-auto lg:max-h-none lg:min-h-0 lg:flex-1">
         <div className="flex flex-wrap items-center justify-between gap-1.5 border-b border-line px-2 py-2 sm:gap-2 sm:px-4">
           <div className="flex items-center gap-3">
             <h1 className="font-display text-lg tracking-wider text-text">CALENDAR</h1>
@@ -265,11 +266,11 @@ export function Calendar() {
               </button>
               {/* Jump straight to any date, crossing months — the piece day
                *  stepping alone can't do. */}
-              {view === 'day' && (
+              {(
                 <div className="relative">
                   <button
                     onClick={() => setDatePickerOpen((o) => !o)}
-                    title="Pick a date"
+                    title={view === 'day' ? 'Pick a date' : view === 'week' ? 'Jump to a week' : 'Jump to a month'}
                     className={cn(
                       'border border-line p-1',
                       datePickerOpen ? 'text-accent' : 'text-dim hover:text-text',
@@ -282,10 +283,17 @@ export function Calendar() {
                       <div className="fixed inset-0 z-30" onClick={() => setDatePickerOpen(false)} />
                       <div className="absolute right-0 top-full z-40 mt-2 animate-fade-in">
                         <MiniMonthPicker
-                          value={selectedDay}
+                          value={view === 'day' ? selectedDay : view === 'week' ? weekStart : month}
                           isDayMarked={isDayMarked}
                           onSelect={(d) => {
-                            setDayOffset(dayOffsetOf(d))
+                            if (view === 'day') setDayOffset(dayOffsetOf(d))
+                            else if (view === 'week') {
+                              const base = startOfWeek(TODAY, { weekStartsOn: 1 })
+                              const target = startOfWeek(d, { weekStartsOn: 1 })
+                              setWeekOffset(Math.round((target.getTime() - base.getTime()) / (7 * 86_400_000)))
+                            } else {
+                              setMonthOffset((d.getFullYear() - TODAY.getFullYear()) * 12 + d.getMonth() - TODAY.getMonth())
+                            }
                             setDatePickerOpen(false)
                           }}
                         />
@@ -457,39 +465,59 @@ function WeekGrid({
   onSelectReminder: (r: Reminder) => void
   onCreateAt: (dayOffset: number, hour: number) => void
 }) {
+  // The hour height scales so the whole day fits the available height (no
+  // inner scrolling on a normal screen), within readable limits.
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [hourPx, setHourPx] = useState(HOUR_PX)
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const fit = () => {
+      const avail = el.clientHeight - 44 // day header row
+      setHourPx(Math.max(26, Math.min(56, Math.floor(avail / (DAY_END - DAY_START)))))
+    }
+    fit()
+    const ro = new ResizeObserver(fit)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
   // Translate a vertical click position in a day column into a fractional hour,
   // snapped to the nearest 15 minutes.
   const hourFromClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect()
     const y = e.clientY - rect.top
-    const raw = DAY_START + y / HOUR_PX
+    const raw = DAY_START + y / hourPx
     const snapped = Math.round(raw * 4) / 4
     return Math.min(DAY_END - 0.25, Math.max(DAY_START, snapped))
   }
 
+  const now = new Date()
+  const nowHour = now.getHours() + now.getMinutes() / 60
+
   return (
-    <div className="min-h-0 flex-1 overflow-auto">
+    <div ref={scrollRef} className="min-h-0 flex-1 overflow-auto">
       <div className="min-w-[720px] lg:min-w-0">
         {/* Day headers */}
-        <div className="sticky top-0 z-20 flex border-b border-line bg-bg pr-3" style={{ paddingLeft: 52 }}>
+        <div className="sticky top-0 z-20 flex border-b border-line bg-bg pr-3" style={{ paddingLeft: 44 }}>
           {days.map((d) => {
             const today = isSameDay(d, TODAY)
             return (
-              <div key={d.toISOString()} className="flex-1 py-2 text-center">
-                <div className="text-[10px] uppercase tracking-wider text-dim">{format(d, 'EEE')}</div>
-                <div className={`font-display text-lg ${today ? 'text-accent' : 'text-text'}`}>{format(d, 'd')}</div>
+              <div key={d.toISOString()} className="flex flex-1 items-baseline justify-center gap-1.5 py-2">
+                <span className="text-[10px] uppercase tracking-wider text-dim">{format(d, 'EEE')}</span>
+                <span className={`font-display text-sm ${today ? 'text-accent' : 'text-text'}`}>{format(d, 'd')}</span>
               </div>
             )
           })}
         </div>
 
         {/* Time grid */}
-        <div className="relative flex" style={{ height: (DAY_END - DAY_START) * HOUR_PX }}>
+        <div className="relative flex pr-3" style={{ height: (DAY_END - DAY_START) * hourPx }}>
           {/* hour labels */}
-          <div className="w-[52px] shrink-0">
+          <div className="w-[44px] shrink-0">
             {Array.from({ length: DAY_END - DAY_START }, (_, i) => (
-              <div key={i} className="relative border-t border-line/60" style={{ height: HOUR_PX }}>
-                <span className="absolute -top-2 left-1 text-[10px] tabular-nums text-dim">
+              <div key={i} className="relative border-t border-line/60" style={{ height: hourPx }}>
+                <span className="absolute -top-2 left-1 text-[9px] tabular-nums text-dim">
                   {String(DAY_START + i).padStart(2, '0')}:00
                 </span>
               </div>
@@ -502,6 +530,18 @@ function WeekGrid({
             const dayTasks = tasks.filter(
               (t) => t.status !== 'done' && t.dueTime != null && taskOccursOn(t, d),
             )
+            // Tasks and reminders are moments; give them a 30-minute slot so
+            // they take part in the side-by-side split instead of overlapping.
+            const placed = layoutOverlaps([
+              ...dayAppts.map((a) => ({ id: `a:${a.id}`, start: a.start, end: Math.max(a.end, a.start + 0.5) })),
+              ...dayTasks.map((t) => ({ id: `t:${t.id}`, start: t.dueTime!, end: t.dueTime! + 0.5 })),
+              ...dayReminders.map((r) => ({ id: `r:${r.id}`, start: r.time, end: r.time + 0.5 })),
+            ])
+            const box = (key: string) => {
+              const p = placed.get(key) ?? { col: 0, cols: 1 }
+              return { left: `calc(${(p.col / p.cols) * 100}% + 2px)`, width: `calc(${100 / p.cols}% - 4px)` }
+            }
+            const isToday = isSameDay(d, TODAY)
             return (
               <div
                 key={d.toISOString()}
@@ -510,17 +550,22 @@ function WeekGrid({
                 title="Double-click to add a reminder"
               >
                 {Array.from({ length: DAY_END - DAY_START }, (_, i) => (
-                  <div key={i} className="border-t border-line/40" style={{ height: HOUR_PX }} />
+                  <div key={i} className="border-t border-line/40" style={{ height: hourPx }} />
                 ))}
                 {dayAppts.map((a) => (
-                  <ApptBlock key={a.id} appt={a} onClick={() => onSelectAppt(a)} />
+                  <ApptBlock key={a.id} appt={a} hourPx={hourPx} pos={box(`a:${a.id}`)} onClick={() => onSelectAppt(a)} />
                 ))}
                 {dayTasks.map((t) => (
-                  <TaskMarker key={t.id} task={t} onClick={() => onSelectTask(t)} />
+                  <TaskMarker key={t.id} task={t} hourPx={hourPx} pos={box(`t:${t.id}`)} onClick={() => onSelectTask(t)} />
                 ))}
                 {dayReminders.map((r) => (
-                  <ReminderMarker key={r.id} reminder={r} onClick={() => onSelectReminder(r)} />
+                  <ReminderMarker key={r.id} reminder={r} hourPx={hourPx} pos={box(`r:${r.id}`)} onClick={() => onSelectReminder(r)} />
                 ))}
+                {isToday && nowHour >= DAY_START && nowHour <= DAY_END && (
+                  <div className="pointer-events-none absolute inset-x-0 z-20 border-t border-accent" style={{ top: (nowHour - DAY_START) * hourPx }}>
+                    <span className="absolute -left-1 -top-1 h-2 w-2 rounded-full bg-accent" />
+                  </div>
+                )}
               </div>
             )
           })}
@@ -530,60 +575,65 @@ function WeekGrid({
   )
 }
 
-function ReminderMarker({ reminder, onClick }: { reminder: Reminder; onClick: () => void }) {
-  const top = (reminder.time - DAY_START) * HOUR_PX
+type Pos = { left: string; width: string }
+
+function ReminderMarker({ reminder, hourPx, pos, onClick }: { reminder: Reminder; hourPx: number; pos: Pos; onClick: () => void }) {
+  const top = (reminder.time - DAY_START) * hourPx
   return (
     <button
       onClick={onClick}
       onDoubleClick={(e) => e.stopPropagation()}
       title={`${reminder.title} · ${hhmm(reminder.time)}`}
-      className="absolute right-0.5 z-10 flex items-center gap-1 border px-1 py-0.5 text-[9px] leading-none hover:brightness-125"
+      className="absolute z-10 flex items-center gap-1 overflow-hidden border px-1 text-[9px] leading-none hover:z-30 hover:brightness-125"
       style={{
-        top: top - 7,
+        ...pos,
+        top: top + 1,
+        height: Math.max(14, hourPx / 2 - 2),
         color: REMINDER_COLOR,
         borderColor: `${REMINDER_COLOR}66`,
         backgroundColor: '#11141b',
       }}
     >
-      <Bell size={9} />
-      <span className="max-w-[80px] truncate">{reminder.title}</span>
+      <Bell size={9} className="shrink-0" />
+      <span className="truncate">{reminder.title}</span>
     </button>
   )
 }
 
-function TaskMarker({ task, onClick }: { task: Task; onClick: () => void }) {
+function TaskMarker({ task, hourPx, pos, onClick }: { task: Task; hourPx: number; pos: Pos; onClick: () => void }) {
   const color = PRIORITY_COLOR[task.priority]
-  const top = (task.dueTime! - DAY_START) * HOUR_PX
+  const top = (task.dueTime! - DAY_START) * hourPx
   return (
     <button
       onClick={onClick}
       onDoubleClick={(e) => e.stopPropagation()}
       title={`${task.title} · due ${hhmm(task.dueTime!)}`}
-      className="absolute right-0.5 z-10 flex items-center gap-1 border px-1 py-0.5 text-[9px] leading-none hover:brightness-125"
-      style={{ top: top - 7, color, borderColor: `${color}66`, backgroundColor: '#11141b' }}
+      className="absolute z-10 flex items-center gap-1 overflow-hidden border px-1 text-[9px] leading-none hover:z-30 hover:brightness-125"
+      style={{ ...pos, top: top + 1, height: Math.max(14, hourPx / 2 - 2), color, borderColor: `${color}66`, backgroundColor: '#11141b' }}
     >
-      <CheckSquare size={9} />
-      <span className="max-w-[80px] truncate">{task.title}</span>
+      <CheckSquare size={9} className="shrink-0" />
+      <span className="truncate">{task.title}</span>
     </button>
   )
 }
 
-function ApptBlock({ appt, onClick }: { appt: Appt; onClick: () => void }) {
-  const top = (appt.start - DAY_START) * HOUR_PX
-  const height = Math.max(22, (appt.end - appt.start) * HOUR_PX - 2)
+function ApptBlock({ appt, hourPx, pos, onClick }: { appt: Appt; hourPx: number; pos: Pos; onClick: () => void }) {
+  const top = (appt.start - DAY_START) * hourPx
+  const height = Math.max(16, (appt.end - appt.start) * hourPx - 2)
   const color = KIND_COLOR[appt.kind]
   return (
     <button
       onClick={onClick}
       onDoubleClick={(e) => e.stopPropagation()}
-      className="absolute left-0.5 right-0.5 overflow-hidden border-l-2 px-1.5 py-1 text-left transition-all hover:z-10 hover:brightness-125"
-      style={{ top, height, backgroundColor: `${color}22`, borderColor: color }}
+      title={`${appt.title} · ${hhmm(appt.start)}–${hhmm(appt.end)}`}
+      className="absolute overflow-hidden border-l-2 px-1.5 py-0.5 text-left transition-all hover:z-30 hover:brightness-125"
+      style={{ ...pos, top, height, backgroundColor: `${color}22`, borderColor: color }}
     >
-      <div className="flex items-center gap-1 truncate text-[11px] font-medium text-text">
+      <div className="flex items-center gap-1 truncate text-[10px] font-medium leading-tight text-text">
         {appt.recurrence && <Repeat size={9} className="shrink-0 text-dim" />}
         {appt.title}
       </div>
-      <div className="truncate text-[9px] text-dim">{hhmm(appt.start)}–{hhmm(appt.end)}</div>
+      {height > 26 && <div className="truncate text-[9px] leading-tight text-dim">{hhmm(appt.start)}–{hhmm(appt.end)}</div>}
     </button>
   )
 }

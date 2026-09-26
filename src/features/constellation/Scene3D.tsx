@@ -29,10 +29,14 @@ export function Scene3D({ activeKey, focusTarget, onHover, onSelect }: Props) {
     [],
   )
 
+  // Phones start zoomed out to roughly 60% so the whole map fits a narrow
+  // portrait viewport (camera distance ÷ 0.6).
+  const narrow = useMemo(() => typeof window !== 'undefined' && window.innerWidth < 768, [])
+
   return (
     <Canvas
       className="absolute inset-0 touch-none"
-      camera={{ position: [0, 6, 26], fov: 50, near: 0.1, far: 500 }}
+      camera={{ position: narrow ? [0, 10, 43] : [0, 6, 26], fov: 50, near: 0.1, far: 500 }}
       // Cap device pixel ratio lower on touch/coarse-pointer devices — most
       // phones report a devicePixelRatio of 2-3, and rendering bloom +
       // antialiasing at full native res on integrated mobile GPUs is the

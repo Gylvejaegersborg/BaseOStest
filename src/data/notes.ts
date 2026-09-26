@@ -62,6 +62,7 @@ Every note below shows one feature:
 - [[Properties]]: note metadata, shown at the top of a note
 - [[Song catalog]]: a **base**. It turns properties into a table and cards you can sort, filter and edit
 - [[Release plan]]: a **canvas** with cards, arrows, shapes and hand drawing
+- [[Everything tagged]]: a base that lists **projects**, or notes and projects together. Tags and properties are shared across BaseSpace
 
 ## Search the whole vault
 Press **Ctrl/Cmd + Shift + F** (or the magnifier in the explorer) to search inside every note at once. It finds words even when you don't know which note mentions them, and it tolerates typos.
@@ -394,6 +395,45 @@ Properties power [[Song catalog]], a **base** that lists notes as a table or as 
             sort: [{ prop: 'bpm', dir: 'desc' }],
             groupBy: null,
             columns: ['file.name', 'bpm', 'status'],
+          },
+        ],
+      },
+      null,
+      2,
+    ),
+  },
+  {
+    id: 'vault-overview-base',
+    title: 'Everything tagged',
+    folder: '',
+    tags: [],
+    ago: 30,
+    kind: 'base',
+    body: JSON.stringify(
+      {
+        formulas: {},
+        views: [
+          {
+            id: 'view-projects',
+            name: 'Projects',
+            type: 'table',
+            source: 'projects',
+            filters: [],
+            match: 'all',
+            sort: [{ prop: 'file.mtime', dir: 'desc' }],
+            groupBy: null,
+            columns: ['file.name', 'status', 'section', 'file.tags', 'file.mtime'],
+          },
+          {
+            id: 'view-music',
+            name: '#music everywhere',
+            type: 'cards',
+            source: 'all',
+            filters: [{ prop: '', op: 'has tag', value: 'music' }],
+            match: 'all',
+            sort: [{ prop: 'file.name', dir: 'asc' }],
+            groupBy: 'file.folder',
+            columns: ['file.name', 'file.tags', 'status'],
           },
         ],
       },

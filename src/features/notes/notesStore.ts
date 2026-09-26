@@ -1,6 +1,7 @@
 import { useMemo, useSyncExternalStore } from 'react'
 import { NOTES, NOTE_FOLDERS, type Note } from '@/data/notes'
 import { useOsOverlay, mergeById } from '@/features/team/osOverlay'
+import { reportError } from '@/lib/errorBus'
 import {
   allFolders,
   isWithin,
@@ -47,8 +48,9 @@ export function loadJSON<T>(key: string, fallback: T): T {
 export function saveJSON(key: string, value: unknown) {
   try {
     localStorage.setItem(key, JSON.stringify(value))
-  } catch {
-    /* storage full / disabled — the in-memory store still works this session */
+  } catch (e) {
+    // Storage full / disabled — the in-memory store still works this session.
+    reportError({ source: 'notes', message: `Could not save ${key}: ${(e as Error).message}` })
   }
 }
 
