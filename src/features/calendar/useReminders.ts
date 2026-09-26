@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { Appt, Reminder, Task } from '@/data/calendar'
-import { KIND_COLOR, PRIORITY_COLOR, REMINDER_COLOR } from '@/data/calendar'
-import { apptNextMs, hhmm, reminderNextMs, taskNextMs, untilLabel } from './util'
+import type { Appt, Task } from '@/data/calendar'
+import { KIND_COLOR, PRIORITY_COLOR } from '@/data/calendar'
+import { apptNextMs, hhmm, taskNextMs, untilLabel } from './util'
 import {
   getPermission,
   pushNotification,
@@ -9,7 +9,7 @@ import {
   type NotifyPermission,
 } from './notifications'
 
-type Source = 'appt' | 'task' | 'reminder'
+type Source = 'appt' | 'task'
 
 export interface Nudge {
   id: string // unique per fire
@@ -49,7 +49,7 @@ const FIRST_RUN_DELAY = 1_800
 const NOTIFY_KEY = 'os:calendar:notify'
 const MAX_NUDGES = 4
 
-function buildTargets(appts: Appt[], tasks: Task[], reminders: Reminder[]): Target[] {
+function buildTargets(appts: Appt[], tasks: Task[]): Target[] {
   const out: Target[] = []
   for (const a of appts) {
     out.push({
@@ -63,7 +63,8 @@ function buildTargets(appts: Appt[], tasks: Task[], reminders: Reminder[]): Targ
     })
   }
   for (const t of tasks) {
-    if (t.status === 'done' || t.dueTime == null) continue
+    // notify:false = a plain todo that just sits on the list, no ping.
+    if (t.status === 'done' || t.dueTime == null || t.notify === false) continue
     out.push({
       refId: t.id,
       source: 'task',
@@ -74,31 +75,18 @@ function buildTargets(appts: Appt[], tasks: Task[], reminders: Reminder[]): Targ
       nextStartAt: (from) => taskNextMs(t, from),
     })
   }
-  for (const r of reminders) {
-    if (r.done) continue
-    out.push({
-      refId: r.id,
-      source: 'reminder',
-      title: r.title,
-      color: REMINDER_COLOR,
-      lead: 0, // the reminder time IS the ping time
-      hour: r.time,
-      nextStartAt: (from) => reminderNextMs(r, from),
-    })
-  }
   return out
 }
 
 /**
- * Watches appointments, tasks and standalone reminders against the wall clock
+ * Watches appointments and timed todos against the wall clock
  * and surfaces them as in-app nudges (and OS push notifications when enabled).
  * Fires a "soon" ping at `start − lead` and a "now" ping when the item starts.
  */
 export function useReminders(
   appts: Appt[],
   tasks: Task[],
-  reminders: Reminder[],
-  opts: { onCompleteTask?: (id: string) => void; onCompleteReminder?: (id: string) => void } = {},
+  opts: { onCompleteTask?: (id: string) => void } = {},
 ) {
   const [enabled, setEnabled] = useState<boolean>(() => {
     try {
@@ -115,10 +103,8 @@ export function useReminders(
   enabledRef.current = enabled
   const onCompleteTaskRef = useRef(opts.onCompleteTask)
   onCompleteTaskRef.current = opts.onCompleteTask
-  const onCompleteReminderRef = useRef(opts.onCompleteReminder)
-  onCompleteReminderRef.current = opts.onCompleteReminder
 
-  const targets = useMemo(() => buildTargets(appts, tasks, reminders), [appts, tasks, reminders])
+  const targets = useMemo(() => buildTargets(appts, tasks), [appts, tasks])
   const targetsRef = useRef(targets)
   targetsRef.current = targets
 
@@ -172,11 +158,7 @@ export function useReminders(
             color: tg.color,
             stage: 'now',
             body:
-              tg.source === 'task'
-                ? 'Due now — knock it out.'
-                : tg.source === 'reminder'
-                  ? 'Reminder.'
-                  : 'Happening now.',
+              tg.source === 'task' ? 'Due now.' : 'Happening now.',
           },
           true,
         )
@@ -211,7 +193,7 @@ export function useReminders(
       })
       .filter((r): r is ScheduledReminder => r != null)
       .sort((a, b) => a.fireAt - b.fireAt)
-      .slice(0, 4)
+      .slice(0, 12)
   }, [targets])
 
   const dismiss = useCallback((id: string) => {
@@ -242,7 +224,6 @@ export function useReminders(
   const complete = useCallback((nudge: Nudge) => {
     setNudges((prev) => prev.filter((n) => n.id !== nudge.id))
     if (nudge.source === 'task') onCompleteTaskRef.current?.(nudge.refId)
-    else if (nudge.source === 'reminder') onCompleteReminderRef.current?.(nudge.refId)
   }, [])
 
   const toggleEnabled = useCallback(() => {

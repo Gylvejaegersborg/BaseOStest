@@ -5,6 +5,7 @@ import { buildAgenda, type AgendaItem } from './agenda'
 import { useCalendar } from './CalendarContext'
 import { hhmm } from './util'
 import { cn } from '@/lib/cn'
+import { cronVisible } from '@/data/calendar'
 
 const WINDOW_BEFORE_H = 1
 const WINDOW_AFTER_H = 11
@@ -26,7 +27,7 @@ function until(ms: number): string {
  */
 export function HomeTimeline() {
   const navigate = useNavigate()
-  const { appts, tasks, reminders, crons } = useCalendar()
+  const { appts, tasks, crons } = useCalendar()
   const [now, setNow] = useState(() => Date.now())
   const [open, setOpen] = useState(() => {
     try {
@@ -52,8 +53,8 @@ export function HomeTimeline() {
   const start = now - WINDOW_BEFORE_H * 3600_000
   const end = now + WINDOW_AFTER_H * 3600_000
   const items = useMemo(
-    () => buildAgenda({ appts, tasks, reminders, crons }, 40, start).filter((i) => i.when <= end),
-    [appts, tasks, reminders, crons, start, end],
+    () => buildAgenda({ appts, tasks, crons: crons.filter(cronVisible) }, 40, start).filter((i) => i.when <= end),
+    [appts, tasks, crons, start, end],
   )
   const next = items.find((i) => i.when >= now) ?? null
   const x = (ms: number) => ((ms - start) / (end - start)) * 100

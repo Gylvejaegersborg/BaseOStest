@@ -14,11 +14,9 @@ function metaLine(it: AgendaItem): string {
     case 'appt':
       return `${hhmm(it.hour)}–${hhmm(it.endHour ?? it.hour)}`
     case 'task':
-      return `due ${hhmm(it.hour)} · task`
+      return `${hhmm(it.hour)} · todo`
     case 'cron':
       return `${hhmm(it.hour)} · cron`
-    case 'reminder':
-      return `${hhmm(it.hour)} · reminder`
   }
 }
 

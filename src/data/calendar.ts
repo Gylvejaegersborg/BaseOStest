@@ -80,6 +80,13 @@ export interface Task {
   reminderMinutes?: number
   subtasks?: Subtask[]
   recurrence?: Recurrence
+  /** Send a notification (reminderMinutes before dueTime). Defaults to on
+   *  when there's a due time. Reminders are simply todos with this on. */
+  notify?: boolean
+  /** Where a todo comes from. Derived ones (project next moves, dated note
+   *  checkboxes) are read-only here and complete back at their source. */
+  source?: 'manual' | 'project' | 'note'
+  sourceRef?: { projectId?: string; entryId?: string; noteId?: string; line?: number }
 }
 
 export const PRIORITY_COLOR: Record<TaskPriority, string> = {
@@ -135,8 +142,12 @@ export type CronSchedule =
 export interface CronJob {
   id: string
   name: string
-  owner: 'Claude' | 'Hemera' | 'Nyx'
+  /** The agent that runs it (any agent name). */
+  owner: string
   schedule: CronSchedule
+  /** Show its runs in the calendar's time grid. Defaults to on for daily
+   *  and ≥6-hourly jobs, off for frequent ones (they'd fill the grid). */
+  showInCalendar?: boolean
   lastRun: string
   status: 'ok' | 'running' | 'warn'
   description?: string
@@ -270,3 +281,9 @@ export const REMINDERS: Reminder[] = [
   { id: 'r1', title: 'Stand up & stretch', dayOffset: 0, time: 15 },
   { id: 'r2', title: 'Wind down — screens off', dayOffset: 0, time: 22 },
 ]
+
+/** Whether a cron's runs appear in the time grid (see showInCalendar). */
+export function cronVisible(c: CronJob): boolean {
+  if (c.showInCalendar != null) return c.showInCalendar
+  return c.schedule.type === 'daily'
+}

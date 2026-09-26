@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronDown, ChevronUp, Plus, Repeat, Trash2 } from 'lucide-react'
+import { Bell, ChevronDown, ChevronUp, FileText, FolderKanban, Maximize2, Plus, Repeat, Trash2 } from 'lucide-react'
 import {
   PRIORITY_COLOR,
   PRIORITY_LABEL,
@@ -23,9 +23,12 @@ interface TaskPanelProps {
   onToggle: (task: Task) => void
   onEdit: (task: Task) => void
   onAdd: () => void
+  onExpand?: () => void
+  /** Open rows shown before "+N more" (the expanded pop-up lists them all). */
+  limit?: number
 }
 
-export function TaskPanel({ tasks, onToggle, onEdit, onAdd }: TaskPanelProps) {
+export function TaskPanel({ tasks, onToggle, onEdit, onAdd, onExpand, limit = 8 }: TaskPanelProps) {
   const [showDone, setShowDone] = useState(false)
   const open = tasks.filter((t) => t.status !== 'done')
   const done = tasks.filter((t) => t.status === 'done')
@@ -41,14 +44,21 @@ export function TaskPanel({ tasks, onToggle, onEdit, onAdd }: TaskPanelProps) {
 
   return (
     <Panel
-      title="Tasks"
+      title="Todo"
       code="TODO"
       accent="#46d369"
       bodyClassName="p-2"
       right={
-        <button onClick={onAdd} className="flex items-center gap-1 text-[10px] uppercase tracking-wider text-dim hover:text-text">
-          <Plus size={12} /> Add
-        </button>
+        <span className="flex items-center gap-2">
+          <button onClick={onAdd} className="flex items-center gap-1 text-[10px] uppercase tracking-wider text-dim hover:text-text">
+            <Plus size={12} /> Add
+          </button>
+          {onExpand && (
+            <button onClick={onExpand} title="Open full view" className="text-dim hover:text-text">
+              <Maximize2 size={12} />
+            </button>
+          )}
+        </span>
       }
     >
       <div className="mb-2 px-1">
@@ -65,7 +75,16 @@ export function TaskPanel({ tasks, onToggle, onEdit, onAdd }: TaskPanelProps) {
 
       <div className="space-y-1.5">
         {sorted.length ? (
-          sorted.map((t) => <TaskRow key={t.id} task={t} onToggle={() => onToggle(t)} onEdit={() => onEdit(t)} />)
+          <>
+            {sorted.slice(0, limit).map((t) => (
+              <TaskRow key={t.id} task={t} onToggle={() => onToggle(t)} onEdit={() => onEdit(t)} />
+            ))}
+            {sorted.length > limit && (
+              <button onClick={onExpand} className="w-full px-2 py-1 text-left text-[10px] text-dim hover:text-text">
+                +{sorted.length - limit} more…
+              </button>
+            )}
+          </>
         ) : (
           <div className="px-2 py-3 text-xs text-dim">All clear. Nice.</div>
         )}
@@ -101,6 +120,12 @@ function dueLabel(t: Task): string | null {
   return t.dueTime != null && !overdue ? `${day} · ${hhmm(t.dueTime)}` : day
 }
 
+export function SourceIcon({ task, size = 9 }: { task: Task; size?: number }) {
+  if (task.source === 'project') return <FolderKanban size={size} className="shrink-0 text-dim" aria-label="from a project" />
+  if (task.source === 'note') return <FileText size={size} className="shrink-0 text-dim" aria-label="from a note" />
+  return null
+}
+
 function TaskRow({ task, onToggle, onEdit }: { task: Task; onToggle: () => void; onEdit: () => void }) {
   const color = PRIORITY_COLOR[task.priority]
   const subDone = task.subtasks?.filter((s) => s.done).length ?? 0
@@ -128,6 +153,8 @@ function TaskRow({ task, onToggle, onEdit }: { task: Task; onToggle: () => void;
           <span style={{ color }}>{PRIORITY_LABEL[task.priority]}</span>
           {label && <span className={overdue ? 'text-danger' : 'text-dim'}>{label}</span>}
           {task.recurrence && <Repeat size={9} className="text-dim" />}
+          {task.dueTime != null && task.notify !== false && <Bell size={9} className="text-dim" />}
+          <SourceIcon task={task} />
           {task.status === 'doing' && <span className="text-accent">{STATUS_LABEL.doing}</span>}
           {subTotal > 0 && (
             <span className="text-dim">
@@ -150,11 +177,14 @@ export function TaskModal({
   onClose,
   onSave,
   onDelete,
+  onOpenSource,
 }: {
   task: Task | null
   onClose: () => void
   onSave: (t: Task) => void
   onDelete: (id: string) => void
+  /** Derived todos (from a project or note) open their source instead. */
+  onOpenSource?: (t: Task) => void
 }) {
   const [draft, setDraft] = useState<Task | null>(task)
   if (task && (!draft || draft.id !== task.id)) setDraft(task)
@@ -162,9 +192,33 @@ export function TaskModal({
   const color = PRIORITY_COLOR[draft.priority]
 
   const set = (patch: Partial<Task>) => setDraft({ ...draft, ...patch })
+  const derived = draft.source === 'project' || draft.source === 'note'
+
+  if (derived) {
+    return (
+      <Modal open onClose={onClose} title="Todo" code={draft.source === 'project' ? 'PROJECT' : 'NOTE'} accent={color} width={460}>
+        <div className="mb-2 text-sm text-text">{draft.title}</div>
+        <p className="mb-4 text-xs text-dim">
+          {draft.notes} It lives there — tick it off here, or open it to edit.
+        </p>
+        <div className="flex justify-end gap-2 text-xs">
+          <button onClick={onClose} className="border border-line px-3 py-1.5 uppercase tracking-wider text-dim hover:text-text">
+            Close
+          </button>
+          <button
+            onClick={() => onOpenSource?.(draft)}
+            className="border px-3 py-1.5 uppercase tracking-wider"
+            style={{ borderColor: `${color}66`, color }}
+          >
+            Open {draft.source}
+          </button>
+        </div>
+      </Modal>
+    )
+  }
 
   return (
-    <Modal open={!!task} onClose={onClose} title="Task" code={draft.id.startsWith('new') ? 'NEW' : draft.id.toUpperCase()} accent={color} width={460}>
+    <Modal open={!!task} onClose={onClose} title="Todo" code={draft.id.startsWith('new') ? 'NEW' : draft.id.toUpperCase()} accent={color} width={460}>
       <label className="label mb-1 block">Title</label>
       <input
         value={draft.title}
@@ -221,12 +275,17 @@ export function TaskModal({
           />
         </div>
         <div>
-          <label className="label mb-1 block">Remind</label>
+          <label className="label mb-1 block">Notify</label>
           <select
-            value={draft.reminderMinutes ?? 15}
-            onChange={(e) => set({ reminderMinutes: Number(e.target.value) })}
-            className="w-full border border-line bg-bg/60 px-2 py-1.5 text-sm text-text focus:border-accent/60 focus:outline-none"
+            value={draft.notify === false ? 'off' : String(draft.reminderMinutes ?? 15)}
+            disabled={draft.dueTime == null}
+            onChange={(e) =>
+              e.target.value === 'off' ? set({ notify: false }) : set({ notify: true, reminderMinutes: Number(e.target.value) })
+            }
+            className="w-full border border-line bg-bg/60 px-2 py-1.5 text-sm text-text focus:border-accent/60 focus:outline-none disabled:opacity-40"
           >
+            <option value="off">Off</option>
+            <option value="0">At the time</option>
             {[5, 10, 15, 30, 60].map((m) => (
               <option key={m} value={m}>
                 {m}m before

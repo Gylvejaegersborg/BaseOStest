@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { format } from 'date-fns'
-import { Bell, BellOff, BellRing, Plus, Send } from 'lucide-react'
+import { Bell, BellOff, BellRing, Maximize2, Plus, Send } from 'lucide-react'
 import { Panel } from '@/components/ui/Panel'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { hhmm, parseHM } from './util'
@@ -17,6 +17,9 @@ interface RemindersPanelProps {
   onTest: () => void
   onAddReminder: (title: string, dayOffset: number, time: number) => void
   onSelect: (item: ScheduledReminder) => void
+  /** How many upcoming pings to list (the expanded pop-up shows them all). */
+  limit?: number
+  onExpand?: () => void
 }
 
 function nextHour(): number {
@@ -32,6 +35,8 @@ export function RemindersPanel({
   onTest,
   onAddReminder,
   onSelect,
+  limit = 4,
+  onExpand,
 }: RemindersPanelProps) {
   const [adding, setAdding] = useState(false)
   const [title, setTitle] = useState('')
@@ -49,11 +54,17 @@ export function RemindersPanel({
 
   return (
     <Panel
-      title="Reminders"
+      title="Notifications"
       code="PUSH"
       accent="#9b7bff"
       bodyClassName="p-2"
       right={
+        <span className="flex items-center gap-2">
+        {onExpand && (
+          <button onClick={onExpand} title="Open full view" className="text-dim hover:text-text">
+            <Maximize2 size={12} />
+          </button>
+        )}
         <button
           onClick={onToggle}
           title={enabled ? 'Mute reminders' : 'Unmute reminders'}
@@ -61,6 +72,7 @@ export function RemindersPanel({
         >
           {enabled ? <BellRing size={14} /> : <BellOff size={14} />}
         </button>
+        </span>
       }
     >
       {/* Notification permission state */}
@@ -133,14 +145,14 @@ export function RemindersPanel({
           onClick={() => setAdding(true)}
           className="mb-2 flex w-full items-center justify-center gap-1.5 border border-dashed border-line px-2 py-1.5 text-[10px] uppercase tracking-wider text-dim hover:text-text"
         >
-          <Plus size={11} /> New reminder
+          <Plus size={11} /> Remind me
         </button>
       )}
 
       {/* Next scheduled pings — click to edit */}
       {scheduled.length ? (
         <div className="space-y-1">
-          {scheduled.map((r) => (
+          {scheduled.slice(0, limit).map((r) => (
             <button
               key={`${r.source}:${r.refId}`}
               onClick={() => onSelect(r)}
@@ -150,14 +162,14 @@ export function RemindersPanel({
               <div className="min-w-0 flex-1">
                 <div className="truncate text-[11px] text-text">{r.title}</div>
                 <div className="text-[9px] text-dim">
-                  {format(r.startAt, 'EEE dd MMM · HH:mm')} · {r.source}
+                  {format(r.startAt, 'EEE dd MMM · HH:mm')} · {r.source === 'task' ? 'todo' : 'event'}
                 </div>
               </div>
             </button>
           ))}
         </div>
       ) : (
-        <div className="px-1 py-2 text-[11px] text-dim">No upcoming reminders.</div>
+        <div className="px-1 py-2 text-[11px] text-dim">Nothing will ping soon.</div>
       )}
 
       <button

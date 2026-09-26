@@ -1,6 +1,11 @@
 import type { ReactNode } from 'react'
-import { useEffect } from 'react'
+import { useEffect, useId } from 'react'
+import { createPortal } from 'react-dom'
 import { Panel } from './Panel'
+
+// Open modals, innermost last — so Escape closes only the top one and a
+// pop-up opened from inside another pop-up returns to its parent.
+const openStack: string[] = []
 
 interface ModalProps {
   open: boolean
@@ -19,16 +24,29 @@ interface ModalProps {
  *  that system-wide visual shift belongs to the page-specific phase, applied
  *  deliberately per surface rather than defaulted onto every modal at once. */
 export function Modal({ open, onClose, title, code, accent, children, width = 560 }: ModalProps) {
+  const id = useId()
   useEffect(() => {
     if (!open) return
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    openStack.push(id)
+    return () => {
+      const i = openStack.lastIndexOf(id)
+      if (i >= 0) openStack.splice(i, 1)
+    }
+  }, [open, id])
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && openStack[openStack.length - 1] === id) onClose()
+    }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [open, onClose])
+  }, [open, onClose, id])
 
   if (!open) return null
 
-  return (
+  // Portalled to <body> so a pop-up opened from inside another pop-up (whose
+  // panel's backdrop-filter would otherwise trap position:fixed) stacks on top.
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-fade-in"
       onClick={onClose}
@@ -51,6 +69,7 @@ export function Modal({ open, onClose, title, code, accent, children, width = 56
           {children}
         </Panel>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
