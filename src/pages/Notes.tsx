@@ -14,13 +14,16 @@ import {
   FolderInput,
   FolderPlus,
   Hash,
+  LayoutDashboard,
   Link2,
   LocateFixed,
   MoreHorizontal,
   Pencil,
   Plus,
+  ScanSearch,
   Search,
   SlidersHorizontal,
+  Table2,
   Trash2,
   X,
 } from 'lucide-react'
@@ -36,11 +39,20 @@ import {
   moveFolder,
   moveNote,
   renameNote,
+  renameProperty,
   saveJSON,
+  setPropType,
+  setProperty,
   setTags,
   updateBody,
   useVault,
 } from '@/features/notes/notesStore'
+import { splitFrontmatter, withProps, type PropValue } from '@/features/notes/frontmatter'
+import { PropertiesPanel } from '@/features/notes/PropertiesPanel'
+import { Omnisearch } from '@/features/notes/Omnisearch'
+import { MENU_EVENT, type MenuRequest } from '@/features/notes/menuBus'
+import type { NoteEditorApi } from '@/features/notes/editor/NoteEditor'
+import type { PageCommand } from '@/features/notes/editor/slashCommands'
 import {
   baseName,
   backlinks,
@@ -75,6 +87,8 @@ import { cn } from '@/lib/cn'
 
 // CodeMirror is sizeable — load it only when the Notes page opens.
 const NoteEditor = lazy(() => import('@/features/notes/editor/NoteEditor'))
+const CanvasView = lazy(() => import('@/features/notes/canvas/CanvasView').then((m) => ({ default: m.CanvasView })))
+const BaseView = lazy(() => import('@/features/notes/bases/BaseView').then((m) => ({ default: m.BaseView })))
 
 const UI = {
   view: 'os:notes:view',
@@ -86,10 +100,14 @@ const UI = {
 const copy = (text: string) => void navigator.clipboard?.writeText(text).catch(() => {})
 
 export function Notes() {
-  const { notes, folders } = useVault()
+  const { notes, folders, propTypes } = useVault()
   const [searchParams] = useSearchParams()
   const pageRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLInputElement>(null)
+  const editorApi = useRef<NoteEditorApi | null>(null)
+  const noteScroll = useRef<HTMLDivElement>(null)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [addPropNonce, setAddPropNonce] = useState(0)
 
   // ---- explorer state ------------------------------------------------------
   const [query, setQuery] = useState('')
@@ -135,7 +153,7 @@ export function Notes() {
     return { stack: first ? [first.id] : [], index: 0 }
   })
   const selected = notes.find((n) => n.id === hist.stack[hist.index]) ?? null
-  const [jump, setJump] = useState<{ heading: string; nonce: number } | null>(null)
+  const [jump, setJump] = useState<{ heading?: string; text?: string; nonce: number } | null>(null)
   const [freshId, setFreshId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -146,10 +164,37 @@ export function Notes() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected?.id])
 
-  const openNote = useCallback((id: string, opts?: { heading?: string | null }) => {
+  const openNote = useCallback((id: string, opts?: { heading?: string | null; text?: string | null }) => {
     setHist((h) => (h.stack[h.index] === id ? h : { stack: [...h.stack.slice(0, h.index + 1), id], index: h.index + 1 }))
     setMobileView('note')
-    setJump(opts?.heading ? { heading: opts.heading, nonce: Date.now() } : null)
+    setJump(
+      opts?.heading || opts?.text ? { heading: opts.heading ?? undefined, text: opts.text ?? undefined, nonce: Date.now() } : null,
+    )
+  }, [])
+
+  // Scroll a newly opened note back to the top.
+  useEffect(() => {
+    noteScroll.current?.scrollTo({ top: 0 })
+  }, [selected?.id])
+
+  // Editor widgets and the canvas open this page's context menu via an event.
+  useEffect(() => {
+    const onMenu = (e: Event) => setMenu((e as CustomEvent<MenuRequest>).detail)
+    window.addEventListener(MENU_EVENT, onMenu)
+    return () => window.removeEventListener(MENU_EVENT, onMenu)
+  }, [])
+
+  // Ctrl/Cmd+Shift+F: search inside every note.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'f') {
+        e.preventDefault()
+        e.stopPropagation()
+        setSearchOpen(true)
+      }
+    }
+    window.addEventListener('keydown', onKey, true)
+    return () => window.removeEventListener('keydown', onKey, true)
   }, [])
   const canBack = hist.index > 0
   const canForward = hist.index < hist.stack.length - 1
@@ -191,14 +236,53 @@ export function Notes() {
   )
 
   const links = useMemo(() => (selected ? backlinks(notes, selected) : []), [notes, selected])
-  const words = useMemo(() => selected?.body.match(/\S+/g)?.length ?? 0, [selected?.body])
+  const fm = useMemo(() => splitFrontmatter(selected?.body ?? ''), [selected?.body])
+  const words = useMemo(() => fm.content.match(/\S+/g)?.length ?? 0, [fm.content])
+
+  /** Values already used for each property — list autocomplete. */
+  const propValues = useMemo(() => {
+    const map = new Map<string, Set<string>>()
+    for (const n of notes)
+      for (const [k, v] of Object.entries(n.props ?? {})) {
+        const set = map.get(k) ?? new Set<string>()
+        for (const x of Array.isArray(v) ? v : v == null || typeof v === 'boolean' ? [] : [String(v)]) set.add(x)
+        map.set(k, set)
+      }
+    return map
+  }, [notes])
+  const suggestions = useCallback((key: string) => [...(propValues.get(key) ?? [])].sort(), [propValues])
 
   // ---- actions -------------------------------------------------------------
-  const newNote = (folder = focusedFolder ?? '') => {
-    const id = createNote(notes, { folder })
+  const newNote = (folder = focusedFolder ?? '', kind: Note['kind'] = 'markdown', body?: string) => {
+    const id = createNote(notes, { folder, kind, body })
     reveal(folder)
     setFreshId(id)
     openNote(id)
+    return id
+  }
+
+  /** Slash commands that reach outside the editor. */
+  const runCommand = (cmd: PageCommand): string | void => {
+    const folder = selected?.folder ?? ''
+    switch (cmd) {
+      case 'new-note':
+        newNote(folder)
+        return
+      case 'new-canvas':
+        newNote(folder, 'canvas')
+        return
+      case 'new-base':
+        newNote(folder, 'base')
+        return
+      case 'add-property':
+        setAddPropNonce((n) => n + 1)
+        return
+      case 'link-new-note': {
+        const id = createNote(notes, { folder })
+        reveal(folder)
+        return notes.find((n) => n.id === id)?.title ?? 'Untitled'
+      }
+    }
   }
 
   const newFolder = (parent = focusedFolder ?? '') => {
@@ -283,7 +367,7 @@ export function Notes() {
     if (!selected) return
     const words = new Set(selected.body.toLowerCase().match(/[\p{L}\p{N}_\-/]+/gu) ?? [])
     const found = vaultTags.map(([t]) => t).filter((t) => words.has(t) || words.has(baseName(t)))
-    setTags(selected.id, [...new Set([...selected.tags, ...found.filter((t) => !inlineTags(selected.body).includes(t))])])
+    setTags(selected, [...new Set([...selected.tags, ...found.filter((t) => !inlineTags(selected.body).includes(t))])])
   }
 
   // ---- menus ---------------------------------------------------------------
@@ -361,6 +445,8 @@ export function Notes() {
   const folderMenu = (path: string): MenuItem[] => [
     { kind: 'header', label: `${path}/`, mono: true },
     { label: 'New note', icon: <FilePlus size={13} />, onSelect: () => newNote(path) },
+    { label: 'New canvas', icon: <LayoutDashboard size={13} />, onSelect: () => newNote(path, 'canvas') },
+    { label: 'New base', icon: <Table2 size={13} />, onSelect: () => newNote(path, 'base') },
     { label: 'New folder', icon: <FolderPlus size={13} />, onSelect: () => newFolder(path) },
     { kind: 'separator' },
     { label: 'Rename', icon: <Pencil size={13} />, hint: 'F2', onSelect: () => setRenaming({ kind: 'folder', path }) },
@@ -386,6 +472,8 @@ export function Notes() {
 
   const blankMenu = (): MenuItem[] => [
     { label: 'New note', icon: <FilePlus size={13} />, onSelect: () => newNote('') },
+    { label: 'New canvas', icon: <LayoutDashboard size={13} />, onSelect: () => newNote('', 'canvas') },
+    { label: 'New base', icon: <Table2 size={13} />, onSelect: () => newNote('', 'base') },
     { label: 'New folder', icon: <FolderPlus size={13} />, onSelect: () => newFolder('') },
     { kind: 'separator' },
     { label: 'Sort by', submenu: sortItems() },
@@ -485,10 +573,29 @@ export function Notes() {
             >
               <SlidersHorizontal size={14} />
             </ToolButton>
+            <ToolButton title="Search inside all notes (Ctrl/Cmd+Shift+F)" onClick={() => setSearchOpen(true)}>
+              <ScanSearch size={14} />
+            </ToolButton>
             <ToolButton title="New folder" onClick={() => newFolder()}>
               <FolderPlus size={14} />
             </ToolButton>
-            <ToolButton title="New note" onClick={() => newNote()} accent>
+            <ToolButton
+              title="New note (right-click for canvas or base)"
+              onClick={() => newNote()}
+              onContextMenu={(e) => {
+                e.preventDefault()
+                setMenu({
+                  x: e.clientX,
+                  y: e.clientY,
+                  items: [
+                    { label: 'New note', icon: <FilePlus size={13} />, onSelect: () => newNote() },
+                    { label: 'New canvas', icon: <LayoutDashboard size={13} />, onSelect: () => newNote(undefined, 'canvas') },
+                    { label: 'New base', icon: <Table2 size={13} />, onSelect: () => newNote(undefined, 'base') },
+                  ],
+                })
+              }}
+              accent
+            >
               <Plus size={15} />
             </ToolButton>
           </div>
@@ -630,36 +737,95 @@ export function Notes() {
               </ToolButton>
             </div>
 
-            <div className="min-h-0 flex-1">
-              <Suspense fallback={<div className="h-full" />}>
-                <NoteEditor
-                  noteId={selected.id}
-                  value={selected.body}
-                  notes={notes}
-                  onChange={(body) => updateBody(selected.id, body)}
-                  onOpenWiki={openWiki}
-                  onOpenTag={filterByTag}
-                  jump={jump}
-                  focusOnOpen={false}
-                />
-              </Suspense>
-            </div>
+            {selected.kind === 'canvas' ? (
+              <div className="min-h-0 flex-1">
+                <Suspense fallback={<div className="h-full" />}>
+                  <CanvasView note={selected} notes={notes} onChange={(body) => updateBody(selected.id, body)} onOpenNote={(id) => openNote(id)} />
+                </Suspense>
+              </div>
+            ) : selected.kind === 'base' ? (
+              <div className="min-h-0 flex-1">
+                <Suspense fallback={<div className="h-full" />}>
+                  <BaseView
+                    base={selected}
+                    notes={notes}
+                    propTypes={propTypes}
+                    suggestions={suggestions}
+                    onChange={(body) => updateBody(selected.id, body)}
+                    onOpenNote={(id) => openNote(id)}
+                    onCreateNote={(folder, props: Record<string, PropValue>) => newNote(folder, 'markdown', withProps('', props))}
+                    onSetProp={setProperty}
+                    onOpenWiki={openWiki}
+                    onTagClick={filterByTag}
+                  />
+                </Suspense>
+              </div>
+            ) : (
+              <>
+                <div
+                  ref={noteScroll}
+                  className="group/note min-h-0 flex-1 cursor-text overflow-y-auto overflow-x-hidden"
+                  onMouseDown={(e) => {
+                    // Clicking the empty space below the text puts the cursor at the end.
+                    const t = e.target as HTMLElement
+                    if (t === e.currentTarget || t.dataset.noteColumn != null) {
+                      e.preventDefault()
+                      editorApi.current?.focusEnd()
+                    }
+                  }}
+                >
+                  <div data-note-column className="mx-auto w-full max-w-[47rem] px-4 pb-[40vh] pt-7 sm:px-8">
+                    <PropertiesPanel
+                      note={selected}
+                      propTypes={propTypes}
+                      suggestions={suggestions}
+                      vaultTags={vaultTags}
+                      addNonce={addPropNonce}
+                      onSet={(key, value) => setProperty(selected, key, value)}
+                      onRename={(from, to) => renameProperty(selected, from, to)}
+                      onSetType={setPropType}
+                      onOpenWiki={openWiki}
+                      onTagClick={filterByTag}
+                    />
+                    <div className="-ml-5">
+                      <Suspense fallback={<div className="h-40" />}>
+                        <NoteEditor
+                          noteId={selected.id}
+                          value={fm.content}
+                          notes={notes}
+                          onChange={(content) => updateBody(selected.id, splitFrontmatter(selected.body).block + content)}
+                          onOpenWiki={openWiki}
+                          onOpenTag={filterByTag}
+                          jump={jump}
+                          focusOnOpen={false}
+                          onCommand={runCommand}
+                          apiRef={editorApi}
+                        />
+                      </Suspense>
+                    </div>
+                  </div>
+                </div>
 
-            <TagBar
-              tags={selected.tags}
-              inlineTags={inlineTags(selected.body)}
-              vaultTags={vaultTags}
-              onAdd={(t) => setTags(selected.id, [...selected.tags, t])}
-              onRemove={(t) => setTags(selected.id, selected.tags.filter((x) => x !== t))}
-              onAutotag={autotag}
-              onTagClick={filterByTag}
-              right={<FooterStats words={words} chars={selected.body.length} links={links} onOpen={(id) => openNote(id)} />}
-            />
+                <TagBar
+                  tags={selected.tags}
+                  inlineTags={inlineTags(selected.body)}
+                  vaultTags={vaultTags}
+                  onAdd={(t) => setTags(selected, [...selected.tags, t])}
+                  onRemove={(t) => setTags(selected, selected.tags.filter((x) => x !== t))}
+                  onAutotag={autotag}
+                  onTagClick={filterByTag}
+                  right={<FooterStats words={words} chars={fm.content.length} links={links} onOpen={(id) => openNote(id)} />}
+                />
+              </>
+            )}
           </>
         )}
       </section>
 
       <ContextMenu menu={menu} onClose={() => setMenu(null)} />
+      {searchOpen && (
+        <Omnisearch notes={notes} onClose={() => setSearchOpen(false)} onOpen={(id, match) => openNote(id, { text: match })} />
+      )}
     </div>
   )
 }
@@ -671,10 +837,12 @@ function ToolButton({
   active,
   accent,
   disabled,
+  onContextMenu,
 }: {
   children: React.ReactNode
   title: string
   onClick: (e: ReactMouseEvent<HTMLButtonElement>) => void
+  onContextMenu?: (e: ReactMouseEvent<HTMLButtonElement>) => void
   active?: boolean
   accent?: boolean
   disabled?: boolean
@@ -684,6 +852,7 @@ function ToolButton({
       title={title}
       aria-label={title}
       onClick={onClick}
+      onContextMenu={onContextMenu}
       disabled={disabled}
       className={cn(
         'relative flex h-7 w-7 shrink-0 items-center justify-center rounded-control transition-colors disabled:opacity-30 disabled:hover:bg-transparent',

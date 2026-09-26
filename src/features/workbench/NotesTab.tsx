@@ -3,6 +3,7 @@ import { ChevronLeft, FileText } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { useNotesList } from '@/features/notes/notesStore'
+import { contentOf } from '@/features/notes/frontmatter'
 import { SearchInput } from '@/components/ui/SearchInput'
 import { relTime } from '@/lib/time'
 
@@ -43,7 +44,7 @@ export function NotesTab({
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto p-4">
           <div className="prose-term prose-read">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{docked.body}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{contentOf(docked.body)}</ReactMarkdown>
           </div>
         </div>
       </div>

@@ -3,6 +3,8 @@ import { Decoration, EditorView, WidgetType, type DecorationSet } from '@codemir
 import { ensureSyntaxTree, syntaxTree } from '@codemirror/language'
 import type { SyntaxNode } from '@lezer/common'
 import { parseWikiTarget } from '../vault'
+import { openContextMenu } from '../menuBus'
+import { editTable, focusTableCellSoon, parseTable, tableEdits, takePendingFocus, type TableModel } from './tableOps'
 
 // Obsidian-style Live Preview: the document is always rendered, and the
 // markdown syntax of an element only appears while the cursor is inside it
@@ -205,42 +207,187 @@ function renderInline(md: string, resolves: (note: string) => boolean): string {
   return s.replace(/\u0000(\d+)\u0000/g, (_, i) => codes[Number(i)])
 }
 
-function splitRow(line: string): string[] {
-  let s = line.trim()
-  if (s.startsWith('|')) s = s.slice(1)
-  if (s.endsWith('|') && !s.endsWith('\\|')) s = s.slice(0, -1)
-  return s.split(/(?<!\\)\|/).map((c) => c.trim().replace(/\\\|/g, '|'))
-}
-
+/** A rendered table you edit in place, like Obsidian/Confluence: click a
+ *  cell to edit it (Tab/Enter move on), hover for the + bars that add a
+ *  row or column, right-click a cell for insert/delete/align. Every edit
+ *  is written straight back to the markdown. */
 class TableWidget extends WidgetType {
-  constructor(readonly html: string) {
+  constructor(
+    readonly src: string,
+    readonly resolves: (note: string) => boolean,
+  ) {
     super()
   }
-  static build(src: string, resolves: (note: string) => boolean) {
-    const rows = src.split('\n').map(splitRow)
-    const aligns = (rows[1] ?? []).map((c) =>
-      c.startsWith(':') && c.endsWith(':') ? 'center' : c.endsWith(':') ? 'right' : 'left',
-    )
-    const cell = (tag: string, c: string, i: number) =>
-      `<${tag} style="text-align:${aligns[i] ?? 'left'}">${renderInline(c, resolves)}</${tag}>`
-    const head = `<tr>${(rows[0] ?? []).map((c, i) => cell('th', c, i)).join('')}</tr>`
-    const body = rows
-      .slice(2)
-      .map((r) => `<tr>${r.map((c, i) => cell('td', c, i)).join('')}</tr>`)
-      .join('')
-    return new TableWidget(`<table><thead>${head}</thead><tbody>${body}</tbody></table>`)
-  }
   eq(o: TableWidget) {
-    return o.html === this.html
+    return o.src === this.src
   }
-  toDOM() {
+
+  toDOM(view: EditorView) {
+    const model = parseTable(this.src)
     const wrap = document.createElement('div')
     wrap.className = 'cm-lp-table'
-    wrap.innerHTML = this.html
+    const scroll = document.createElement('div')
+    scroll.className = 'cm-lp-table-scroll'
+    const table = document.createElement('table')
+    model.rows.forEach((row, r) => {
+      const tr = document.createElement('tr')
+      row.forEach((cell, c) => {
+        const td = document.createElement(r === 0 ? 'th' : 'td')
+        td.dataset.r = String(r)
+        td.dataset.c = String(c)
+        td.style.textAlign = model.aligns[c] ?? 'left'
+        td.innerHTML = renderInline(cell, this.resolves) || '&nbsp;'
+        tr.appendChild(td)
+      })
+      ;(r === 0 ? table.createTHead() : table.tBodies[0] ?? table.createTBody()).appendChild(tr)
+    })
+    scroll.appendChild(table)
+    const addRow = document.createElement('button')
+    addRow.className = 'cm-lp-table-add cm-lp-table-add-row'
+    addRow.title = 'Add row'
+    addRow.textContent = '+'
+    const addCol = document.createElement('button')
+    addCol.className = 'cm-lp-table-add cm-lp-table-add-col'
+    addCol.title = 'Add column'
+    addCol.textContent = '+'
+    wrap.append(scroll, addRow, addCol)
+
+    const pos = () => view.posAtDOM(wrap)
+    const cellEl = (r: number, c: number) => wrap.querySelector<HTMLElement>(`[data-r="${r}"][data-c="${c}"]`)
+    const rows = model.rows.length
+    const cols = model.rows[0].length
+
+    const edit = (r: number, c: number) => {
+      const el = cellEl(r, c)
+      if (!el || el.querySelector('input')) return
+      const original = model.rows[r][c]
+      const input = document.createElement('input')
+      input.className = 'cm-lp-table-input'
+      input.value = original
+      el.textContent = ''
+      el.appendChild(input)
+      input.focus()
+      input.select()
+      let done = false
+      const finish = (next: { r: number; c: number } | null, addRow = false) => {
+        if (done) return
+        done = true
+        const value = input.value
+        const from = pos()
+        if (next) focusTableCellSoon(view, from, next.r, next.c)
+        const changed = editTable(view, from, (t) => {
+          tableEdits.setCell(r, c, value)(t)
+          if (addRow) tableEdits.insertRow(t.rows.length)(t)
+        })
+        if (!changed) {
+          // Nothing to rebuild — restore this cell and move on directly.
+          el.innerHTML = renderInline(original, this.resolves) || '&nbsp;'
+          if (next) {
+            takePendingFocus(view, from)
+            edit(next.r, next.c)
+          }
+        }
+      }
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+          e.preventDefault()
+          const idx = r * cols + c + (e.shiftKey ? -1 : 1)
+          if (idx < 0) return finish(null)
+          if (idx >= rows * cols) return finish({ r: rows, c: 0 }, true)
+          finish({ r: Math.floor(idx / cols), c: idx % cols })
+        } else if (e.key === 'Enter') {
+          e.preventDefault()
+          finish(r + 1 < rows ? { r: r + 1, c } : null)
+        } else if (e.key === 'Escape') {
+          // Keep what was typed and leave the table (like Confluence).
+          e.preventDefault()
+          finish(null)
+          view.focus()
+        } else if (e.key === 'ArrowUp' && r > 0) {
+          e.preventDefault()
+          finish({ r: r - 1, c })
+        } else if (e.key === 'ArrowDown' && r + 1 < rows) {
+          e.preventDefault()
+          finish({ r: r + 1, c })
+        }
+      })
+      input.addEventListener('blur', () => finish(null))
+    }
+
+    wrap.addEventListener('mousedown', (e) => {
+      const t = e.target as HTMLElement
+      if (t.closest('input')) return
+      e.preventDefault()
+      if (e.button !== 0) return
+      if (t === addRow) {
+        focusTableCellSoon(view, pos(), rows, 0)
+        editTable(view, pos(), tableEdits.insertRow(rows))
+        return
+      }
+      if (t === addCol) {
+        focusTableCellSoon(view, pos(), 0, cols)
+        editTable(view, pos(), tableEdits.insertCol(cols))
+        return
+      }
+      const link = t.closest<HTMLElement>('[data-lp-href],[data-lp-wiki],[data-lp-tag]')
+      if (link) {
+        const h = view.state.facet(previewHandlers)
+        if (link.dataset.lpHref != null) h.openUrl(link.dataset.lpHref)
+        else if (link.dataset.lpWiki != null) h.openWiki(link.dataset.lpWiki)
+        else if (link.dataset.lpTag != null) h.openTag(link.dataset.lpTag)
+        return
+      }
+      const cell = t.closest<HTMLElement>('[data-r]')
+      if (cell) edit(Number(cell.dataset.r), Number(cell.dataset.c))
+    })
+
+    wrap.addEventListener('contextmenu', (e) => {
+      const cell = (e.target as HTMLElement).closest<HTMLElement>('[data-r]')
+      if (!cell) return
+      e.preventDefault()
+      const r = Number(cell.dataset.r)
+      const c = Number(cell.dataset.c)
+      const run = (fn: (t: TableModel) => void) => () => editTable(view, pos(), fn)
+      openContextMenu(e.clientX, e.clientY, [
+        { kind: 'header', label: `Row ${r === 0 ? 'header' : r} · column ${c + 1}` },
+        { label: 'Insert row above', disabled: r === 0, onSelect: run(tableEdits.insertRow(r)) },
+        { label: 'Insert row below', onSelect: run(tableEdits.insertRow(r + 1)) },
+        { label: 'Insert column left', onSelect: run(tableEdits.insertCol(c)) },
+        { label: 'Insert column right', onSelect: run(tableEdits.insertCol(c + 1)) },
+        { kind: 'separator' },
+        {
+          label: 'Align column',
+          submenu: (['left', 'center', 'right'] as const).map((a) => ({
+            label: a[0].toUpperCase() + a.slice(1),
+            checked: (model.aligns[c] ?? 'left') === a,
+            onSelect: run(tableEdits.align(c, a)),
+          })),
+        },
+        {
+          label: 'Edit as markdown',
+          onSelect: () => {
+            view.dispatch({ selection: { anchor: pos() } })
+            view.focus()
+          },
+        },
+        { kind: 'separator' },
+        { label: 'Delete row', danger: true, disabled: r === 0 || rows <= 1, onSelect: run(tableEdits.deleteRow(r)) },
+        { label: 'Delete column', danger: true, disabled: cols <= 1, onSelect: run(tableEdits.deleteCol(c)) },
+      ])
+    })
+
+    // Reopen the cell an edit moved to (Tab/Enter/+ bars) once mounted.
+    requestAnimationFrame(() => {
+      if (!wrap.isConnected) return
+      const next = takePendingFocus(view, pos())
+      if (next) edit(next.r, next.c)
+    })
     return wrap
   }
+
   ignoreEvent() {
-    return false
+    // The widget handles its own clicks and keys.
+    return true
   }
 }
 
@@ -490,7 +637,7 @@ function build(state: EditorState): DecorationSet {
           const last = doc.lineAt(node.to)
           if (!touches(first.from, last.to)) {
             replace(first.from, last.to, {
-              widget: TableWidget.build(doc.sliceString(first.from, last.to), handlers.resolves),
+              widget: new TableWidget(doc.sliceString(first.from, last.to), handlers.resolves),
               block: true,
             })
             return false

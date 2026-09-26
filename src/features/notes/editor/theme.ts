@@ -45,7 +45,6 @@ const mono = '"JetBrains Mono", ui-monospace, monospace'
 export const editorTheme = EditorView.theme(
   {
     '&': {
-      height: '100%',
       color: c.text,
       backgroundColor: 'transparent',
       fontSize: '16px',
@@ -54,8 +53,9 @@ export const editorTheme = EditorView.theme(
     '.cm-scroller': {
       fontFamily: '"Inter", ui-sans-serif, system-ui, sans-serif',
       lineHeight: '1.75',
-      // Obsidian's "readable line length": content centred at ~46rem.
-      padding: '28px max(16px, calc((100% - 46rem) / 2)) 45vh',
+      // The page scrolls (so properties sit above the text, like
+      // Obsidian); the editor just grows with its content.
+      overflow: 'visible',
     },
     '.cm-content': { caretColor: c.accent, padding: '0' },
     '.cm-line': { padding: '0 4px' },
@@ -182,9 +182,42 @@ export const editorTheme = EditorView.theme(
     '.cm-lp-code-copy:hover': { color: c.accent1, borderColor: c.accent },
 
     // tables
-    '.cm-lp-table': { overflowX: 'auto', margin: '6px 0', cursor: 'text' },
+    '.cm-lp-table': { position: 'relative', margin: '6px 0', padding: '0 22px 20px 0' },
+    '.cm-lp-table-scroll': { overflowX: 'auto' },
+    '.cm-lp-table-input': {
+      width: '100%',
+      minWidth: '60px',
+      background: 'transparent',
+      border: 'none',
+      outline: 'none',
+      color: c.bright,
+      font: 'inherit',
+      padding: '0',
+    },
+    '.cm-lp-table th:has(.cm-lp-table-input), .cm-lp-table td:has(.cm-lp-table-input)': {
+      boxShadow: `inset 0 0 0 1px ${c.accent}`,
+      backgroundColor: 'rgba(199, 117, 145, 0.08)',
+    },
+    '.cm-lp-table-add': {
+      position: 'absolute',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      border: `1px dashed ${c.line2}`,
+      borderRadius: '4px',
+      background: 'transparent',
+      color: c.dim,
+      font: `600 13px/1 ${mono}`,
+      cursor: 'pointer',
+      opacity: '0',
+      transition: 'opacity 120ms, background-color 120ms, color 120ms',
+    },
+    '.cm-lp-table:hover .cm-lp-table-add': { opacity: '1' },
+    '.cm-lp-table-add:hover': { backgroundColor: 'rgba(199, 117, 145, 0.15)', color: c.accent1, borderColor: c.accent },
+    '.cm-lp-table-add-row': { left: '0', right: '22px', bottom: '0', height: '16px' },
+    '.cm-lp-table-add-col': { top: '0', bottom: '20px', right: '0', width: '16px' },
     '.cm-lp-table table': { borderCollapse: 'collapse', width: '100%', fontSize: '0.92em', lineHeight: '1.5' },
-    '.cm-lp-table th, .cm-lp-table td': { border: `1px solid ${c.line2}`, padding: '6px 10px' },
+    '.cm-lp-table th, .cm-lp-table td': { border: `1px solid ${c.line2}`, padding: '6px 10px', cursor: 'text', minWidth: '60px' },
     '.cm-lp-table th': { backgroundColor: c.panel2, color: c.bright, fontWeight: '600' },
     '.cm-lp-table tr:nth-child(even) td': { backgroundColor: 'rgba(255, 255, 255, 0.015)' },
     '.cm-lp-table-src': { fontFamily: mono, fontSize: '0.86em' },

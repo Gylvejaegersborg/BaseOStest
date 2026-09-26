@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type DragEvent, type MouseEvent as ReactMouseEvent } from 'react'
-import { ChevronRight, FileText, Folder, FolderOpen } from 'lucide-react'
+import { ChevronRight, FileText, Folder, FolderOpen, LayoutDashboard, Table2 } from 'lucide-react'
 import type { Note } from '@/data/notes'
 import { relTime } from '@/lib/time'
 import { cn } from '@/lib/cn'
@@ -75,7 +75,7 @@ function buildTree(notes: Note[], folders: string[], includeEmpty: boolean): Fol
 
 export type TreeTarget = { kind: 'note'; id: string } | { kind: 'folder'; path: string }
 
-const NOTE_MIME = 'application/x-os-note'
+export const NOTE_MIME = 'application/x-os-note'
 const FOLDER_MIME = 'application/x-os-folder'
 
 export interface FileTreeProps {
@@ -258,6 +258,7 @@ function NoteRow({ note, showFolder, ...p }: RowProps & { note: Note; showFolder
   const active = note.id === p.activeId
   const renaming = p.renaming?.kind === 'note' && p.renaming.id === note.id
   const tags = p.view.showTags || p.view.density === 'detailed' ? p.tagsOf(note) : []
+  const KindIcon = note.kind === 'canvas' ? LayoutDashboard : note.kind === 'base' ? Table2 : FileText
   return (
     <div
       data-tree-row
@@ -290,7 +291,7 @@ function NoteRow({ note, showFolder, ...p }: RowProps & { note: Note; showFolder
         active ? 'bg-accent/15 text-text' : 'text-text/75 hover:bg-panel-2 hover:text-text',
       )}
     >
-      <FileText size={12} className={cn('shrink-0', active ? 'text-accent' : 'text-dim/70', p.view.density === 'detailed' && 'mt-[3px]')} />
+      <KindIcon size={12} className={cn('shrink-0', active ? 'text-accent' : 'text-dim/70', p.view.density === 'detailed' && 'mt-[3px]')} />
       <span className="min-w-0 flex-1">
         {renaming ? (
           <RenameInput initial={note.title} onDone={p.onRenameDone} />
