@@ -8,7 +8,17 @@ export interface Agent {
   task: string
   stats: { tasksDone: number; tokens: string; uptime: string; load: number }
   /** Live metrics from a connected Agent-OS gateway (absent in mock mode). */
-  live?: { tasks: number; successRate: number | null; failureRate: number | null; avgTurnMs: number | null }
+  live?: {
+    tasks: number
+    successRate: number | null
+    failureRate: number | null
+    avgTurnMs: number | null
+    /** Model turns and tokens (input + output) from Agent-OS; tokens is null
+     *  when the gateway or model doesn't report usage. */
+    turns?: number
+    tokens?: number | null
+    lastTurnAt?: string | null
+  }
   // canned lines the agent "says" in the room feed
   chatter: string[]
 }

@@ -149,3 +149,18 @@
 .prose-term hr {
   @apply border-line my-6;
 }
+
+/* iOS Safari gives native date/time inputs an intrinsic minimum width and
+   ignores `width: 100%`, so in a two-column form they spill into the next
+   column. Let them shrink like any other input. */
+input[type='date'],
+input[type='time'],
+input[type='datetime-local'] {
+  min-width: 0;
+  max-width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+}
+input::-webkit-date-and-time-value {
+  text-align: left;
+}

@@ -45,7 +45,7 @@ export function CronEditModal({
         className="mb-3 w-full border border-line bg-bg/60 px-2 py-1.5 text-sm text-text focus:border-accent/60 focus:outline-none"
       />
 
-      <div className="mb-3 grid grid-cols-2 gap-2">
+      <div className="mb-3 grid grid-cols-2 gap-2 [&>*]:min-w-0">
         <div>
           <label className="label mb-1 block">Owner</label>
           <select
@@ -78,7 +78,7 @@ export function CronEditModal({
 
       {/* Schedule editor */}
       <label className="label mb-1 block">Schedule</label>
-      <div className="mb-3 grid grid-cols-2 gap-2">
+      <div className="mb-3 grid grid-cols-2 gap-2 [&>*]:min-w-0">
         <select
           value={draft.schedule.type}
           onChange={(e) => {

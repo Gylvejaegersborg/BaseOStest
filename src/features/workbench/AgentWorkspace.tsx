@@ -26,6 +26,8 @@ export function AgentWorkspace({
   dockedNoteId,
   onDockNote,
   onBack,
+  onShowApproval,
+  focusApprovalId,
 }: {
   agentId: string
   activePanel: StripTab | null
@@ -38,6 +40,8 @@ export function AgentWorkspace({
   dockedNoteId: string | null
   onDockNote: (id: string | null) => void
   onBack: () => void
+  onShowApproval: (id: string) => void
+  focusApprovalId: string | null
 }) {
   const { agents } = useAgentOsContext()
   const agent = agents.find((a) => a.id === agentId)
@@ -61,7 +65,7 @@ export function AgentWorkspace({
         onOpenSettings={onOpenSettings}
       />
       <div className="flex min-h-0 flex-1">
-        <ConversationPane agent={agent} chat={chat} onDockNote={onDockNote} />
+        <ConversationPane agent={agent} chat={chat} onDockNote={onDockNote} onShowApproval={onShowApproval} />
         {activePanel && (
           <RightPanel
             tab={activePanel}
@@ -72,6 +76,7 @@ export function AgentWorkspace({
             onClose={() => onSelectTab(activePanel)}
             dockedNoteId={dockedNoteId}
             onSelectNote={onDockNote}
+            focusApprovalId={focusApprovalId}
             onNewFlow={onNewFlow}
           />
         )}

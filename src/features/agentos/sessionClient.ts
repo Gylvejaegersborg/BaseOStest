@@ -107,6 +107,8 @@ export interface AgentOsApproval {
   resolvedAt?: string
   resolvedBy?: string
   resolutionNote?: string
+  /** Set once an approved request was used by the call it approved. */
+  usedAt?: string
 }
 
 /** Every pending tool-execution approval across every agent/session — the
@@ -122,8 +124,55 @@ export async function fetchPendingApprovals(): Promise<AgentOsApproval[]> {
   return approvals
 }
 
-export function resolveApproval(id: string, decision: 'approve' | 'reject', resolvedBy?: string): Promise<AgentOsApproval> {
-  return request<AgentOsApproval>(`/approvals/${id}/${decision}`, { method: 'POST', body: JSON.stringify({ resolvedBy }) })
+/** Approve or reject. `always` also adds an allowlist rule for the agent:
+ *  'tool' = every call of this tool, 'exact' = just this exact call. */
+export function resolveApproval(
+  id: string,
+  decision: 'approve' | 'reject',
+  resolvedBy?: string,
+  always?: 'tool' | 'exact',
+): Promise<AgentOsApproval> {
+  return request<AgentOsApproval>(`/approvals/${id}/${decision}`, { method: 'POST', body: JSON.stringify({ resolvedBy, always }) })
+}
+
+/** Recently decided approvals (newest first), for the Approvals tab's history. */
+export async function fetchRecentDecisions(limit = 30): Promise<AgentOsApproval[]> {
+  const [approved, rejected] = await Promise.all([
+    request<{ approvals: AgentOsApproval[] }>('/approvals?status=approved'),
+    request<{ approvals: AgentOsApproval[] }>('/approvals?status=rejected'),
+  ])
+  return [...approved.approvals, ...rejected.approvals]
+    .sort((a, b) => (b.resolvedAt ?? b.requestedAt).localeCompare(a.resolvedAt ?? a.requestedAt))
+    .slice(0, limit)
+}
+
+export async function fetchApproval(id: string): Promise<AgentOsApproval> {
+  return request<AgentOsApproval>(`/approvals/${encodeURIComponent(id)}`)
+}
+
+// ---- Allowlist ("always allow" per agent — agent-os's allowlist.ts) ----
+
+export interface AgentOsAllowRule {
+  id: string
+  agentId: string
+  toolName: string
+  /** Exact arguments allowed; absent = every call of the tool. */
+  args?: Record<string, unknown>
+  note?: string
+  createdAt: string
+  createdBy?: string
+}
+
+export async function fetchAllowRules(agentId?: string): Promise<{ rules: AgentOsAllowRule[]; exactOnlyTools: string[] }> {
+  return request(`/allowlist${agentId ? `?agentId=${encodeURIComponent(agentId)}` : ''}`)
+}
+
+export function addAllowRule(input: { agentId: string; toolName: string; args?: Record<string, unknown> }): Promise<AgentOsAllowRule> {
+  return request<AgentOsAllowRule>('/allowlist', { method: 'POST', body: JSON.stringify({ ...input, createdBy: 'dashboard-user' }) })
+}
+
+export function removeAllowRule(id: string): Promise<{ ok: true }> {
+  return request<{ ok: true }>(`/allowlist/${encodeURIComponent(id)}`, { method: 'DELETE' })
 }
 
 export type AgentOsTaskStatus = 'queued' | 'running' | 'succeeded' | 'failed' | 'timed_out' | 'cancelled' | 'lost'

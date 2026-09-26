@@ -2,6 +2,7 @@ import { createContext, useContext, type ReactNode } from 'react'
 import { useAgentOsAgents } from './useAgentOsAgents'
 import { useAgentOsEventLog, type WorkbenchEvent } from './useAgentOsEventLog'
 import type { AgentOsConnection } from './types'
+import { useAgentOsApprovalsSource, type AgentOsApprovalsState } from './useAgentOsApprovals'
 import type { Agent } from '@/data/agents'
 
 interface AgentOsContextValue {
@@ -11,6 +12,8 @@ interface AgentOsContextValue {
   /** Re-fetches the agent roster — call after creating or editing an
    *  agent from the Workbench so the change shows up without a reload. */
   refreshAgents: () => void
+  /** Pending tool-call approvals (shared — see useAgentOsApprovals). */
+  approvals: AgentOsApprovalsState
 }
 
 const AgentOsContext = createContext<AgentOsContextValue | null>(null)
@@ -27,7 +30,8 @@ const AgentOsContext = createContext<AgentOsContextValue | null>(null)
 export function AgentOsProvider({ children }: { children: ReactNode }) {
   const { agents, connection, refresh } = useAgentOsAgents()
   const events = useAgentOsEventLog()
-  return <AgentOsContext.Provider value={{ agents, connection, events, refreshAgents: refresh }}>{children}</AgentOsContext.Provider>
+  const approvals = useAgentOsApprovalsSource()
+  return <AgentOsContext.Provider value={{ agents, connection, events, refreshAgents: refresh, approvals }}>{children}</AgentOsContext.Provider>
 }
 
 export function useAgentOsContext(): AgentOsContextValue {

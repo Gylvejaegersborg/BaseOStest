@@ -44,6 +44,11 @@ export function Workbench() {
   const [newFlowOpen, setNewFlowOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [dockedNoteId, setDockedNoteId] = useState<string | null>(null)
+  const [focusApprovalId, setFocusApprovalId] = useState<string | null>(null)
+  const showApproval = (id: string) => {
+    setFocusApprovalId(id)
+    setActivePanel('approvals')
+  }
 
   // Shared by a chat message's "Send to Notes" action and the composer's
   // note picker — either summons the same docked Notes panel to the same note.
@@ -97,6 +102,8 @@ export function Workbench() {
             dockedNoteId={dockedNoteId}
             onDockNote={dockNote}
             onBack={backToRail}
+            onShowApproval={showApproval}
+            focusApprovalId={focusApprovalId}
           />
         ) : (
           <>
@@ -126,6 +133,7 @@ export function Workbench() {
                   dockedNoteId={dockedNoteId}
                   onSelectNote={dockNote}
                   onNewFlow={() => setNewFlowOpen(true)}
+                  focusApprovalId={focusApprovalId}
                 />
               )}
             </div>

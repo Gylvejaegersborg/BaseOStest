@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useAgentOsContext } from './AgentOsProvider'
 import { agentOsGatewayConfigured, fetchPendingApprovals, resolveApproval, subscribeToEvents, type AgentOsApproval } from './sessionClient'
 
 export type AgentOsApprovalsConnection = 'unconfigured' | 'connecting' | 'live' | 'error'
@@ -11,7 +12,7 @@ export type AgentOsApprovalsConnection = 'unconfigured' | 'connecting' | 'live' 
  * architecture plan's Approval system section), surfaced in Team.tsx
  * alongside (not merged into) the existing content-publish approval queue.
  */
-export function useAgentOsApprovals() {
+export function useAgentOsApprovalsSource() {
   const [connection, setConnection] = useState<AgentOsApprovalsConnection>('connecting')
   const [approvals, setApprovals] = useState<AgentOsApproval[]>([])
   const [busyId, setBusyId] = useState<string | null>(null)
@@ -40,11 +41,11 @@ export function useAgentOsApprovals() {
   }, [refresh])
 
   const act = useCallback(
-    async (id: string, decision: 'approve' | 'reject') => {
+    async (id: string, decision: 'approve' | 'reject', always?: 'tool' | 'exact') => {
       setBusyId(id)
       setError('')
       try {
-        await resolveApproval(id, decision, 'dashboard-user')
+        await resolveApproval(id, decision, 'dashboard-user', always)
         await refresh()
       } catch (err) {
         setError((err as Error)?.message ?? `Could not ${decision} the request`)
@@ -56,4 +57,13 @@ export function useAgentOsApprovals() {
   )
 
   return { connection, approvals, busyId, error, act }
+}
+
+export type AgentOsApprovalsState = ReturnType<typeof useAgentOsApprovalsSource>
+
+/** The app-wide approvals state — one fetch + one event subscription,
+ *  owned by AgentOsProvider and shared by the nav rail, the Workbench
+ *  strip's glow and the Approvals tab. */
+export function useAgentOsApprovals(): AgentOsApprovalsState {
+  return useAgentOsContext().approvals
 }

@@ -22,8 +22,15 @@ function mergeAgent(local: Agent, remote: AgentOsAgent | undefined): Agent {
       successRate: remote.metrics.tasks.successRate,
       failureRate: remote.metrics.tasks.failureRate,
       avgTurnMs: remote.metrics.turnLatency.avgMs,
+      ...liveUsage(remote),
     },
   }
+}
+
+function liveUsage(remote: AgentOsAgent): Pick<NonNullable<Agent['live']>, 'turns' | 'tokens' | 'lastTurnAt'> {
+  const u = remote.metrics.usage
+  if (!u) return {}
+  return { turns: u.turns, tokens: u.turnsWithUsage ? u.inputTokens + u.outputTokens : null, lastTurnAt: u.lastTurnAt }
 }
 
 // A small fixed palette for agents created live (via the Workbench's "new
@@ -56,6 +63,7 @@ function synthesizeAgent(remote: AgentOsAgent): Agent {
       successRate: remote.metrics.tasks.successRate,
       failureRate: remote.metrics.tasks.failureRate,
       avgTurnMs: remote.metrics.turnLatency.avgMs,
+      ...liveUsage(remote),
     },
     chatter: [],
   }

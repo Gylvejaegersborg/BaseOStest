@@ -101,6 +101,20 @@ const text = (v: unknown) => (v instanceof Error ? v.message : typeof v === 'str
 
 let installed = false
 
+// iOS/Safari aborts in-flight requests when the tab is backgrounded or the
+// screen locks and reports them as "Load failed" — not a real outage. Skip
+// network failures that happen while hidden or just after coming back.
+let lastVisibilityChange = 0
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    lastVisibilityChange = Date.now()
+  })
+}
+function networkBlip(err: unknown): boolean {
+  if (!(err instanceof TypeError)) return false
+  return document.visibilityState === 'hidden' || !navigator.onLine || Date.now() - lastVisibilityChange < 5000
+}
+
 /** Hooks the global failure points. Call once at startup. */
 export function installErrorCapture() {
   if (installed || typeof window === 'undefined') return
@@ -110,6 +124,7 @@ export function installErrorCapture() {
     reportError({ source: 'runtime', message: e.message || 'Uncaught error', context: e.filename ? `${e.filename}:${e.lineno}:${e.colno}` : undefined, stack: e.error?.stack })
   })
   window.addEventListener('unhandledrejection', (e) => {
+    if (networkBlip(e.reason)) return
     reportError({ source: 'promise', message: `Unhandled rejection: ${text(e.reason)}`, stack: e.reason instanceof Error ? e.reason.stack : undefined })
   })
 
@@ -157,7 +172,7 @@ export function installErrorCapture() {
       return res
     } catch (err) {
       const name = (err as Error)?.name
-      if (!quiet && name !== 'AbortError') {
+      if (!quiet && name !== 'AbortError' && !networkBlip(err)) {
         reportError({
           severity: name === 'TimeoutError' ? 'warn' : 'error',
           source: sourceFor(url),

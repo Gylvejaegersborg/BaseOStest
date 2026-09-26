@@ -17,7 +17,7 @@ import {
   WifiOff,
 } from 'lucide-react'
 import { DEVICES, OPS_ERRORS, SERVICES, makeLogLine, type DeviceConn, type ServiceStatus } from '@/data/ops'
-import type { Agent } from '@/data/agents'
+import { isRealAgent, type Agent } from '@/data/agents'
 import { useAgentOsContext } from '@/features/agentos/AgentOsProvider'
 import { clearErrors, dismissError, useAppErrors, type Severity } from '@/lib/errorBus'
 import { Panel } from '@/components/ui/Panel'
@@ -93,8 +93,36 @@ function tokenCount(s: string): number {
 
 const pct = (v: number | null | undefined) => (v == null ? '—' : `${Math.round(v * 100)}%`)
 
+/** Tokens an agent has used: real (Agent-OS) when connected — null if its
+ *  model doesn't report usage — otherwise the bundled roster's demo figure. */
+function agentTokens(a: Agent): number | null {
+  if (a.live) return a.live.tokens ?? null
+  return tokenCount(a.stats.tokens)
+}
+
+/** What the usage bar compares: tokens, or model turns when no model reports tokens. */
+function usageOf(a: Agent, byTurns: boolean): number {
+  return byTurns ? (a.live?.turns ?? 0) : (agentTokens(a) ?? 0)
+}
+
+function fmtTokens(n: number | null): string {
+  if (n == null) return '—'
+  if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`
+  if (n >= 1e3) return `${(n / 1e3).toFixed(1)}k`
+  return String(n)
+}
+
+function lastTurn(a: Agent): string {
+  const t = a.live?.lastTurnAt
+  if (!t) return a.live ? 'no turns yet' : a.stats.uptime
+  const min = Math.round((Date.now() - new Date(t).getTime()) / 60_000)
+  return min < 1 ? 'just now' : min < 60 ? `${min}m ago` : min < 1440 ? `${Math.round(min / 60)}h ago` : `${Math.round(min / 1440)}d ago`
+}
+
 export function Ops() {
-  const { agents, connection, events } = useAgentOsContext()
+  const { agents: allAgents, connection, events } = useAgentOsContext()
+  // Nyx's simulated sub-agents have no Agent-OS identity; hide them once real data is in.
+  const agents = connection === 'live' ? allAgents.filter(isRealAgent) : allAgents
   const appErrors = useAppErrors()
   const [logs, setLogs] = useState<LogLine[]>(() => Array.from({ length: 16 }, (_, i) => makeLogLine(i)))
   const [paused, setPaused] = useState(false)
@@ -182,7 +210,10 @@ export function Ops() {
   const shownIssues = sevFilter === 'all' ? issues : issues.filter((i) => i.severity === sevFilter)
 
   const count = <T,>(xs: T[], f: (x: T) => boolean) => xs.filter(f).length
-  const maxTokens = Math.max(1, ...agents.map((a) => tokenCount(a.stats.tokens)))
+  // Real usage once Agent-OS is connected; bars fall back to turn counts
+  // when the model in use doesn't report tokens (e.g. the stub).
+  const byTurns = connection === 'live' && agents.every((a) => a.live?.tokens == null)
+  const maxTokens = Math.max(1, ...agents.map((a) => usageOf(a, byTurns)))
 
   const related = (source: string) => ({
     issues: issues.filter((i) => i.source.toLowerCase().includes(source.toLowerCase()) || source.toLowerCase().includes(i.source.toLowerCase())),
@@ -352,8 +383,8 @@ export function Ops() {
           <Panel title="Agent Health" code="AGT" accent="#e0408a" className="rounded-none" bodyClassName="p-1.5" right={<Expand onClick={() => setDetail({ kind: 'table', panel: 'agents' })} />}>
             <div className="mb-1 flex gap-2 px-2 text-[9px] uppercase tracking-wider text-dim">
               <span className="w-20">agent</span>
-              <span className="flex-1">token usage (share)</span>
-              <span className="w-12 text-right">tokens</span>
+              <span className="flex-1">{byTurns ? 'turns (share)' : 'token usage (share)'}</span>
+              <span className="w-12 text-right">{byTurns ? 'turns' : 'tokens'}</span>
               <span className="w-12 text-right" title="Task success rate — live from Agent-OS">success</span>
             </div>
             <div className="space-y-1">
@@ -366,16 +397,13 @@ export function Ops() {
                   <StatusDot color={a.status === 'offline' ? '#ff5566' : a.color} pulse={a.status === 'working'} size={6} />
                   <span className="w-[68px] truncate text-xs text-text">{a.name}</span>
                   <div className="h-1.5 flex-1 bg-bg">
-                    <div className="h-full" style={{ width: `${(tokenCount(a.stats.tokens) / maxTokens) * 100}%`, backgroundColor: a.color }} />
+                    <div className="h-full" style={{ width: `${(usageOf(a, byTurns) / maxTokens) * 100}%`, backgroundColor: a.color }} />
                   </div>
-                  <span className="w-12 text-right text-[10px] tabular-nums text-dim">{a.stats.tokens}</span>
+                  <span className="w-12 text-right text-[10px] tabular-nums text-dim">{byTurns ? (a.live?.turns ?? 0) : fmtTokens(agentTokens(a))}</span>
                   <span className="w-12 text-right text-[10px] tabular-nums text-dim">{pct(a.live?.successRate)}</span>
                 </button>
               ))}
             </div>
-            <p className="mt-1.5 px-1 text-[10px] leading-snug text-dim">
-              Bar = share of total tokens used. Success rate and turn latency come from Agent-OS when it's connected ({connection}).
-            </p>
           </Panel>
         </div>
       </div>
@@ -390,7 +418,6 @@ export function Ops() {
           agents={agents}
           logs={allLogs}
           related={related}
-          maxTokens={maxTokens}
         />
       )}
     </div>
@@ -574,7 +601,6 @@ function DetailModal({
   agents,
   logs,
   related,
-  maxTokens,
 }: {
   detail: Detail
   onClose: () => void
@@ -583,7 +609,6 @@ function DetailModal({
   agents: Agent[]
   logs: LogLine[]
   related: (source: string) => { issues: Issue[]; logs: LogLine[] }
-  maxTokens: number
 }) {
   const [pingResult, setPingResult] = useState<string | null>(null)
 
@@ -742,17 +767,15 @@ function DetailModal({
           </div>
           <div className="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
             <KV k="status" v={a.status} c={a.status === 'offline' ? '#ff5566' : a.color} />
-            <KV k="tokens used" v={a.stats.tokens} />
-            <KV k="token share" v={`${Math.round((tokenCount(a.stats.tokens) / maxTokens) * 100)}% of top`} />
-            <KV k="uptime" v={a.stats.uptime} />
+            <KV k="tokens used" v={fmtTokens(agentTokens(a))} />
+            <KV k="model turns" v={a.live?.turns ?? '—'} />
+            <KV k={a.live ? 'last turn' : 'uptime'} v={lastTurn(a)} />
             <KV k="tasks done" v={a.live?.tasks ?? a.stats.tasksDone} />
             <KV k="success rate" v={pct(a.live?.successRate)} c="#46d369" />
             <KV k="failure rate" v={pct(a.live?.failureRate)} c="#ff5566" />
             <KV k="avg turn" v={a.live?.avgTurnMs != null ? `${Math.round(a.live.avgTurnMs)}ms` : '—'} />
           </div>
-          {!a.live && (
-            <p className="mt-1.5 text-[10px] text-dim">Success rate and turn latency appear when an Agent-OS gateway is connected; token and uptime figures are from the local roster.</p>
-          )}
+          {!a.live && <p className="mt-1.5 text-[10px] text-dim">Agent-OS isn't connected — these are the local roster's demo figures.</p>}
           <Section title="Current task">
             <div className="border border-line bg-bg/40 px-2 py-1 text-xs text-text/85">{a.task || '—'}</div>
           </Section>
@@ -865,7 +888,7 @@ function DetailModal({
         body = (
           <table className="w-full">
             <thead>
-              <tr>{['agent', 'status', 'model', 'tokens', 'tasks', 'success', 'avg turn', 'uptime'].map((h) => <th key={h} className={th}>{h}</th>)}</tr>
+              <tr>{['agent', 'status', 'model', 'tokens', 'turns', 'tasks', 'success', 'avg turn', 'last turn'].map((h) => <th key={h} className={th}>{h}</th>)}</tr>
             </thead>
             <tbody>
               {agents.map((a) => (
@@ -873,11 +896,12 @@ function DetailModal({
                   <td className={td} style={{ color: a.color }}>{a.name}</td>
                   <td className={td}>{a.status}</td>
                   <td className={td}>{a.model}</td>
-                  <td className={td}>{a.stats.tokens}</td>
+                  <td className={td}>{fmtTokens(agentTokens(a))}</td>
+                  <td className={td}>{a.live?.turns ?? '—'}</td>
                   <td className={td}>{a.live?.tasks ?? a.stats.tasksDone}</td>
                   <td className={td}>{pct(a.live?.successRate)}</td>
                   <td className={td}>{a.live?.avgTurnMs != null ? `${Math.round(a.live.avgTurnMs)}ms` : '—'}</td>
-                  <td className={td}>{a.stats.uptime}</td>
+                  <td className={td}>{lastTurn(a)}</td>
                 </tr>
               ))}
             </tbody>
