@@ -69,19 +69,13 @@ else
   echo "[start] agent-os not found at $AGENT_OS_DIR (postCreateCommand didn't run?) — Workbench will fall back to mock data."
 fi
 
-# A plain "localhost:$GATEWAY_PORT" would resolve to the BROWSER's own
-# machine, not this container — the browser (not this container) is what
-# actually calls the gateway. CODESPACE_NAME and
-# GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN are set automatically by
-# Codespaces, so this computes the real forwarded URL; it's a no-op
-# outside Codespaces (leaves .env.local, and thus mock-data fallback,
-# untouched).
-if [ -n "${CODESPACE_NAME:-}" ]; then
-  GATEWAY_URL="https://${CODESPACE_NAME}-${GATEWAY_PORT}.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN:-app.github.dev}"
-  echo "VITE_AGENT_OS_GATEWAY_URL=$GATEWAY_URL" > .env.local
-  echo "[start] Wrote .env.local -> $GATEWAY_URL"
-  echo "[start] First time in this Codespace: open the Ports panel and set port $GATEWAY_PORT's visibility to Public —"
-  echo "[start]   the gateway has no login of its own, so a Private port's GitHub-auth redirect breaks plain fetch() calls to it."
+# BaseSpace reaches the gateway through its own dev server (vite.config.ts
+# proxies /agent-os/* to 127.0.0.1:$GATEWAY_PORT), so the browser only ever
+# talks to BaseSpace's own origin — no second port to make public, and it
+# works the same on a phone as on the desktop.
+if [ -d "$AGENT_OS_DIR" ]; then
+  echo "VITE_AGENT_OS_GATEWAY_URL=/agent-os" > .env.local
+  echo "[start] Wrote .env.local -> /agent-os (proxied to :$GATEWAY_PORT)"
 fi
 
 # setup.sh only installs deps once, when the Codespace is created — so a

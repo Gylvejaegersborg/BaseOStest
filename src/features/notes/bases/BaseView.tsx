@@ -195,7 +195,7 @@ export function BaseView({
         <button onClick={addView} title="Add view" className="rounded-control p-1 text-dim hover:bg-panel-2 hover:text-text">
           <Plus size={13} />
         </button>
-        <div className="ml-auto flex items-center gap-0.5">
+        <div className="-mx-1 flex w-full items-center gap-0.5 overflow-x-auto px-1 sm:mx-0 sm:ml-auto sm:w-auto sm:overflow-visible [&>*]:shrink-0">
           <select
             value={source}
             onChange={(e) => updateView({ source: e.target.value as View['source'] })}

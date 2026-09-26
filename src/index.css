@@ -15,6 +15,9 @@
 
   body {
     @apply bg-bg text-text font-mono antialiased;
+    /* Long-press opens BaseSpace's own context menu (lib/longPress.ts),
+     * not iOS's link-preview callout. */
+    -webkit-touch-callout: none;
     margin: 0;
     /* Accent wash uses two tones from the ramp (light → deep) rather than
      * one flat hue fading to transparent, for real tonal depth. Violet and

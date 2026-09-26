@@ -8,8 +8,9 @@
   "postCreateCommand": "bash .devcontainer/setup.sh",
   "postStartCommand": "bash .devcontainer/start.sh",
 
-  // Forward Vite's port (auto-opens in the browser) and the Agent-OS
-  // gateway's port (does NOT auto-open — it's an API, not a page).
+  // Forward Vite's port (auto-opens in the browser). The Agent-OS gateway
+  // (8787) is reached through Vite's /agent-os proxy, so it doesn't need to
+  // be public; it's still forwarded for direct debugging.
   "forwardPorts": [5173, 8787],
   "portsAttributes": {
     "5173": {
@@ -19,9 +20,8 @@
     },
     "8787": {
       "label": "Agent-OS gateway",
-      "onAutoForward": "notify",
-      "protocol": "http",
-      "visibility": "public"
+      "onAutoForward": "silent",
+      "protocol": "http"
     }
   },
 

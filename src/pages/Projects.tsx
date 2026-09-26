@@ -44,10 +44,9 @@ import {
   type HistoryKind,
   type ProjectView,
 } from '@/features/projects/store'
-import { useGlobalProps, useGlobalTags, normTag } from '@/features/connections/connections'
+import { useGlobalProps, useGlobalTags, useLinkGraph, normTag, type LinkHit } from '@/features/connections/connections'
 import { ListEditor, PropertiesPanel } from '@/features/notes/PropertiesPanel'
-import { setPropType, useVault } from '@/features/notes/notesStore'
-import { resolveNote } from '@/features/notes/vault'
+import { setPropType } from '@/features/notes/notesStore'
 import type { Note } from '@/data/notes'
 import { Modal } from '@/components/ui/Modal'
 import { StatusDot } from '@/components/ui/StatusDot'
@@ -512,16 +511,20 @@ function ProjectModal({
   const section = sectionById(project.sectionId)
   const { index, all } = useGlobalTags()
   const { propTypes, suggestions } = useGlobalProps()
-  const { notes } = useVault()
   const nameRef = useRef<HTMLInputElement>(null)
   // The Properties panel works on anything note-shaped: id, title, props.
   const asNote = useMemo(
     () => ({ id: project.id, title: project.name, folder: '', tags: [], updated: project.updatedAt, body: '', props: project.props }) as Note,
     [project.id, project.name, project.updatedAt, project.props],
   )
+  const graph = useLinkGraph()
+  const linkedFrom = useMemo(() => graph.notesLinkingToProject(project.id), [graph, project.id])
+  const linksTo = useMemo(() => graph.linksFromProject(project), [graph, project])
+  const openHit = (h: LinkHit) =>
+    h.kind === 'note' ? navigate(`/notes?note=${encodeURIComponent(h.note.id)}`) : onOpenProject(h.project.id)
   const openWiki = (target: string) => {
-    const hit = resolveNote(notes, target)
-    if (hit) navigate(`/notes?note=${encodeURIComponent(hit.id)}`)
+    const hit = graph.resolve(target)
+    if (hit) openHit(hit)
   }
 
   useEffect(() => {
@@ -588,7 +591,7 @@ function ProjectModal({
             />
           </div>
 
-          <History project={project} />
+          <History project={project} onOpenWiki={openWiki} />
         </div>
 
         {/* Meta column */}
@@ -660,6 +663,34 @@ function ProjectModal({
               </div>
             </Field>
           )}
+          {(linkedFrom.length > 0 || linksTo.length > 0) && (
+            <Field label="Linked with [[links]]">
+              <div className="space-y-0.5">
+                {linkedFrom.map((n) => (
+                  <button
+                    key={n.id}
+                    onClick={() => navigate(`/notes?note=${encodeURIComponent(n.id)}`)}
+                    className="flex w-full items-center gap-1.5 rounded-control px-1 py-0.5 text-left hover:bg-panel-2"
+                  >
+                    <FileText size={12} className="shrink-0 text-dim" />
+                    <span className="min-w-0 flex-1 truncate text-text/85">{n.title}</span>
+                    <span className="shrink-0 text-[10px] text-dim">links here</span>
+                  </button>
+                ))}
+                {linksTo.map((h) => (
+                  <button
+                    key={h.kind === 'note' ? h.note.id : h.project.id}
+                    onClick={() => openHit(h)}
+                    className="flex w-full items-center gap-1.5 rounded-control px-1 py-0.5 text-left hover:bg-panel-2"
+                  >
+                    {h.kind === 'note' ? <FileText size={12} className="shrink-0 text-dim" /> : <Sparkles size={12} className="shrink-0 text-accent/70" />}
+                    <span className="min-w-0 flex-1 truncate text-text/85">{h.kind === 'note' ? h.note.title : h.project.name}</span>
+                    <span className="shrink-0 text-[10px] text-dim">linked</span>
+                  </button>
+                ))}
+              </div>
+            </Field>
+          )}
           {project.links && project.links.length > 0 && (
             <Field label="Links">
               <div className="flex flex-wrap gap-1.5">
@@ -707,7 +738,25 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 }
 
 /** Next moves (open plans), a composer, and the full history feed. */
-function History({ project }: { project: ProjectView }) {
+/** Plain text with clickable [[links]] (to notes or projects). */
+function LinkText({ text, onOpenWiki }: { text: string; onOpenWiki: (t: string) => void }) {
+  const parts: ReactNode[] = []
+  let last = 0
+  for (const m of text.matchAll(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g)) {
+    parts.push(text.slice(last, m.index))
+    const target = m[1]
+    parts.push(
+      <button key={m.index} onClick={() => onOpenWiki(target)} className="text-accent-2 underline decoration-accent-2/40 underline-offset-2 hover:decoration-accent-2">
+        {m[2] ?? target}
+      </button>,
+    )
+    last = (m.index ?? 0) + m[0].length
+  }
+  parts.push(text.slice(last))
+  return <>{parts}</>
+}
+
+function History({ project, onOpenWiki }: { project: ProjectView; onOpenWiki: (t: string) => void }) {
   const [kind, setKind] = useState<'comment' | 'move' | 'plan'>('comment')
   const [text, setText] = useState('')
   const submit = () => {
@@ -726,7 +775,9 @@ function History({ project }: { project: ProjectView }) {
               <button onClick={() => completePlan(project.id, p)} title="Mark done — it becomes a move" className="mt-0.5 text-amber hover:text-neon-green">
                 <Circle size={14} />
               </button>
-              <span className="min-w-0 flex-1 text-[13px] text-text/90">{p.text}</span>
+              <span className="min-w-0 flex-1 text-[13px] text-text/90">
+                <LinkText text={p.text} onOpenWiki={onOpenWiki} />
+              </span>
               <span className="shrink-0 text-[10px] text-dim">{relTime(new Date(p.date))}</span>
               <button onClick={() => removeEntry(project.id, p)} className="text-dim opacity-0 hover:text-danger group-hover:opacity-100" aria-label="Remove">
                 <X size={12} />
@@ -786,7 +837,7 @@ function History({ project }: { project: ProjectView }) {
             </span>
             <div className="min-w-0 flex-1">
               <div className={cn('text-[13px]', h.kind === 'status' || h.kind === 'created' ? 'text-dim' : 'text-text/90')}>
-                {h.kind === 'status' ? `Status changed: ${h.text}` : h.text}
+                {h.kind === 'status' ? `Status changed: ${h.text}` : <LinkText text={h.text} onOpenWiki={onOpenWiki} />}
               </div>
               <div className="text-[10px] text-dim" title={new Date(h.date).toLocaleString()}>
                 {KIND_META[h.kind].label} · {relTime(new Date(h.date))}

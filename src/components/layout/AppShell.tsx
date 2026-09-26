@@ -1,3 +1,6 @@
+import { useEffect, useState } from 'react'
+import { ContextMenu, type MenuState } from '@/features/notes/ContextMenu'
+import { MENU_EVENT, type MenuRequest } from '@/features/notes/menuBus'
 import { Outlet, useLocation } from 'react-router-dom'
 import { NavBar } from './NavBar'
 import { MobileTopBar, MobileBottomNav } from './MobileNav'
@@ -8,6 +11,18 @@ import { NudgeStack } from '@/features/calendar/NudgeStack'
 import { OsOverlayProvider } from '@/features/team/osOverlay'
 import { AgentOsProvider } from '@/features/agentos/AgentOsProvider'
 import { sectionForPath } from '@/data/sections'
+
+/** One context menu for the whole app: anything (editor widgets, canvas,
+ *  property panels, long-press on touch) can open it via menuBus. */
+function GlobalContextMenu() {
+  const [menu, setMenu] = useState<MenuState | null>(null)
+  useEffect(() => {
+    const onMenu = (e: Event) => setMenu((e as CustomEvent<MenuRequest>).detail)
+    window.addEventListener(MENU_EVENT, onMenu)
+    return () => window.removeEventListener(MENU_EVENT, onMenu)
+  }, [])
+  return <ContextMenu menu={menu} onClose={() => setMenu(null)} />
+}
 
 function GlobalNudges() {
   const { remindersEngine } = useCalendar()
@@ -57,6 +72,7 @@ export function AppShell() {
         </div>
       </div>
       <GlobalNudges />
+      <GlobalContextMenu />
       </AgentOsProvider>
       </CalendarProvider>
     </OsOverlayProvider>

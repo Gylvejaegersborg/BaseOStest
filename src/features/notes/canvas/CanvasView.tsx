@@ -347,6 +347,58 @@ export function CanvasView({
     })
   }
 
+  // Two-finger pinch zooms (and pans) on touch screens.
+  useEffect(() => {
+    const el = box.current
+    if (!el) return
+    const pts = new Map<number, { x: number; y: number }>()
+    let pinch: { dist: number; mid: { x: number; y: number }; vp: Vp } | null = null
+    const measure = () => {
+      const [a, b] = [...pts.values()]
+      return { dist: Math.hypot(a.x - b.x, a.y - b.y), mid: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 } }
+    }
+    const down = (e: PointerEvent) => {
+      if (e.pointerType !== 'touch') return
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY })
+      if (pts.size === 2) {
+        setDrag(null)
+        pinch = { ...measure(), vp: live.current.vp }
+      }
+    }
+    const move = (e: PointerEvent) => {
+      if (!pts.has(e.pointerId)) return
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY })
+      if (!pinch || pts.size < 2) return
+      const r = el.getBoundingClientRect()
+      const { dist, mid } = measure()
+      const zoom = Math.max(0.1, Math.min(4, pinch.vp.zoom * (dist / (pinch.dist || 1))))
+      // Keep the world point under the starting midpoint under the fingers.
+      const wx = (pinch.mid.x - r.left - pinch.vp.x) / pinch.vp.zoom
+      const wy = (pinch.mid.y - r.top - pinch.vp.y) / pinch.vp.zoom
+      setVp({ zoom, x: mid.x - r.left - wx * zoom, y: mid.y - r.top - wy * zoom })
+    }
+    const up = (e: PointerEvent) => {
+      pts.delete(e.pointerId)
+      if (pts.size < 2) pinch = null
+    }
+    el.addEventListener('pointerdown', down, true)
+    window.addEventListener('pointermove', move)
+    window.addEventListener('pointerup', up)
+    window.addEventListener('pointercancel', up)
+    return () => {
+      el.removeEventListener('pointerdown', down, true)
+      window.removeEventListener('pointermove', move)
+      window.removeEventListener('pointerup', up)
+      window.removeEventListener('pointercancel', up)
+    }
+  }, [])
+
+  // Phones: open fitted to the screen instead of at desktop zoom.
+  useEffect(() => {
+    if (window.innerWidth < 768) window.setTimeout(fit, 0)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [note.id])
+
   // Wheel: pan; Ctrl/Cmd (and trackpad pinch) zooms at the cursor.
   useEffect(() => {
     const el = box.current
@@ -498,6 +550,8 @@ export function CanvasView({
   const onPointerDown = (e: React.PointerEvent) => {
     const t = e.target as HTMLElement
     if (t.closest('textarea, input, .canvas-ui, a, button')) return
+    // A second finger belongs to the pinch gesture, not a new drag.
+    if (e.pointerType === 'touch' && !e.isPrimary) return
     box.current?.focus({ preventScroll: true })
     const [x, y] = toWorld(e.clientX, e.clientY)
     if (e.button === 1 || tool === 'hand' || space) {
@@ -559,6 +613,11 @@ export function CanvasView({
     }
     setEditing(null)
     if (!e.shiftKey) setSelected(new Set())
+    // Touch: a one-finger drag on empty space pans (marquee needs a mouse).
+    if (e.pointerType === 'touch') {
+      setDrag({ kind: 'pan', sx: e.clientX, sy: e.clientY, vx: vp.x, vy: vp.y })
+      return
+    }
     setDrag({ kind: 'marquee', sx: x, sy: y, x, y, additive: e.shiftKey })
   }
 
@@ -919,7 +978,7 @@ export function CanvasView({
       </div>
 
       {/* Tools */}
-      <div className="canvas-ui absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-0.5 rounded-panel border border-line-2 bg-panel/95 p-1 shadow-[0_12px_32px_rgba(0,0,0,0.5)] backdrop-blur">
+      <div className="canvas-ui absolute inset-x-2 bottom-2 flex items-center gap-0.5 overflow-x-auto rounded-panel border border-line-2 bg-panel/95 p-1 shadow-[0_12px_32px_rgba(0,0,0,0.5)] backdrop-blur sm:inset-x-auto sm:bottom-4 sm:left-1/2 sm:-translate-x-1/2 sm:overflow-visible [&>*]:shrink-0">
         {(
           [
             ['select', <MousePointer2 size={15} />, 'Select (V)'],
@@ -970,7 +1029,7 @@ export function CanvasView({
         ))}
       </div>
 
-      <div className="canvas-ui absolute bottom-4 right-4 flex items-center gap-0.5 rounded-panel border border-line-2 bg-panel/95 p-1 font-read text-[11px] text-dim shadow-[0_12px_32px_rgba(0,0,0,0.5)]">
+      <div className="canvas-ui absolute right-2 top-2 flex items-center gap-0.5 rounded-panel border border-line-2 bg-panel/95 p-1 font-read text-[11px] text-dim shadow-[0_12px_32px_rgba(0,0,0,0.5)] sm:bottom-4 sm:right-4 sm:top-auto">
         <button title="Undo (Ctrl+Z)" onClick={undo} className="rounded-control p-1.5 hover:bg-panel-2 hover:text-text">
           <Undo2 size={14} />
         </button>
