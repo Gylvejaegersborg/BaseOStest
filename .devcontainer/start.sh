@@ -60,14 +60,12 @@ else
   echo "[start] Ollama not installed (postCreateCommand didn't run?) — falling back to whatever env vars/stub model resolve."
 fi
 
-if [ -d "$AGENT_OS_DIR" ]; then
-  echo "[start] Starting Agent-OS gateway on :$GATEWAY_PORT…"
-  # Falls back further to a deterministic stub model with zero config at
-  # all (see agent-os's gateway/cli.ts) if even Ollama isn't reachable.
-  (cd "$AGENT_OS_DIR" && AGENT_OS_GATEWAY_PORT="$GATEWAY_PORT" OLLAMA_MODEL="$OLLAMA_MODEL" BASEOS_REPO_DIR="$BASEOS_REPO_DIR" nohup npm run gateway > /tmp/agent-os-gateway.log 2>&1 &)
-else
-  echo "[start] agent-os not found at $AGENT_OS_DIR (postCreateCommand didn't run?) — Workbench will fall back to mock data."
-fi
+# Update agent-os to the latest main and start its gateway (see
+# agent-os.sh — also runnable by hand after merging an agent-os PR).
+# Falls back to a deterministic stub model with zero config if even Ollama
+# isn't reachable (agent-os's gateway/cli.ts).
+AGENT_OS_GATEWAY_PORT="$GATEWAY_PORT" OLLAMA_MODEL="$OLLAMA_MODEL" BASEOS_REPO_DIR="$BASEOS_REPO_DIR" \
+  bash "$BASEOS_REPO_DIR/.devcontainer/agent-os.sh" &
 
 # BaseSpace reaches the gateway through its own dev server (vite.config.ts
 # proxies /agent-os/* to 127.0.0.1:$GATEWAY_PORT), so the browser only ever
