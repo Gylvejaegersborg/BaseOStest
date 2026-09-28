@@ -6,6 +6,7 @@ import type { Agent } from '@/data/agents'
 import type { useAgentOsChat } from '@/features/agentos/useAgentOsChat'
 import type { AgentOsSession } from '@/features/agentos/sessionClient'
 import { useAgentOsSessionUsage } from '@/features/agentos/useAgentOsSessionUsage'
+import { FocusPicker } from './FocusPicker'
 
 function fmtTokens(n: number): string {
   return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n)
@@ -45,17 +46,17 @@ export function ThreadHeader({ agent, chat }: { agent: Agent; chat: ReturnType<t
   }
 
   return (
-    <div className="relative">
+    <div className="relative flex min-w-0 items-center gap-2">
       <div
         role="button"
         tabIndex={0}
         onClick={() => setOpen((o) => !o)}
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen((o) => !o) } }}
-        className="flex min-w-0 cursor-pointer items-center gap-2"
+        className="flex min-w-0 cursor-pointer items-center gap-2 overflow-hidden"
       >
         <StatusDot color={agent.color} size={7} />
         <span className="font-display text-sm tracking-wider" style={{ color: agent.color }}>{agent.name}</span>
-        <span className="min-w-0 max-w-[220px] truncate text-xs text-dim">{current ? sessionLabel(current) : 'New chat'}</span>
+        <span className="min-w-0 max-w-[220px] shrink truncate text-xs text-dim">{current ? sessionLabel(current) : 'New chat'}</span>
         {!!usage?.turnsWithUsage && (
           <span
             title={`${usage.inputTokens.toLocaleString()} input + ${usage.outputTokens.toLocaleString()} output tokens this thread`}
@@ -74,6 +75,13 @@ export function ThreadHeader({ agent, chat }: { agent: Agent; chat: ReturnType<t
         </button>
         <ChevronDown size={14} className={cn('shrink-0 text-dim transition-transform', open && 'rotate-180')} />
       </div>
+      {current && (
+        <FocusPicker
+          focus={current.focus}
+          disabled={chat.connection !== 'ready'}
+          onChange={(f) => void chat.setFocus(current.id, f)}
+        />
+      )}
       {open && (
         <>
           <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />

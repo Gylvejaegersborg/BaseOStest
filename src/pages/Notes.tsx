@@ -53,6 +53,7 @@ import { PropertiesPanel } from '@/features/notes/PropertiesPanel'
 import { Omnisearch } from '@/features/notes/Omnisearch'
 import type { NoteEditorApi } from '@/features/notes/editor/NoteEditor'
 import type { PageCommand } from '@/features/notes/editor/slashCommands'
+import { resolveGoal, useGoals } from '@/features/goals/store'
 import { useGlobalProps, useGlobalTags, useLinkGraph } from '@/features/connections/connections'
 import { createProject, patchProject, setProjectProp, setStatus as setProjectStatus, useProjects } from '@/features/projects/store'
 import { STATUS_META, type ProjectStatus } from '@/data/projects'
@@ -262,6 +263,7 @@ export function Notes() {
 
   // Projects as note-shaped rows so a base can list them (source: projects).
   const projects = useProjects()
+  const goals = useGoals()
   const projectIds = useMemo(() => new Set(projects.map((p) => p.id)), [projects])
   const projectNames = useMemo(() => projects.map((p) => ({ id: p.id, name: p.name })), [projects])
   const graph = useLinkGraph()
@@ -397,6 +399,9 @@ export function Notes() {
     // Notes and projects link to each other: a project name opens it.
     const project = projects.find((p) => p.name.toLowerCase() === note.trim().toLowerCase())
     if (project) return navigate(`/projects?project=${encodeURIComponent(project.id)}`)
+    // …and a goal title opens the goal.
+    const goal = resolveGoal(goals, note)
+    if (goal) return navigate(`/projects?goal=${encodeURIComponent(goal.id)}`)
     // Unresolved link → create the note, like Obsidian.
     const path = normFolder(note)
     const folder = path.includes('/') ? parentOf(path) : selected?.folder ?? ''

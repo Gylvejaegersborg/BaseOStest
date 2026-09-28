@@ -6,6 +6,8 @@ import {
   getSessionHistory,
   listChatSessions,
   renameChatSession,
+  setSessionFocus,
+  type AgentOsSessionFocus,
   sendTurn,
   subscribeToSessionEvents,
   type AgentOsSession,
@@ -220,6 +222,14 @@ export function useAgentOsChat(agentId: string) {
     [refreshHistory],
   )
 
+  const setFocus = useCallback(
+    async (id: string, focus: AgentOsSessionFocus | null) => {
+      await setSessionFocus(id, focus)
+      await refreshSessions()
+    },
+    [refreshSessions],
+  )
+
   const rename = useCallback(
     async (id: string, title: string) => {
       await renameChatSession(id, title)
@@ -230,6 +240,6 @@ export function useAgentOsChat(agentId: string) {
 
   return {
     connection, errorText, sessions, sessionId, messages, streaming, workingOn, streamingText,
-    send, cancel, newSession, switchSession, rename,
+    send, cancel, newSession, switchSession, rename, setFocus,
   }
 }

@@ -20,6 +20,14 @@ export interface AgentOsSession {
   parentSessionId?: string
   taskId?: string
   flowId?: string
+  /** What this thread's work serves — a BaseSpace goal or project. Each turn
+   *  then gets the goal chain, linked notes and open todos (agent-os). */
+  focus?: AgentOsSessionFocus
+}
+
+export interface AgentOsSessionFocus {
+  kind: 'goal' | 'project'
+  id: string
 }
 
 export interface AgentOsHistoryMessage {
@@ -89,6 +97,11 @@ export function sendTurn(sessionId: string, userMessage: string, planMode?: bool
 
 export function cancelChatSession(sessionId: string, reason?: string): Promise<AgentOsSession> {
   return request<AgentOsSession>(`/sessions/${sessionId}/cancel`, { method: 'POST', body: JSON.stringify({ reason }) })
+}
+
+/** Sets (or, with null, clears) what a thread's work serves. */
+export function setSessionFocus(sessionId: string, focus: AgentOsSessionFocus | null): Promise<AgentOsSession> {
+  return request<AgentOsSession>(`/sessions/${sessionId}/focus`, { method: 'PUT', body: JSON.stringify({ focus }) })
 }
 
 export function renameChatSession(sessionId: string, title: string): Promise<AgentOsSession> {

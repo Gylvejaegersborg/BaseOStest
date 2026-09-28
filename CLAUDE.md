@@ -28,6 +28,11 @@ gateway through the dev server's `/agent-os` proxy (see `vite.config.ts`).
   BaseSpace, list agents and approvals, ask an agent). No MCP tool decides approvals.
 - Board controls (agent-os's `controls.ts`): pause/resume and per-agent token budgets, set in the
   agent editor. Operator-only — never give agents a way to change them.
+- Goals (`src/features/goals/`) are what the work is for: a goal links projects and can sit under
+  a bigger goal; notes link goals with `[[Goal title]]`; todos can serve a project or goal. The
+  snapshot carries these links. A Workbench thread can be focused on a goal/project ("Serves…" in
+  the thread header) — its agent then gets the chain, linked notes and open todos every turn, and
+  what it adds links back. Keep new features on this connective layer; continuity is the point.
 - The integrations plan (providers, Hindsight, knowledge graph, voice, CLI-Anything) lives in
   agent-os's `ROADMAP.md`.
 - Be honest: agents can't hear audio, don't invent metrics or stream counts, and mark

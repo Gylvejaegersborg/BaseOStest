@@ -87,6 +87,10 @@ export interface Task {
    *  checkboxes) are read-only here and complete back at their source. */
   source?: 'manual' | 'project' | 'note'
   sourceRef?: { projectId?: string; entryId?: string; noteId?: string; line?: number }
+  /** What this todo serves (see features/goals): a project and/or a goal.
+   *  Derived next-move todos serve their project through sourceRef. */
+  projectId?: string
+  goalId?: string
 }
 
 export const PRIORITY_COLOR: Record<TaskPriority, string> = {
