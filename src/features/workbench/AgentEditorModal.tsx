@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Modal } from '@/components/ui/Modal'
 import { createAgent, fetchAgents, fetchProviders, updateAgent, type AgentOsProvider } from '@/features/agentos/client'
 import { useAgentOsContext } from '@/features/agentos/AgentOsProvider'
+import { BoardControls } from './BoardControls'
 import { cn } from '@/lib/cn'
 
 interface EditTarget {
@@ -276,6 +277,7 @@ export function AgentEditorModal({
             <code>claude</code> once on the gateway machine and log in.
           </p>
         </div>
+        {isEdit && target && <BoardControls agentId={target.id} onChanged={refreshAgents} />}
         {error && <p className="border border-danger/40 bg-danger/10 p-2 text-xs text-danger">{error}</p>}
         <button
           onClick={submit}

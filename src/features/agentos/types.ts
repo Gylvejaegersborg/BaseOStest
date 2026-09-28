@@ -13,6 +13,18 @@ export interface AgentOsMetrics {
   usage?: { turns: number; turnsWithUsage: number; inputTokens: number; outputTokens: number; lastTurnAt: string | null }
 }
 
+/** Board controls for one agent (agent-os's controls.ts): pause state and
+ *  a token budget per period. `blocked` says why a new turn would be refused. */
+export interface AgentOsControl {
+  agentId: string
+  paused?: { reason: string; by?: string; at: string }
+  budget?: { period: 'day' | 'week' | 'month'; limitTokens: number; warnAt: number }
+  usedTokens: number
+  period: 'day' | 'week' | 'month'
+  periodStart: string
+  blocked?: 'paused' | 'budget'
+}
+
 export interface AgentOsAgent {
   id: string
   name: string
@@ -21,6 +33,8 @@ export interface AgentOsAgent {
   capabilities: string[]
   defaultModel?: string
   status: AgentOsStatus
+  /** Absent on gateways older than board controls. */
+  control?: AgentOsControl
   currentSessionId?: string
   currentTaskId?: string
   workerId?: string

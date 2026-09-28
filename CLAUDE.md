@@ -24,6 +24,10 @@ gateway through the dev server's `/agent-os` proxy (see `vite.config.ts`).
 - Workbench → Terminal runs Claude Code (the real CLI, your own login) or a shell through the
   gateway (`/terminals`, agent-os's `src/gateway/terminal.ts`). Off unless the gateway has
   `AGENT_OS_TERMINAL=1`; the Codespace turns it on, so never make its ports public.
+- Claude Code started from the Terminal gets the OS as MCP tools (agent-os's `/mcp`: read/add
+  BaseSpace, list agents and approvals, ask an agent). No MCP tool decides approvals.
+- Board controls (agent-os's `controls.ts`): pause/resume and per-agent token budgets, set in the
+  agent editor. Operator-only — never give agents a way to change them.
 - The integrations plan (providers, Hindsight, knowledge graph, voice, CLI-Anything) lives in
   agent-os's `ROADMAP.md`.
 - Be honest: agents can't hear audio, don't invent metrics or stream counts, and mark

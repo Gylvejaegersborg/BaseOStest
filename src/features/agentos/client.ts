@@ -1,4 +1,4 @@
-import type { AgentOsAgent } from './types'
+import type { AgentOsAgent, AgentOsControl } from './types'
 
 // Thin typed client for the Agent-OS gateway (agent-os/src/gateway/server.ts).
 // Every function performs a plain fetch against the documented contract and
@@ -77,6 +77,14 @@ export async function fetchAgents(): Promise<AgentOsAgent[]> {
   const { agents } = await getJSON<{ agents: AgentOsAgent[] }>('/agents')
   return agents
 }
+
+/** Board controls (agent-os's controls.ts) — operator-only levers. */
+export const pauseAgent = (id: string, reason?: string) =>
+  writeJSON<AgentOsControl>('POST', `/agents/${encodeURIComponent(id)}/pause`, { reason })
+export const resumeAgent = (id: string) => writeJSON<AgentOsControl>('POST', `/agents/${encodeURIComponent(id)}/resume`, {})
+/** `limitTokens: null` removes the budget (unlimited). */
+export const setAgentBudget = (id: string, budget: { period: 'day' | 'week' | 'month'; limitTokens: number | null }) =>
+  writeJSON<AgentOsControl>('PUT', `/agents/${encodeURIComponent(id)}/budget`, budget)
 
 /** A model provider as the gateway reports it (GET /providers). */
 export interface AgentOsProvider {
