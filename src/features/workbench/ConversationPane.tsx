@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import { useAgentOsSessionUsage } from '@/features/agentos/useAgentOsSessionUsage'
+import { FocusPicker } from './FocusPicker'
 import { Mic, Paperclip, Send, Square, X, Bot, AlertTriangle, Eye, StickyNote, FileUp, FileText, ShieldCheck } from 'lucide-react'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { cn } from '@/lib/cn'
@@ -42,6 +44,8 @@ export function ConversationPane({
   const [pending, setPending] = useState<Attachment[]>([])
   const [dragging, setDragging] = useState(false)
   const [planMode, setPlanMode] = useState(false)
+  const currentSession = chat.sessions.find((x) => x.id === chat.sessionId)
+  const usage = useAgentOsSessionUsage(chat.sessionId, chat.streaming)
   const [attachMenuOpen, setAttachMenuOpen] = useState(false)
   const [notePickerOpen, setNotePickerOpen] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
@@ -204,15 +208,38 @@ export function ConversationPane({
           </div>
           <input ref={fileRef} type="file" multiple hidden onChange={(e) => addFiles(e.target.files)} />
           <MicButton onClip={(att) => setPending((p) => [...p, att])} />
-          <textarea
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }}
-            rows={1}
-            disabled={notReady}
-            placeholder={chat.streaming ? 'Receiving…' : notReady ? 'Agent-OS not connected' : `Message ${agent.name}…`}
-            className="max-h-32 min-h-[40px] flex-1 resize-none border border-line bg-bg/60 px-3 py-2 text-sm text-text placeholder:text-dim focus:border-accent/60 focus:outline-none disabled:opacity-50"
-          />
+          {/* The field carries the thread's context: what it serves (goal or
+              project) and its token use, tucked under the text instead of
+              crowding the top strip. */}
+          <div className="flex min-w-0 flex-1 flex-col border border-line bg-bg/60 focus-within:border-accent/60">
+            <textarea
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }}
+              rows={1}
+              disabled={notReady}
+              placeholder={chat.streaming ? 'Receiving…' : notReady ? 'Agent-OS not connected' : `Message ${agent.name}…`}
+              className="max-h-32 min-h-[36px] resize-none bg-transparent px-3 pb-1 pt-2 text-sm text-text placeholder:text-dim focus:outline-none disabled:opacity-50"
+            />
+            {currentSession && (
+              <div className="flex min-w-0 items-center justify-end gap-2 px-2 pb-1.5">
+                <FocusPicker
+                  focus={currentSession.focus}
+                  disabled={chat.connection !== 'ready'}
+                  placement="up"
+                  onChange={(f) => void chat.setFocus(currentSession.id, f)}
+                />
+                {!!usage?.turnsWithUsage && (
+                  <span
+                    title={`${usage.inputTokens.toLocaleString()} input + ${usage.outputTokens.toLocaleString()} output tokens this thread`}
+                    className="shrink-0 rounded-sm bg-panel-2 px-1.5 py-0.5 text-[10px] text-dim"
+                  >
+                    {fmtTokens(usage.inputTokens + usage.outputTokens)} tok
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
           <button
             onClick={send}
             disabled={notReady}
@@ -402,4 +429,8 @@ function MicButton({ onClip }: { onClip: (att: { id: string; name: string; size:
       )}
     </button>
   )
+}
+
+function fmtTokens(n: number): string {
+  return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n)
 }

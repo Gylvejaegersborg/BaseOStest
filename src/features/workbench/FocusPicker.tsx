@@ -13,9 +13,11 @@ import { cn } from '@/lib/cn'
  * This is what makes a conversation part of the ongoing work instead of a
  * fresh start.
  */
-export function FocusPicker({ focus, disabled, onChange }: {
+export function FocusPicker({ focus, disabled, placement = 'down', onChange }: {
   focus?: AgentOsSessionFocus
   disabled?: boolean
+  /** Which way the menu opens — 'up' when the picker sits in the composer. */
+  placement?: 'up' | 'down'
   onChange: (focus: AgentOsSessionFocus | null) => void
 }) {
   const [open, setOpen] = useState(false)
@@ -54,12 +56,17 @@ export function FocusPicker({ focus, disabled, onChange }: {
         )}
       >
         {focus?.kind === 'project' ? <Sparkles size={10} /> : <Flag size={10} />}
-        <span className="truncate">{focus ? (label ?? 'missing') : 'Serves…'}</span>
+        <span className="truncate">{focus ? (label ?? (focus.kind === 'goal' ? 'goal not found' : 'project not found')) : 'Serves…'}</span>
       </button>
       {open && (
         <>
           <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 top-full z-40 mt-2 max-h-[60vh] w-[280px] overflow-y-auto border border-line-2 bg-panel py-1 shadow-glow animate-fade-in">
+          <div
+            className={cn(
+              'absolute z-40 max-h-[60vh] w-[280px] overflow-y-auto border border-line-2 bg-panel py-1 shadow-glow animate-fade-in',
+              placement === 'up' ? 'bottom-full right-0 mb-2' : 'left-0 top-full mt-2',
+            )}
+          >
             <p className="px-3 py-1.5 text-[10px] text-dim">What does this thread serve? The agent sees the chain, linked notes and open todos.</p>
             {focus && (
               <button onClick={() => pick(null)} className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs text-dim hover:bg-panel-2/50 hover:text-text">
