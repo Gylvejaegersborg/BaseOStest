@@ -1,11 +1,11 @@
 import { useState, type ReactNode } from 'react'
-import { ListChecks, Workflow, FileStack, ShieldCheck, Activity as ActivityIcon, Brain, History, Users, StickyNote, Settings, LayoutPanelLeft, Timer } from 'lucide-react'
+import { ListChecks, Workflow, FileStack, ShieldCheck, Activity as ActivityIcon, Brain, History, Users, StickyNote, Settings, LayoutPanelLeft, Timer, SquareTerminal } from 'lucide-react'
 import { Tabs, type TabItem } from '@/components/ui/Tabs'
 import { cn } from '@/lib/cn'
 import { Glow } from '@/components/ui/Glow'
 import { useAgentOsApprovals } from '@/features/agentos/useAgentOsApprovals'
 
-export type StripTab = 'tasks' | 'flow' | 'artifacts' | 'approvals' | 'events' | 'memory' | 'files' | 'notes' | 'teams' | 'crons'
+export type StripTab = 'tasks' | 'flow' | 'artifacts' | 'approvals' | 'events' | 'memory' | 'files' | 'notes' | 'teams' | 'crons' | 'terminal'
 
 export const STRIP_TABS: TabItem<StripTab>[] = [
   { id: 'tasks', label: 'Tasks', icon: ListChecks },
@@ -18,6 +18,7 @@ export const STRIP_TABS: TabItem<StripTab>[] = [
   { id: 'notes', label: 'Notes', icon: StickyNote },
   { id: 'crons', label: 'Crons', icon: Timer },
   { id: 'teams', label: 'Teams', icon: Users },
+  { id: 'terminal', label: 'Terminal', icon: SquareTerminal },
 ]
 
 const ALL_TABS = STRIP_TABS

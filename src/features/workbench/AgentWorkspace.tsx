@@ -68,6 +68,7 @@ export function AgentWorkspace({
         <ConversationPane agent={agent} chat={chat} onDockNote={onDockNote} onShowApproval={onShowApproval} />
         {activePanel && (
           <RightPanel
+            key={activePanel === 'terminal' ? 'terminal' : 'panel'}
             tab={activePanel}
             agentId={agentId}
             flowId={flowId}

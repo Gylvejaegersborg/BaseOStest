@@ -37,7 +37,7 @@ export function Workbench() {
   })
   const [activePanel, setActivePanel] = useState<StripTab | null>(() => {
     const param = searchParams.get('panel')
-    return param === 'team' || param === 'teams' ? 'teams' : param === 'crons' ? 'crons' : null
+    return param === 'team' || param === 'teams' ? 'teams' : param === 'crons' ? 'crons' : param === 'terminal' ? 'terminal' : null
   })
   const [activeFlowId, setActiveFlowId] = useState<string | null>(null)
   const [activeFlowSteps, setActiveFlowSteps] = useState<FlowStepInput[]>([])
@@ -124,6 +124,7 @@ export function Workbench() {
               <div className="flex flex-1 items-center justify-center text-xs text-dim">Pick an agent on the left to open a conversation.</div>
               {activePanel && (
                 <RightPanel
+                  key={activePanel === 'terminal' ? 'terminal' : 'panel'}
                   tab={activePanel}
                   agentId={null}
                   flowId={activeFlowId}

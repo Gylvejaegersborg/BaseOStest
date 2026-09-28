@@ -8,6 +8,7 @@ import { MemoryTab } from './MemoryTab'
 import { FileRevisionsTab } from './FileRevisionsTab'
 import { NotesTab } from './NotesTab'
 import { TeamsTab } from './TeamsTab'
+import { TerminalTab } from './TerminalTab'
 import { CronManager } from '@/features/calendar/CronManager'
 import { STRIP_TABS, type StripTab } from './WorkbenchTopStrip'
 import { useResizablePanel } from '@/components/ui/useResizablePanel'
@@ -53,12 +54,16 @@ export function RightPanel({
   focusApprovalId?: string | null
 }) {
   const label = STRIP_TABS.find((t) => t.id === tab)?.label ?? tab
+  // The terminal gets its own (wider) remembered width — Claude Code needs
+  // ~80 columns. Callers key the panel on terminal-vs-other so this is
+  // re-read when switching.
+  const isTerminal = tab === 'terminal'
   const { width, onMouseDown } = useResizablePanel({
-    defaultWidth: 380,
+    defaultWidth: isTerminal ? 760 : 380,
     min: 280,
-    max: 720,
+    max: isTerminal ? 1400 : 720,
     edge: 'left',
-    storageKey: 'os:workbench:rightPanelWidth',
+    storageKey: isTerminal ? 'os:workbench:terminalPanelWidth' : 'os:workbench:rightPanelWidth',
   })
 
   return (
@@ -87,6 +92,7 @@ export function RightPanel({
             {tab === 'notes' && <NotesTab dockedNoteId={dockedNoteId} onSelectNote={onSelectNote} />}
             {tab === 'crons' && <CronManager variant="table" className="p-3" />}
             {tab === 'teams' && <TeamsTab />}
+            {tab === 'terminal' && <TerminalTab />}
           </div>
         </aside>
       </div>
