@@ -32,6 +32,8 @@ export interface AgentOsAgent {
   role?: string
   capabilities: string[]
   defaultModel?: string
+  /** Manager's agent id; absent = reports to the operator. */
+  reportsTo?: string
   status: AgentOsStatus
   /** Absent on gateways older than board controls. */
   control?: AgentOsControl
@@ -44,3 +46,28 @@ export interface AgentOsAgent {
 }
 
 export type AgentOsConnection = 'connecting' | 'live' | 'mock' | 'error'
+
+/** Work handed between agents (agent-os's core/work.ts). */
+export type AgentOsWorkStatus = 'open' | 'in_progress' | 'blocked' | 'done' | 'cancelled'
+
+export interface AgentOsWork {
+  id: string
+  title: string
+  detail?: string
+  assignee: string
+  /** Agent id, or 'operator'. */
+  requestedBy: string
+  parentId?: string
+  depth: number
+  focus?: { kind: 'goal' | 'project'; id: string }
+  status: AgentOsWorkStatus
+  sessionId?: string
+  result?: string
+  blockedReason?: string
+  notes: { at: string; by: string; text: string }[]
+  tokens: number
+  totalTokens: number
+  childIds: string[]
+  createdAt: string
+  updatedAt: string
+}

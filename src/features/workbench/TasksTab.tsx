@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { CheckCircle2, XCircle, Clock, Loader2, Ban, HelpCircle, ChevronDown, ChevronRight } from 'lucide-react'
 import { useAgentOsTasks } from '@/features/agentos/useAgentOsTasks'
+import { WorkSection } from './WorkSection'
 import type { AgentOsTask, AgentOsTaskStatus } from '@/features/agentos/sessionClient'
 
 const STATUS_ICON: Record<AgentOsTaskStatus, typeof CheckCircle2> = {
@@ -85,18 +86,28 @@ function TaskRow({ t }: { t: AgentOsTask }) {
 export function TasksTab({ agentId }: { agentId: string | null }) {
   const { tasks, loading, error } = useAgentOsTasks(agentId ? { agentId } : {})
 
-  if (loading) return <p className="p-3 text-xs text-dim">Loading tasks…</p>
-  if (error) return <p className="p-3 text-xs text-danger">{error}</p>
-  if (!tasks.length) return <p className="p-3 text-xs text-dim">No tasks{agentId ? ' for this agent' : ''} yet.</p>
-
   return (
-    <div className="divide-y divide-line/60">
-      {tasks
-        .slice()
-        .reverse()
-        .map((t) => (
-          <TaskRow key={t.id} t={t} />
-        ))}
+    <div>
+      {/* Work handed between agents (or by you) — the "what" and "who". */}
+      <WorkSection agentId={agentId} />
+      {/* Runs — the runtime's own execution records, the "how". */}
+      <div className="label px-3 pb-1 pt-3">Runs</div>
+      {loading ? (
+        <p className="p-3 text-xs text-dim">Loading tasks…</p>
+      ) : error ? (
+        <p className="p-3 text-xs text-danger">{error}</p>
+      ) : !tasks.length ? (
+        <p className="p-3 text-xs text-dim">No runs{agentId ? ' for this agent' : ''} yet.</p>
+      ) : (
+        <div className="divide-y divide-line/60">
+          {tasks
+            .slice()
+            .reverse()
+            .map((t) => (
+              <TaskRow key={t.id} t={t} />
+            ))}
+        </div>
+      )}
     </div>
   )
 }

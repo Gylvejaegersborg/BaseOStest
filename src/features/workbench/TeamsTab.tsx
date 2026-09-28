@@ -11,6 +11,7 @@ import { CronEditModal } from '@/features/calendar/CronEditModal'
 import { cronNextRunMs, cronScheduleLabel, CRON_STATUS_COLOR } from '@/features/calendar/cron'
 import { cn } from '@/lib/cn'
 import { downloadSnapshot, syncSnapshotNow, useSnapshot, useSnapshotStatus } from '@/features/agentos/snapshot'
+import { OrgChart } from './OrgChart'
 import { TEAM_COLORS, deleteTeam, newTeam, saveTeam, setActiveTeam, toggleMember, useTeams, type Team } from './teams'
 
 /**
@@ -56,6 +57,7 @@ export function TeamsTab() {
 
   return (
     <div className="space-y-3 p-3 text-xs">
+      <OrgChart agents={real} />
       <div className="flex items-center gap-2">
         <select
           value={team?.id ?? ''}

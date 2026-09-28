@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAgentOsSessionUsage } from '@/features/agentos/useAgentOsSessionUsage'
 import { FocusPicker } from './FocusPicker'
-import { Mic, Paperclip, Send, Square, X, Bot, AlertTriangle, Eye, StickyNote, FileUp, FileText, ShieldCheck } from 'lucide-react'
+import { Mic, Paperclip, Send, Square, X, Bot, AlertTriangle, Eye, StickyNote, FileUp, FileText, ShieldCheck, CheckCircle2, OctagonAlert, ArrowRightLeft, Ban } from 'lucide-react'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { cn } from '@/lib/cn'
 import type { Agent } from '@/data/agents'
@@ -278,6 +278,7 @@ function MessageRow({
   onSendToNotes: (text: string) => void
   onShowApproval?: (id: string) => void
 }) {
+  if (msg.role === 'system' && msg.tag === 'Work') return <WorkNote text={msg.text} />
   if (msg.role === 'system') {
     // "Approved <id>: shell {…}. Go ahead…" (older gateways omit the id)
     const m = /^(Approved|Rejected)(?: (\S+))?: (.*?)\. (?:Go ahead|Don't run)/s.exec(msg.text)
@@ -433,4 +434,23 @@ function MicButton({ onClip }: { onClip: (att: { id: string; name: string; size:
 
 function fmtTokens(n: number): string {
   return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n)
+}
+
+/** A teammate finished, got blocked on, or handed back work this thread
+ *  asked for (agent-os's work runner posts it here). Compact until clicked. */
+function WorkNote({ text }: { text: string }) {
+  const [open, setOpen] = useState(false)
+  const kind = / finished "/.test(text) ? 'done' : / is blocked on "/.test(text) ? 'blocked' : / was handed to /.test(text) ? 'handed' : 'other'
+  const Icon = kind === 'done' ? CheckCircle2 : kind === 'blocked' ? OctagonAlert : kind === 'handed' ? ArrowRightLeft : Ban
+  const color = kind === 'done' ? 'text-neon-green' : kind === 'blocked' ? 'text-danger' : 'text-dim'
+  return (
+    <button onClick={() => setOpen((o) => !o)} title={open ? 'Collapse' : 'Show the whole result'} className="flex w-full items-start gap-2 text-left text-[11px] text-dim hover:text-text">
+      <span className="mt-2 h-px w-6 shrink-0 bg-line" />
+      <Icon size={12} className={cn('mt-0.5 shrink-0', color)} />
+      <span className={cn('min-w-0 flex-1 whitespace-pre-wrap', !open && 'line-clamp-2')}>
+        <span className="text-text/60">Work · </span>
+        {text}
+      </span>
+    </button>
+  )
 }

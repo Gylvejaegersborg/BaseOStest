@@ -31,6 +31,7 @@ interface EditTarget {
   role: string
   capabilities: string[]
   defaultModel?: string
+  reportsTo?: string
 }
 
 /**
@@ -136,7 +137,15 @@ export function AgentRail({ selectedAgentId, onSelect }: { selectedAgentId: stri
     setEditing({ id: a.id, name: a.name, persona: '', role: a.role, capabilities: [] })
     try {
       const remote = await fetchAgent(a.id)
-      setEditing({ id: remote.id, name: remote.name, persona: remote.persona, role: remote.role ?? '', capabilities: remote.capabilities })
+      setEditing({
+        id: remote.id,
+        name: remote.name,
+        persona: remote.persona,
+        role: remote.role ?? '',
+        capabilities: remote.capabilities,
+        defaultModel: remote.defaultModel,
+        reportsTo: remote.reportsTo,
+      })
     } catch {
       // Keep the local-data fallback already showing — see comment above.
     }

@@ -12,6 +12,7 @@ interface EditTarget {
   role: string
   capabilities: string[]
   defaultModel?: string
+  reportsTo?: string
 }
 
 const OTHER_MODEL = '__other__'
@@ -85,6 +86,8 @@ export function AgentEditorModal({
   const [persona, setPersona] = useState('')
   const [capabilities, setCapabilities] = useState('')
   const [defaultModel, setDefaultModel] = useState('')
+  const [reportsTo, setReportsTo] = useState('')
+  const { agents: roster } = useAgentOsContext()
   const [customModel, setCustomModel] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -137,6 +140,7 @@ export function AgentEditorModal({
     setRole(target?.role ?? '')
     setPersona(target?.persona ?? '')
     setCapabilities(target?.capabilities.join(', ') ?? '')
+    setReportsTo(target?.reportsTo ?? '')
     const preset = target?.defaultModel ?? ''
     const isKnown = !preset || MODEL_GROUPS.some((g) => g.options.some((o) => o.value === preset))
     setDefaultModel(isKnown ? preset : OTHER_MODEL)
@@ -157,6 +161,7 @@ export function AgentEditorModal({
           role: role.trim() || undefined,
           capabilities: caps,
           defaultModel: resolvedModel,
+          reportsTo: reportsTo || null,
         })
         onSaved(target!.id)
       } else {
@@ -167,6 +172,7 @@ export function AgentEditorModal({
           role: role.trim() || undefined,
           capabilities: caps,
           defaultModel: resolvedModel,
+          ...(reportsTo ? { reportsTo } : {}),
         })
         onSaved(agent.id)
       }
@@ -244,6 +250,26 @@ export function AgentEditorModal({
           </datalist>
           <p className="mt-1 text-[10px] text-dim">
             Free text, comma-separated — agent-os doesn't enforce a fixed list of capabilities.
+          </p>
+        </div>
+        <div>
+          <label className="label mb-1 block">Reports to</label>
+          <select
+            value={reportsTo}
+            onChange={(e) => setReportsTo(e.target.value)}
+            className="w-full border border-line bg-bg/40 px-2 py-1.5 text-sm text-text outline-none focus:border-accent/50"
+          >
+            <option value="">You (the operator)</option>
+            {roster
+              .filter((a) => a.id !== target?.id && !a.id.includes('-w'))
+              .map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.name}
+                </option>
+              ))}
+          </select>
+          <p className="mt-1 text-[10px] text-dim">
+            Where this agent hands work back when it can&apos;t or shouldn&apos;t do it. Not access control — everyone can hand anyone work.
           </p>
         </div>
         <div>

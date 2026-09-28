@@ -1,4 +1,4 @@
-import type { AgentOsAgent, AgentOsControl } from './types'
+import type { AgentOsAgent, AgentOsControl, AgentOsWork, AgentOsWorkStatus } from './types'
 
 // Thin typed client for the Agent-OS gateway (agent-os/src/gateway/server.ts).
 // Every function performs a plain fetch against the documented contract and
@@ -111,6 +111,7 @@ export interface CreateAgentInput {
   role?: string
   capabilities?: string[]
   defaultModel?: string
+  reportsTo?: string
 }
 
 /** POST {base}/agents — registers a brand-new agent identity on the
@@ -125,11 +126,27 @@ export interface UpdateAgentInput {
   role?: string
   capabilities?: string[]
   defaultModel?: string
+  /** An agent id, or null for "reports to the operator". */
+  reportsTo?: string | null
 }
 
 /** PUT {base}/agents/:id — updates an existing agent's identity fields
  *  (agent-os's updateAgent()). Live status/currentTask/model routing stay
  *  server-derived, not editable here. */
+// ---- Work handed between agents (agent-os's core/work.ts) ----
+
+export async function fetchWork(filter: { involving?: string; status?: AgentOsWorkStatus } = {}): Promise<AgentOsWork[]> {
+  const q = new URLSearchParams(Object.entries(filter).filter(([, v]) => v) as [string, string][]).toString()
+  const { work } = await getJSON<{ work: AgentOsWork[] }>(`/work${q ? `?${q}` : ''}`)
+  return work
+}
+export const assignWork = (input: { assignee: string; title: string; detail?: string; focus?: { kind: 'goal' | 'project'; id: string } }) =>
+  writeJSON<AgentOsWork>('POST', '/work', input)
+export const cancelWork = (id: string, reason?: string) => writeJSON<AgentOsWork>('POST', `/work/${encodeURIComponent(id)}/cancel`, { reason })
+export const reopenWork = (id: string, reason?: string) => writeJSON<AgentOsWork>('POST', `/work/${encodeURIComponent(id)}/reopen`, { reason })
+export const reassignWork = (id: string, to: string, reason?: string) =>
+  writeJSON<AgentOsWork>('POST', `/work/${encodeURIComponent(id)}/reassign`, { to, reason })
+
 export function updateAgent(id: string, input: UpdateAgentInput): Promise<AgentOsAgent> {
   return writeJSON<AgentOsAgent>('PUT', `/agents/${encodeURIComponent(id)}`, input)
 }

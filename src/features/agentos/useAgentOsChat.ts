@@ -17,6 +17,8 @@ export interface ChatMessage {
   id: string
   /** 'system' = a note from the harness (e.g. an approval decision), not something you typed. */
   role: 'user' | 'assistant' | 'system'
+  /** For system notes: where it came from. */
+  tag?: 'Approvals' | 'Work'
   text: string
   time: string
 }
@@ -39,13 +41,16 @@ function toChatMessages(history: { role: string; content: string }[]): ChatMessa
   return history
     .filter((m) => m.role === 'user' || m.role === 'assistant')
     .map((m, i) => {
-      // The gateway resumes a chat after an Approvals decision with a
-      // "[Approvals] …" turn — show it as a system note, not as you.
-      const system = m.role === 'user' && m.content.startsWith('[Approvals] ')
+      // Notes from the harness arrive as user-role messages with a tag:
+      // "[Approvals] …" (an approval decision) or "[Work] …" (a teammate
+      // finished, got blocked on, or handed back work this thread asked
+      // for) — show them as system notes, not as you.
+      const tag = m.role === 'user' ? /^\[(Approvals|Work)\] /.exec(m.content) : null
       return {
         id: `h${i}`,
-        role: system ? ('system' as const) : (m.role as 'user' | 'assistant'),
-        text: system ? m.content.slice('[Approvals] '.length) : m.content,
+        role: tag ? ('system' as const) : (m.role as 'user' | 'assistant'),
+        ...(tag ? { tag: tag[1] as 'Approvals' | 'Work' } : {}),
+        text: tag ? m.content.slice(tag[0].length) : m.content,
         time: '',
       }
     })
@@ -153,6 +158,10 @@ export function useAgentOsChat(agentId: string) {
         setWorkingOn(String(e.payload.name ?? 'a tool'))
       } else if (e.type === 'tool.call.end') {
         setWorkingOn(null)
+      } else if (e.type === 'session.note') {
+        // A note posted into this thread from outside a turn (e.g. work
+        // handed off from here finished) — show it without a reload.
+        refreshHistory(sessionId)
       } else if (e.type === 'agent.turn.end') {
         setStreaming(false)
         setWorkingOn(null)

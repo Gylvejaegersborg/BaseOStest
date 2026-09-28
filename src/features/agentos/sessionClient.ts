@@ -361,6 +361,7 @@ export function subscribeToEvents(types: string[], onEvent: (e: SessionEvent) =>
 
 const SESSION_EVENT_TYPES = [
   'agent.turn.start',
+  'session.note',
   'agent.turn.delta',
   'tool.call.start',
   'tool.call.end',

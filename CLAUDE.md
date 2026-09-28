@@ -33,6 +33,10 @@ gateway through the dev server's `/agent-os` proxy (see `vite.config.ts`).
   snapshot carries these links. A Workbench thread can be focused on a goal/project ("Serves…" in
   the thread header) — its agent then gets the chain, linked notes and open todos every turn, and
   what it adds links back. Keep new features on this connective layer; continuity is the point.
+- Agents hand each other work as tracked items (agent-os's `core/work.ts`: `delegate` and `work`
+  tools, a background runner), not chat. Reporting lines (`reportsTo`, agent editor) decide where
+  hand-backs go. Work shows in Workbench → Tasks; results land in the asking thread as `[Work]`
+  notes. An assignee can't cancel work — keep that rule.
 - The integrations plan (providers, Hindsight, knowledge graph, voice, CLI-Anything) lives in
   agent-os's `ROADMAP.md`.
 - Be honest: agents can't hear audio, don't invent metrics or stream counts, and mark
