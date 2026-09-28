@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Modal } from '@/components/ui/Modal'
-import { createAgent, fetchAgents, updateAgent } from '@/features/agentos/client'
+import { createAgent, fetchAgents, fetchProviders, updateAgent, type AgentOsProvider } from '@/features/agentos/client'
 import { useAgentOsContext } from '@/features/agentos/AgentOsProvider'
 import { cn } from '@/lib/cn'
 
@@ -15,17 +15,27 @@ interface EditTarget {
 
 const OTHER_MODEL = '__other__'
 
-// A curated starting point, not a live query against any provider —
-// agent-os has no "list available models" endpoint (each adapter just
-// takes whatever model id you hand it — see agent-os's models/real.ts).
-// Model ids move fast and availability depends on your own account/keys,
-// so "Custom" always stays the escape hatch rather than trying to be
-// exhaustive. Only takes effect once the gateway resolves a real
-// provider (an env var set on the gateway process) — with none set,
-// every agent still gets the deterministic stub regardless of this.
-const MODEL_GROUPS: { label: string; options: { value: string; label: string }[] }[] = [
+// A curated starting point, not a live list of every model — ids move fast
+// and availability depends on your own accounts, so "Custom" stays the
+// escape hatch. A value can name its provider ("claude-cli:sonnet",
+// "ollama:llama3.2:3b"), which lets agents on one gateway run on different
+// providers; see agent-os's models/real.ts (provider router). A bare
+// "claude-…" id uses the Anthropic API when the gateway has a key, else the
+// Claude CLI. `providers` is what the group needs from the gateway — groups
+// it can't use are labeled from GET /providers.
+const MODEL_GROUPS: { label: string; providers: string[]; options: { value: string; label: string }[] }[] = [
+  {
+    label: 'Claude — your subscription (Claude Code CLI)',
+    providers: ['claude-cli'],
+    options: [
+      { value: 'claude-cli:sonnet', label: 'Claude Sonnet (subscription)' },
+      { value: 'claude-cli:opus', label: 'Claude Opus (subscription)' },
+      { value: 'claude-cli:haiku', label: 'Claude Haiku (subscription)' },
+    ],
+  },
   {
     label: 'Anthropic',
+    providers: ['anthropic', 'claude-cli'],
     options: [
       { value: 'claude-opus-5', label: 'Claude Opus 5' },
       { value: 'claude-sonnet-5', label: 'Claude Sonnet 5' },
@@ -33,15 +43,17 @@ const MODEL_GROUPS: { label: string; options: { value: string; label: string }[]
     ],
   },
   {
-    label: 'OpenAI',
+    label: 'OpenAI / compatible',
+    providers: ['openai'],
     options: [
-      { value: 'gpt-4o', label: 'GPT-4o' },
-      { value: 'gpt-4o-mini', label: 'GPT-4o mini' },
+      { value: 'openai:gpt-4o', label: 'GPT-4o' },
+      { value: 'openai:gpt-4o-mini', label: 'GPT-4o mini' },
     ],
   },
   {
     label: 'Ollama (local)',
-    options: [{ value: 'llama3.2', label: 'Llama 3.2' }],
+    providers: ['ollama'],
+    options: [{ value: 'ollama:llama3.2:3b', label: 'Llama 3.2 3B' }],
   },
 ]
 
@@ -100,6 +112,21 @@ export function AgentEditorModal({
       cancelled = true
     }
   }, [open])
+
+  // Which providers the gateway can actually use, to label the groups it
+  // can't. Unknown (older gateway) leaves every group unlabeled.
+  const [providers, setProviders] = useState<AgentOsProvider[] | null>(null)
+  useEffect(() => {
+    if (!open) return
+    let cancelled = false
+    fetchProviders()
+      .then((p) => !cancelled && setProviders(p))
+      .catch(() => !cancelled && setProviders(null))
+    return () => {
+      cancelled = true
+    }
+  }, [open])
+  const groupUsable = (names: string[]) => !providers || providers.some((p) => names.includes(p.name) && p.available)
 
   useEffect(() => {
     if (!open) return
@@ -227,7 +254,7 @@ export function AgentEditorModal({
           >
             <option value="">Use the gateway's default</option>
             {MODEL_GROUPS.map((g) => (
-              <optgroup key={g.label} label={g.label}>
+              <optgroup key={g.label} label={groupUsable(g.providers) ? g.label : `${g.label} — not set up on the gateway`}>
                 {g.options.map((o) => (
                   <option key={o.value} value={o.value}>{o.label}</option>
                 ))}
@@ -240,13 +267,13 @@ export function AgentEditorModal({
               value={customModel}
               onChange={(e) => setCustomModel(e.target.value)}
               autoFocus
-              placeholder="exact model id, e.g. claude-sonnet-4-5-20250929"
+              placeholder="model id, optionally with a provider: ollama:qwen2.5:7b, claude-cli:sonnet"
               className="mt-1.5 w-full border border-line bg-bg/40 px-2 py-1.5 text-sm text-text outline-none focus:border-accent/50"
             />
           )}
           <p className="mt-1 text-[10px] text-dim">
-            Only takes effect once the gateway itself has a real provider configured (an API key set on the gateway
-            process) — with none set, every agent gets the same deterministic stub regardless of this.
+            A provider the gateway can&apos;t use falls back to its default. For your Claude subscription, run{' '}
+            <code>claude</code> once on the gateway machine and log in.
           </p>
         </div>
         {error && <p className="border border-danger/40 bg-danger/10 p-2 text-xs text-danger">{error}</p>}

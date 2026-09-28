@@ -60,6 +60,15 @@ else
   echo "[start] Ollama not installed (postCreateCommand didn't run?) — falling back to whatever env vars/stub model resolve."
 fi
 
+# Optional long-term memory for the agents (Hindsight) — only with the
+# Codespace secret HINDSIGHT_ENABLED=1; see hindsight.sh. Started in the
+# background (its first start is slow) and the gateway is pointed at it
+# right away: agent-os treats a not-yet-up Hindsight as "no recall".
+if [ "${HINDSIGHT_ENABLED:-}" = "1" ]; then
+  export HINDSIGHT_URL="${HINDSIGHT_URL:-http://127.0.0.1:${HINDSIGHT_PORT:-8888}}"
+  OLLAMA_MODEL="$OLLAMA_MODEL" bash "$BASEOS_REPO_DIR/.devcontainer/hindsight.sh" &
+fi
+
 # Update agent-os to the latest main and start its gateway (see
 # agent-os.sh — also runnable by hand after merging an agent-os PR).
 # Falls back to a deterministic stub model with zero config if even Ollama

@@ -18,5 +18,10 @@ gateway through the dev server's `/agent-os` proxy (see `vite.config.ts`).
   approvals — never published directly.
 - The old GitHub team's output lives in `public/team-archive.json` (Notes → Team, plus its
   open board items imported once as todos). It is history; don't add to it.
+- An agent's model (`defaultModel`, set in the agent editor) can name its provider:
+  `claude-cli:sonnet` (your Claude subscription via the Claude Code CLI), `ollama:<model>`,
+  `anthropic:<id>`, `openai:<id>`. See agent-os's README, "Model providers".
+- The integrations plan (providers, Hindsight, knowledge graph, voice, CLI-Anything) lives in
+  agent-os's `ROADMAP.md`.
 - Be honest: agents can't hear audio, don't invent metrics or stream counts, and mark
   assumptions as assumptions.

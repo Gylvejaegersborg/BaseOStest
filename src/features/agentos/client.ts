@@ -78,6 +78,20 @@ export async function fetchAgents(): Promise<AgentOsAgent[]> {
   return agents
 }
 
+/** A model provider as the gateway reports it (GET /providers). */
+export interface AgentOsProvider {
+  name: string
+  available: boolean
+  detail: string
+}
+
+/** Which providers the gateway can use. Older gateways without the route
+ *  reject — callers treat that as "unknown", not "none". */
+export async function fetchProviders(): Promise<AgentOsProvider[]> {
+  const { providers } = await getJSON<{ providers: AgentOsProvider[] }>('/providers')
+  return providers
+}
+
 export function fetchAgent(id: string): Promise<AgentOsAgent> {
   return getJSON<AgentOsAgent>(`/agents/${encodeURIComponent(id)}`)
 }

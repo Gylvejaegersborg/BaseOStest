@@ -37,4 +37,15 @@ else
   echo "[setup] Ollama already installed."
 fi
 
+# The Claude Code CLI lets agents run on your own Claude subscription
+# (agent-os's "claude-cli:" provider — pick "Claude (your subscription)"
+# in an agent's settings). Installing it is harmless; it's only used once
+# you log in: run `claude` in a terminal and use /login.
+if ! command -v claude >/dev/null 2>&1; then
+  echo "[setup] Installing the Claude Code CLI…"
+  npm install -g @anthropic-ai/claude-code || echo "[setup] Claude Code CLI install failed — agents can still use Ollama/API keys."
+else
+  echo "[setup] Claude Code CLI already installed."
+fi
+
 echo "[setup] Done. The gateway + Ollama start automatically on every Codespace start (see start.sh)."
