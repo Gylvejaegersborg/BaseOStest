@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAgentOsSessionUsage } from '@/features/agentos/useAgentOsSessionUsage'
 import { FocusPicker } from './FocusPicker'
-import { Mic, Paperclip, Send, Square, X, Bot, AlertTriangle, Eye, StickyNote, FileUp, FileText, ShieldCheck, CheckCircle2, OctagonAlert, ArrowRightLeft, Ban } from 'lucide-react'
+import { Mic, Paperclip, Send, Square, X, Bot, AlertTriangle, Eye, StickyNote, FileUp, FileText, ShieldCheck, CheckCircle2, OctagonAlert, ArrowRightLeft, Ban, ClipboardCheck } from 'lucide-react'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { cn } from '@/lib/cn'
 import type { Agent } from '@/data/agents'
@@ -279,6 +279,7 @@ function MessageRow({
   onShowApproval?: (id: string) => void
 }) {
   if (msg.role === 'system' && msg.tag === 'Work') return <WorkNote text={msg.text} />
+  if (msg.role === 'system' && msg.tag === 'Review') return <ReviewBrief text={msg.text} />
   if (msg.role === 'system') {
     // "Approved <id>: shell {…}. Go ahead…" (older gateways omit the id)
     const m = /^(Approved|Rejected)(?: (\S+))?: (.*?)\. (?:Go ahead|Don't run)/s.exec(msg.text)
@@ -434,6 +435,23 @@ function MicButton({ onClip }: { onClip: (att: { id: string; name: string; size:
 
 function fmtTokens(n: number): string {
   return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n)
+}
+
+/** The brief a lead's team review starts from (agent-os's review.ts):
+ *  the first line, the rest on click. */
+function ReviewBrief({ text }: { text: string }) {
+  const [open, setOpen] = useState(false)
+  const [first, ...rest] = text.split('\n')
+  return (
+    <button onClick={() => setOpen((o) => !o)} title={open ? 'Collapse' : 'Show the whole brief'} className="flex w-full items-start gap-2 text-left text-[11px] text-dim hover:text-text">
+      <span className="mt-2 h-px w-6 shrink-0 bg-line" />
+      <ClipboardCheck size={12} className="mt-0.5 shrink-0 text-accent" />
+      <span className="min-w-0 flex-1 whitespace-pre-wrap">
+        <span className="text-text/80">{first}</span>
+        {open && rest.length > 0 && <span className="block">{rest.join('\n')}</span>}
+      </span>
+    </button>
+  )
 }
 
 /** A teammate finished, got blocked on, or handed back work this thread

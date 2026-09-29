@@ -1,4 +1,4 @@
-import type { AgentOsAgent, AgentOsControl, AgentOsWork, AgentOsWorkStatus } from './types'
+import type { AgentOsAgent, AgentOsControl, AgentOsReview, AgentOsReviewDigest, AgentOsWork, AgentOsWorkStatus } from './types'
 
 // Thin typed client for the Agent-OS gateway (agent-os/src/gateway/server.ts).
 // Every function performs a plain fetch against the documented contract and
@@ -135,7 +135,8 @@ export interface UpdateAgentInput {
  *  server-derived, not editable here. */
 // ---- Work handed between agents (agent-os's core/work.ts) ----
 
-export async function fetchWork(filter: { involving?: string; status?: AgentOsWorkStatus } = {}): Promise<AgentOsWork[]> {
+/** `team`: the agent's own work plus its reports' (for a lead; same as `involving` otherwise). */
+export async function fetchWork(filter: { involving?: string; team?: string; status?: AgentOsWorkStatus } = {}): Promise<AgentOsWork[]> {
   const q = new URLSearchParams(Object.entries(filter).filter(([, v]) => v) as [string, string][]).toString()
   const { work } = await getJSON<{ work: AgentOsWork[] }>(`/work${q ? `?${q}` : ''}`)
   return work
@@ -146,6 +147,14 @@ export const cancelWork = (id: string, reason?: string) => writeJSON<AgentOsWork
 export const reopenWork = (id: string, reason?: string) => writeJSON<AgentOsWork>('POST', `/work/${encodeURIComponent(id)}/reopen`, { reason })
 export const reassignWork = (id: string, to: string, reason?: string) =>
   writeJSON<AgentOsWork>('POST', `/work/${encodeURIComponent(id)}/reassign`, { to, reason })
+
+// ---- Team reviews: a lead looks over its team's work (core/review.ts) ----
+export const fetchReviews = (agentId?: string) =>
+  getJSON<{ leads: string[]; reviews: AgentOsReview[] }>(`/reviews${agentId ? `?agentId=${encodeURIComponent(agentId)}` : ''}`)
+export const fetchReviewDigest = (agentId: string) => getJSON<AgentOsReviewDigest>(`/reviews/${encodeURIComponent(agentId)}/digest`)
+/** Runs a model turn for the lead — can take a minute or two. */
+export const runReviewNow = (agentId: string) =>
+  writeJSON<{ ran: boolean; reason?: string }>('POST', `/reviews/${encodeURIComponent(agentId)}`, {}, 300_000)
 
 export function updateAgent(id: string, input: UpdateAgentInput): Promise<AgentOsAgent> {
   return writeJSON<AgentOsAgent>('PUT', `/agents/${encodeURIComponent(id)}`, input)

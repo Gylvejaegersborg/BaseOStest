@@ -39,6 +39,13 @@ gateway through the dev server's `/agent-os` proxy (see `vite.config.ts`).
   tools, a background runner), not chat. Reporting lines (`reportsTo`, agent editor) decide where
   hand-backs go. Work shows in Workbench → Tasks; results land in the asking thread as `[Work]`
   notes. An assignee can't cancel work — keep that rule.
+- Leads (anyone with reports; Hemera) run a team review (agent-os's `core/review.ts`): a code-built
+  digest of blocked, handed-back and quiet work; a model turn only when something needs attention
+  and changed. They reopen, reassign or escalate through `work` — only the requester, the
+  assignee's manager or the operator may. Escalations show as "needs you" (Workbench → Tasks).
+- All live updates share ONE EventSource (`subscribeToEvents` in `sessionClient.ts`). Never open
+  another per component: browsers allow six connections per host, and extra streams stall every
+  later request.
 - The integrations plan (providers, Hindsight, knowledge graph, voice, CLI-Anything) lives in
   agent-os's `ROADMAP.md`.
 - Be honest: agents can't hear audio, don't invent metrics or stream counts, and mark

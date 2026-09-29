@@ -16,7 +16,7 @@ const STATUS: Record<AgentOsWorkStatus, { icon: typeof CheckCircle2; color: stri
   cancelled: { icon: Ban, color: '#6b7785', label: 'cancelled' },
 }
 
-const WORK_EVENTS = ['work.created', 'work.claimed', 'work.completed', 'work.blocked', 'work.reassigned', 'work.reopened', 'work.cancelled']
+const WORK_EVENTS = ['work.created', 'work.claimed', 'work.completed', 'work.blocked', 'work.reassigned', 'work.reopened', 'work.cancelled', 'work.escalated']
 
 function fmtTokens(n: number): string {
   return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n)
@@ -26,7 +26,8 @@ function useWork(agentId: string | null) {
   const [work, setWork] = useState<AgentOsWork[] | null>(null)
   const [error, setError] = useState('')
   const refresh = useCallback(() => {
-    fetchWork(agentId ? { involving: agentId } : {})
+    // A lead sees its reports' work too — the same view its team review uses.
+    fetchWork(agentId ? { team: agentId } : {})
       .then((w) => {
         setWork(w)
         setError('')
@@ -59,7 +60,10 @@ export function WorkSection({ agentId }: { agentId: string | null }) {
   if (error && !work) return <p className="p-3 text-xs text-dim">Work isn&apos;t available ({error}).</p>
   if (!work) return <p className="p-3 text-xs text-dim">Loading work…</p>
 
-  const active = work.filter((w) => w.status === 'open' || w.status === 'in_progress' || w.status === 'blocked')
+  // What a lead escalated to you comes first.
+  const active = work
+    .filter((w) => w.status === 'open' || w.status === 'in_progress' || w.status === 'blocked')
+    .sort((a, b) => Number(!!b.escalation) - Number(!!a.escalation))
   const closed = work.filter((w) => w.status === 'done' || w.status === 'cancelled')
 
   return (
@@ -96,7 +100,7 @@ export function WorkSection({ agentId }: { agentId: string | null }) {
 }
 
 function WorkRow({ w, onChanged }: { w: AgentOsWork; onChanged: () => void }) {
-  const [open, setOpen] = useState(w.status === 'blocked')
+  const [open, setOpen] = useState(w.status === 'blocked' || !!w.escalation)
   const { agents } = useAgentOsContext()
   const goals = useGoals()
   const projects = useProjects()
@@ -115,6 +119,7 @@ function WorkRow({ w, onChanged }: { w: AgentOsWork; onChanged: () => void }) {
           <span className="flex flex-wrap items-center gap-1 text-[10px] text-dim">
             {nameOf(w.requestedBy)} <ArrowRight size={9} /> {nameOf(w.assignee)}
             <span style={{ color: s.color }}>· {s.label}</span>
+            {w.escalation && <span className="text-[#c084fc]">· needs you</span>}
             {w.depth > 0 && <span>· hand-off {w.depth}</span>}
             {focusName && <span className="truncate text-[#f0a020]/80">· {focusName}</span>}
             {w.totalTokens > 0 && <span>· {fmtTokens(w.totalTokens)} tok</span>}
@@ -126,6 +131,11 @@ function WorkRow({ w, onChanged }: { w: AgentOsWork; onChanged: () => void }) {
           {w.detail && <p className="whitespace-pre-wrap text-text/75">{w.detail}</p>}
           {w.result && <p className="whitespace-pre-wrap text-text/85"><span className="text-[#46d369]">Result: </span>{w.result}</p>}
           {w.blockedReason && w.status === 'blocked' && <p className="text-danger">Blocked: {w.blockedReason}</p>}
+          {w.escalation && (
+            <p className="text-[#c084fc]">
+              {nameOf(w.escalation.by)} needs you: {w.escalation.reason}
+            </p>
+          )}
           {w.notes.length > 0 && (
             <details>
               <summary className="cursor-pointer text-dim">History · {w.notes.length}</summary>

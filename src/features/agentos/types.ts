@@ -64,10 +64,46 @@ export interface AgentOsWork {
   sessionId?: string
   result?: string
   blockedReason?: string
+  /** A lead raised it to you; cleared once it moves again. */
+  escalation?: { by: string; reason: string; at: string }
   notes: { at: string; by: string; text: string }[]
   tokens: number
   totalTokens: number
   childIds: string[]
   createdAt: string
   updatedAt: string
+}
+
+// ---- Team reviews (agent-os's core/review.ts) ----
+
+export interface AgentOsReviewItem {
+  id: string
+  title: string
+  assignee: string
+  status: string
+  why: string
+  goal?: string
+}
+
+export interface AgentOsReviewDigest {
+  agentId: string
+  reports: string[]
+  blocked: AgentOsReviewItem[]
+  handedBack: AgentOsReviewItem[]
+  stale: AgentOsReviewItem[]
+  escalated: AgentOsReviewItem[]
+  doneSinceLastReview: AgentOsReviewItem[]
+  idleGoals: string[]
+  attention: number
+}
+
+export interface AgentOsReview {
+  agentId: string
+  sessionId: string
+  at: string
+  attention: number
+  tokens: number
+  summary: string
+  stopReason?: string
+  trigger: 'schedule' | 'event' | 'operator'
 }

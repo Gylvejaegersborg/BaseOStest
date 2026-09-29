@@ -304,58 +304,99 @@ export interface SessionEvent {
   payload: Record<string, unknown>
 }
 
-/** Opens the gateway's SSE stream (GET /events?types=...) and forwards
- *  every event of the given types to onEvent, unfiltered by session —
- *  the raw building block both subscribeToSessionEvents (below, filtered
- *  to one session) and MeetingRoom's activity feed (unfiltered, every
- *  agent) are built on. Returns a disposer that closes the connection.
- *  Auto-reconnects with backoff, mirroring discorddash/bridgeClient.ts's
- *  openGateway() WebSocket reconnect shape (same problem, different
- *  transport: don't leave the UI silently stuck disconnected). */
+// ---- One shared event stream ----
+//
+// Every subscriber shares ONE EventSource. Browsers allow only six open
+// HTTP/1.1 connections per host, and an EventSource holds one open for
+// good: with one stream per subscriber (chat, work, reviews, approvals,
+// events…) the Workbench used up all six, and every later request — a
+// button's POST, a refresh — queued behind them and never went out. The
+// shared stream carries the union of every subscriber's types; it only
+// reconnects when a subscriber needs a type it doesn't carry yet, and
+// closes when nobody is listening.
+
+interface Listener {
+  types: Set<string>
+  onEvent: (e: SessionEvent) => void
+}
+
+const listeners = new Set<Listener>()
+let shared: EventSource | null = null
+let sharedTypes = new Set<string>()
+let retry = 0
+let retryTimer: ReturnType<typeof setTimeout> | undefined
+let syncQueued = false
+
+function wantedTypes(): Set<string> {
+  const all = new Set<string>()
+  for (const l of listeners) for (const t of l.types) all.add(t)
+  return all
+}
+
+function openShared(types: Set<string>): void {
+  shared?.close()
+  sharedTypes = types
+  const source = new EventSource(`${BASE}/events?types=${[...types].sort().join(',')}`)
+  shared = source
+  for (const type of types) {
+    source.addEventListener(type, (ev) => {
+      let payload: Record<string, unknown>
+      try {
+        payload = JSON.parse((ev as MessageEvent).data)
+      } catch {
+        return // ignore malformed frames
+      }
+      for (const l of listeners) if (l.types.has(type)) l.onEvent({ type, payload })
+    })
+  }
+  source.onopen = () => {
+    retry = 0
+  }
+  source.onerror = () => {
+    source.close()
+    if (shared !== source) return
+    shared = null
+    // Reconnect with backoff — don't leave the UI silently disconnected.
+    clearTimeout(retryTimer)
+    retryTimer = setTimeout(syncShared, Math.min(1000 * 2 ** retry++, 16000))
+  }
+}
+
+/** Brings the shared stream in line with what subscribers want. Batched to
+ *  the end of the tick, so a render that mounts several subscribers opens
+ *  one connection, not one per mount. */
+function syncShared(): void {
+  syncQueued = false
+  const wanted = wantedTypes()
+  if (!wanted.size) {
+    shared?.close()
+    shared = null
+    sharedTypes = new Set()
+    return
+  }
+  const missing = [...wanted].some((t) => !sharedTypes.has(t))
+  // Narrowing never reconnects: carrying a few unused types is cheaper than
+  // dropping the stream every time a panel closes.
+  if (!shared || missing) openShared(new Set([...sharedTypes, ...wanted]))
+}
+
+function queueSync(): void {
+  if (syncQueued) return
+  syncQueued = true
+  setTimeout(syncShared, 0)
+}
+
+/** Forwards every gateway event of the given types to onEvent, unfiltered
+ *  by session — the building block subscribeToSessionEvents (below, one
+ *  session) and the activity feeds are built on. Returns a disposer. */
 export function subscribeToEvents(types: string[], onEvent: (e: SessionEvent) => void): () => void {
   if (!BASE) return () => {}
-
-  const typesParam = types.join(',')
-  let source: EventSource | null = null
-  let retry = 0
-  let timer: ReturnType<typeof setTimeout> | undefined
-  let disposed = false
-
-  const connect = () => {
-    if (disposed) return
-    source = new EventSource(`${BASE}/events?types=${typesParam}`)
-    for (const type of types) {
-      source.addEventListener(type, (ev) => {
-        try {
-          const payload = JSON.parse((ev as MessageEvent).data)
-          onEvent({ type, payload })
-        } catch {
-          /* ignore malformed frames */
-        }
-      })
-    }
-    source.onopen = () => {
-      retry = 0
-    }
-    source.onerror = () => {
-      source?.close()
-      schedule()
-    }
-  }
-
-  const schedule = () => {
-    if (disposed) return
-    const delay = Math.min(1000 * 2 ** retry, 16000)
-    retry += 1
-    timer = setTimeout(connect, delay)
-  }
-
-  connect()
-
+  const listener: Listener = { types: new Set(types), onEvent }
+  listeners.add(listener)
+  queueSync()
   return () => {
-    disposed = true
-    clearTimeout(timer)
-    source?.close()
+    listeners.delete(listener)
+    queueSync()
   }
 }
 

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ChevronLeft } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import { AgentRail } from '@/features/workbench/AgentRail'
@@ -56,6 +56,12 @@ export function Workbench() {
     setDockedNoteId(id)
     if (id) setActivePanel('notes')
   }
+
+  // Links into the Workbench (?agent=…) while it's already open.
+  const agentParam = searchParams.get('agent')
+  useEffect(() => {
+    if (agentParam && agents.some((a) => a.id === agentParam)) setSelectedAgentId(agentParam)
+  }, [agentParam, agents])
 
   const selectAgent = (id: string) => {
     setSelectedAgentId(id)

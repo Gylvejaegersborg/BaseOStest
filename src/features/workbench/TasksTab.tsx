@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { CheckCircle2, XCircle, Clock, Loader2, Ban, HelpCircle, ChevronDown, ChevronRight } from 'lucide-react'
 import { useAgentOsTasks } from '@/features/agentos/useAgentOsTasks'
 import { WorkSection } from './WorkSection'
+import { TeamReview } from './TeamReview'
 import type { AgentOsTask, AgentOsTaskStatus } from '@/features/agentos/sessionClient'
 
 const STATUS_ICON: Record<AgentOsTaskStatus, typeof CheckCircle2> = {
@@ -88,6 +89,8 @@ export function TasksTab({ agentId }: { agentId: string | null }) {
 
   return (
     <div>
+      {/* A lead's review of its team's work — what's stuck and what it did. */}
+      <TeamReview agentId={agentId} />
       {/* Work handed between agents (or by you) — the "what" and "who". */}
       <WorkSection agentId={agentId} />
       {/* Runs — the runtime's own execution records, the "how". */}

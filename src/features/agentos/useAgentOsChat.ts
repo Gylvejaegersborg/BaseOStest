@@ -18,7 +18,7 @@ export interface ChatMessage {
   /** 'system' = a note from the harness (e.g. an approval decision), not something you typed. */
   role: 'user' | 'assistant' | 'system'
   /** For system notes: where it came from. */
-  tag?: 'Approvals' | 'Work'
+  tag?: 'Approvals' | 'Work' | 'Review'
   text: string
   time: string
 }
@@ -45,11 +45,11 @@ function toChatMessages(history: { role: string; content: string }[]): ChatMessa
       // "[Approvals] …" (an approval decision) or "[Work] …" (a teammate
       // finished, got blocked on, or handed back work this thread asked
       // for) — show them as system notes, not as you.
-      const tag = m.role === 'user' ? /^\[(Approvals|Work)\] /.exec(m.content) : null
+      const tag = m.role === 'user' ? /^\[(Approvals|Work|Review)\] /.exec(m.content) : null
       return {
         id: `h${i}`,
         role: tag ? ('system' as const) : (m.role as 'user' | 'assistant'),
-        ...(tag ? { tag: tag[1] as 'Approvals' | 'Work' } : {}),
+        ...(tag ? { tag: tag[1] as 'Approvals' | 'Work' | 'Review' } : {}),
         text: tag ? m.content.slice(tag[0].length) : m.content,
         time: '',
       }
@@ -66,7 +66,7 @@ function toChatMessages(history: { role: string; content: string }[]): ChatMessa
  * when no gateway is set or it's unreachable, same posture as
  * useAgentOsAgents/useTeamState/useDiscordBridge elsewhere in this repo.
  */
-export function useAgentOsChat(agentId: string) {
+export function useAgentOsChat(agentId: string, preferredSessionId?: string | null) {
   const [connection, setConnection] = useState<ChatConnection>('connecting')
   const [errorText, setErrorText] = useState('')
   const [sessions, setSessions] = useState<AgentOsSession[]>([])
@@ -78,6 +78,10 @@ export function useAgentOsChat(agentId: string) {
 
   const sessionIdRef = useRef<string | null>(null)
   sessionIdRef.current = sessionId
+  // A thread asked for by link (?session=…, e.g. a lead's Team review) wins
+  // over "most recently active" when the agent's threads first load.
+  const preferredRef = useRef(preferredSessionId)
+  preferredRef.current = preferredSessionId
 
   const refreshHistory = useCallback(async (id: string) => {
     try {
@@ -117,7 +121,7 @@ export function useAgentOsChat(agentId: string) {
         // guard was moved up.
         if (cancelled) return
         const mostRecent = [...list].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0]
-        let session = mostRecent
+        let session = list.find((x) => x.id === preferredRef.current) ?? mostRecent
         if (!session) {
           session = await createChatSession(agentId)
           if (cancelled) return
@@ -230,6 +234,14 @@ export function useAgentOsChat(agentId: string) {
     },
     [refreshHistory],
   )
+
+  // Following a link to another of this agent's threads while it's open.
+  useEffect(() => {
+    if (connection !== 'ready' || !preferredSessionId || preferredSessionId === sessionIdRef.current) return
+    void refreshSessions().then((list) => {
+      if (list.some((x) => x.id === preferredSessionId)) switchSession(preferredSessionId)
+    })
+  }, [preferredSessionId, connection, refreshSessions, switchSession])
 
   const setFocus = useCallback(
     async (id: string, focus: AgentOsSessionFocus | null) => {

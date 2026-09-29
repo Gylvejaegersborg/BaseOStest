@@ -1,3 +1,4 @@
+import { useSearchParams } from 'react-router-dom'
 import { ChevronLeft } from 'lucide-react'
 import { useAgentOsContext } from '@/features/agentos/AgentOsProvider'
 import { useAgentOsChat } from '@/features/agentos/useAgentOsChat'
@@ -45,7 +46,8 @@ export function AgentWorkspace({
 }) {
   const { agents } = useAgentOsContext()
   const agent = agents.find((a) => a.id === agentId)
-  const chat = useAgentOsChat(agentId)
+  const [searchParams] = useSearchParams()
+  const chat = useAgentOsChat(agentId, searchParams.get('session'))
 
   if (!agent) return null
 
