@@ -154,6 +154,9 @@ export interface CronJob {
   showInCalendar?: boolean
   /** Team this job belongs to (e.g. its standup), when it's a team job. */
   team?: string
+  /** What a team job serves — its run is focused on this goal or project
+   *  (agent-os: the chair gets the goal chain; the minutes link back). */
+  focus?: { kind: 'goal' | 'project'; id: string }
   lastRun: string
   status: 'ok' | 'running' | 'warn'
   description?: string

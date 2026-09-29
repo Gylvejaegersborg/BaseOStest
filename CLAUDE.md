@@ -34,7 +34,8 @@ gateway through the dev server's `/agent-os` proxy (see `vite.config.ts`).
   a bigger goal; notes link goals with `[[Goal title]]`; todos can serve a project or goal. The
   snapshot carries these links. A Workbench thread can be focused on a goal/project ("Serves…" in
   the thread header) — its agent then gets the chain, linked notes and open todos every turn, and
-  what it adds links back. Keep new features on this connective layer; continuity is the point.
+  what it adds links back. Flows (New Flow → Serves) and team crons (cron editor → Serves) take a
+  focus the same way: every step / standup runs focused on it. Keep new features on this connective layer; continuity is the point.
 - Agents hand each other work as tracked items (agent-os's `core/work.ts`: `delegate` and `work`
   tools, a background runner), not chat. Reporting lines (`reportsTo`, agent editor) decide where
   hand-backs go. Work shows in Workbench → Tasks; results land in the asking thread as `[Work]`

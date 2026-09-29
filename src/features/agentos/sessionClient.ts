@@ -272,8 +272,9 @@ export interface FlowStepInput {
  *  not block on the whole DAG, which can take minutes). Watch progress
  *  via subscribeToEvents(['flow.step.started','flow.step.completed',
  *  'flow.completed']) or by polling fetchFlow(). */
-export function createFlow(steps: FlowStepInput[]): Promise<AgentOsFlow> {
-  return request<AgentOsFlow>('/flows', { method: 'POST', body: JSON.stringify({ steps }) })
+/** `focus`: what the flow serves — every step runs focused on it. */
+export function createFlow(steps: FlowStepInput[], focus?: AgentOsSessionFocus): Promise<AgentOsFlow> {
+  return request<AgentOsFlow>('/flows', { method: 'POST', body: JSON.stringify({ steps, ...(focus ? { focus } : {}) }) })
 }
 
 export function fetchFlow(flowId: string): Promise<AgentOsFlow> {

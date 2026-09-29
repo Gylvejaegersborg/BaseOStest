@@ -53,7 +53,7 @@ export interface BaseSpaceSnapshot {
     progress: number | null
   }[]
   events: { id: string; title: string; kind: string; date: string; start: number; end: number; location?: string; recurring: boolean }[]
-  crons: { id: string; name: string; owner: string; team?: string; schedule: unknown; nextRun: string; status: string }[]
+  crons: { id: string; name: string; owner: string; team?: string; focus?: { kind: 'goal' | 'project'; id: string }; schedule: unknown; nextRun: string; status: string }[]
   teams: { id: string; name: string; members: string[]; description?: string }[]
 }
 
@@ -123,6 +123,7 @@ export function useSnapshot(): BaseSpaceSnapshot {
       name: c.name,
       owner: c.owner,
       team: c.team,
+      ...(c.focus ? { focus: c.focus } : {}),
       schedule: c.schedule,
       nextRun: new Date(cronNextRunMs(c.schedule)).toISOString(),
       status: c.status,

@@ -3,7 +3,8 @@ import { Plus, Trash2, FileText, X } from 'lucide-react'
 import { Modal } from '@/components/ui/Modal'
 import { AGENTS } from '@/data/agents'
 import { FLOW_TEMPLATES, resolveFlowTemplate, type FlowTemplate } from '@/data/flowTemplates'
-import { createFlow, type FlowStepInput } from '@/features/agentos/sessionClient'
+import { createFlow, type AgentOsSessionFocus, type FlowStepInput } from '@/features/agentos/sessionClient'
+import { FocusPicker } from './FocusPicker'
 import { deleteFlowDraft, listFlowDrafts, saveFlowDraft, type FlowDraft } from '@/data/flowDrafts'
 import { cn } from '@/lib/cn'
 
@@ -45,6 +46,8 @@ export function NewFlowModal({
   const [customSteps, setCustomSteps] = useState<DraftStep[]>([])
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  // What the whole flow serves (agent-os: every step runs focused on it).
+  const [focus, setFocus] = useState<AgentOsSessionFocus | null>(null)
   const [drafts, setDrafts] = useState<FlowDraft[]>([])
   const [draftId, setDraftId] = useState<string | null>(null)
 
@@ -131,7 +134,7 @@ export function NewFlowModal({
         if (!template || !goal.trim()) return
         steps = resolveFlowTemplate(template, goal.trim(), overrides)
       }
-      const flow = await createFlow(steps)
+      const flow = await createFlow(steps, focus ?? undefined)
       if (draftId) deleteFlowDraft(draftId)
       onCreated(flow.id, steps)
       reset()
@@ -278,6 +281,11 @@ export function NewFlowModal({
             <p className="text-[10px] text-dim">Every step needs a unique id, an agent and a goal before this can start.</p>
           )}
           {error && <p className="border border-danger/40 bg-danger/10 p-2 text-xs text-danger">{error}</p>}
+          <div className="flex items-center gap-2 text-[11px] text-dim">
+            <span>Serves</span>
+            <FocusPicker focus={focus ?? undefined} onChange={setFocus} />
+            <span className="min-w-0 flex-1 truncate">— every step gets the goal chain, and what it adds links back.</span>
+          </div>
           <div className="flex gap-2">
             <button
               onClick={saveDraft}
@@ -338,6 +346,11 @@ export function NewFlowModal({
             ))}
           </div>
           {error && <p className="border border-danger/40 bg-danger/10 p-2 text-xs text-danger">{error}</p>}
+          <div className="flex items-center gap-2 text-[11px] text-dim">
+            <span>Serves</span>
+            <FocusPicker focus={focus ?? undefined} onChange={setFocus} />
+            <span className="min-w-0 flex-1 truncate">— every step gets the goal chain, and what it adds links back.</span>
+          </div>
           <div className="flex gap-2">
             <button
               onClick={saveDraft}
