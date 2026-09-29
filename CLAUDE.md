@@ -20,7 +20,9 @@ gateway through the dev server's `/agent-os` proxy (see `vite.config.ts`).
   open board items imported once as todos). It is history; don't add to it.
 - An agent's model (`defaultModel`, set in the agent editor) can name its provider:
   `claude-cli:sonnet` (your Claude subscription via the Claude Code CLI), `ollama:<model>`,
-  `anthropic:<id>`, `openai:<id>`. See agent-os's README, "Model providers".
+  `anthropic:<id>`, `openai:<id>`. See agent-os's README, "Model providers". `claude-cli` runs
+  with thinking off; `claude-cli:sonnet+think` turns it on for one agent. Every model call resends
+  the system prompt and tool list, so keep per-call context lean: agents only see tools they can use.
 - Workbench → Terminal runs Claude Code (the real CLI, your own login) or a shell through the
   gateway (`/terminals`, agent-os's `src/gateway/terminal.ts`). Off unless the gateway has
   `AGENT_OS_TERMINAL=1`; the Codespace turns it on, so never make its ports public.
