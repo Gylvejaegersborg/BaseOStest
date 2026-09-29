@@ -41,7 +41,9 @@ fi
 [ -n "${HINDSIGHT_LLM_API_KEY:-}" ] && export HINDSIGHT_API_LLM_API_KEY="$HINDSIGHT_LLM_API_KEY"
 
 echo "[hindsight] starting on :$PORT (LLM: $HINDSIGHT_API_LLM_PROVIDER/$HINDSIGHT_API_LLM_MODEL; first start downloads models — log: /tmp/hindsight.log)…"
-nohup uvx --from "hindsight-api==$VERSION" hindsight-api --port "$PORT" --idle-timeout 0 >> /tmp/hindsight.log 2>&1 &
+# --host 127.0.0.1: Hindsight's default is 0.0.0.0 and it has no auth unless a key
+# is set. Only the gateway (same machine) talks to it, so keep it off the network.
+nohup uvx --from "hindsight-api==$VERSION" hindsight-api --host 127.0.0.1 --port "$PORT" --idle-timeout 0 >> /tmp/hindsight.log 2>&1 &
 
 for _ in $(seq 1 300); do
   if curl -sf "http://127.0.0.1:$PORT/health" > /dev/null 2>&1; then
