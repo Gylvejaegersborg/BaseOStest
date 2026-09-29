@@ -21,6 +21,10 @@ export interface Agent {
   }
   // canned lines the agent "says" in the room feed
   chatter: string[]
+  /** Board controls from Agent-OS (pause/budget); absent in mock mode. */
+  control?: import('@/features/agentos/types').AgentOsControl
+  /** Manager's agent id from Agent-OS; absent = reports to the operator. */
+  reportsTo?: string
 }
 
 /** The nyx-w1/nyx-w2 entries are presentational-only sub-agents (Nyx's

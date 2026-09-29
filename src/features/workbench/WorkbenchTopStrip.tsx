@@ -1,11 +1,11 @@
 import { useState, type ReactNode } from 'react'
-import { ListChecks, Workflow, FileStack, ShieldCheck, Activity as ActivityIcon, Brain, History, Users, StickyNote, Settings, LayoutPanelLeft, Timer } from 'lucide-react'
+import { ListChecks, Workflow, FileStack, ShieldCheck, Activity as ActivityIcon, Brain, History, Users, StickyNote, Settings, LayoutPanelLeft, Timer, SquareTerminal } from 'lucide-react'
 import { Tabs, type TabItem } from '@/components/ui/Tabs'
 import { cn } from '@/lib/cn'
 import { Glow } from '@/components/ui/Glow'
 import { useAgentOsApprovals } from '@/features/agentos/useAgentOsApprovals'
 
-export type StripTab = 'tasks' | 'flow' | 'artifacts' | 'approvals' | 'events' | 'memory' | 'files' | 'notes' | 'teams' | 'crons'
+export type StripTab = 'tasks' | 'flow' | 'artifacts' | 'approvals' | 'events' | 'memory' | 'files' | 'notes' | 'teams' | 'crons' | 'terminal'
 
 export const STRIP_TABS: TabItem<StripTab>[] = [
   { id: 'tasks', label: 'Tasks', icon: ListChecks },
@@ -18,6 +18,7 @@ export const STRIP_TABS: TabItem<StripTab>[] = [
   { id: 'notes', label: 'Notes', icon: StickyNote },
   { id: 'crons', label: 'Crons', icon: Timer },
   { id: 'teams', label: 'Teams', icon: Users },
+  { id: 'terminal', label: 'Terminal', icon: SquareTerminal },
 ]
 
 const ALL_TABS = STRIP_TABS
@@ -35,7 +36,8 @@ const ALL_TABS = STRIP_TABS
  * Responsive pass (Phase 6): ten separate icon buttons plus Settings
  * don't fit a phone-width bar next to the agent identity and its own back
  * control. Below `lg`, they collapse into one "Panels" overflow
- * button with a dropdown list — the tabs themselves are runtime state,
+ * button with a dropdown list (below 1400px wide — eleven tabs plus the
+ * agent/thread identity don't fit a laptop-width bar either) — the tabs themselves are runtime state,
  * not navigation, so folding them behind one control loses nothing a
  * mobile user reaches for constantly.
  */
@@ -61,11 +63,11 @@ export function WorkbenchTopStrip({
     <div className="flex items-center justify-between gap-3 border-b border-line px-3 py-2">
       <div className="min-w-0 flex-1">{left}</div>
       <div className="flex shrink-0 items-center gap-1">
-        <div className="hidden items-center gap-1 lg:flex">
+        <div className="hidden items-center gap-1 min-[1400px]:flex">
           <Tabs tabs={STRIP_TABS} active={activePanel} onChange={onSelectTab} glow={pending ? { approvals: APPROVAL_GLOW } : undefined} />
         </div>
 
-        <div className="relative lg:hidden">
+        <div className="relative min-[1400px]:hidden">
           <button
             onClick={() => setMenuOpen((o) => !o)}
             title={pending ? `Panels — ${pending} approval${pending > 1 ? 's' : ''} waiting` : 'Panels'}

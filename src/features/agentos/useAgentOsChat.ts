@@ -6,6 +6,8 @@ import {
   getSessionHistory,
   listChatSessions,
   renameChatSession,
+  setSessionFocus,
+  type AgentOsSessionFocus,
   sendTurn,
   subscribeToSessionEvents,
   type AgentOsSession,
@@ -15,6 +17,8 @@ export interface ChatMessage {
   id: string
   /** 'system' = a note from the harness (e.g. an approval decision), not something you typed. */
   role: 'user' | 'assistant' | 'system'
+  /** For system notes: where it came from. */
+  tag?: 'Approvals' | 'Work' | 'Review'
   text: string
   time: string
 }
@@ -37,13 +41,16 @@ function toChatMessages(history: { role: string; content: string }[]): ChatMessa
   return history
     .filter((m) => m.role === 'user' || m.role === 'assistant')
     .map((m, i) => {
-      // The gateway resumes a chat after an Approvals decision with a
-      // "[Approvals] …" turn — show it as a system note, not as you.
-      const system = m.role === 'user' && m.content.startsWith('[Approvals] ')
+      // Notes from the harness arrive as user-role messages with a tag:
+      // "[Approvals] …" (an approval decision) or "[Work] …" (a teammate
+      // finished, got blocked on, or handed back work this thread asked
+      // for) — show them as system notes, not as you.
+      const tag = m.role === 'user' ? /^\[(Approvals|Work|Review)\] /.exec(m.content) : null
       return {
         id: `h${i}`,
-        role: system ? ('system' as const) : (m.role as 'user' | 'assistant'),
-        text: system ? m.content.slice('[Approvals] '.length) : m.content,
+        role: tag ? ('system' as const) : (m.role as 'user' | 'assistant'),
+        ...(tag ? { tag: tag[1] as 'Approvals' | 'Work' | 'Review' } : {}),
+        text: tag ? m.content.slice(tag[0].length) : m.content,
         time: '',
       }
     })
@@ -59,7 +66,7 @@ function toChatMessages(history: { role: string; content: string }[]): ChatMessa
  * when no gateway is set or it's unreachable, same posture as
  * useAgentOsAgents/useTeamState/useDiscordBridge elsewhere in this repo.
  */
-export function useAgentOsChat(agentId: string) {
+export function useAgentOsChat(agentId: string, preferredSessionId?: string | null) {
   const [connection, setConnection] = useState<ChatConnection>('connecting')
   const [errorText, setErrorText] = useState('')
   const [sessions, setSessions] = useState<AgentOsSession[]>([])
@@ -71,6 +78,10 @@ export function useAgentOsChat(agentId: string) {
 
   const sessionIdRef = useRef<string | null>(null)
   sessionIdRef.current = sessionId
+  // A thread asked for by link (?session=…, e.g. a lead's Team review) wins
+  // over "most recently active" when the agent's threads first load.
+  const preferredRef = useRef(preferredSessionId)
+  preferredRef.current = preferredSessionId
 
   const refreshHistory = useCallback(async (id: string) => {
     try {
@@ -110,7 +121,7 @@ export function useAgentOsChat(agentId: string) {
         // guard was moved up.
         if (cancelled) return
         const mostRecent = [...list].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0]
-        let session = mostRecent
+        let session = list.find((x) => x.id === preferredRef.current) ?? mostRecent
         if (!session) {
           session = await createChatSession(agentId)
           if (cancelled) return
@@ -151,6 +162,10 @@ export function useAgentOsChat(agentId: string) {
         setWorkingOn(String(e.payload.name ?? 'a tool'))
       } else if (e.type === 'tool.call.end') {
         setWorkingOn(null)
+      } else if (e.type === 'session.note') {
+        // A note posted into this thread from outside a turn (e.g. work
+        // handed off from here finished) — show it without a reload.
+        refreshHistory(sessionId)
       } else if (e.type === 'agent.turn.end') {
         setStreaming(false)
         setWorkingOn(null)
@@ -220,6 +235,22 @@ export function useAgentOsChat(agentId: string) {
     [refreshHistory],
   )
 
+  // Following a link to another of this agent's threads while it's open.
+  useEffect(() => {
+    if (connection !== 'ready' || !preferredSessionId || preferredSessionId === sessionIdRef.current) return
+    void refreshSessions().then((list) => {
+      if (list.some((x) => x.id === preferredSessionId)) switchSession(preferredSessionId)
+    })
+  }, [preferredSessionId, connection, refreshSessions, switchSession])
+
+  const setFocus = useCallback(
+    async (id: string, focus: AgentOsSessionFocus | null) => {
+      await setSessionFocus(id, focus)
+      await refreshSessions()
+    },
+    [refreshSessions],
+  )
+
   const rename = useCallback(
     async (id: string, title: string) => {
       await renameChatSession(id, title)
@@ -230,6 +261,6 @@ export function useAgentOsChat(agentId: string) {
 
   return {
     connection, errorText, sessions, sessionId, messages, streaming, workingOn, streamingText,
-    send, cancel, newSession, switchSession, rename,
+    send, cancel, newSession, switchSession, rename, setFocus,
   }
 }

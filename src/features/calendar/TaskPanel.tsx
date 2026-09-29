@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useGoals } from '@/features/goals/store'
+import { useProjects } from '@/features/projects/store'
 import { Bell, ChevronDown, ChevronUp, FileText, FolderKanban, Maximize2, Plus, Repeat, Trash2 } from 'lucide-react'
 import {
   PRIORITY_COLOR,
@@ -297,6 +299,8 @@ export function TaskModal({
 
       <RecurrenceField value={draft.recurrence} onChange={(recurrence) => set({ recurrence })} />
 
+      <ServesField projectId={draft.projectId} goalId={draft.goalId} onChange={(projectId, goalId) => set({ projectId, goalId })} />
+
       <label className="label mb-1 block">Tag</label>
       <select
         value={draft.kind ?? ''}
@@ -368,5 +372,48 @@ export function TaskModal({
         </div>
       </div>
     </Modal>
+  )
+}
+
+/** What a todo serves — a goal or a project (features/goals). Agents see it,
+ *  and it shows under that goal in Projects. */
+function ServesField({ projectId, goalId, onChange }: { projectId?: string; goalId?: string; onChange: (projectId?: string, goalId?: string) => void }) {
+  const goals = useGoals()
+  const projects = useProjects()
+  const value = goalId ? `goal:${goalId}` : projectId ? `project:${projectId}` : ''
+  return (
+    <>
+      <label className="label mb-1 block">Serves</label>
+      <select
+        value={value}
+        onChange={(e) => {
+          const [kind, id] = e.target.value.split(/:(.*)/s)
+          onChange(kind === 'project' ? id : undefined, kind === 'goal' ? id : undefined)
+        }}
+        className="mb-3 w-full border border-line bg-bg/60 px-2 py-1.5 text-sm text-text focus:border-accent/60 focus:outline-none"
+      >
+        <option value="">nothing in particular</option>
+        {goals.some((g) => g.status === 'active') && (
+          <optgroup label="Goals">
+            {goals
+              .filter((g) => g.status === 'active' || g.id === goalId)
+              .map((g) => (
+                <option key={g.id} value={`goal:${g.id}`}>
+                  {g.title}
+                </option>
+              ))}
+          </optgroup>
+        )}
+        <optgroup label="Projects">
+          {projects
+            .filter((p) => p.status !== 'shipped' || p.id === projectId)
+            .map((p) => (
+              <option key={p.id} value={`project:${p.id}`}>
+                {p.name}
+              </option>
+            ))}
+        </optgroup>
+      </select>
+    </>
   )
 }

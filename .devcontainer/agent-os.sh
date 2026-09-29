@@ -39,8 +39,14 @@ if pkill -f "[d]ist/gateway/cli.js"; then
   echo "[agent-os] stopped the old gateway"
   sleep 1
 fi
+# AGENT_OS_TERMINAL=1 turns on the Workbench's Terminal panel (Claude Code
+# or a shell, run by the gateway). Safe here because a Codespace's
+# forwarded ports are private to your GitHub login by default — set the
+# Codespace secret AGENT_OS_TERMINAL=0 to turn it off, and never make port
+# 5173/8787 public while it's on.
 echo "[agent-os] starting gateway on :$GATEWAY_PORT (log: /tmp/agent-os-gateway.log)…"
 AGENT_OS_GATEWAY_PORT="$GATEWAY_PORT" OLLAMA_MODEL="$OLLAMA_MODEL" BASEOS_REPO_DIR="$BASEOS_REPO_DIR" \
+AGENT_OS_TERMINAL="${AGENT_OS_TERMINAL:-1}" \
   nohup npm run gateway > /tmp/agent-os-gateway.log 2>&1 &
 
 # Wait until it answers (the TypeScript build takes a few seconds).

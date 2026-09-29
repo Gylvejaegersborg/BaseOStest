@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { Mic, Paperclip, Send, Square, X, Bot, AlertTriangle, Eye, StickyNote, FileUp, FileText, ShieldCheck } from 'lucide-react'
+import { useAgentOsSessionUsage } from '@/features/agentos/useAgentOsSessionUsage'
+import { FocusPicker } from './FocusPicker'
+import { Mic, Paperclip, Send, Square, X, Bot, AlertTriangle, Eye, StickyNote, FileUp, FileText, ShieldCheck, CheckCircle2, OctagonAlert, ArrowRightLeft, Ban, ClipboardCheck } from 'lucide-react'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { cn } from '@/lib/cn'
 import type { Agent } from '@/data/agents'
@@ -42,6 +44,8 @@ export function ConversationPane({
   const [pending, setPending] = useState<Attachment[]>([])
   const [dragging, setDragging] = useState(false)
   const [planMode, setPlanMode] = useState(false)
+  const currentSession = chat.sessions.find((x) => x.id === chat.sessionId)
+  const usage = useAgentOsSessionUsage(chat.sessionId, chat.streaming)
   const [attachMenuOpen, setAttachMenuOpen] = useState(false)
   const [notePickerOpen, setNotePickerOpen] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
@@ -204,15 +208,38 @@ export function ConversationPane({
           </div>
           <input ref={fileRef} type="file" multiple hidden onChange={(e) => addFiles(e.target.files)} />
           <MicButton onClip={(att) => setPending((p) => [...p, att])} />
-          <textarea
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }}
-            rows={1}
-            disabled={notReady}
-            placeholder={chat.streaming ? 'Receiving…' : notReady ? 'Agent-OS not connected' : `Message ${agent.name}…`}
-            className="max-h-32 min-h-[40px] flex-1 resize-none border border-line bg-bg/60 px-3 py-2 text-sm text-text placeholder:text-dim focus:border-accent/60 focus:outline-none disabled:opacity-50"
-          />
+          {/* The field carries the thread's context: what it serves (goal or
+              project) and its token use, tucked under the text instead of
+              crowding the top strip. */}
+          <div className="flex min-w-0 flex-1 flex-col border border-line bg-bg/60 focus-within:border-accent/60">
+            <textarea
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }}
+              rows={1}
+              disabled={notReady}
+              placeholder={chat.streaming ? 'Receiving…' : notReady ? 'Agent-OS not connected' : `Message ${agent.name}…`}
+              className="max-h-32 min-h-[36px] resize-none bg-transparent px-3 pb-1 pt-2 text-sm text-text placeholder:text-dim focus:outline-none disabled:opacity-50"
+            />
+            {currentSession && (
+              <div className="flex min-w-0 items-center justify-end gap-2 px-2 pb-1.5">
+                <FocusPicker
+                  focus={currentSession.focus}
+                  disabled={chat.connection !== 'ready'}
+                  placement="up"
+                  onChange={(f) => void chat.setFocus(currentSession.id, f)}
+                />
+                {!!usage?.turnsWithUsage && (
+                  <span
+                    title={`${usage.inputTokens.toLocaleString()} input + ${usage.outputTokens.toLocaleString()} output tokens this thread`}
+                    className="shrink-0 rounded-sm bg-panel-2 px-1.5 py-0.5 text-[10px] text-dim"
+                  >
+                    {fmtTokens(usage.inputTokens + usage.outputTokens)} tok
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
           <button
             onClick={send}
             disabled={notReady}
@@ -251,6 +278,8 @@ function MessageRow({
   onSendToNotes: (text: string) => void
   onShowApproval?: (id: string) => void
 }) {
+  if (msg.role === 'system' && msg.tag === 'Work') return <WorkNote text={msg.text} />
+  if (msg.role === 'system' && msg.tag === 'Review') return <ReviewBrief text={msg.text} />
   if (msg.role === 'system') {
     // "Approved <id>: shell {…}. Go ahead…" (older gateways omit the id)
     const m = /^(Approved|Rejected)(?: (\S+))?: (.*?)\. (?:Go ahead|Don't run)/s.exec(msg.text)
@@ -400,6 +429,46 @@ function MicButton({ onClip }: { onClip: (att: { id: string; name: string; size:
           {String(Math.floor(secs / 60)).padStart(2, '0')}:{String(secs % 60).padStart(2, '0')}
         </span>
       )}
+    </button>
+  )
+}
+
+function fmtTokens(n: number): string {
+  return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n)
+}
+
+/** The brief a lead's team review starts from (agent-os's review.ts):
+ *  the first line, the rest on click. */
+function ReviewBrief({ text }: { text: string }) {
+  const [open, setOpen] = useState(false)
+  const [first, ...rest] = text.split('\n')
+  return (
+    <button onClick={() => setOpen((o) => !o)} title={open ? 'Collapse' : 'Show the whole brief'} className="flex w-full items-start gap-2 text-left text-[11px] text-dim hover:text-text">
+      <span className="mt-2 h-px w-6 shrink-0 bg-line" />
+      <ClipboardCheck size={12} className="mt-0.5 shrink-0 text-accent" />
+      <span className="min-w-0 flex-1 whitespace-pre-wrap">
+        <span className="text-text/80">{first}</span>
+        {open && rest.length > 0 && <span className="block">{rest.join('\n')}</span>}
+      </span>
+    </button>
+  )
+}
+
+/** A teammate finished, got blocked on, or handed back work this thread
+ *  asked for (agent-os's work runner posts it here). Compact until clicked. */
+function WorkNote({ text }: { text: string }) {
+  const [open, setOpen] = useState(false)
+  const kind = / finished "/.test(text) ? 'done' : / is blocked on "/.test(text) ? 'blocked' : / was handed to /.test(text) ? 'handed' : 'other'
+  const Icon = kind === 'done' ? CheckCircle2 : kind === 'blocked' ? OctagonAlert : kind === 'handed' ? ArrowRightLeft : Ban
+  const color = kind === 'done' ? 'text-neon-green' : kind === 'blocked' ? 'text-danger' : 'text-dim'
+  return (
+    <button onClick={() => setOpen((o) => !o)} title={open ? 'Collapse' : 'Show the whole result'} className="flex w-full items-start gap-2 text-left text-[11px] text-dim hover:text-text">
+      <span className="mt-2 h-px w-6 shrink-0 bg-line" />
+      <Icon size={12} className={cn('mt-0.5 shrink-0', color)} />
+      <span className={cn('min-w-0 flex-1 whitespace-pre-wrap', !open && 'line-clamp-2')}>
+        <span className="text-text/60">Work · </span>
+        {text}
+      </span>
     </button>
   )
 }

@@ -17,6 +17,8 @@ function mergeAgent(local: Agent, remote: AgentOsAgent | undefined): Agent {
     role: remote.role ?? local.role,
     model: remote.defaultModel ?? local.model,
     status: remote.status === 'active' ? 'working' : 'idle',
+    control: remote.control,
+    reportsTo: remote.reportsTo,
     live: {
       tasks: remote.metrics.tasks.total,
       successRate: remote.metrics.tasks.successRate,
@@ -58,6 +60,8 @@ function synthesizeAgent(remote: AgentOsAgent): Agent {
     status: remote.status === 'active' ? 'working' : 'idle',
     task: remote.currentTaskId ? 'Working…' : 'Idle — no task yet',
     stats: { tasksDone: remote.metrics.tasks.total, tokens: '—', uptime: '—', load: 0 },
+    control: remote.control,
+    reportsTo: remote.reportsTo,
     live: {
       tasks: remote.metrics.tasks.total,
       successRate: remote.metrics.tasks.successRate,

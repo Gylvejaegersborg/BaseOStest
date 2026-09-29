@@ -87,6 +87,10 @@ export interface Task {
    *  checkboxes) are read-only here and complete back at their source. */
   source?: 'manual' | 'project' | 'note'
   sourceRef?: { projectId?: string; entryId?: string; noteId?: string; line?: number }
+  /** What this todo serves (see features/goals): a project and/or a goal.
+   *  Derived next-move todos serve their project through sourceRef. */
+  projectId?: string
+  goalId?: string
 }
 
 export const PRIORITY_COLOR: Record<TaskPriority, string> = {
@@ -150,6 +154,9 @@ export interface CronJob {
   showInCalendar?: boolean
   /** Team this job belongs to (e.g. its standup), when it's a team job. */
   team?: string
+  /** What a team job serves — its run is focused on this goal or project
+   *  (agent-os: the chair gets the goal chain; the minutes link back). */
+  focus?: { kind: 'goal' | 'project'; id: string }
   lastRun: string
   status: 'ok' | 'running' | 'warn'
   description?: string

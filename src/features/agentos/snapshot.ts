@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { useNotesList } from '@/features/notes/notesStore'
 import { useProjects } from '@/features/projects/store'
 import { useCalendar } from '@/features/calendar/CalendarContext'
 import { cronNextRunMs } from '@/features/calendar/cron'
 import { offsetDate } from '@/features/calendar/util'
 import { useTeams } from '@/features/workbench/teams'
+import { todoLinks, useGoalViews } from '@/features/goals/store'
+import { useLinkGraph } from '@/features/connections/connections'
 import { useAgentOsContext } from './AgentOsProvider'
 import { pushSnapshot } from './client'
 
@@ -31,10 +33,27 @@ export interface BaseSpaceSnapshot {
     props: Record<string, unknown>
     nextMoves: string[]
     recent: { date: string; text: string }[]
+    /** Goals this project serves, and notes that [[link]] it. */
+    goalIds?: string[]
+    noteIds?: string[]
   }[]
-  todos: { id: string; title: string; status: string; priority: string; due?: string; source: string; notes?: string }[]
+  todos: { id: string; title: string; status: string; priority: string; due?: string; source: string; notes?: string; projectId?: string; goalId?: string }[]
+  /** What the work is for (features/goals). Optional so older gateways and
+   *  snapshots without goals still read fine. */
+  goals?: {
+    id: string
+    title: string
+    why: string
+    status: string
+    target?: string
+    parentId?: string
+    projectIds: string[]
+    /** Notes linking the goal, then notes linking its projects. */
+    noteIds: string[]
+    progress: number | null
+  }[]
   events: { id: string; title: string; kind: string; date: string; start: number; end: number; location?: string; recurring: boolean }[]
-  crons: { id: string; name: string; owner: string; team?: string; schedule: unknown; nextRun: string; status: string }[]
+  crons: { id: string; name: string; owner: string; team?: string; focus?: { kind: 'goal' | 'project'; id: string }; schedule: unknown; nextRun: string; status: string }[]
   teams: { id: string; name: string; members: string[]; description?: string }[]
 }
 
@@ -45,6 +64,12 @@ export function useSnapshot(): BaseSpaceSnapshot {
   const projects = useProjects()
   const { tasks, appts, crons } = useCalendar()
   const { teams } = useTeams()
+  const goals = useGoalViews()
+  const graph = useLinkGraph()
+  const projectNoteIds = useMemo(
+    () => new Map(projects.map((p) => [p.id, graph.notesLinkingToProject(p.id).map((n) => n.id)])),
+    [projects, graph],
+  )
   return {
     schema: 1,
     exportedAt: new Date().toISOString(),
@@ -70,6 +95,8 @@ export function useSnapshot(): BaseSpaceSnapshot {
       props: p.props,
       nextMoves: p.plans.map((e) => e.text),
       recent: p.history.slice(0, 5).map((e) => ({ date: e.date, text: e.text })),
+      goalIds: goals.filter((g) => g.projectIds.includes(p.id)).map((g) => g.id),
+      noteIds: projectNoteIds.get(p.id) ?? [],
     })),
     todos: tasks.map((t) => ({
       id: t.id,
@@ -79,6 +106,7 @@ export function useSnapshot(): BaseSpaceSnapshot {
       due: t.dayOffset == null ? undefined : `${iso(offsetDate(t.dayOffset))}${t.dueTime != null ? ` ${hhmmOf(t.dueTime)}` : ''}`,
       source: t.source ?? 'manual',
       notes: t.notes,
+      ...todoLinks(t),
     })),
     events: appts.map((a) => ({
       id: a.id,
@@ -95,11 +123,23 @@ export function useSnapshot(): BaseSpaceSnapshot {
       name: c.name,
       owner: c.owner,
       team: c.team,
+      ...(c.focus ? { focus: c.focus } : {}),
       schedule: c.schedule,
       nextRun: new Date(cronNextRunMs(c.schedule)).toISOString(),
       status: c.status,
     })),
     teams: teams.map((t) => ({ id: t.id, name: t.name, members: t.members, description: t.description })),
+    goals: goals.map((g) => ({
+      id: g.id,
+      title: g.title,
+      why: g.why,
+      status: g.status,
+      target: g.target,
+      parentId: g.parentId,
+      projectIds: g.projectIds,
+      noteIds: [...new Set([...g.notes.map((n) => n.id), ...g.projectNotes.map((x) => x.note.id)])],
+      progress: g.progress,
+    })),
   }
 }
 

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { FocusPicker } from '@/features/workbench/FocusPicker'
 import type { CronJob, CronSchedule } from '@/data/calendar'
 import { Modal } from '@/components/ui/Modal'
 import { hhmm, parseHM } from './util'
@@ -75,6 +76,14 @@ export function CronEditModal({
           </select>
         </div>
       </div>
+
+      {draft.team && (
+        <div className="mb-3 flex items-center gap-2 text-[11px] text-dim">
+          <span className="label">Serves</span>
+          <FocusPicker focus={draft.focus} onChange={(focus) => set({ focus: focus ?? undefined })} />
+          <span className="min-w-0 flex-1 truncate">— the chair gets the goal chain; the minutes link back.</span>
+        </div>
+      )}
 
       {/* Schedule editor */}
       <label className="label mb-1 block">Schedule</label>

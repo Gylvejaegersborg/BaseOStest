@@ -128,6 +128,7 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
           notes: `Next move in project “${p.name}”.`,
           source: 'project',
           sourceRef: { projectId: p.id, entryId: plan.id },
+          projectId: p.id,
         })
     for (const n of notes) {
       if ((n.kind ?? 'markdown') !== 'markdown') continue

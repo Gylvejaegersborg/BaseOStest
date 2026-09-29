@@ -44,6 +44,9 @@ import {
   type HistoryKind,
   type ProjectView,
 } from '@/features/projects/store'
+import { GoalsStrip } from '@/features/goals/GoalsStrip'
+import { GoalModal } from '@/features/goals/GoalModal'
+import { createGoal, goalsForProject, toggleGoalProject, useGoals } from '@/features/goals/store'
 import { useGlobalProps, useGlobalTags, useLinkGraph, normTag, type LinkHit } from '@/features/connections/connections'
 import { ListEditor, PropertiesPanel } from '@/features/notes/PropertiesPanel'
 import { setPropType } from '@/features/notes/notesStore'
@@ -78,6 +81,24 @@ export function Projects() {
       const next = new URLSearchParams(p)
       if (id) next.set('project', id)
       else next.delete('project')
+      return next
+    })
+  // ?goal=<id> opens a goal (from the goals strip, a project's "Serves", or a
+  // [[goal]] link in a note). Opening one closes the other.
+  const goalId = params.get('goal')
+  const setGoalId = (id: string | null) =>
+    setParams((p) => {
+      const next = new URLSearchParams(p)
+      next.delete('project')
+      if (id) next.set('goal', id)
+      else next.delete('goal')
+      return next
+    })
+  const openProjectFromGoal = (id: string) =>
+    setParams((p) => {
+      const next = new URLSearchParams(p)
+      next.delete('goal')
+      next.set('project', id)
       return next
     })
   const [freshId, setFreshId] = useState<string | null>(null)
@@ -223,6 +244,8 @@ export function Projects() {
           </div>
         </div>
 
+        <GoalsStrip onOpenGoal={setGoalId} />
+
         {tagsOpen && (
           <div className="mb-3 flex shrink-0 flex-wrap items-center gap-1 rounded-panel border border-line bg-panel/50 p-2">
             {projectTags.map(([t, count]) => {
@@ -266,6 +289,7 @@ export function Projects() {
         {hover && !openId && !activeId && <HoverPreview project={hover.project} x={hover.x} y={hover.y} />}
       </div>
 
+      {goalId && <GoalModal goalId={goalId} onClose={() => setGoalId(null)} onOpenGoal={setGoalId} onOpenProject={openProjectFromGoal} />}
       {openProject && (
         <ProjectModal
           project={openProject}
@@ -276,6 +300,7 @@ export function Projects() {
             setFreshId(null)
           }}
           onOpenProject={setOpenId}
+          onOpenGoal={setGoalId}
           onFilterTag={(t) => {
             setTagFilter([normTag(t)])
             setTagsOpen(true)
@@ -498,6 +523,7 @@ function ProjectModal({
   tagPool,
   onClose,
   onOpenProject,
+  onOpenGoal,
   onFilterTag,
 }: {
   project: ProjectView
@@ -505,8 +531,11 @@ function ProjectModal({
   tagPool: string[]
   onClose: () => void
   onOpenProject: (id: string) => void
+  onOpenGoal: (id: string) => void
   onFilterTag: (t: string) => void
 }) {
+  const goals = useGoals()
+  const serves = goalsForProject(goals, project.id)
   const navigate = useNavigate()
   const section = sectionById(project.sectionId)
   const { index, all } = useGlobalTags()
@@ -612,6 +641,39 @@ function ProjectModal({
                   {STATUS_META[s].label}
                 </button>
               ))}
+            </div>
+          </Field>
+          <Field label="Serves goals">
+            <div className="space-y-0.5">
+              {serves.map((g) => (
+                <div key={g.id} className="group flex items-center gap-1.5 rounded-control px-1 py-0.5 hover:bg-panel-2">
+                  <Flag size={12} className="shrink-0 text-[#f0a020]/80" />
+                  <button onClick={() => onOpenGoal(g.id)} className="min-w-0 flex-1 truncate text-left text-text/85 hover:text-accent">
+                    {g.title}
+                  </button>
+                  <button onClick={() => toggleGoalProject(g.id, project.id)} title="Unlink" className="shrink-0 text-dim opacity-0 hover:text-danger group-hover:opacity-100">
+                    <X size={11} />
+                  </button>
+                </div>
+              ))}
+              <select
+                value=""
+                onChange={(e) => {
+                  if (e.target.value === '__new') onOpenGoal(createGoal({ title: `${project.name} goal`, projectIds: [project.id] }))
+                  else if (e.target.value) toggleGoalProject(e.target.value, project.id)
+                }}
+                className="w-full rounded-control border border-line bg-bg px-2 py-1 text-[12px] text-dim focus:border-accent/60 focus:outline-none"
+              >
+                <option value="">{serves.length ? '+ Another goal…' : '+ Link to a goal…'}</option>
+                {goals
+                  .filter((g) => g.status === 'active' && !g.projectIds.includes(project.id))
+                  .map((g) => (
+                    <option key={g.id} value={g.id}>
+                      {g.title}
+                    </option>
+                  ))}
+                <option value="__new">New goal…</option>
+              </select>
             </div>
           </Field>
           <Field label="Section">

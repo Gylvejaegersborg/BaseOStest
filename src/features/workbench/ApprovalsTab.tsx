@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ThumbsUp, ThumbsDown, FileEdit, FilePlus, ShieldCheck, X, ChevronDown, ChevronRight } from 'lucide-react'
+import { ThumbsUp, ThumbsDown, FileEdit, FilePlus, ShieldCheck, X, ChevronDown, ChevronRight, UserPlus, ListChecks } from 'lucide-react'
+import { useGoals } from '@/features/goals/store'
 import { AGENTS } from '@/data/agents'
 import { useAgentOsApprovals } from '@/features/agentos/useAgentOsApprovals'
 import {
@@ -32,8 +33,70 @@ const MAX_DIFF_CHARS = 4000
  * just to build a preview), so it's shown as a flat "new content" block
  * instead of a diff. Caps each side so one huge edit doesn't blow out the
  * Approvals panel — this is a review surface, not a full file viewer. */
+/** Growing the team and planning a goal — always asked, never always-allowed
+ *  (agent-os's governance.ts). */
+const GATED = ['propose-agent', 'propose-plan']
+
+function planSteps(raw: unknown): { to: string; title: string; detail?: string }[] {
+  let v = raw
+  if (typeof v === 'string') {
+    try {
+      v = JSON.parse(v)
+    } catch {
+      return []
+    }
+  }
+  return Array.isArray(v) ? v.filter((x) => x && typeof x === 'object').map((x) => ({ to: String(x.to ?? '?'), title: String(x.title ?? ''), ...(x.detail ? { detail: String(x.detail) } : {}) })) : []
+}
+
+function HirePreview({ args, proposer }: { args: Record<string, unknown>; proposer: string }) {
+  const s = (k: string) => (typeof args[k] === 'string' ? (args[k] as string) : '')
+  return (
+    <div className="mb-1.5 space-y-1 border-l-2 border-accent/50 pl-2 text-[11px]">
+      <p className="flex items-center gap-1.5 text-text/90">
+        <UserPlus size={12} className="text-accent" /> {s('name') || s('id')} <span className="text-dim">({s('id')}) · {s('role')}</span>
+      </p>
+      <p className="text-dim">
+        Reports to {agentName(s('reportsTo') || proposer)}
+        {s('model') && <> · runs on <code className="text-text/80">{s('model')}</code></>}
+      </p>
+      {s('persona') && <p className="whitespace-pre-wrap text-text/75">{s('persona')}</p>}
+      {s('why') && <p className="text-text/85"><span className="text-dim">Why: </span>{s('why')}</p>}
+    </div>
+  )
+}
+
+function PlanPreview({ args }: { args: Record<string, unknown> }) {
+  const goals = useGoals()
+  const goalId = typeof args.goalId === 'string' ? args.goalId : ''
+  const goal = goals.find((g) => g.id === goalId)
+  const steps = planSteps(args.steps)
+  return (
+    <div className="mb-1.5 space-y-1 border-l-2 border-[#f0a020]/60 pl-2 text-[11px]">
+      <p className="flex items-center gap-1.5 text-text/90">
+        <ListChecks size={12} className="text-[#f0a020]" /> {goal ? goal.title : goalId ? goalId : "the thread's goal"}
+      </p>
+      {typeof args.summary === 'string' && <p className="text-text/80">{args.summary}</p>}
+      <ol className="list-decimal space-y-0.5 pl-4 text-text/80">
+        {steps.map((st, i) => (
+          <li key={i}>
+            <span style={{ color: agentColor(st.to) }}>{agentName(st.to)}</span>: {st.title}
+            {st.detail && <span className="block text-dim">{st.detail}</span>}
+          </li>
+        ))}
+      </ol>
+      <p className="text-dim">
+        Approving creates these as work items; they run in the background.
+        {args.verify === true && ' When all are finished, Argus checks the results against what actually happened.'}
+      </p>
+    </div>
+  )
+}
+
 function ToolCallPreview({ approval }: { approval: AgentOsApproval }) {
   const { toolName, args } = approval
+  if (toolName === 'propose-agent') return <HirePreview args={args} proposer={approval.agentId} />
+  if (toolName === 'propose-plan') return <PlanPreview args={args} />
 
   if (toolName === 'edit_file' && typeof args.old_string === 'string' && typeof args.new_string === 'string') {
     const oldStr = args.old_string.slice(0, MAX_DIFF_CHARS)
@@ -183,17 +246,26 @@ function PendingCard({
   onDecide: (d: 'approve' | 'reject', always?: 'tool' | 'exact') => void
 }) {
   const { exactOnly } = useExactOnlyTools()
+  const gated = GATED.includes(a.toolName)
   const btn = 'flex items-center gap-1.5 border px-2.5 py-1.5 text-[11px] uppercase tracking-wider disabled:opacity-50'
   return (
     <div className="border border-line bg-bg/40 p-2">
       <div className="mb-1 flex items-center gap-2 text-[10px] text-dim">
         <span style={{ color: agentColor(a.agentId) }}>{agentName(a.agentId)}</span>
-        <span>wants to run</span>
-        <code className="text-text/80">{a.toolName}</code>
+        {a.toolName === 'propose-agent' ? (
+          <span>proposes a new agent</span>
+        ) : a.toolName === 'propose-plan' ? (
+          <span>proposes a plan</span>
+        ) : (
+          <>
+            <span>wants to run</span>
+            <code className="text-text/80">{a.toolName}</code>
+          </>
+        )}
         <span>· {time(a.requestedAt)}</span>
       </div>
       <ToolCallPreview approval={a} />
-      <p className="mb-2 text-[11px] text-dim">{a.reason}</p>
+      {!gated && <p className="mb-2 text-[11px] text-dim">{a.reason}</p>}
       <div className="flex flex-wrap gap-1.5">
         <button onClick={() => onDecide('approve')} disabled={busy} className={btn} style={{ borderColor: '#46d36966', color: '#46d369', backgroundColor: '#46d36915' }}>
           <ThumbsUp size={12} /> Approve
@@ -202,7 +274,7 @@ function PendingCard({
           <ThumbsDown size={12} /> Reject
         </button>
       </div>
-      <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[10px] text-dim">
+      {!gated && <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[10px] text-dim">
         <ShieldCheck size={11} className="text-neon-green" /> Approve &amp; always allow:
         <button onClick={() => onDecide('approve', 'exact')} disabled={busy} className="border border-line px-1.5 py-0.5 hover:text-text disabled:opacity-50">
           this exact call
@@ -212,7 +284,7 @@ function PendingCard({
             every <code>{a.toolName}</code> call
           </button>
         )}
-      </div>
+      </div>}
     </div>
   )
 }

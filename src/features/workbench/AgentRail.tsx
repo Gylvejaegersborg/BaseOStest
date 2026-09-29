@@ -19,6 +19,9 @@ const STATUS_COLOR: Record<Agent['status'], string> = {
   offline: '#ff5566',
 }
 
+/** Paused or over budget (agent-os's board controls). */
+const BLOCKED_COLOR = '#f0a020'
+
 const COLLAPSE_KEY = 'os:workbench:agentRailCollapsed'
 
 interface EditTarget {
@@ -28,6 +31,7 @@ interface EditTarget {
   role: string
   capabilities: string[]
   defaultModel?: string
+  reportsTo?: string
 }
 
 /**
@@ -133,7 +137,15 @@ export function AgentRail({ selectedAgentId, onSelect }: { selectedAgentId: stri
     setEditing({ id: a.id, name: a.name, persona: '', role: a.role, capabilities: [] })
     try {
       const remote = await fetchAgent(a.id)
-      setEditing({ id: remote.id, name: remote.name, persona: remote.persona, role: remote.role ?? '', capabilities: remote.capabilities })
+      setEditing({
+        id: remote.id,
+        name: remote.name,
+        persona: remote.persona,
+        role: remote.role ?? '',
+        capabilities: remote.capabilities,
+        defaultModel: remote.defaultModel,
+        reportsTo: remote.reportsTo,
+      })
     } catch {
       // Keep the local-data fallback already showing — see comment above.
     }
@@ -159,11 +171,11 @@ export function AgentRail({ selectedAgentId, onSelect }: { selectedAgentId: stri
             <button
               key={a.id}
               onClick={() => onSelect(a.id)}
-              title={a.name}
+              title={a.control?.blocked ? `${a.name} — ${a.control.blocked === 'paused' ? 'paused' : 'over budget'}` : a.name}
               className={cn('flex h-6 w-6 items-center justify-center border', a.id === selectedAgentId ? 'border-current' : 'border-transparent')}
               style={a.id === selectedAgentId ? { color: a.color } : undefined}
             >
-              <StatusDot color={STATUS_COLOR[a.status]} pulse={a.status === 'working'} size={8} />
+              <StatusDot color={a.control?.blocked ? BLOCKED_COLOR : STATUS_COLOR[a.status]} pulse={a.status === 'working' && !a.control?.blocked} size={8} />
             </button>
           ))}
         </div>
@@ -236,12 +248,19 @@ export function AgentRail({ selectedAgentId, onSelect }: { selectedAgentId: stri
                       )}
                       style={a.id === selectedAgentId ? { borderColor: a.color } : undefined}
                     >
-                      <StatusDot color={STATUS_COLOR[a.status]} pulse={a.status === 'working'} size={7} />
+                      <StatusDot color={a.control?.blocked ? BLOCKED_COLOR : STATUS_COLOR[a.status]} pulse={a.status === 'working' && !a.control?.blocked} size={7} />
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-sm" style={{ color: a.id === selectedAgentId ? a.color : undefined }}>
                           {a.name}
                         </span>
-                        <span className="block truncate text-[10px] text-dim">{a.role}</span>
+                        <span className="block truncate text-[10px] text-dim">
+                          {a.control?.blocked && (
+                            <span className="text-[#f0a020]" title={a.control.paused?.reason}>
+                              {a.control.blocked === 'paused' ? 'Paused' : 'Over budget'} ·{' '}
+                            </span>
+                          )}
+                          {a.role}
+                        </span>
                       </span>
                       <span className="flex shrink-0 gap-0.5">
                         {teams.teams
