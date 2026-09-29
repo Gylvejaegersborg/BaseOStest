@@ -55,6 +55,8 @@ export interface Asset {
   /** Uploaded through the Add-song flow (stored by the gateway). The overlay
    *  provider turns the file ids into audioFile / coverImage URLs. */
   uploaded?: boolean
+  /** Lyrics of an uploaded song, as written down by the operator or an agent. */
+  lyrics?: string
   audioFileId?: string
   coverFileId?: string
 
@@ -189,91 +191,6 @@ const EXTRA_ASSETS: Asset[] = [
   },
 
   // ── Lyrics ──────────────────────────────────────────────────────────────
-  {
-    id: 'homerun-lyrics',
-    title: 'Homerun — Lyrics',
-    category: 'lyrics',
-    artist: ARTIST,
-    date: '2025-03-01',
-    tags: ['Hard', 'Trap'],
-    fileType: 'md',
-    fileSize: '2 KB',
-    source: SOURCE,
-    gradient: ['#FF7A55', '#3A0F18'],
-    relatedId: 'homerun',
-    body: `# Homerun — Lyrics
-
-**Hook**
-
-> Swing it, swing it, out the park\\
-> Lights down low, I'm the spark\\
-> Two strikes, never miss the mark\\
-> Homerun, leave 'em in the dark
-
-**Verse 1**
-
-Bases loaded, I been patient at the plate,\\
-Every pitch they throw I'm reading, never take the bait.\\
-Diamond on my neck, diamond where I operate,\\
-Crowd up on their feet 'cause they know I'm 'bout to demonstrate.
-
-**Bridge**
-
-Round the bases, no brakes,\\
-Slid in home for the team's sake.
-
-_Status: hook final · verse 2 TBD_`,
-  },
-  {
-    id: 'virtual-love-lyrics',
-    title: 'Virtual Love — Lyrics',
-    category: 'lyrics',
-    artist: ARTIST,
-    date: '2025-02-18',
-    tags: ['Lo-fi', 'R&B'],
-    fileType: 'txt',
-    fileSize: '1 KB',
-    source: SOURCE,
-    gradient: ['#F4A8E8', '#3A1B33'],
-    relatedId: 'virtual-love',
-    body: `# Virtual Love — Lyrics
-
-**Verse**
-
-Blue light on your face at 4am,\\
-Typing then deleting it again.\\
-Pixels where your heartbeat should have been,\\
-Falling for a window, not a friend.
-
-**Hook**
-
-Virtual love, virtual love,\\
-Close enough to feel, never close enough.
-
-_Draft 1 — rework second line, too on-the-nose._`,
-  },
-  {
-    id: 'switch-hook',
-    title: 'Switch — Hook ideas',
-    category: 'lyrics',
-    artist: 'ISΛRK × 10k.emraan',
-    date: '2025-01-22',
-    tags: ['Drill', 'Hard'],
-    fileType: 'md',
-    fileSize: '1 KB',
-    source: SOURCE,
-    gradient: ['#A78BFA', '#150A33'],
-    relatedId: 'switch',
-    body: `# Switch — Hook ideas
-
-Trying a few directions for the 186bpm drill cut.
-
-1. _"Switch lanes, switch up, never switch sides"_ — favourite
-2. _"Flip it, flip it, watch the whole thing switch"_
-3. _"Same me, new frame, you the one that switched"_
-
-10k wants option 1 for his verse, doubled.`,
-  },
 
   // ── Artwork ─────────────────────────────────────────────────────────────
   {

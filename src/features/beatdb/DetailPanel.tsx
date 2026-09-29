@@ -66,6 +66,13 @@ export function DetailPanel({ asset, player, onSelectRelated, onEdit }: DetailPa
 
       {asset.note && <p className="text-xs leading-relaxed text-text/85">{asset.note}</p>}
 
+      {asset.lyrics && (
+        <section>
+          <h3 className="mb-1 text-[9px] uppercase tracking-wider text-dim">Lyrics</h3>
+          <p className="max-h-64 overflow-y-auto whitespace-pre-wrap text-xs leading-relaxed text-text/85">{asset.lyrics}</p>
+        </section>
+      )}
+
       {/* Tags */}
       {asset.tags.length > 0 && (
         <div className="flex flex-wrap gap-1">

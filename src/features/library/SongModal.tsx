@@ -24,6 +24,7 @@ export function SongModal({ open, onClose, editing, onSaved }: SongModalProps) {
   const [key, setKey] = useState('')
   const [tags, setTags] = useState('')
   const [note, setNote] = useState('')
+  const [lyrics, setLyrics] = useState('')
   const [audio, setAudio] = useState<File | null>(null)
   const [cover, setCover] = useState<File | null>(null)
   const [busy, setBusy] = useState(false)
@@ -39,6 +40,7 @@ export function SongModal({ open, onClose, editing, onSaved }: SongModalProps) {
     setKey(editing?.musicalKey ?? '')
     setTags(editing?.tags.join(', ') ?? '')
     setNote(editing?.note ?? '')
+    setLyrics(editing?.lyrics ?? '')
     setAudio(null)
     setCover(null)
     setError(null)
@@ -67,6 +69,7 @@ export function SongModal({ open, onClose, editing, onSaved }: SongModalProps) {
         musicalKey: key.trim(),
         tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
         note: note.trim(),
+        lyrics: lyrics.trim(),
       }
       const coverId = cover ? (await uploadFile(cover)).id : undefined
       let id: string
@@ -127,6 +130,10 @@ export function SongModal({ open, onClose, editing, onSaved }: SongModalProps) {
           <div>
             <label className="label mb-1 block">Note</label>
             <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} maxLength={2000} className={`${input} resize-none`} />
+          </div>
+          <div>
+            <label className="label mb-1 block">Lyrics (optional)</label>
+            <textarea value={lyrics} onChange={(e) => setLyrics(e.target.value)} rows={4} maxLength={20000} className={`${input} resize-y`} />
           </div>
           <div>
             <label className="label mb-1 block">Cover image (optional)</label>

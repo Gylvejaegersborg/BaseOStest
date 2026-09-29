@@ -21,6 +21,7 @@ export interface SongFields {
   musicalKey?: string
   tags?: string[]
   note?: string
+  lyrics?: string
   durationSec?: number
   audioFileId?: string | null
   coverFileId?: string | null
