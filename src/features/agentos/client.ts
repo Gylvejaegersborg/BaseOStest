@@ -154,6 +154,29 @@ export const reopenWork = (id: string, reason?: string) => writeJSON<AgentOsWork
 export const reassignWork = (id: string, to: string, reason?: string) =>
   writeJSON<AgentOsWork>('POST', `/work/${encodeURIComponent(id)}/reassign`, { to, reason })
 
+// ---- Team templates: the team as markdown files (agent-os's team-template.ts) ----
+export interface AgentOsTeamImportPlan {
+  create: string[]
+  update: { id: string; fields: string[] }[]
+  unchanged: string[]
+  skills: { add: string[]; update: string[]; unchanged: string[] }
+  problems: string[]
+  applied: boolean
+}
+export const exportTeamTemplate = () => getJSON<{ files: Record<string, string>; bundle: string }>('/team/export', 10000)
+/** apply: false previews; true applies (only if there are no problems). */
+export async function importTeamTemplate(bundle: string, apply: boolean): Promise<AgentOsTeamImportPlan> {
+  if (!BASE) throw new Error('agent-os gateway not configured')
+  const res = await fetch(`${BASE}/team/import`, {
+    method: 'POST',
+    headers: { accept: 'application/json', 'content-type': 'application/json' },
+    body: JSON.stringify({ bundle, apply }),
+    signal: AbortSignal.timeout(30000),
+  })
+  // A 409 still carries the plan (with its problems).
+  return res.json() as Promise<AgentOsTeamImportPlan>
+}
+
 // ---- Stale work: stuck or badly-ended runs (agent-os's stale.ts) ----
 export const fetchStale = () => getJSON<{ stale: AgentOsStaleEntry[]; quietMinutes: number }>('/stale')
 

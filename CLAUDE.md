@@ -51,6 +51,10 @@ gateway through the dev server's `/agent-os` proxy (see `vite.config.ts`).
   has all stopped, Argus checks each claim against evidence the harness assembles (tool calls that
   ran, what was added to BaseSpace). The verifier reopens or escalates — it never fixes. Badges in
   Workbench → Tasks.
+- Team templates (agent-os's `core/team-template.ts`): Teams panel → Team as files exports the
+  team as markdown (TEAM.md, agents/*.md, skills) and imports it with a preview; import never
+  deletes and every change is a config revision. Tasks panel → "Needs a look" lists stuck runs
+  (agent-os's `stale.ts`) — surfaced, never auto-reassigned.
 - All live updates share ONE EventSource (`subscribeToEvents` in `sessionClient.ts`). Never open
   another per component: browsers allow six connections per host, and extra streams stall every
   later request.
