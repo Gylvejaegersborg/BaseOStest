@@ -52,6 +52,11 @@ export interface Asset {
   plays?: number
   /** Same-origin audio under /public/beats/audio/. Falls back to a synth preview. */
   audioFile?: string
+  /** Uploaded through the Add-song flow (stored by the gateway). The overlay
+   *  provider turns the file ids into audioFile / coverImage URLs. */
+  uploaded?: boolean
+  audioFileId?: string
+  coverFileId?: string
 
   // ── image ────────────────────────────────────────────────
   /** Same-origin image under /public/library/. */

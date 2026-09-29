@@ -8,6 +8,8 @@ import { useTeams } from '@/features/workbench/teams'
 import { todoLinks, useGoalViews } from '@/features/goals/store'
 import { useLinkGraph } from '@/features/connections/connections'
 import { useAgentOsContext } from './AgentOsProvider'
+import { LIBRARY } from '@/data/library'
+import { mergeById, useOsOverlay } from '@/features/overlay/osOverlay'
 import { pushSnapshot } from './client'
 
 /**
@@ -55,6 +57,8 @@ export interface BaseSpaceSnapshot {
   events: { id: string; title: string; kind: string; date: string; start: number; end: number; location?: string; recurring: boolean }[]
   crons: { id: string; name: string; owner: string; team?: string; focus?: { kind: 'goal' | 'project'; id: string }; schedule: unknown; nextRun: string; status: string }[]
   teams: { id: string; name: string; members: string[]; description?: string }[]
+  /** The music library: only what the operator entered (no lyrics, no art). */
+  songs?: { id: string; title: string; kind: string; bpm?: number; key?: string; tags: string[]; note?: string; uploaded?: boolean }[]
 }
 
 const iso = (d: Date) => d.toISOString().slice(0, 10)
@@ -66,6 +70,7 @@ export function useSnapshot(): BaseSpaceSnapshot {
   const { teams } = useTeams()
   const goals = useGoalViews()
   const graph = useLinkGraph()
+  const overlay = useOsOverlay()
   const projectNoteIds = useMemo(
     () => new Map(projects.map((p) => [p.id, graph.notesLinkingToProject(p.id).map((n) => n.id)])),
     [projects, graph],
@@ -129,6 +134,9 @@ export function useSnapshot(): BaseSpaceSnapshot {
       status: c.status,
     })),
     teams: teams.map((t) => ({ id: t.id, name: t.name, members: t.members, description: t.description })),
+    songs: mergeById(LIBRARY, overlay.library)
+      .filter((a) => a.category === 'beat' || a.category === 'song')
+      .map((a) => ({ id: a.id, title: a.title, kind: a.category, bpm: a.bpm, key: a.musicalKey, tags: a.tags, note: a.note, uploaded: a.uploaded })),
     goals: goals.map((g) => ({
       id: g.id,
       title: g.title,

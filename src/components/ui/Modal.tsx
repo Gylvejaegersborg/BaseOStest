@@ -15,6 +15,8 @@ interface ModalProps {
   accent?: string
   children: ReactNode
   width?: number
+  /** Stacking level; raise it above a full-screen app (Beat DB is z-60) that opens the modal. */
+  zIndex?: number
 }
 
 /** Modal is Panel in its contained role (dismissible), sharing one header/
@@ -23,7 +25,7 @@ interface ModalProps {
  *  square corners) rather than adopting Panel's elevation-4 look here —
  *  that system-wide visual shift belongs to the page-specific phase, applied
  *  deliberately per surface rather than defaulted onto every modal at once. */
-export function Modal({ open, onClose, title, code, accent, children, width = 560 }: ModalProps) {
+export function Modal({ open, onClose, title, code, accent, children, width = 560, zIndex }: ModalProps) {
   const id = useId()
   useEffect(() => {
     if (!open) return
@@ -49,6 +51,7 @@ export function Modal({ open, onClose, title, code, accent, children, width = 56
   return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-fade-in"
+      style={zIndex ? { zIndex } : undefined}
       onClick={onClose}
     >
       <div
