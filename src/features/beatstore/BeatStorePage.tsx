@@ -4,7 +4,6 @@ import { useOsOverlay, mergeById } from '@/features/overlay/osOverlay'
 import { useBeatPlayer } from './useBeatPlayer'
 import { BeatStoreNav, type StoreView } from './BeatStoreNav'
 import { BeatsView } from './views/BeatsView'
-import { PacksView } from './views/PacksView'
 import { LicensingView } from './views/LicensingView'
 import { AboutView } from './views/AboutView'
 import { Cart } from './Cart'
@@ -18,7 +17,7 @@ interface BeatStorePageProps {
 
 /**
  * Immersive full-screen beat-store experience. Mounted on top of the OS shell
- * when `open` is true. Holds its own internal view router (Beats / Packs /
+ * when `open` is true. Holds its own internal view router (Beats /
  * Licensing / About / Cart / Checkout / Done) and a real-audio player driving
  * the Now Playing card.
  */
@@ -90,7 +89,6 @@ export function BeatStorePage({ open, onClose }: BeatStorePageProps) {
         {view === 'beats' && (
           <BeatsView player={player} cartTiersFor={cartTiersFor} onAddToCart={addToCart} />
         )}
-        {view === 'packs' && <PacksView />}
         {view === 'licensing' && <LicensingView />}
         {view === 'about' && <AboutView onBrowseBeats={() => setView('beats')} />}
         {view === 'cart' && (
