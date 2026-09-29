@@ -45,7 +45,7 @@ export const PROJECTS: Project[] = [
     tags: ['agents', 'music', 'ops'],
     links: [{ label: 'SoundCloud', href: 'https://soundcloud.com/itsisark' }],
     timeline: [
-      { date: '2026-09-26', text: 'GitHub team retired. Its briefs, minutes and reports moved to Notes → Team; agents now live in Agent-OS teams.' },
+      { date: '2026-09-26', text: 'GitHub team retired; agents now live in Agent-OS teams. Its archive turned out to be test data and was removed.' },
       { date: '2026-06-12', text: 'Team went real: GitHub Actions runs Hemera, Nyx, Aether, Hermes and Mnemosyne against team/ state.' },
       { date: '2026-05-20', text: 'Split roles between Hemera (planning) and Nyx (execution).' },
       { date: '2026-05-12', text: 'First fully-automated weekly content plan generated.' },

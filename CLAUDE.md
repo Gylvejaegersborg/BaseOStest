@@ -16,8 +16,14 @@ gateway through the dev server's `/agent-os` proxy (see `vite.config.ts`).
   `src/features/overlay/osOverlay.tsx`). That is internal to the user's own OS and is not
   approval-gated. Anything outward-facing (uploads, posts, emails) goes through Agent-OS
   approvals — never published directly.
-- The old GitHub team's output lives in `public/team-archive.json` (Notes → Team, plus its
-  open board items imported once as todos). It is history; don't add to it.
+- The old GitHub team's archive (`team-archive.json`) was test data that ran on without the
+  operator knowing; it is removed (recoverable from git history) and its imported todos are purged
+  on load. Do not bring it back.
+- **Only three songs are real: Homerun, Virtual Love and Switch** (audio in `public/beats/audio`).
+  Every other song, beat, release, plan or tracker entry that ever appeared in this repo was
+  invented test data. Even for the three, the *details* in code (BPM, key, mood, license prices,
+  lyrics, asset notes in `src/data/beats.ts` / `library.ts`) were generated and are unverified.
+  Never invent song facts or metrics: ask the operator, or leave the field empty.
 - An agent's model (`defaultModel`, set in the agent editor) can name its provider:
   `claude-cli:sonnet` (your Claude subscription via the Claude Code CLI), `ollama:<model>`,
   `anthropic:<id>`, `openai:<id>`. See agent-os's README, "Model providers". `claude-cli` runs

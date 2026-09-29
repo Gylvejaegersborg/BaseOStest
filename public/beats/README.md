@@ -9,14 +9,12 @@ One MP3 (or WAV) per beat, named with the beat's `id`:
 
 | Beat                | Filename                  |
 | ------------------- | ------------------------- |
-| Nightshade          | `nightshade.mp3`          |
-| Cold Storage        | `cold-storage.mp3`        |
-| Velvet Static       | `velvet-static.mp3`       |
-| Lowlight            | `lowlight.mp3`            |
-| Concrete Bloom      | `concrete-bloom.mp3`      |
-| Signal Lost         | `signal-lost.mp3`         |
-| Afterglow           | `afterglow.mp3`           |
-| Patient Zero        | `patient-zero.mp3`        |
+| Homerun             | `homerun.mp3`             |
+| Virtual Love        | `virtual-love.mp3`        |
+| Switch              | `switch.mp3`              |
+
+These three are the real songs. (Earlier versions of this table listed
+placeholder beats that never existed; they were removed.)
 
 If a file is missing, the player falls back to a synthesised drum-loop
 preview at that beat's BPM so the page still works.
@@ -27,8 +25,8 @@ Optional, square images. Same filename convention with `.jpg`, `.png`,
 or `.webp`:
 
 ```
-public/beats/covers/nightshade.jpg
-public/beats/covers/cold-storage.png
+public/beats/covers/homerun.jpg
+public/beats/covers/virtual-love.png
 …
 ```
 

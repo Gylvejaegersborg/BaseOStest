@@ -299,20 +299,6 @@ Trying a few directions for the 186bpm drill cut.
     note: '3000×3000 single artwork for streaming + SoundCloud.',
   },
   {
-    id: 'nightshade-art',
-    title: 'Nightshade — Cover',
-    category: 'artwork',
-    artist: ARTIST,
-    date: '2025-01-10',
-    tags: ['Cover', 'Dark'],
-    fileType: 'jpg',
-    fileSize: '3.3 MB',
-    source: SOURCE,
-    gradient: ['#FF3D9F', '#14082E'],
-    relatedId: 'nightshade',
-    note: 'Moody single art. Considering a darker recolor.',
-  },
-  {
     id: 'virtual-love-art',
     title: 'Virtual Love — Cover',
     category: 'artwork',
@@ -406,52 +392,6 @@ Trying a few directions for the 186bpm drill cut.
   },
 
   // ── Notes ───────────────────────────────────────────────────────────────
-  {
-    id: 'nightshade-mixnotes',
-    title: 'Mix notes — Nightshade',
-    category: 'note',
-    artist: ARTIST,
-    date: '2025-01-12',
-    tags: ['Mix', 'Todo'],
-    fileType: 'md',
-    fileSize: '1 KB',
-    source: 'Local',
-    gradient: ['#FF3D9F', '#14082E'],
-    relatedId: 'nightshade',
-    body: `# Mix notes — Nightshade
-
-- [ ] 808 too boomy below 40Hz — high-pass at 32
-- [ ] Hat pattern fighting the snare on the turnaround
-- [x] Side-chain pad to the kick (−3dB)
-- [ ] Try a tape stop into the second drop
-
-Reference: *Cold Storage* low end sits better — match it.`,
-  },
-  {
-    id: 'release-plan',
-    title: 'Release plan — Q3',
-    category: 'note',
-    artist: ARTIST,
-    date: '2025-04-01',
-    tags: ['Plan', 'Release'],
-    fileType: 'md',
-    fileSize: '2 KB',
-    source: 'Local',
-    gradient: ['#36e0c8', '#0A2540'],
-    body: `# Release plan — Q3
-
-| Week | Drop | Asset status |
-| --- | --- | --- |
-| W1 | Homerun (single) | art ✓ · master ✓ · video pending |
-| W3 | Switch video | export ✓ · upload scheduled |
-| W6 | Virtual Love | demo only — needs chorus |
-
-**Priorities**
-
-1. Lock the Homerun video before W1.
-2. Push the Switch trackouts to the store as Exclusive.
-3. Start the Nightshade re-mix.`,
-  },
 ]
 
 export const LIBRARY: Asset[] = [...BEAT_ASSETS, ...EXTRA_ASSETS]

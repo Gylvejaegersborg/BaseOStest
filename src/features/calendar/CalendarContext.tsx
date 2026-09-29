@@ -35,16 +35,11 @@ interface CalendarContextValue {
 const CalendarContext = createContext<CalendarContextValue | null>(null)
 
 const MERGED_KEY = 'os:calendar:reminders-merged'
-const TEAM_TODOS_KEY = 'os:calendar:team-todos-imported'
-
-interface TeamBoardItem {
-  id: string
-  title: string
-  owner: string
-  status: string
-  due?: string | null
-  notes?: string
-}
+// The retired GitHub team's open board items were once imported as todos (ids
+// "team-t-…"). That team turned out to be test data, so a one-time cleanup
+// removes them. Only those ids: anything made here is untouched.
+const TEAM_TODOS_PURGED_KEY = 'os:calendar:team-todos-purged'
+const TEAM_TODO_PREFIX = 'team-t-'
 
 /** A reminder is a timed todo that notifies at its time. */
 export function reminderToTask(r: Reminder): Task {
@@ -211,30 +206,15 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
     [persistTasks],
   )
 
-  // One-time: the retired GitHub team's open board items become todos.
+  // One-time cleanup of the todos the retired GitHub team's board was imported
+  // as (see TEAM_TODO_PREFIX). The old team was test data.
   useEffect(() => {
-    if (localStorage.getItem(TEAM_TODOS_KEY)) return
-    fetch(`${import.meta.env.BASE_URL}team-archive.json`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((a: { todos?: TeamBoardItem[] } | null) => {
-        if (!a?.todos) return
-        const imported: Task[] = a.todos.map((t) => ({
-          id: t.id,
-          title: t.title,
-          status: t.status === 'doing' ? 'doing' : 'todo',
-          priority: t.owner === 'user' ? 'high' : 'med',
-          dayOffset: t.due ? dayOffsetOf(new Date(`${t.due}T12:00:00`)) : undefined,
-          notify: false,
-          notes: `From the GitHub team board (owner: ${t.owner}).${t.notes ? ` ${t.notes}` : ''}`,
-          source: 'manual',
-        }))
-        setTasks((list) => {
-          const ids = new Set(list.map((x) => x.id))
-          return persistTasks([...list, ...imported.filter((x) => !ids.has(x.id))])
-        })
-        localStorage.setItem(TEAM_TODOS_KEY, '1')
-      })
-      .catch(() => {})
+    if (localStorage.getItem(TEAM_TODOS_PURGED_KEY)) return
+    setTasks((list) => {
+      const kept = list.filter((t) => !t.id.startsWith(TEAM_TODO_PREFIX))
+      return kept.length === list.length ? list : persistTasks(kept)
+    })
+    localStorage.setItem(TEAM_TODOS_PURGED_KEY, '1')
   }, [persistTasks])
 
   const deleteTask = useCallback((id: string) => setTasks((list) => persistTasks(list.filter((t) => t.id !== id))), [persistTasks])
