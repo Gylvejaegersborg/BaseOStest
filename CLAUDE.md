@@ -47,6 +47,10 @@ gateway through the dev server's `/agent-os` proxy (see `vite.config.ts`).
   (`propose-plan`) always go to Approvals — enforced in the harness, never always-allowed. Agent
   config has a revision history with restore (agent editor → History); a restore is a new
   revision, never a rewrite.
+- Watchdog (agent-os's `core/watchdog.ts`): "verify when done" on a work item or plan; once it
+  has all stopped, Argus checks each claim against evidence the harness assembles (tool calls that
+  ran, what was added to BaseSpace). The verifier reopens or escalates — it never fixes. Badges in
+  Workbench → Tasks.
 - All live updates share ONE EventSource (`subscribeToEvents` in `sessionClient.ts`). Never open
   another per component: browsers allow six connections per host, and extra streams stall every
   later request.

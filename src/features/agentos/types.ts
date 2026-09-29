@@ -66,6 +66,9 @@ export interface AgentOsWork {
   blockedReason?: string
   /** A lead raised it to you; cleared once it moves again. */
   escalation?: { by: string; reason: string; at: string }
+  /** 'verification': the watchdog's check of other items. */
+  kind?: 'verification'
+  verifies?: string[]
   notes: { at: string; by: string; text: string }[]
   tokens: number
   totalTokens: number
@@ -125,4 +128,20 @@ export interface AgentOsRevision {
   changed: (keyof AgentOsAgentConfig)[]
   config: AgentOsAgentConfig
   restoredFrom?: number
+}
+
+// ---- Watchdog (agent-os's watchdog.ts) ----
+
+export type AgentOsWatchStatus = 'watching' | 'verifying' | 'verified' | 'reopened' | 'needs-operator' | 'closed'
+
+export interface AgentOsWatch {
+  id: string
+  label: string
+  rootIds: string[]
+  verifier: string
+  status: AgentOsWatchStatus
+  rounds: number
+  verdict?: string
+  reopened?: string[]
+  updatedAt: string
 }

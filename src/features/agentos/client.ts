@@ -1,4 +1,4 @@
-import type { AgentOsAgent, AgentOsControl, AgentOsRevision, AgentOsReview, AgentOsReviewDigest, AgentOsWork, AgentOsWorkStatus } from './types'
+import type { AgentOsAgent, AgentOsControl, AgentOsRevision, AgentOsWatch, AgentOsReview, AgentOsReviewDigest, AgentOsWork, AgentOsWorkStatus } from './types'
 
 // Thin typed client for the Agent-OS gateway (agent-os/src/gateway/server.ts).
 // Every function performs a plain fetch against the documented contract and
@@ -147,12 +147,16 @@ export async function fetchWork(filter: { involving?: string; team?: string; sta
   const { work } = await getJSON<{ work: AgentOsWork[] }>(`/work${q ? `?${q}` : ''}`)
   return work
 }
-export const assignWork = (input: { assignee: string; title: string; detail?: string; focus?: { kind: 'goal' | 'project'; id: string } }) =>
+export const assignWork = (input: { assignee: string; title: string; detail?: string; focus?: { kind: 'goal' | 'project'; id: string }; verify?: boolean }) =>
   writeJSON<AgentOsWork>('POST', '/work', input)
 export const cancelWork = (id: string, reason?: string) => writeJSON<AgentOsWork>('POST', `/work/${encodeURIComponent(id)}/cancel`, { reason })
 export const reopenWork = (id: string, reason?: string) => writeJSON<AgentOsWork>('POST', `/work/${encodeURIComponent(id)}/reopen`, { reason })
 export const reassignWork = (id: string, to: string, reason?: string) =>
   writeJSON<AgentOsWork>('POST', `/work/${encodeURIComponent(id)}/reassign`, { to, reason })
+
+// ---- Watchdog: a verifier checks finished work (agent-os's watchdog.ts) ----
+export const fetchWatches = () => getJSON<{ watches: AgentOsWatch[]; verifier: string }>('/watches')
+export const verifyWork = (id: string) => writeJSON<AgentOsWatch>('POST', `/work/${encodeURIComponent(id)}/verify`, {})
 
 // ---- Team reviews: a lead looks over its team's work (core/review.ts) ----
 export const fetchReviews = (agentId?: string) =>

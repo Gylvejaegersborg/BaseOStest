@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
-import { ArrowRight, Ban, CheckCircle2, ChevronDown, ChevronRight, CircleDot, Loader2, OctagonAlert, Plus, RotateCcw } from 'lucide-react'
-import { assignWork, cancelWork, fetchWork, reassignWork, reopenWork } from '@/features/agentos/client'
+import { ArrowRight, Ban, CheckCircle2, ChevronDown, ChevronRight, CircleDot, Loader2, OctagonAlert, Plus, RotateCcw, ShieldCheck } from 'lucide-react'
+import { assignWork, cancelWork, fetchWatches, fetchWork, reassignWork, reopenWork, verifyWork } from '@/features/agentos/client'
 import { subscribeToEvents } from '@/features/agentos/sessionClient'
-import type { AgentOsWork, AgentOsWorkStatus } from '@/features/agentos/types'
+import type { AgentOsWatch, AgentOsWatchStatus, AgentOsWork, AgentOsWorkStatus } from '@/features/agentos/types'
 import { useAgentOsContext } from '@/features/agentos/AgentOsProvider'
 import { useGoals } from '@/features/goals/store'
 import { useProjects } from '@/features/projects/store'
@@ -16,7 +16,17 @@ const STATUS: Record<AgentOsWorkStatus, { icon: typeof CheckCircle2; color: stri
   cancelled: { icon: Ban, color: '#6b7785', label: 'cancelled' },
 }
 
-const WORK_EVENTS = ['work.created', 'work.claimed', 'work.completed', 'work.blocked', 'work.reassigned', 'work.reopened', 'work.cancelled', 'work.escalated']
+const WORK_EVENTS = ['work.created', 'work.claimed', 'work.completed', 'work.blocked', 'work.reassigned', 'work.reopened', 'work.cancelled', 'work.escalated', 'watch.created', 'watch.verifying', 'watch.settled']
+
+/** A watch as a badge on the item it watches (agent-os's watchdog.ts). */
+const WATCH: Record<AgentOsWatchStatus, { label: string; color: string }> = {
+  watching: { label: 'verify when done', color: '#6b7785' },
+  verifying: { label: 'verifying', color: '#f0a020' },
+  verified: { label: 'verified', color: '#46d369' },
+  reopened: { label: 'sent back by the verifier', color: '#f0a020' },
+  'needs-operator': { label: 'verification needs you', color: '#c084fc' },
+  closed: { label: 'nothing to verify', color: '#6b7785' },
+}
 
 function fmtTokens(n: number): string {
   return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n)
@@ -24,8 +34,10 @@ function fmtTokens(n: number): string {
 
 function useWork(agentId: string | null) {
   const [work, setWork] = useState<AgentOsWork[] | null>(null)
+  const [watches, setWatches] = useState<AgentOsWatch[]>([])
   const [error, setError] = useState('')
   const refresh = useCallback(() => {
+    fetchWatches().then((r) => setWatches(r.watches), () => setWatches([]))
     // A lead sees its reports' work too — the same view its team review uses.
     fetchWork(agentId ? { team: agentId } : {})
       .then((w) => {
@@ -43,7 +55,7 @@ function useWork(agentId: string | null) {
       window.clearInterval(id)
     }
   }, [refresh])
-  return { work, error, refresh }
+  return { work, watches, error, refresh }
 }
 
 /**
@@ -54,7 +66,9 @@ function useWork(agentId: string | null) {
  * piece of work directly; it runs in the background, one at a time.
  */
 export function WorkSection({ agentId }: { agentId: string | null }) {
-  const { work, error, refresh } = useWork(agentId)
+  const { work, watches, error, refresh } = useWork(agentId)
+  // Newest watch per watched item.
+  const watchOf = (id: string) => watches.find((w) => w.rootIds.includes(id))
   const [assigning, setAssigning] = useState(false)
   const [showClosed, setShowClosed] = useState(false)
   if (error && !work) return <p className="p-3 text-xs text-dim">Work isn&apos;t available ({error}).</p>
@@ -78,9 +92,17 @@ export function WorkSection({ agentId }: { agentId: string | null }) {
       {!work.length && <p className="px-3 pb-3 text-[11px] text-dim">No work handed around yet. Agents hand each other work with `delegate`; you can assign it here.</p>}
       <div className="divide-y divide-line/40">
         {active.map((w) => (
-          <WorkRow key={w.id} w={w} onChanged={refresh} />
+          <WorkRow key={w.id} w={w} watch={watchOf(w.id)} onChanged={refresh} />
         ))}
       </div>
+      {watches
+        .filter((x) => x.status === 'needs-operator' && work.some((w) => x.rootIds.includes(w.id)))
+        .map((x) => (
+          <p key={x.id} className="border-t border-line/40 px-3 py-2 text-[11px] text-[#c084fc]">
+            <ShieldCheck size={11} className="mr-1 inline" />
+            “{x.label}” still isn’t right after {x.rounds} verifications — {x.verdict}
+          </p>
+        ))}
       {closed.length > 0 && (
         <>
           <button onClick={() => setShowClosed((s) => !s)} className="flex w-full items-center gap-1 px-3 py-2 text-left text-[11px] text-dim hover:text-text">
@@ -89,7 +111,7 @@ export function WorkSection({ agentId }: { agentId: string | null }) {
           {showClosed && (
             <div className="divide-y divide-line/40">
               {closed.slice(0, 30).map((w) => (
-                <WorkRow key={w.id} w={w} onChanged={refresh} />
+                <WorkRow key={w.id} w={w} watch={watchOf(w.id)} onChanged={refresh} />
               ))}
             </div>
           )}
@@ -99,7 +121,7 @@ export function WorkSection({ agentId }: { agentId: string | null }) {
   )
 }
 
-function WorkRow({ w, onChanged }: { w: AgentOsWork; onChanged: () => void }) {
+function WorkRow({ w, watch, onChanged }: { w: AgentOsWork; watch?: AgentOsWatch; onChanged: () => void }) {
   const [open, setOpen] = useState(w.status === 'blocked' || !!w.escalation)
   const { agents } = useAgentOsContext()
   const goals = useGoals()
@@ -120,6 +142,8 @@ function WorkRow({ w, onChanged }: { w: AgentOsWork; onChanged: () => void }) {
             {nameOf(w.requestedBy)} <ArrowRight size={9} /> {nameOf(w.assignee)}
             <span style={{ color: s.color }}>· {s.label}</span>
             {w.escalation && <span className="text-[#c084fc]">· needs you</span>}
+            {w.kind === 'verification' && <span className="text-accent">· verification of {w.verifies?.length ?? 0}</span>}
+            {watch && <span style={{ color: WATCH[watch.status].color }}>· {WATCH[watch.status].label}</span>}
             {w.depth > 0 && <span>· hand-off {w.depth}</span>}
             {focusName && <span className="truncate text-[#f0a020]/80">· {focusName}</span>}
             {w.totalTokens > 0 && <span>· {fmtTokens(w.totalTokens)} tok</span>}
@@ -128,9 +152,23 @@ function WorkRow({ w, onChanged }: { w: AgentOsWork; onChanged: () => void }) {
       </button>
       {open && (
         <div className="space-y-2 border-t border-line/40 bg-bg/40 px-3 py-2 text-[11px]">
-          {w.detail && <p className="whitespace-pre-wrap text-text/75">{w.detail}</p>}
+          {w.detail &&
+            (w.kind === 'verification' ? (
+              <details>
+                <summary className="cursor-pointer text-dim">Brief and evidence</summary>
+                <p className="mt-1 whitespace-pre-wrap text-text/75">{w.detail}</p>
+              </details>
+            ) : (
+              <p className="whitespace-pre-wrap text-text/75">{w.detail}</p>
+            ))}
           {w.result && <p className="whitespace-pre-wrap text-text/85"><span className="text-[#46d369]">Result: </span>{w.result}</p>}
           {w.blockedReason && w.status === 'blocked' && <p className="text-danger">Blocked: {w.blockedReason}</p>}
+          {watch?.verdict && (
+            <p className="text-text/80">
+              <ShieldCheck size={10} className="mr-1 inline" style={{ color: WATCH[watch.status].color }} />
+              {watch.verifier} (round {watch.rounds}): {watch.verdict}
+            </p>
+          )}
           {w.escalation && (
             <p className="text-[#c084fc]">
               {nameOf(w.escalation.by)} needs you: {w.escalation.reason}
@@ -170,6 +208,11 @@ function WorkRow({ w, onChanged }: { w: AgentOsWork; onChanged: () => void }) {
                     </option>
                   ))}
               </select>
+              {!watch && w.kind !== 'verification' && (
+                <button onClick={() => act(verifyWork(w.id))} title="When it's finished, the verifier checks the result against what actually happened" className="flex items-center gap-1 px-1 py-0.5 text-dim hover:text-accent">
+                  <ShieldCheck size={10} /> Verify when done
+                </button>
+              )}
               <button onClick={() => act(cancelWork(w.id, 'cancelled by the operator'))} className="flex items-center gap-1 px-1 py-0.5 text-dim hover:text-danger">
                 <Ban size={10} /> Cancel
               </button>
@@ -189,6 +232,7 @@ function AssignForm({ defaultAssignee, onDone }: { defaultAssignee: string | nul
   const [title, setTitle] = useState('')
   const [detail, setDetail] = useState('')
   const [serves, setServes] = useState('')
+  const [verify, setVerify] = useState(false)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
@@ -203,6 +247,7 @@ function AssignForm({ defaultAssignee, onDone }: { defaultAssignee: string | nul
         title: title.trim(),
         ...(detail.trim() ? { detail: detail.trim() } : {}),
         ...(kind === 'goal' || kind === 'project' ? { focus: { kind, id } } : {}),
+        ...(verify ? { verify: true } : {}),
       })
       onDone()
     } catch (e) {
@@ -250,6 +295,10 @@ function AssignForm({ defaultAssignee, onDone }: { defaultAssignee: string | nul
             ))}
         </optgroup>
       </select>
+      <label className="flex items-center gap-1.5 text-[11px] text-dim">
+        <input type="checkbox" checked={verify} onChange={(e) => setVerify(e.target.checked)} />
+        Verify when done — Argus checks the result against what actually happened
+      </label>
       {error && <p className="text-[11px] text-danger">{error}</p>}
       <button
         onClick={() => void submit()}

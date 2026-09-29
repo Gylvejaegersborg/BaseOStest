@@ -85,7 +85,10 @@ function PlanPreview({ args }: { args: Record<string, unknown> }) {
           </li>
         ))}
       </ol>
-      <p className="text-dim">Approving creates these as work items; they run in the background.</p>
+      <p className="text-dim">
+        Approving creates these as work items; they run in the background.
+        {args.verify === true && ' When all are finished, Argus checks the results against what actually happened.'}
+      </p>
     </div>
   )
 }
