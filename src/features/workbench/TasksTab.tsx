@@ -3,6 +3,7 @@ import { CheckCircle2, XCircle, Clock, Loader2, Ban, HelpCircle, ChevronDown, Ch
 import { useAgentOsTasks } from '@/features/agentos/useAgentOsTasks'
 import { WorkSection } from './WorkSection'
 import { TeamReview } from './TeamReview'
+import { NeedsALook } from './NeedsALook'
 import type { AgentOsTask, AgentOsTaskStatus } from '@/features/agentos/sessionClient'
 
 const STATUS_ICON: Record<AgentOsTaskStatus, typeof CheckCircle2> = {
@@ -89,6 +90,8 @@ export function TasksTab({ agentId }: { agentId: string | null }) {
 
   return (
     <div>
+      {/* Stuck runs and runs that ended badly — for you to look at. */}
+      <NeedsALook agentId={agentId} />
       {/* A lead's review of its team's work — what's stuck and what it did. */}
       <TeamReview agentId={agentId} />
       {/* Work handed between agents (or by you) — the "what" and "who". */}

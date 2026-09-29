@@ -1,4 +1,4 @@
-import type { AgentOsAgent, AgentOsControl, AgentOsRevision, AgentOsWatch, AgentOsReview, AgentOsReviewDigest, AgentOsWork, AgentOsWorkStatus } from './types'
+import type { AgentOsAgent, AgentOsControl, AgentOsRevision, AgentOsStaleEntry, AgentOsWatch, AgentOsReview, AgentOsReviewDigest, AgentOsWork, AgentOsWorkStatus } from './types'
 
 // Thin typed client for the Agent-OS gateway (agent-os/src/gateway/server.ts).
 // Every function performs a plain fetch against the documented contract and
@@ -153,6 +153,9 @@ export const cancelWork = (id: string, reason?: string) => writeJSON<AgentOsWork
 export const reopenWork = (id: string, reason?: string) => writeJSON<AgentOsWork>('POST', `/work/${encodeURIComponent(id)}/reopen`, { reason })
 export const reassignWork = (id: string, to: string, reason?: string) =>
   writeJSON<AgentOsWork>('POST', `/work/${encodeURIComponent(id)}/reassign`, { to, reason })
+
+// ---- Stale work: stuck or badly-ended runs (agent-os's stale.ts) ----
+export const fetchStale = () => getJSON<{ stale: AgentOsStaleEntry[]; quietMinutes: number }>('/stale')
 
 // ---- Watchdog: a verifier checks finished work (agent-os's watchdog.ts) ----
 export const fetchWatches = () => getJSON<{ watches: AgentOsWatch[]; verifier: string }>('/watches')

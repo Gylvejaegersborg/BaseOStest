@@ -145,3 +145,15 @@ export interface AgentOsWatch {
   reopened?: string[]
   updatedAt: string
 }
+
+// ---- Stale work (agent-os's stale.ts) ----
+
+export interface AgentOsStaleEntry {
+  kind: 'work' | 'run'
+  id: string
+  title: string
+  agentId: string
+  status: string
+  why: string
+  since: string
+}
