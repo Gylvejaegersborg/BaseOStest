@@ -1,4 +1,5 @@
-import { createContext, useContext, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, type ReactNode } from 'react'
+import { subscribeToEvents } from './sessionClient'
 import { useAgentOsAgents } from './useAgentOsAgents'
 import { useAgentOsEventLog, type WorkbenchEvent } from './useAgentOsEventLog'
 import type { AgentOsConnection } from './types'
@@ -31,6 +32,9 @@ export function AgentOsProvider({ children }: { children: ReactNode }) {
   const { agents, connection, refresh } = useAgentOsAgents()
   const events = useAgentOsEventLog()
   const approvals = useAgentOsApprovalsSource()
+  // The roster changes outside this tab too: an approved hire, a restored
+  // config revision (agent-os's governance.ts).
+  useEffect(() => subscribeToEvents(['agent.hired', 'agent.restored'], () => refresh()), [refresh])
   return <AgentOsContext.Provider value={{ agents, connection, events, refreshAgents: refresh, approvals }}>{children}</AgentOsContext.Provider>
 }
 

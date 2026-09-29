@@ -43,6 +43,10 @@ gateway through the dev server's `/agent-os` proxy (see `vite.config.ts`).
   digest of blocked, handed-back and quiet work; a model turn only when something needs attention
   and changed. They reopen, reassign or escalate through `work` — only the requester, the
   assignee's manager or the operator may. Escalations show as "needs you" (Workbench → Tasks).
+- Governance (agent-os's `core/governance.ts`): hiring an agent (`propose-agent`) and a goal plan
+  (`propose-plan`) always go to Approvals — enforced in the harness, never always-allowed. Agent
+  config has a revision history with restore (agent editor → History); a restore is a new
+  revision, never a rewrite.
 - All live updates share ONE EventSource (`subscribeToEvents` in `sessionClient.ts`). Never open
   another per component: browsers allow six connections per host, and extra streams stall every
   later request.

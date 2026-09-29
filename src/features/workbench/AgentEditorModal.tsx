@@ -3,6 +3,7 @@ import { Modal } from '@/components/ui/Modal'
 import { createAgent, fetchAgents, fetchProviders, updateAgent, type AgentOsProvider } from '@/features/agentos/client'
 import { useAgentOsContext } from '@/features/agentos/AgentOsProvider'
 import { BoardControls } from './BoardControls'
+import { AgentHistory } from './AgentHistory'
 import { cn } from '@/lib/cn'
 
 interface EditTarget {
@@ -304,6 +305,17 @@ export function AgentEditorModal({
           </p>
         </div>
         {isEdit && target && <BoardControls agentId={target.id} onChanged={refreshAgents} />}
+        {/* A restore changes the fields above underneath this form — close
+            it so nothing stale gets saved back over the restored config. */}
+        {isEdit && target && (
+          <AgentHistory
+            agentId={target.id}
+            onRestored={() => {
+              refreshAgents()
+              onClose()
+            }}
+          />
+        )}
         {error && <p className="border border-danger/40 bg-danger/10 p-2 text-xs text-danger">{error}</p>}
         <button
           onClick={submit}

@@ -107,3 +107,22 @@ export interface AgentOsReview {
   stopReason?: string
   trigger: 'schedule' | 'event' | 'operator'
 }
+
+// ---- Agent config revisions (agent-os's governance.ts) ----
+
+export interface AgentOsAgentConfig {
+  name?: string
+  role?: string
+  persona?: string
+  reportsTo?: string
+  defaultModel?: string
+  budget?: { period: 'day' | 'week' | 'month'; limitTokens: number; warnAt: number }
+}
+
+export interface AgentOsRevision {
+  rev: number
+  at: string
+  changed: (keyof AgentOsAgentConfig)[]
+  config: AgentOsAgentConfig
+  restoredFrom?: number
+}

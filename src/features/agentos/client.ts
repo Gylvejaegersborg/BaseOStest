@@ -1,4 +1,4 @@
-import type { AgentOsAgent, AgentOsControl, AgentOsReview, AgentOsReviewDigest, AgentOsWork, AgentOsWorkStatus } from './types'
+import type { AgentOsAgent, AgentOsControl, AgentOsRevision, AgentOsReview, AgentOsReviewDigest, AgentOsWork, AgentOsWorkStatus } from './types'
 
 // Thin typed client for the Agent-OS gateway (agent-os/src/gateway/server.ts).
 // Every function performs a plain fetch against the documented contract and
@@ -85,6 +85,12 @@ export const resumeAgent = (id: string) => writeJSON<AgentOsControl>('POST', `/a
 /** `limitTokens: null` removes the budget (unlimited). */
 export const setAgentBudget = (id: string, budget: { period: 'day' | 'week' | 'month'; limitTokens: number | null }) =>
   writeJSON<AgentOsControl>('PUT', `/agents/${encodeURIComponent(id)}/budget`, budget)
+
+// Config history (agent-os's governance.ts) — operator-only, like budgets.
+export const fetchAgentRevisions = (id: string) =>
+  getJSON<{ revisions: AgentOsRevision[] }>(`/agents/${encodeURIComponent(id)}/revisions`).then((r) => r.revisions)
+export const restoreAgentRevision = (id: string, rev: number) =>
+  writeJSON<{ revisions: AgentOsRevision[] }>('POST', `/agents/${encodeURIComponent(id)}/revisions/${rev}/restore`, {}).then((r) => r.revisions)
 
 /** A model provider as the gateway reports it (GET /providers). */
 export interface AgentOsProvider {
