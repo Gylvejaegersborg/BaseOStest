@@ -42,6 +42,7 @@ export function ConversationPane({
 }) {
   const [draft, setDraft] = useState('')
   const [pending, setPending] = useState<Attachment[]>([])
+  const [referencedNoteIds, setReferencedNoteIds] = useState<string[]>([])
   const [dragging, setDragging] = useState(false)
   const [planMode, setPlanMode] = useState(false)
   const currentSession = chat.sessions.find((x) => x.id === chat.sessionId)
@@ -50,6 +51,7 @@ export function ConversationPane({
   const [notePickerOpen, setNotePickerOpen] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const notes = useNotesList()
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
@@ -68,12 +70,26 @@ export function ConversationPane({
       return
     }
     if (!draft.trim() && !pending.length) return
-    const withAttachments = pending.length
+    let withAttachments = pending.length
       ? `${draft.trim()}\n\n[attached: ${pending.map((a) => a.name).join(', ')}]`
       : draft.trim()
+    // A "[[Title]]" reference in the draft is just text to a small local
+    // model — it has no built-in wikilink convention and would need to
+    // guess it should call the basespace tool and match the title, which
+    // is exactly what was going wrong (agent "gets confused" instead of
+    // reading the note). Inlining the note's actual body here means the
+    // agent already has it, no tool round-trip or guessing required.
+    if (referencedNoteIds.length) {
+      const blocks = referencedNoteIds
+        .map((id) => notes.find((n) => n.id === id))
+        .filter((n): n is NonNullable<typeof n> => Boolean(n))
+        .map((n) => `--- Referenced note: "${n.title}" ---\n${n.body}\n--- end note ---`)
+      withAttachments = `${blocks.join('\n\n')}\n\n${withAttachments}`
+    }
     chat.send(withAttachments, planMode)
     setDraft('')
     setPending([])
+    setReferencedNoteIds([])
   }
 
   const notReady = chat.connection === 'unconfigured' || chat.connection === 'error'
@@ -85,6 +101,7 @@ export function ConversationPane({
 
   const referenceNote = (id: string, title: string) => {
     setDraft((d) => (d ? `${d} [[${title}]]` : `[[${title}]]`))
+    setReferencedNoteIds((ids) => (ids.includes(id) ? ids : [...ids, id]))
     setNotePickerOpen(false)
     setAttachMenuOpen(false)
     onDockNote(id)
