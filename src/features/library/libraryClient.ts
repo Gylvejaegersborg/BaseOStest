@@ -22,6 +22,7 @@ export interface SongFields {
   tags?: string[]
   note?: string
   lyrics?: string
+  collaborators?: { name: string; role?: string }[]
   durationSec?: number
   audioFileId?: string | null
   coverFileId?: string | null

@@ -57,6 +57,8 @@ export interface Asset {
   uploaded?: boolean
   /** Lyrics of an uploaded song, as written down by the operator or an agent. */
   lyrics?: string
+  /** Who else made it and what they did. Credits only; no splits are stored. */
+  collaborators?: { name: string; role?: string }[]
   audioFileId?: string
   coverFileId?: string
 

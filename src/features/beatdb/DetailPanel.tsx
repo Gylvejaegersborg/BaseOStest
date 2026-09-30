@@ -66,6 +66,13 @@ export function DetailPanel({ asset, player, onSelectRelated, onEdit }: DetailPa
 
       {asset.note && <p className="text-xs leading-relaxed text-text/85">{asset.note}</p>}
 
+      {asset.collaborators && asset.collaborators.length > 0 && (
+        <p className="text-xs text-text/85">
+          <span className="text-[9px] uppercase tracking-wider text-dim">Made with </span>
+          {asset.collaborators.map((c) => (c.role ? `${c.name} (${c.role})` : c.name)).join(', ')}
+        </p>
+      )}
+
       {asset.lyrics && (
         <section>
           <h3 className="mb-1 text-[9px] uppercase tracking-wider text-dim">Lyrics</h3>

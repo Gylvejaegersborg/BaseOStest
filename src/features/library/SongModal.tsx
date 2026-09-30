@@ -25,6 +25,7 @@ export function SongModal({ open, onClose, editing, onSaved }: SongModalProps) {
   const [tags, setTags] = useState('')
   const [note, setNote] = useState('')
   const [lyrics, setLyrics] = useState('')
+  const [collabs, setCollabs] = useState('')
   const [audio, setAudio] = useState<File | null>(null)
   const [cover, setCover] = useState<File | null>(null)
   const [busy, setBusy] = useState(false)
@@ -41,6 +42,7 @@ export function SongModal({ open, onClose, editing, onSaved }: SongModalProps) {
     setTags(editing?.tags.join(', ') ?? '')
     setNote(editing?.note ?? '')
     setLyrics(editing?.lyrics ?? '')
+    setCollabs((editing?.collaborators ?? []).map((c) => (c.role ? `${c.name}: ${c.role}` : c.name)).join('\n'))
     setAudio(null)
     setCover(null)
     setError(null)
@@ -70,6 +72,13 @@ export function SongModal({ open, onClose, editing, onSaved }: SongModalProps) {
         tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
         note: note.trim(),
         lyrics: lyrics.trim(),
+        // One per line: "Name" or "Name: what they did".
+        collaborators: collabs.split('\n').map((l) => {
+          const i = l.indexOf(':')
+          const name = (i < 0 ? l : l.slice(0, i)).trim()
+          const role = i < 0 ? '' : l.slice(i + 1).trim()
+          return { name, ...(role ? { role } : {}) }
+        }).filter((c) => c.name),
       }
       const coverId = cover ? (await uploadFile(cover)).id : undefined
       let id: string
@@ -122,6 +131,10 @@ export function SongModal({ open, onClose, editing, onSaved }: SongModalProps) {
               <label className="label mb-1 block">Key</label>
               <input value={key} onChange={(e) => setKey(e.target.value)} placeholder="optional" maxLength={24} className={input} />
             </div>
+          </div>
+          <div>
+            <label className="label mb-1 block">Made with (one per line: name, or name: what they did)</label>
+            <textarea value={collabs} onChange={(e) => setCollabs(e.target.value)} rows={2} placeholder="Gswish: melody" className={`${input} resize-none`} />
           </div>
           <div>
             <label className="label mb-1 block">Tags (comma separated)</label>

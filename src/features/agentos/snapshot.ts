@@ -58,7 +58,7 @@ export interface BaseSpaceSnapshot {
   crons: { id: string; name: string; owner: string; team?: string; focus?: { kind: 'goal' | 'project'; id: string }; schedule: unknown; nextRun: string; status: string }[]
   teams: { id: string; name: string; members: string[]; description?: string }[]
   /** The music library: only what the operator entered (no lyrics, no art). */
-  songs?: { id: string; title: string; kind: string; bpm?: number; key?: string; tags: string[]; note?: string; uploaded?: boolean }[]
+  songs?: { id: string; title: string; kind: string; bpm?: number; key?: string; tags: string[]; note?: string; uploaded?: boolean; collaborators?: { name: string; role?: string }[] }[]
 }
 
 const iso = (d: Date) => d.toISOString().slice(0, 10)
@@ -136,7 +136,7 @@ export function useSnapshot(): BaseSpaceSnapshot {
     teams: teams.map((t) => ({ id: t.id, name: t.name, members: t.members, description: t.description })),
     songs: mergeById(LIBRARY, overlay.library)
       .filter((a) => a.category === 'beat' || a.category === 'song')
-      .map((a) => ({ id: a.id, title: a.title, kind: a.category, bpm: a.bpm, key: a.musicalKey, tags: a.tags, note: a.note, uploaded: a.uploaded })),
+      .map((a) => ({ id: a.id, title: a.title, kind: a.category, bpm: a.bpm, key: a.musicalKey, tags: a.tags, note: a.note, uploaded: a.uploaded, collaborators: a.collaborators })),
     goals: goals.map((g) => ({
       id: g.id,
       title: g.title,
