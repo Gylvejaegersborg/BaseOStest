@@ -79,11 +79,11 @@ export function useAgentOsFlow(flowId: string | null, steps: FlowStepInput[]) {
   }, [flowId, refresh, known])
 
   const markDone = useCallback(
-    async (stepId: string) => {
+    async (stepIds: string[]) => {
       if (!flowId) return
       setBusy(true)
       try {
-        await markFlowStepDone(flowId, stepId, known)
+        await markFlowStepDone(flowId, stepIds, known)
         setError('')
       } catch (err) {
         setError((err as Error)?.message ?? 'Could not mark the step done')

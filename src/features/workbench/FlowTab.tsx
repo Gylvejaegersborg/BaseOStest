@@ -120,6 +120,7 @@ export function FlowTab({
   const showingList = !flowId || listOpen
 
   const stepMeta = (stepId: string) => knownSteps.find((s) => s.id === stepId)
+  const stoppedIds = flow ? flow.steps.filter((s) => s.status === 'failed' || s.status === 'timed_out' || s.status === 'lost').map((s) => s.id) : []
   const reportFor = (stepId: string) => report?.steps.find((r) => r.id === stepId)
 
   return (
@@ -159,6 +160,16 @@ export function FlowTab({
                   className="flex items-center gap-1.5 border border-danger/40 bg-danger/10 px-2.5 py-1 text-[11px] uppercase tracking-wider text-danger hover:bg-danger/20"
                 >
                   <Square size={11} /> Cancel
+                </button>
+              )}
+              {stoppedIds.length > 1 && (
+                <button
+                  onClick={() => markDone(stoppedIds)}
+                  disabled={busy || !knownSteps.length}
+                  className="flex items-center gap-1.5 border border-accent/40 bg-accent/10 px-2.5 py-1 text-[11px] uppercase tracking-wider text-accent hover:bg-accent/20 disabled:opacity-40"
+                  title="Accept every stopped step as done; the flow carries on without re-running them"
+                >
+                  <CheckCircle2 size={11} /> Mark all {stoppedIds.length} stopped done
                 </button>
               )}
               {(flow.status === 'failed' || flow.status === 'cancelled') && (
@@ -248,9 +259,12 @@ export function FlowTab({
                       {(rep?.goal ?? meta?.goal) && <p className="text-[11px] italic text-dim">{rep?.goal ?? meta?.goal}</p>}
                       {(s.status === 'failed' || s.status === 'timed_out' || s.status === 'lost') && knownSteps.length > 0 && (
                         <div className="flex flex-wrap items-center gap-2 border border-line/60 bg-panel-2/40 px-2 py-1.5 text-[11px] text-text/80">
-                          <span>Read what it added below. If the work is done, accept it and the flow carries on without re-running it.</span>
+                          <span>
+                            Read what it added below. If the work is done, accept it and the flow carries on without re-running it.
+                            {stoppedIds.length > 1 ? ' The other stopped steps run again unless you accept them too.' : ''}
+                          </span>
                           <button
-                            onClick={() => markDone(s.id)}
+                            onClick={() => markDone([s.id])}
                             disabled={busy}
                             className="ml-auto flex items-center gap-1.5 border border-accent/40 bg-accent/10 px-2 py-1 text-[10px] uppercase tracking-wider text-accent hover:bg-accent/20 disabled:opacity-40"
                           >
