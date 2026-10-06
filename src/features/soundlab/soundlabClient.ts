@@ -52,3 +52,19 @@ export const listSounds = (kind: SoundKind, verdict: Verdict) =>
 export const generateSounds = (kind: SoundKind, count: number) => call<{ candidates: Candidate[] }>('POST', '/batches', { kind, count }).then((r) => r.candidates)
 export const judgeSound = (id: string, verdict: Verdict) => call<Candidate>('POST', `/candidates/${encodeURIComponent(id)}/judge`, { verdict })
 export const soundStats = () => call<Stats>('GET', '/stats')
+
+export interface PackSummary {
+  id: string
+  name: string
+  createdAt: string
+  counts: Record<string, number>
+  sounds: { file: string; label: string; kind: string }[]
+  zipBytes: number
+  licenseNote: string
+}
+
+/** Everything the operator has kept, across all kinds. */
+export const listKept = () => call<{ candidates: Candidate[] }>('GET', '/candidates?verdict=accepted').then((r) => r.candidates)
+export const buildPack = (name: string, ids: string[]) => call<PackSummary>('POST', '/packs', { name, ids })
+export const listPacks = () => call<{ packs: PackSummary[] }>('GET', '/packs').then((r) => r.packs)
+export const packDownloadUrl = (id: string) => `${BASE}/soundlab/packs/${encodeURIComponent(id)}/download`

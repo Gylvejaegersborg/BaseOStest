@@ -69,3 +69,5 @@ gateway through the dev server's `/agent-os` proxy (see `vite.config.ts`).
   agent-os's `ROADMAP.md`.
 - Be honest: agents can't hear audio, don't invent metrics or stream counts, and mark
   assumptions as assumptions.
+- The artist name is stylized ISΛRK, but the Λ is only styling. Wherever search matters (file and
+  folder names, tags, titles, listings, URLs) write plain **ISARK**. Agent-written promotion copy too.

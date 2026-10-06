@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Check, HelpCircle, Play, RotateCcw, Sparkles, Trophy, X } from 'lucide-react'
+import { Check, HelpCircle, Package, Play, RotateCcw, Sparkles, Trophy, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { Wave } from './Wave'
 import { Tournament } from './Tournament'
+import { PackBuilder } from './PackBuilder'
 import { KINDS, generateSounds, judgeSound, listSounds, soundStats, soundUrl, type Candidate, type SoundKind, type Stats, type Verdict } from './soundlabClient'
 
 const SWIPE_PX = 90
@@ -23,6 +24,7 @@ export function SoundLabPage() {
   const [flying, setFlying] = useState<0 | -1 | 1>(0)
   const [showKept, setShowKept] = useState(false)
   const [rounds, setRounds] = useState(false)
+  const [packing, setPacking] = useState(false)
   const history = useRef<{ c: Candidate; verdict: Verdict }[]>([])
   const player = useRef<HTMLAudioElement | null>(null)
   const preload = useRef<HTMLAudioElement | null>(null)
@@ -138,7 +140,7 @@ export function SoundLabPage() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.target as HTMLElement)?.tagName === 'INPUT') return
-      if (rounds) return // the tournament has the keyboard
+      if (rounds || packing) return // the tournament and the pack builder have the keyboard
       if (e.key === 'ArrowRight') decide('accepted')
       else if (e.key === 'ArrowLeft') decide('skipped')
       else if (e.key === 'ArrowDown' || e.key.toLowerCase() === 'm') decide('maybe')
@@ -152,7 +154,7 @@ export function SoundLabPage() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [decide, play, undo, rounds])
+  }, [decide, play, undo, rounds, packing])
 
   const total = stats?.total
   const mine = stats?.[kind]
@@ -165,11 +167,16 @@ export function SoundLabPage() {
           <h1 className="font-display text-sm tracking-wider">
             SOUND LAB <span className="ml-1 text-[9px] uppercase tracking-[0.2em] text-dim">your ears decide</span>
           </h1>
-          {total && (
-            <span className="text-[10px] tabular-nums text-dim">
-              kept {total.accepted} · maybe {total.maybe}
-            </span>
-          )}
+          <div className="flex items-center gap-3">
+            {total && (
+              <span className="text-[10px] tabular-nums text-dim">
+                kept {total.accepted} · maybe {total.maybe}
+              </span>
+            )}
+            <button onClick={() => setPacking(true)} className="flex items-center gap-1 border border-accent/50 px-2 py-1 text-[11px] text-accent hover:bg-accent/10">
+              <Package size={12} /> Pack
+            </button>
+          </div>
         </div>
         <div className="mt-2 flex gap-1 overflow-x-auto pb-1" role="tablist" aria-label="Kind of sound">
           {KINDS.map((k) => (
@@ -284,6 +291,8 @@ export function SoundLabPage() {
           {showKept ? 'Hide' : 'Show'} kept {mine ? `(${mine.accepted})` : ''}
         </button>
       </footer>
+
+      {packing && <PackBuilder onClose={() => setPacking(false)} />}
 
       {rounds && (
         <Tournament
