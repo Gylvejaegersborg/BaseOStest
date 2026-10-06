@@ -112,7 +112,7 @@ export function FlowTab({
   onSelectFlow: (id: string | null, steps: FlowStepInput[]) => void
   onNewFlow: () => void
 }) {
-  const { flow, report, error, busy, cancel, resume, steps: knownSteps } = useAgentOsFlow(flowId, steps)
+  const { flow, report, error, busy, cancel, resume, markDone, steps: knownSteps } = useAgentOsFlow(flowId, steps)
   const { flows, loading } = useAgentOsFlowList()
   const [openStep, setOpenStep] = useState<string | null>(null)
   // With a flow open the list of all flows sits folded at the bottom; with none open it is the whole panel.
@@ -246,6 +246,18 @@ export function FlowTab({
                   {isOpen && (
                     <div className="space-y-2 border-t border-line/40 px-2.5 py-2">
                       {(rep?.goal ?? meta?.goal) && <p className="text-[11px] italic text-dim">{rep?.goal ?? meta?.goal}</p>}
+                      {(s.status === 'failed' || s.status === 'timed_out' || s.status === 'lost') && knownSteps.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-2 border border-line/60 bg-panel-2/40 px-2 py-1.5 text-[11px] text-text/80">
+                          <span>Read what it added below. If the work is done, accept it and the flow carries on without re-running it.</span>
+                          <button
+                            onClick={() => markDone(s.id)}
+                            disabled={busy}
+                            className="ml-auto flex items-center gap-1.5 border border-accent/40 bg-accent/10 px-2 py-1 text-[10px] uppercase tracking-wider text-accent hover:bg-accent/20 disabled:opacity-40"
+                          >
+                            <CheckCircle2 size={11} /> Mark done
+                          </button>
+                        </div>
+                      )}
                       {rep && rep.attempts.length ? (
                         rep.attempts
                           .slice()

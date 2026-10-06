@@ -5,6 +5,7 @@ import {
   fetchFlows,
   cancelFlow as cancelFlowRequest,
   resumeFlow as resumeFlowRequest,
+  markFlowStepDone,
   fetchFlowReport,
   type AgentOsFlowReport,
   type AgentOsFlow,
@@ -77,7 +78,24 @@ export function useAgentOsFlow(flowId: string | null, steps: FlowStepInput[]) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [flowId, refresh, known])
 
-  return { flow, report, error, busy, refresh, cancel, resume, steps: known }
+  const markDone = useCallback(
+    async (stepId: string) => {
+      if (!flowId) return
+      setBusy(true)
+      try {
+        await markFlowStepDone(flowId, stepId, known)
+        setError('')
+      } catch (err) {
+        setError((err as Error)?.message ?? 'Could not mark the step done')
+      } finally {
+        setBusy(false)
+      }
+      await refresh()
+    },
+    [flowId, refresh, known],
+  )
+
+  return { flow, report, error, busy, refresh, cancel, resume, markDone, steps: known }
 }
 
 /** All Flows, for a picker/list view — refetches on demand and whenever

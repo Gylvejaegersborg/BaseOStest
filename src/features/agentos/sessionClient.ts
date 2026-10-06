@@ -345,6 +345,12 @@ export function resumeFlow(flowId: string, steps: FlowStepInput[]): Promise<Agen
   return request<AgentOsFlow>(`/flows/${flowId}/resume`, { method: 'POST', body: JSON.stringify({ steps }) })
 }
 
+/** Accept a stopped step as done (it finished its work but ran out of steps saying so): the flow carries on after it
+ *  without running that step again. */
+export function markFlowStepDone(flowId: string, stepId: string, steps: FlowStepInput[]): Promise<AgentOsFlow> {
+  return request<AgentOsFlow>(`/flows/${flowId}/steps/${encodeURIComponent(stepId)}/done`, { method: 'POST', body: JSON.stringify({ steps }) })
+}
+
 export function cancelFlow(flowId: string, reason?: string): Promise<AgentOsFlow> {
   return request<AgentOsFlow>(`/flows/${flowId}/cancel`, { method: 'POST', body: JSON.stringify({ reason }) })
 }
