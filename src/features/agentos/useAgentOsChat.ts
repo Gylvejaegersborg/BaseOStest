@@ -75,6 +75,8 @@ export function useAgentOsChat(agentId: string, preferredSessionId?: string | nu
   const [streaming, setStreaming] = useState(false)
   const [workingOn, setWorkingOn] = useState<string | null>(null)
   const [streamingText, setStreamingText] = useState('')
+  // Bumped to try the bootstrap again after a failure.
+  const [retry, setRetry] = useState(0)
 
   const sessionIdRef = useRef<string | null>(null)
   sessionIdRef.current = sessionId
@@ -108,6 +110,7 @@ export function useAgentOsChat(agentId: string, preferredSessionId?: string | nu
       return
     }
     setConnection('connecting')
+    let retryTimer: number | undefined
     ;(async () => {
       try {
         const list = await refreshSessions()
@@ -136,13 +139,16 @@ export function useAgentOsChat(agentId: string, preferredSessionId?: string | nu
         if (cancelled) return
         setErrorText((err as Error)?.message ?? 'Could not reach Agent-OS')
         setConnection('error')
+        // Don't stay disconnected: try again shortly.
+        retryTimer = window.setTimeout(() => !cancelled && setRetry((n) => n + 1), 8000)
       }
     })()
     return () => {
       cancelled = true
+      window.clearTimeout(retryTimer)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [agentId])
+  }, [agentId, retry])
 
   // Live activity for the CURRENT session, via the real event bus over SSE.
   useEffect(() => {

@@ -12,8 +12,9 @@ import {
   type ConfiguredHook,
 } from '@/features/agentos/client'
 import { cn } from '@/lib/cn'
+import { ConnectorsPanel } from './ConnectorsPanel'
 
-type SettingsSection = 'skills' | 'hooks'
+type SettingsSection = 'skills' | 'hooks' | 'connectors'
 
 /** Empty-string sentinel for "no skill selected yet" vs "editing a new,
  * unsaved one" — keeps the three modes (list / editing existing /
@@ -150,7 +151,7 @@ export function SettingsModal({ open, onClose }: { open: boolean; onClose: () =>
     <Modal open={open} onClose={onClose} title="Settings" code="WB.02" accent="#f0a020" width={620}>
       {!isEditing && (
         <div className="mb-3 flex gap-1 border-b border-line">
-          {(['skills', 'hooks'] as const).map((s) => (
+          {(['skills', 'hooks', 'connectors'] as const).map((s) => (
             <button
               key={s}
               onClick={() => setSection(s)}
@@ -164,7 +165,9 @@ export function SettingsModal({ open, onClose }: { open: boolean; onClose: () =>
           ))}
         </div>
       )}
-      {section === 'hooks' && !isEditing ? (
+      {section === 'connectors' && !isEditing ? (
+        <ConnectorsPanel />
+      ) : section === 'hooks' && !isEditing ? (
         <div className="space-y-3">
           <p className="text-[11px] text-dim">
             Read-only — agent-os's <code>hooks.json</code> (<code>AGENT_OS_HOOKS_FILE</code> to point elsewhere), loaded once at gateway startup.

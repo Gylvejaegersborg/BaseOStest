@@ -92,6 +92,7 @@ export function useAgentOsAgents(): { agents: Agent[]; connection: AgentOsConnec
 
   useEffect(() => {
     let cancelled = false
+    let retryTimer: number | undefined
 
     if (!agentOsConfigured()) {
       setConnection('mock')
@@ -108,10 +109,13 @@ export function useAgentOsAgents(): { agents: Agent[]; connection: AgentOsConnec
       .catch(() => {
         if (cancelled) return
         setConnection('error')
+        // Don't stay disconnected: try again shortly (a restart or a busy moment passes).
+        retryTimer = window.setTimeout(() => !cancelled && setReloadKey((k) => k + 1), 8000)
       })
 
     return () => {
       cancelled = true
+      window.clearTimeout(retryTimer)
     }
   }, [reloadKey])
 

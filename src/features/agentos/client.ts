@@ -74,7 +74,8 @@ export function pushSnapshot(snapshot: unknown): Promise<{ ok: true; savedAt: st
 }
 
 export async function fetchAgents(): Promise<AgentOsAgent[]> {
-  const { agents } = await getJSON<{ agents: AgentOsAgent[] }>('/agents')
+  // Generous: this is the call that decides whether BaseSpace says Agent-OS is connected, and a busy gateway can take a few seconds.
+  const { agents } = await getJSON<{ agents: AgentOsAgent[] }>('/agents', 12_000)
   return agents
 }
 
@@ -261,6 +262,27 @@ export interface ConfiguredHook {
   command: string
   matchTool?: string
   label?: string
+}
+
+export interface Connector {
+  name: string
+  kind: 'account' | 'local'
+  target: string
+  status: 'connected' | 'needs-auth' | 'failed'
+  enabled: boolean
+  toolPrefix: string
+}
+
+/** The MCP connectors the agents can reach through the Claude CLI (agent-os's connectors.ts). `refresh` re-reads the account first (slow: ~10 s). */
+export async function fetchConnectors(refresh = false): Promise<{ connectors: Connector[]; refreshedAt?: string }> {
+  if (!BASE) throw new Error('agent-os gateway not configured')
+  const res = await fetch(`${BASE}/connectors${refresh ? '?refresh=1' : ''}`, { headers: { accept: 'application/json' }, signal: AbortSignal.timeout(refresh ? 90_000 : 5000) })
+  if (!res.ok) throw new Error(`agent-os gateway ${res.status} on /connectors`)
+  return res.json()
+}
+
+export function setConnectorEnabled(name: string, enabled: boolean): Promise<Connector> {
+  return writeJSON<Connector>('PUT', `/connectors/${encodeURIComponent(name)}`, { enabled })
 }
 
 export async function fetchConfiguredHooks(): Promise<ConfiguredHook[]> {
