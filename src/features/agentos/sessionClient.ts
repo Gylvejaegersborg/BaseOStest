@@ -285,6 +285,43 @@ export function fetchFlow(flowId: string): Promise<AgentOsFlow> {
   return request<AgentOsFlow>(`/flows/${flowId}`)
 }
 
+/** Everything about one flow in one answer (agent-os's flow-report.ts): per step the goal, agent, every attempt, what it
+ *  said, its tool calls, what it added to BaseSpace and its tokens. */
+export interface AgentOsFlowReportAttempt {
+  taskId: string
+  status: string
+  startedAt?: string
+  completedAt?: string
+  seconds?: number
+  sessionId?: string
+  result?: string
+  error?: string
+  tokens?: { input: number; output: number }
+  toolCalls: { name: string; summary: string; ok: boolean }[]
+  added: { kind: string; title: string; folder?: string }[]
+}
+export interface AgentOsFlowReportStep {
+  id: string
+  agentId?: string
+  goal?: string
+  dependsOn: string[]
+  status: AgentOsTaskStatus
+  attempts: AgentOsFlowReportAttempt[]
+}
+export interface AgentOsFlowReport {
+  flowId: string
+  title?: string
+  status: AgentOsFlowStatus
+  summary?: string
+  proposedBy?: string
+  steps: AgentOsFlowReportStep[]
+  totals: { tokens: { input: number; output: number }; toolCalls: number; added: number; seconds: number }
+}
+
+export function fetchFlowReport(flowId: string): Promise<AgentOsFlowReport> {
+  return request<AgentOsFlowReport>(`/flows/${flowId}/report`)
+}
+
 export async function fetchFlows(): Promise<AgentOsFlow[]> {
   const { flows } = await request<{ flows: AgentOsFlow[] }>('/flows')
   return flows

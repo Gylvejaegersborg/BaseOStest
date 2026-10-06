@@ -5,6 +5,8 @@ import {
   fetchFlows,
   cancelFlow as cancelFlowRequest,
   resumeFlow as resumeFlowRequest,
+  fetchFlowReport,
+  type AgentOsFlowReport,
   type AgentOsFlow,
   type FlowStepInput,
 } from './sessionClient'
@@ -21,12 +23,16 @@ import {
  */
 export function useAgentOsFlow(flowId: string | null, steps: FlowStepInput[]) {
   const [flow, setFlow] = useState<AgentOsFlow | null>(null)
+  const [report, setReport] = useState<AgentOsFlowReport | null>(null)
   const [error, setError] = useState('')
+  const [busy, setBusy] = useState(false)
 
   const refresh = useCallback(async () => {
     if (!flowId) return
     try {
-      setFlow(await fetchFlow(flowId))
+      const [f, r] = await Promise.all([fetchFlow(flowId), fetchFlowReport(flowId).catch(() => null)])
+      setFlow(f)
+      setReport(r)
       setError('')
     } catch (err) {
       setError((err as Error)?.message ?? 'Could not load flow')
@@ -35,6 +41,7 @@ export function useAgentOsFlow(flowId: string | null, steps: FlowStepInput[]) {
 
   useEffect(() => {
     setFlow(null)
+    setReport(null)
     if (!flowId) return
     refresh()
     const dispose = subscribeToEvents(['flow.step.started', 'flow.step.completed', 'flow.completed'], (e) => {
@@ -57,12 +64,20 @@ export function useAgentOsFlow(flowId: string | null, steps: FlowStepInput[]) {
 
   const resume = useCallback(async () => {
     if (!flowId) return
-    await resumeFlowRequest(flowId, known)
+    setBusy(true)
+    try {
+      await resumeFlowRequest(flowId, known)
+      setError('')
+    } catch (err) {
+      setError((err as Error)?.message ?? 'Could not resume the flow')
+    } finally {
+      setBusy(false)
+    }
     await refresh()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [flowId, refresh, known])
 
-  return { flow, error, refresh, cancel, resume, steps: known }
+  return { flow, report, error, busy, refresh, cancel, resume, steps: known }
 }
 
 /** All Flows, for a picker/list view — refetches on demand and whenever
