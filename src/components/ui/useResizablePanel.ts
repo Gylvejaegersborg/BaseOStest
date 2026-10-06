@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 interface Options {
-  defaultWidth: number
+  /** A number, or a function when it depends on the screen (e.g. half of it). */
+  defaultWidth: number | (() => number)
   min: number
-  max: number
+  max: number | (() => number)
   /** Which edge carries the drag handle — determines whether dragging
    *  right grows or shrinks the panel (a left-rail's handle is on its
    *  right edge; a right-panel's handle is on its left edge, so the same
@@ -23,13 +24,16 @@ interface Options {
  *
  *  System-wide primitive (design-system workspace model) — any resizable
  *  structural or summoned panel uses this, not just Workbench's rail. */
-export function useResizablePanel({ defaultWidth, min, max, edge, storageKey }: Options) {
+export function useResizablePanel({ defaultWidth: defaultSize, min, max: maxSize, edge, storageKey }: Options) {
+  const resolve = (v: number | (() => number)) => (typeof v === 'function' ? v() : v)
+  const max = resolve(maxSize)
   const [width, setWidth] = useState(() => {
+    const fallback = Math.min(max, Math.max(min, resolve(defaultSize)))
     try {
       const saved = Number(window.localStorage.getItem(storageKey))
-      return saved >= min && saved <= max ? saved : defaultWidth
+      return saved >= min && saved <= max ? saved : fallback
     } catch {
-      return defaultWidth
+      return fallback
     }
   })
   const widthRef = useRef(width)
@@ -46,7 +50,7 @@ export function useResizablePanel({ defaultWidth, min, max, edge, storageKey }: 
       if (!dragging.current) return
       const delta = e.clientX - dragging.current.startX
       const signed = edge === 'left' ? -delta : delta
-      setWidth(Math.min(max, Math.max(min, dragging.current.startWidth + signed)))
+      setWidth(Math.min(resolve(maxSize), Math.max(min, dragging.current.startWidth + signed)))
     }
     const onUp = () => {
       if (!dragging.current) return
@@ -63,6 +67,7 @@ export function useResizablePanel({ defaultWidth, min, max, edge, storageKey }: 
       window.removeEventListener('mousemove', onMove)
       window.removeEventListener('mouseup', onUp)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [edge, max, min, storageKey])
 
   return { width, onMouseDown }

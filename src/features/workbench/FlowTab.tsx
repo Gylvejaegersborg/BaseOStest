@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CheckCircle2, XCircle, Clock, Loader2, Ban, ArrowRight, RotateCcw, Square, ChevronDown, ChevronRight, Plus } from 'lucide-react'
+import { CheckCircle2, XCircle, Clock, Loader2, Ban, ArrowRight, ArrowLeft, RotateCcw, Square, ChevronDown, ChevronRight, Plus, ShieldCheck } from 'lucide-react'
 import { useAgentOsFlow, useAgentOsFlowList } from '@/features/agentos/useAgentOsFlow'
 import type { AgentOsFlowReportAttempt, AgentOsFlowStatus, AgentOsTaskStatus, FlowStepInput } from '@/features/agentos/sessionClient'
 import { cn } from '@/lib/cn'
@@ -115,6 +115,9 @@ export function FlowTab({
   const { flow, report, error, busy, cancel, resume, steps: knownSteps } = useAgentOsFlow(flowId, steps)
   const { flows, loading } = useAgentOsFlowList()
   const [openStep, setOpenStep] = useState<string | null>(null)
+  // With a flow open the list of all flows sits folded at the bottom; with none open it is the whole panel.
+  const [listOpen, setListOpen] = useState(false)
+  const showingList = !flowId || listOpen
 
   const stepMeta = (stepId: string) => knownSteps.find((s) => s.id === stepId)
   const reportFor = (stepId: string) => report?.steps.find((r) => r.id === stepId)
@@ -132,7 +135,17 @@ export function FlowTab({
           )}
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs">
-              <span className="text-dim">Flow</span>
+              <button
+                onClick={() => {
+                  setListOpen(false)
+                  onSelectFlow(null, [])
+                }}
+                className="flex items-center gap-1 text-dim hover:text-text"
+                title="Back to all flows"
+              >
+                <ArrowLeft size={12} /> All flows
+              </button>
+              <span className="text-dim">·</span>
               {flow.title ? <strong className="text-sm font-normal text-text">{flow.title}</strong> : null}
               <code className="text-text/60">{flow.id.slice(0, 8)}</code>
               <span className="uppercase tracking-wider" style={{ color: FLOW_COLOR[flow.status] }}>
@@ -172,6 +185,23 @@ export function FlowTab({
                   : ''}
                 {report.totals.seconds ? ` · ${fmtSeconds(report.totals.seconds)} of agent time` : ''}
               </p>
+              <div className="mt-1 border-t border-line/40 pt-1.5">
+                <p className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-dim">
+                  <ShieldCheck size={12} /> {report.verdict.agentId}'s verdict
+                  {report.verdict.status === 'running' && <span className="text-[#f0a020]">checking now…</span>}
+                </p>
+                {report.verdict.status === 'done' && report.verdict.text ? (
+                  <pre className="mt-1 max-h-72 overflow-y-auto whitespace-pre-wrap break-words text-[11px] text-text/90">{report.verdict.text}</pre>
+                ) : report.verdict.status === 'done' ? (
+                  <p className="mt-1 text-dim">He finished the check but wrote nothing.</p>
+                ) : report.verdict.status === 'failed' ? (
+                  <p className="mt-1 text-danger">The check stopped before it finished{report.verdict.error ? `: ${report.verdict.error}` : '.'}</p>
+                ) : report.verdict.status === 'waiting' ? (
+                  <p className="mt-1 text-dim">Waiting for the steps before it to finish.</p>
+                ) : report.verdict.status === 'not-run' ? (
+                  <p className="mt-1 text-dim">This flow has no verification step, so nobody has checked it.</p>
+                ) : null}
+              </div>
               {report.steps.some((r) => r.status === 'failed') && (
                 <p className="text-danger">
                   {report.steps
@@ -236,9 +266,15 @@ export function FlowTab({
       ) : (
         <p className="p-3 text-xs text-dim">No active flow selected. Pick one below, or start a new one.</p>
       )}
-      <div className="max-h-[30%] overflow-y-auto border-t border-line">
+      <div className={cn('overflow-y-auto border-line', flow && !listOpen ? 'shrink-0 border-t' : flow ? 'max-h-[45%] border-t' : 'flex-1')}>
         <div className="flex items-center justify-between border-b border-line px-3 py-1.5">
-          <span className="label">All flows</span>
+          {flow ? (
+            <button onClick={() => setListOpen((v) => !v)} className="label flex items-center gap-1 hover:text-text">
+              {listOpen ? <ChevronDown size={11} /> : <ChevronRight size={11} />} All flows ({flows.length})
+            </button>
+          ) : (
+            <span className="label">All flows</span>
+          )}
           <button
             onClick={onNewFlow}
             className="flex items-center gap-1.5 border border-accent/40 bg-accent/10 px-2 py-1 text-[10px] uppercase tracking-wider text-accent hover:bg-accent/20"
@@ -246,6 +282,8 @@ export function FlowTab({
             <Plus size={11} /> New Flow
           </button>
         </div>
+        {showingList && (
+          <>
         {loading && <p className="p-2 text-xs text-dim">Loading…</p>}
         {!loading && !flows.length && <p className="p-2 text-xs text-dim">No flows yet.</p>}
         {flows
@@ -254,7 +292,10 @@ export function FlowTab({
           .map((f) => (
             <button
               key={f.id}
-              onClick={() => onSelectFlow(f.id, f.id === flowId ? knownSteps : [])}
+              onClick={() => {
+                setListOpen(false)
+                onSelectFlow(f.id, f.id === flowId ? knownSteps : [])
+              }}
               className={cn(
                 'flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs hover:bg-panel-2/50',
                 f.id === flowId && 'bg-panel-2',
@@ -267,6 +308,8 @@ export function FlowTab({
               </span>
             </button>
           ))}
+          </>
+        )}
       </div>
     </div>
   )

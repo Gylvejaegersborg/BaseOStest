@@ -58,12 +58,14 @@ export function RightPanel({
   // ~80 columns. Callers key the panel on terminal-vs-other so this is
   // re-read when switching.
   const isTerminal = tab === 'terminal'
+  // Half the screen by default (the workbench keeps the other half), and it can be dragged out across nearly all of it.
+  // New storage keys (v2): the old widths were remembered from when the default was a narrow 380px.
   const { width, onMouseDown } = useResizablePanel({
-    defaultWidth: isTerminal ? 760 : 380,
+    defaultWidth: () => Math.round(window.innerWidth / 2),
     min: 280,
-    max: isTerminal ? 1400 : 720,
+    max: () => Math.max(400, window.innerWidth - 120),
     edge: 'left',
-    storageKey: isTerminal ? 'os:workbench:terminalPanelWidth' : 'os:workbench:rightPanelWidth',
+    storageKey: isTerminal ? 'os:workbench:terminalPanelWidth:v2' : 'os:workbench:rightPanelWidth:v2',
   })
 
   return (
@@ -72,7 +74,7 @@ export function RightPanel({
       <div className="flex h-full shrink-0 max-lg:!h-auto max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-40">
         <ResizeHandle onMouseDown={onMouseDown} className="max-lg:hidden" />
         <aside
-          className="flex h-full max-w-[90vw] flex-col border-l border-line-2 bg-panel/40 max-lg:!h-auto max-lg:!w-full max-lg:max-h-[75vh] max-lg:max-w-none max-lg:animate-sheet-up max-lg:rounded-t-panel max-lg:border-l-0 max-lg:border-t"
+          className="flex h-full max-w-[calc(100vw-120px)] flex-col border-l border-line-2 bg-panel/40 max-lg:!h-auto max-lg:!w-full max-lg:max-h-[75vh] max-lg:max-w-none max-lg:animate-sheet-up max-lg:rounded-t-panel max-lg:border-l-0 max-lg:border-t"
           style={{ width }}
         >
           <div className="flex items-center justify-between border-b border-line px-3 py-2">

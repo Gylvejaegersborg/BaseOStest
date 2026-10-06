@@ -7,6 +7,7 @@ import type { Asset } from '@/data/library'
 import type { Beat } from '@/data/beats'
 import type { LabModule } from '@/data/labs'
 import { fetchOverlay } from '@/features/agentos/client'
+import { subscribeToEvents } from '@/features/agentos/sessionClient'
 import { libraryFileUrl } from '@/features/library/libraryClient'
 
 /**
@@ -86,9 +87,18 @@ export function OsOverlayProvider({ children }: { children: ReactNode }) {
     void load()
     // Agents add things while BaseSpace is open — pick them up.
     const id = window.setInterval(load, 30_000)
+    // ...and straight away when the gateway says the overlay changed (an agent added a note, todo or project).
+    // Several adds in a row are one reload.
+    let pending: number | undefined
+    const dispose = subscribeToEvents(['basespace.overlay.updated'], () => {
+      window.clearTimeout(pending)
+      pending = window.setTimeout(() => void load(), 400)
+    })
     return () => {
       cancelled = true
       window.clearInterval(id)
+      window.clearTimeout(pending)
+      dispose()
     }
   }, [])
 

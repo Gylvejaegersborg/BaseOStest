@@ -308,7 +308,15 @@ export interface AgentOsFlowReportStep {
   status: AgentOsTaskStatus
   attempts: AgentOsFlowReportAttempt[]
 }
+export interface AgentOsFlowVerdict {
+  agentId: string
+  stepId?: string
+  status: 'not-run' | 'waiting' | 'running' | 'done' | 'failed'
+  text?: string
+  error?: string
+}
 export interface AgentOsFlowReport {
+  verdict: AgentOsFlowVerdict
   flowId: string
   title?: string
   status: AgentOsFlowStatus

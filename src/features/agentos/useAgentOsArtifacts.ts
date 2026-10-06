@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { fetchArtifacts, type AgentOsArtifact } from './sessionClient'
+import { fetchArtifacts, subscribeToEvents, type AgentOsArtifact } from './sessionClient'
 
 /**
  * Real Agent-OS Artifacts (produced outputs — files, reports, plans —
@@ -29,6 +29,9 @@ export function useAgentOsArtifacts(filter: { producer?: string; sessionId?: str
     setLoading(true)
     refresh()
   }, [refresh])
+
+  // A new artifact shows up without reopening the tab.
+  useEffect(() => subscribeToEvents(['artifact.created'], () => void refresh()), [refresh])
 
   return { artifacts, loading, error, refresh }
 }

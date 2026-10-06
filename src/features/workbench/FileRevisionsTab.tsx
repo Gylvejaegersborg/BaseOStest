@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { RotateCcw, FileEdit, FilePlus, History } from 'lucide-react'
-import { fetchFileRevisions, restoreFileRevision, type AgentOsFileRevision } from '@/features/agentos/sessionClient'
+import { fetchFileRevisions, restoreFileRevision, subscribeToEvents, type AgentOsFileRevision } from '@/features/agentos/sessionClient'
 
 const TOOL_ICON: Record<AgentOsFileRevision['tool'], typeof FileEdit> = {
   edit_file: FileEdit,
@@ -47,6 +47,9 @@ export function FileRevisionsTab() {
   useEffect(() => {
     refresh()
   }, [refresh])
+
+  // A change an agent makes to a file shows up without reopening the tab.
+  useEffect(() => subscribeToEvents(['file.revision.recorded'], () => void refresh()), [refresh])
 
   const restore = async (id: string) => {
     setBusyId(id)
