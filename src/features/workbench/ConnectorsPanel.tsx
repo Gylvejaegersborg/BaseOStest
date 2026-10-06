@@ -83,12 +83,11 @@ export function ConnectorsPanel() {
         minutes (or press Refresh). Tick one to let agents use it. Only connected ones can be ticked.
       </p>
       <p className="border border-line bg-panel-2/40 px-2.5 py-2 text-[11px] leading-relaxed text-dim">
-        <span className="text-text/80">What this can't do:</span> a connector call runs inside the CLI, not through Agent-OS, so it isn't in the event log and
-        can't be held for your approval. Things that send messages as you (Discord, Telegram) are therefore <span className="text-text/80">off by default</span>.
-        Turn one on only if you're fine with agents using it without asking.
-      </p>
-      <p className="text-[11px] leading-relaxed text-dim">
-        Agents on a small model (Haiku) don't get connectors: in testing they used Agent-OS's own tools reliably only without them. Agents on Sonnet and up do.
+        <span className="text-text/80">How agents use them:</span> through a <code>connector</code> tool. Each use is one short, separate request to that one
+        connector, so it shows in the event log and the flow report, and the connector's tools are only loaded when it is used (not on every step of every run).
+        Any agent can use them, Haiku included. What it can't do: tell a read from a write inside a connector, or hold a single call for your approval. Things
+        that send messages as you (Discord, Telegram) are therefore <span className="text-text/80">off by default</span>. Turn one on only if you're fine with
+        agents using it without asking.
       </p>
       {error && <p className="border border-danger/40 bg-danger/10 p-2 text-xs text-danger">{error}</p>}
       <div className="flex items-center justify-between">

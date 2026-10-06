@@ -45,7 +45,7 @@ function Attempt({ a, label }: { a: AgentOsFlowReportAttempt; label?: string }) 
         {a.seconds !== undefined && <span>{fmtSeconds(a.seconds)}</span>}
         {a.tokens && (
           <span>
-            {fmtTokens(a.tokens.input)} in / {fmtTokens(a.tokens.output)} out tokens
+            {fmtTokens(a.tokens.input)} in{a.tokens.cached ? ` (${fmtTokens(a.tokens.cached)} cached)` : ''} / {fmtTokens(a.tokens.output)} out tokens
           </span>
         )}
         <span>
@@ -63,6 +63,18 @@ function Attempt({ a, label }: { a: AgentOsFlowReportAttempt; label?: string }) 
               <li key={i} className="truncate">
                 <span className="text-dim">{x.kind}</span> {x.title}
                 {x.folder ? <span className="text-dim"> · {x.folder}</span> : null}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {a.edited && a.edited.length > 0 && (
+        <div className="border-l-2 border-accent/50 pl-2">
+          <p className="text-[10px] uppercase tracking-wider text-dim">Edited in place ({a.edited.length})</p>
+          <ul className="text-[11px] text-text/80">
+            {a.edited.map((x, i) => (
+              <li key={i} className="truncate">
+                {x.note} <span className="text-dim">· {x.changes} change{x.changes === 1 ? '' : 's'}</span>
               </li>
             ))}
           </ul>
@@ -192,7 +204,7 @@ export function FlowTab({
                 {report.steps.filter((r) => r.status === 'succeeded').length}/{report.steps.length} steps done · {report.totals.toolCalls} tool calls ·{' '}
                 {report.totals.added} added to BaseSpace
                 {report.totals.tokens.input + report.totals.tokens.output > 0
-                  ? ` · ${fmtTokens(report.totals.tokens.input)} in / ${fmtTokens(report.totals.tokens.output)} out tokens`
+                  ? ` · ${fmtTokens(report.totals.tokens.input)} in${report.totals.tokens.cached ? ` (${fmtTokens(report.totals.tokens.cached)} cached)` : ''} / ${fmtTokens(report.totals.tokens.output)} out tokens`
                   : ''}
                 {report.totals.seconds ? ` · ${fmtSeconds(report.totals.seconds)} of agent time` : ''}
               </p>

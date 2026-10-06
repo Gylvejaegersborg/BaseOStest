@@ -296,9 +296,10 @@ export interface AgentOsFlowReportAttempt {
   sessionId?: string
   result?: string
   error?: string
-  tokens?: { input: number; output: number }
+  tokens?: { input: number; output: number; cached?: number }
   toolCalls: { name: string; summary: string; ok: boolean }[]
   added: { kind: string; title: string; folder?: string }[]
+  edited?: { note: string; changes: number }[]
 }
 export interface AgentOsFlowReportStep {
   id: string
@@ -323,7 +324,7 @@ export interface AgentOsFlowReport {
   summary?: string
   proposedBy?: string
   steps: AgentOsFlowReportStep[]
-  totals: { tokens: { input: number; output: number }; toolCalls: number; added: number; seconds: number }
+  totals: { tokens: { input: number; output: number; cached?: number }; toolCalls: number; added: number; seconds: number }
 }
 
 export function fetchFlowReport(flowId: string): Promise<AgentOsFlowReport> {
