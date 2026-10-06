@@ -87,6 +87,9 @@ export function ConnectorsPanel() {
         can't be held for your approval. Things that send messages as you (Discord, Telegram) are therefore <span className="text-text/80">off by default</span>.
         Turn one on only if you're fine with agents using it without asking.
       </p>
+      <p className="text-[11px] leading-relaxed text-dim">
+        Agents on a small model (Haiku) don't get connectors: in testing they used Agent-OS's own tools reliably only without them. Agents on Sonnet and up do.
+      </p>
       {error && <p className="border border-danger/40 bg-danger/10 p-2 text-xs text-danger">{error}</p>}
       <div className="flex items-center justify-between">
         <span className="label">On your account</span>
