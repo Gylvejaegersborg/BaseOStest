@@ -52,14 +52,17 @@ export function useAgentOsFlow(flowId: string | null, steps: FlowStepInput[]) {
     [flowId, refresh],
   )
 
+  // The steps this flow was made of: the ones the caller remembers, else the gateway's stored definition.
+  const known = steps.length ? steps : (flow?.definition?.steps ?? [])
+
   const resume = useCallback(async () => {
     if (!flowId) return
-    await resumeFlowRequest(flowId, steps)
+    await resumeFlowRequest(flowId, known)
     await refresh()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [flowId, refresh])
+  }, [flowId, refresh, known])
 
-  return { flow, error, refresh, cancel, resume }
+  return { flow, error, refresh, cancel, resume, steps: known }
 }
 
 /** All Flows, for a picker/list view — refetches on demand and whenever

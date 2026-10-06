@@ -65,12 +65,12 @@ export function FlowTab({
   onSelectFlow: (id: string | null, steps: FlowStepInput[]) => void
   onNewFlow: () => void
 }) {
-  const { flow, error, cancel, resume } = useAgentOsFlow(flowId, steps)
+  const { flow, error, cancel, resume, steps: knownSteps } = useAgentOsFlow(flowId, steps)
   const { flows, loading } = useAgentOsFlowList()
   const { tasks } = useAgentOsTasks(flowId ? { flowId } : {})
   const [openStep, setOpenStep] = useState<string | null>(null)
 
-  const stepMeta = (stepId: string) => steps.find((s) => s.id === stepId)
+  const stepMeta = (stepId: string) => knownSteps.find((s) => s.id === stepId)
   const taskFor = (taskId: string | undefined) => (taskId ? tasks.find((t) => t.id === taskId) : undefined)
 
   return (
@@ -87,7 +87,8 @@ export function FlowTab({
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs">
               <span className="text-dim">Flow</span>
-              <code className="text-text/80">{flow.id.slice(0, 8)}</code>
+              {flow.title ? <strong className="text-sm font-normal text-text">{flow.title}</strong> : null}
+              <code className="text-text/60">{flow.id.slice(0, 8)}</code>
               <span className="uppercase tracking-wider" style={{ color: FLOW_COLOR[flow.status] }}>
                 {flow.status}
               </span>
@@ -104,9 +105,9 @@ export function FlowTab({
               {(flow.status === 'failed' || flow.status === 'cancelled') && (
                 <button
                   onClick={() => resume()}
-                  disabled={!steps.length}
+                  disabled={!knownSteps.length}
                   className="flex items-center gap-1.5 border border-line px-2.5 py-1 text-[11px] uppercase tracking-wider text-text/80 hover:bg-panel-2 disabled:opacity-40"
-                  title={steps.length ? undefined : 'Original step definitions unknown for this flow'}
+                  title={knownSteps.length ? undefined : 'Original step definitions unknown for this flow'}
                 >
                   <RotateCcw size={11} /> Resume
                 </button>
@@ -181,14 +182,14 @@ export function FlowTab({
           .map((f) => (
             <button
               key={f.id}
-              onClick={() => onSelectFlow(f.id, f.id === flowId ? steps : [])}
+              onClick={() => onSelectFlow(f.id, f.id === flowId ? knownSteps : [])}
               className={cn(
                 'flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs hover:bg-panel-2/50',
                 f.id === flowId && 'bg-panel-2',
               )}
             >
-              <code className="text-text/70">{f.id.slice(0, 8)}</code>
-              <span className="text-dim">{f.steps.length} steps</span>
+              {f.title ? <span className="truncate text-text/90">{f.title}</span> : <code className="text-text/70">{f.id.slice(0, 8)}</code>}
+              <span className="shrink-0 text-dim">{f.steps.length} steps</span>
               <span className="ml-auto uppercase tracking-wider text-[10px]" style={{ color: FLOW_COLOR[f.status] }}>
                 {f.status}
               </span>

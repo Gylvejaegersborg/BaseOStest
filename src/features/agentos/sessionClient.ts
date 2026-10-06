@@ -253,6 +253,10 @@ export interface AgentOsFlowStep {
 
 export interface AgentOsFlow {
   id: string
+  /** What whoever made it called it (older flows have none). */
+  title?: string
+  /** What it was made of, when the gateway knows (flows made by an agent or through the gateway). */
+  definition?: { title?: string; summary?: string; proposedBy?: string; steps: FlowStepInput[] } | null
   kind: 'managed' | 'mirrored'
   status: AgentOsFlowStatus
   steps: AgentOsFlowStep[]
@@ -273,8 +277,8 @@ export interface FlowStepInput {
  *  via subscribeToEvents(['flow.step.started','flow.step.completed',
  *  'flow.completed']) or by polling fetchFlow(). */
 /** `focus`: what the flow serves — every step runs focused on it. */
-export function createFlow(steps: FlowStepInput[], focus?: AgentOsSessionFocus): Promise<AgentOsFlow> {
-  return request<AgentOsFlow>('/flows', { method: 'POST', body: JSON.stringify({ steps, ...(focus ? { focus } : {}) }) })
+export function createFlow(steps: FlowStepInput[], focus?: AgentOsSessionFocus, title?: string): Promise<AgentOsFlow> {
+  return request<AgentOsFlow>('/flows', { method: 'POST', body: JSON.stringify({ steps, ...(focus ? { focus } : {}), ...(title ? { title } : {}) }) })
 }
 
 export function fetchFlow(flowId: string): Promise<AgentOsFlow> {

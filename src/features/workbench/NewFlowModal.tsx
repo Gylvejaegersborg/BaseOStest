@@ -42,6 +42,8 @@ export function NewFlowModal({
   const [template, setTemplate] = useState<FlowTemplate | null>(null)
   const [custom, setCustom] = useState(false)
   const [goal, setGoal] = useState('')
+  // What the flow is called in the flow panel.
+  const [name, setName] = useState('')
   const [overrides, setOverrides] = useState<Record<string, string>>({})
   const [customSteps, setCustomSteps] = useState<DraftStep[]>([])
   const [submitting, setSubmitting] = useState(false)
@@ -59,6 +61,7 @@ export function NewFlowModal({
     setTemplate(null)
     setCustom(false)
     setGoal('')
+    setName('')
     setOverrides({})
     setCustomSteps([])
     setError('')
@@ -134,7 +137,7 @@ export function NewFlowModal({
         if (!template || !goal.trim()) return
         steps = resolveFlowTemplate(template, goal.trim(), overrides)
       }
-      const flow = await createFlow(steps, focus ?? undefined)
+      const flow = await createFlow(steps, focus ?? undefined, name.trim() || (!custom && template ? template.name : undefined))
       if (draftId) deleteFlowDraft(draftId)
       onCreated(flow.id, steps)
       reset()
@@ -283,6 +286,14 @@ export function NewFlowModal({
           {error && <p className="border border-danger/40 bg-danger/10 p-2 text-xs text-danger">{error}</p>}
           <div className="flex items-center gap-2 text-[11px] text-dim">
             <span>Serves</span>
+            <label className="label mb-1 mt-3 block">Name (shown in the flow panel)</label>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={60}
+              placeholder={!custom && template ? template.name : 'What is this flow for?'}
+              className="mb-3 w-full border border-line bg-bg/60 px-2 py-1.5 text-sm text-text outline-none focus:border-accent/50"
+            />
             <FocusPicker focus={focus ?? undefined} onChange={setFocus} />
             <span className="min-w-0 flex-1 truncate">— every step gets the goal chain, and what it adds links back.</span>
           </div>
@@ -348,6 +359,14 @@ export function NewFlowModal({
           {error && <p className="border border-danger/40 bg-danger/10 p-2 text-xs text-danger">{error}</p>}
           <div className="flex items-center gap-2 text-[11px] text-dim">
             <span>Serves</span>
+            <label className="label mb-1 mt-3 block">Name (shown in the flow panel)</label>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={60}
+              placeholder={!custom && template ? template.name : 'What is this flow for?'}
+              className="mb-3 w-full border border-line bg-bg/60 px-2 py-1.5 text-sm text-text outline-none focus:border-accent/50"
+            />
             <FocusPicker focus={focus ?? undefined} onChange={setFocus} />
             <span className="min-w-0 flex-1 truncate">— every step gets the goal chain, and what it adds links back.</span>
           </div>
