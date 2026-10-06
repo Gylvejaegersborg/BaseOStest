@@ -1,53 +1,20 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Check, HelpCircle, Play, RotateCcw, Sparkles, X } from 'lucide-react'
+import { Check, HelpCircle, Play, RotateCcw, Sparkles, Trophy, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
+import { Wave } from './Wave'
+import { Tournament } from './Tournament'
 import { KINDS, generateSounds, judgeSound, listSounds, soundStats, soundUrl, type Candidate, type SoundKind, type Stats, type Verdict } from './soundlabClient'
 
 const SWIPE_PX = 90
 const TOP_UP_AT = 2
 const TOP_UP_COUNT = 8
 
-/** Draws the sound's shape (decoded in the browser, from the same URL that plays). */
-function Wave({ id }: { id: string }) {
-  const ref = useRef<HTMLCanvasElement>(null)
-  useEffect(() => {
-    let cancelled = false
-    const canvas = ref.current
-    if (!canvas) return
-    const ctx2d = canvas.getContext('2d')
-    ctx2d?.clearRect(0, 0, canvas.width, canvas.height)
-    ;(async () => {
-      try {
-        const buf = await (await fetch(soundUrl(id))).arrayBuffer()
-        const audio = await new AudioContext().decodeAudioData(buf)
-        if (cancelled || !ctx2d) return
-        const data = audio.getChannelData(0)
-        const bars = 96
-        const step = Math.max(1, Math.floor(data.length / bars))
-        const { width, height } = canvas
-        ctx2d.clearRect(0, 0, width, height)
-        ctx2d.fillStyle = '#36e0c8'
-        for (let b = 0; b < bars; b++) {
-          let peak = 0
-          for (let i = b * step; i < (b + 1) * step && i < data.length; i++) peak = Math.max(peak, Math.abs(data[i]!))
-          const h = Math.max(2, peak * (height - 6))
-          ctx2d.fillRect(b * (width / bars) + 1, (height - h) / 2, width / bars - 2, h)
-        }
-      } catch {
-        /* the player still works without the picture */
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [id])
-  return <canvas ref={ref} width={480} height={120} className="h-24 w-full opacity-90" aria-hidden />
-}
-
 export function SoundLabPage() {
   const [kind, setKind] = useState<SoundKind>('808')
   const [queue, setQueue] = useState<Candidate[]>([])
   const [kept, setKept] = useState<Candidate[]>([])
+  const [maybe, setMaybe] = useState<Candidate[]>([])
+  const [panel, setPanel] = useState<'kept' | 'maybe'>('kept')
   const [stats, setStats] = useState<Stats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -55,6 +22,7 @@ export function SoundLabPage() {
   const [drag, setDrag] = useState(0)
   const [flying, setFlying] = useState<0 | -1 | 1>(0)
   const [showKept, setShowKept] = useState(false)
+  const [rounds, setRounds] = useState(false)
   const history = useRef<{ c: Candidate; verdict: Verdict }[]>([])
   const player = useRef<HTMLAudioElement | null>(null)
   const preload = useRef<HTMLAudioElement | null>(null)
@@ -89,9 +57,10 @@ export function SoundLabPage() {
     history.current = []
     ;(async () => {
       try {
-        const [pending, accepted] = await Promise.all([listSounds(kind, 'pending'), listSounds(kind, 'accepted')])
+        const [pending, accepted, maybes] = await Promise.all([listSounds(kind, 'pending'), listSounds(kind, 'accepted'), listSounds(kind, 'maybe')])
         if (cancelled) return
         setKept(accepted)
+        setMaybe(maybes)
         setQueue(pending)
         void refreshStats()
         if (!pending.length) await topUp(kind, 12)
@@ -144,6 +113,7 @@ export function SoundLabPage() {
           return rest
         })
         if (verdict === 'accepted') setKept((k) => [...k, c])
+        if (verdict === 'maybe') setMaybe((m) => [...m, c])
       }, 160)
       judgeSound(c.id, verdict).then(refreshStats, (e) => setError(e instanceof Error ? e.message : String(e)))
     },
@@ -155,6 +125,7 @@ export function SoundLabPage() {
     if (!last) return
     setQueue((q) => [last.c, ...q.filter((x) => x.id !== last.c.id)])
     setKept((k) => k.filter((x) => x.id !== last.c.id))
+    setMaybe((m) => m.filter((x) => x.id !== last.c.id))
     judgeSound(last.c.id, 'pending').then(refreshStats, (e) => setError(e instanceof Error ? e.message : String(e)))
   }, [refreshStats])
 
@@ -167,6 +138,7 @@ export function SoundLabPage() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.target as HTMLElement)?.tagName === 'INPUT') return
+      if (rounds) return // the tournament has the keyboard
       if (e.key === 'ArrowRight') decide('accepted')
       else if (e.key === 'ArrowLeft') decide('skipped')
       else if (e.key === 'ArrowDown' || e.key.toLowerCase() === 'm') decide('maybe')
@@ -180,7 +152,7 @@ export function SoundLabPage() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [decide, play, undo])
+  }, [decide, play, undo, rounds])
 
   const total = stats?.total
   const mine = stats?.[kind]
@@ -305,35 +277,84 @@ export function SoundLabPage() {
         <button onClick={undo} className="flex items-center gap-1 hover:text-text">
           <RotateCcw size={12} /> Undo
         </button>
+        <button onClick={() => setRounds(true)} disabled={kept.length < 2} title={kept.length < 2 ? 'Keep at least two sounds of this kind first' : 'Tournament: pick the better of two, round by round'} className="flex items-center gap-1 hover:text-text disabled:opacity-40">
+          <Trophy size={12} /> Rounds
+        </button>
         <button onClick={() => setShowKept((v) => !v)} className="hover:text-text">
           {showKept ? 'Hide' : 'Show'} kept {mine ? `(${mine.accepted})` : ''}
         </button>
       </footer>
 
+      {rounds && (
+        <Tournament
+          kind={kind}
+          kindLabel={KINDS.find((k) => k.id === kind)?.label ?? kind}
+          kept={kept}
+          onClose={() => setRounds(false)}
+          onDemoted={(demoted) => {
+            setMaybe((m) => [...m, ...kept.filter((x) => demoted.includes(x.id))])
+            setKept((k) => k.filter((x) => !demoted.includes(x.id)))
+            setPanel('maybe')
+            setShowKept(true)
+            void refreshStats()
+          }}
+        />
+      )}
+
       {showKept && (
-        <ul className="mt-2 divide-y divide-line border border-line">
-          {kept.length === 0 && <li className="px-3 py-2 text-[11px] text-dim">Nothing kept for this kind yet.</li>}
-          {kept.map((c) => (
-            <li key={c.id} className="flex items-center gap-2 px-3 py-2 text-xs">
+        <div className="mt-2">
+          <div className="mb-1 flex gap-1 text-[11px]" role="tablist" aria-label="Kept or maybe">
+            {(['kept', 'maybe'] as const).map((t) => (
               <button
-                onClick={() => {
-                  setStarted(true)
-                  const a = (player.current ??= new Audio())
-                  a.src = soundUrl(c.id)
-                  void a.play().catch(() => {})
-                }}
-                aria-label={`Play ${c.label}`}
-                className="text-accent"
+                key={t}
+                role="tab"
+                aria-selected={panel === t}
+                onClick={() => setPanel(t)}
+                className={cn('rounded-sm border px-2 py-1', panel === t ? 'border-accent text-accent' : 'border-line text-dim hover:text-text')}
               >
-                <Play size={14} />
+                {t === 'kept' ? `Kept ${kept.length}` : `Maybe ${maybe.length}`}
               </button>
-              <span className="flex-1">{c.label}</span>
-              <button onClick={() => unkeep(c)} className="text-[10px] uppercase tracking-wider text-dim hover:text-red-400">
-                Remove
-              </button>
-            </li>
-          ))}
-        </ul>
+            ))}
+          </div>
+          <ul className="divide-y divide-line border border-line">
+            {(panel === 'kept' ? kept : maybe).length === 0 && (
+              <li className="px-3 py-2 text-[11px] text-dim">{panel === 'kept' ? 'Nothing kept for this kind yet.' : 'Nothing in maybe for this kind.'}</li>
+            )}
+            {(panel === 'kept' ? kept : maybe).map((c) => (
+              <li key={c.id} className="flex items-center gap-2 px-3 py-2 text-xs">
+                <button
+                  onClick={() => {
+                    setStarted(true)
+                    const a = (player.current ??= new Audio())
+                    a.src = soundUrl(c.id)
+                    void a.play().catch(() => {})
+                  }}
+                  aria-label={`Play ${c.label}`}
+                  className="text-accent"
+                >
+                  <Play size={14} />
+                </button>
+                <span className="flex-1">{c.label}</span>
+                {panel === 'kept' ? (
+                  <button onClick={() => unkeep(c)} className="text-[10px] uppercase tracking-wider text-dim hover:text-red-400">
+                    Remove
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setMaybe((m) => m.filter((x) => x.id !== c.id))
+                      setKept((k) => [...k, c])
+                      judgeSound(c.id, 'accepted').then(refreshStats, (e) => setError(e instanceof Error ? e.message : String(e)))
+                    }}
+                    className="text-[10px] uppercase tracking-wider text-green-400 hover:text-green-300"
+                  >
+                    Keep
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   )
