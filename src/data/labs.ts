@@ -51,6 +51,17 @@ export const LAB_MODULES: LabModule[] = [
     stack: ['React', 'Web Audio', 'Tailwind'],
   },
   {
+    id: 'sound-lab',
+    name: 'Sound Lab',
+    kind: 'Internal tool',
+    group: 'creative',
+    status: 'local',
+    description:
+      'Synthesized drums and melodic one-shots for sound kits. Listen to a card at a time and keep, maybe or skip (swipe on a phone); what you keep steers the next batch. Opens as its own page: /sound-lab.',
+    stack: ['React', 'Web Audio', 'Agent-OS'],
+    url: '/sound-lab',
+  },
+  {
     id: 'discord-dash',
     name: 'Discord Bot Dashboard',
     kind: 'Ops panel',

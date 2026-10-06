@@ -7,6 +7,7 @@ import { Calendar } from './pages/Calendar'
 import { Projects } from './pages/Projects'
 import { Lab } from './pages/Lab'
 import { Ops } from './pages/Ops'
+import { SoundLabPage } from './features/soundlab/SoundLabPage'
 
 
 /** Chat and Meeting Room are retired in favor of the single Workbench
@@ -31,6 +32,8 @@ function TeamRedirect() {
 }
 
 const router = createBrowserRouter([
+  // The Sound Lab is a full-screen card: no shell, so it works as a phone page over Tailscale.
+  { path: '/sound-lab', element: <SoundLabPage /> },
   {
     path: '/',
     element: <AppShell />,
