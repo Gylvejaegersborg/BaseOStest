@@ -4,7 +4,7 @@
 
 const BASE = import.meta.env.VITE_AGENT_OS_GATEWAY_URL?.replace(/\/$/, '') ?? ''
 
-export type SoundKind = '808' | 'kick' | 'snare' | 'clap' | 'hat-closed' | 'hat-open' | 'bell' | 'pluck' | 'keys' | 'pad' | 'lead'
+export type SoundKind = '808' | 'kick' | 'snare' | 'clap' | 'perc' | 'hat-closed' | 'hat-open' | 'bell' | 'pluck' | 'keys' | 'pad' | 'strings' | 'lead'
 export type Verdict = 'pending' | 'accepted' | 'maybe' | 'skipped'
 
 export const KINDS: { id: SoundKind; label: string }[] = [
@@ -12,12 +12,14 @@ export const KINDS: { id: SoundKind; label: string }[] = [
   { id: 'kick', label: 'Kick' },
   { id: 'snare', label: 'Snare' },
   { id: 'clap', label: 'Clap' },
+  { id: 'perc', label: 'Perc' },
   { id: 'hat-closed', label: 'Closed hat' },
   { id: 'hat-open', label: 'Open hat' },
   { id: 'bell', label: 'Bell' },
   { id: 'pluck', label: 'Pluck' },
   { id: 'keys', label: 'Keys' },
   { id: 'pad', label: 'Pad' },
+  { id: 'strings', label: 'Strings' },
   { id: 'lead', label: 'Lead' },
 ]
 
