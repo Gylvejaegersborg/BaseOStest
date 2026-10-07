@@ -236,6 +236,63 @@ export function FlowTab({
               )}
             </div>
           )}
+          {report?.outcome && (
+            <div className="mb-3 space-y-3 border border-line bg-bg/40 px-2.5 py-2.5">
+              <div>
+                <p className="label">Results</p>
+                <p className="mt-0.5 text-xs text-text/90">{report.outcome.headline}</p>
+              </div>
+              <div className="space-y-2">
+                {report.outcome.byAgent.map((a) => (
+                  <div key={a.agentId} className="border-l-2 border-line pl-2.5">
+                    <p className="flex flex-wrap items-center gap-x-2 text-xs">
+                      <strong className="font-normal capitalize text-text">{a.agentId}</strong>
+                      {a.steps.map((st) => (
+                        <span key={st.id} className="text-[10px]" style={{ color: STEP_COLOR[st.status as AgentOsTaskStatus] ?? undefined }}>
+                          {st.id} · {st.status}
+                        </span>
+                      ))}
+                    </p>
+                    {a.notes.length > 0 && (
+                      <ul className="mt-0.5 text-[11px] text-text/80">
+                        {a.notes.map((n) => (
+                          <li key={n.title} className="truncate">
+                            <span className="text-dim">{n.edited ? 'note (edited)' : 'note'}</span> {n.title}
+                            {n.folder ? <span className="text-dim"> · {n.folder}</span> : null}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {a.todos.length > 0 && (
+                      <p className="mt-0.5 text-[11px] text-text/80">
+                        <span className="text-dim">todos</span> {a.todos.length} created, {a.todos.filter((t) => t.open).length} still open
+                      </p>
+                    )}
+                    {a.said && (
+                      <p className="mt-0.5 line-clamp-3 text-[11px] italic text-dim" title="In the agent's own words; not verified">
+                        “{a.said}”
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div>
+                <p className="label">Still to do ({report.outcome.toDo.length})</p>
+                {report.outcome.toDo.length === 0 ? (
+                  <p className="mt-0.5 text-[11px] text-dim">Nothing left from this flow.</p>
+                ) : (
+                  <ul className="mt-0.5 space-y-0.5 text-[11px] text-text/85">
+                    {report.outcome.toDo.map((t, i) => (
+                      <li key={i}>
+                        <span className="text-dim">{t.kind === 'todo' ? 'todo' : t.kind === 'review' ? 'check' : 'step'}</span> {t.text}
+                        {t.detail ? <span className="text-dim"> — {t.detail}</span> : null}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          )}
           <div className="space-y-1.5">
             {flow.steps.map((s) => {
               const meta = stepMeta(s.id)

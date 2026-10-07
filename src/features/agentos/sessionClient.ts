@@ -316,7 +316,20 @@ export interface AgentOsFlowVerdict {
   text?: string
   error?: string
 }
+/** The direct summary of a flow (agent-os's flow-report.ts): built by code from the records, checked against live BaseSpace. */
+export interface AgentOsFlowOutcome {
+  headline: string
+  byAgent: {
+    agentId: string
+    steps: { id: string; status: string }[]
+    notes: { title: string; folder?: string; edited: boolean }[]
+    todos: { title: string; open: boolean }[]
+    said?: string
+  }[]
+  toDo: { kind: 'step' | 'review' | 'todo'; text: string; detail?: string }[]
+}
 export interface AgentOsFlowReport {
+  outcome?: AgentOsFlowOutcome
   verdict: AgentOsFlowVerdict
   flowId: string
   title?: string
