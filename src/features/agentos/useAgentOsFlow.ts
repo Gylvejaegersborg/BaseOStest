@@ -6,6 +6,7 @@ import {
   cancelFlow as cancelFlowRequest,
   resumeFlow as resumeFlowRequest,
   markFlowStepDone,
+  writeFlowBriefing,
   fetchFlowReport,
   type AgentOsFlowReport,
   type AgentOsFlow,
@@ -113,7 +114,23 @@ export function useAgentOsFlow(flowId: string | null, steps: FlowStepInput[]) {
     [refresh],
   )
 
-  return { flow, report, error, busy, refresh, cancel, resume, markDone, completeTodo, steps: known }
+  /** Have the flow's lead write (or rewrite) the briefing. One model call; it can take a minute. */
+  const [briefing, setBriefing] = useState(false)
+  const writeBriefing = useCallback(async () => {
+    if (!flowId) return
+    setBriefing(true)
+    try {
+      await writeFlowBriefing(flowId)
+      setError('')
+    } catch (err) {
+      setError((err as Error)?.message ?? 'Could not write the briefing')
+    } finally {
+      setBriefing(false)
+    }
+    await refresh()
+  }, [flowId, refresh])
+
+  return { flow, report, error, busy, briefing, writeBriefing, refresh, cancel, resume, markDone, completeTodo, steps: known }
 }
 
 /** All Flows, for a picker/list view — refetches on demand and whenever

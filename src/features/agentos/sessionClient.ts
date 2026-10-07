@@ -322,13 +322,37 @@ export interface AgentOsFlowOutcome {
   byAgent: {
     agentId: string
     steps: { id: string; status: string }[]
-    notes: { title: string; folder?: string; edited: boolean }[]
+    notes: { title: string; folder?: string; edited: boolean; body?: string }[]
     todos: { id: string; title: string; open: boolean; answer?: string }[]
     said?: string
+    fullReport?: string
   }[]
-  toDo: { kind: 'step' | 'review' | 'todo'; text: string; detail?: string; todoId?: string }[]
+  toDo: {
+    kind: 'step' | 'review' | 'todo'
+    text: string
+    detail?: string
+    todoId?: string
+    info?: string
+    priority?: string
+    refs?: { title: string; body: string }[]
+  }[]
+}
+
+/** What the flow's lead wrote for the operator from the real records (agent-os's flow-briefing.ts). */
+export interface AgentOsFlowBriefing {
+  text: string
+  by: string
+  generatedAt: string
+  usage?: { inputTokens: number; outputTokens: number; cachedInputTokens?: number }
+  /** Numbers in the text that did not match the pack. */
+  unverified?: string[]
+}
+
+export function writeFlowBriefing(flowId: string): Promise<AgentOsFlowBriefing> {
+  return request<AgentOsFlowBriefing>(`/flows/${flowId}/briefing`, { method: 'POST', body: '{}' }, 240000)
 }
 export interface AgentOsFlowReport {
+  briefing?: AgentOsFlowBriefing | null
   outcome?: AgentOsFlowOutcome
   verdict: AgentOsFlowVerdict
   flowId: string

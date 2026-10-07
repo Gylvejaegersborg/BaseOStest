@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { CheckCircle2, XCircle, Clock, Loader2, Ban, ArrowRight, ArrowLeft, RotateCcw, Square, ChevronDown, ChevronRight, Plus, ShieldCheck } from 'lucide-react'
 import { useAgentOsFlow, useAgentOsFlowList } from '@/features/agentos/useAgentOsFlow'
 import type { AgentOsFlowReportAttempt, AgentOsFlowStatus, AgentOsTaskStatus, FlowStepInput } from '@/features/agentos/sessionClient'
@@ -124,7 +126,7 @@ export function FlowTab({
   onSelectFlow: (id: string | null, steps: FlowStepInput[]) => void
   onNewFlow: () => void
 }) {
-  const { flow, report, error, busy, cancel, resume, markDone, completeTodo, steps: knownSteps } = useAgentOsFlow(flowId, steps)
+  const { flow, report, error, busy, briefing, writeBriefing, cancel, resume, markDone, completeTodo, steps: knownSteps } = useAgentOsFlow(flowId, steps)
   const { flows, loading } = useAgentOsFlowList()
   const [openStep, setOpenStep] = useState<string | null>(null)
   // With a flow open the list of all flows sits folded at the bottom; with none open it is the whole panel.
@@ -239,6 +241,41 @@ export function FlowTab({
           )}
           {report?.outcome && (
             <div className="mb-3 space-y-3 border border-line bg-bg/40 px-2.5 py-2.5">
+              <div className="border border-accent/30 bg-accent/5 px-2.5 py-2">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="label">Briefing</p>
+                  <button
+                    onClick={() => void writeBriefing()}
+                    disabled={briefing || flow.status === 'running'}
+                    className="flex items-center gap-1 border border-line px-2 py-0.5 text-[10px] uppercase tracking-wider text-text/80 hover:bg-panel-2 disabled:opacity-40"
+                    title={flow.status === 'running' ? 'Available once the flow has stopped' : 'The flow\'s lead reads what the agents did and wrote, and writes this. One model call.'}
+                  >
+                    <RotateCcw size={10} className={briefing ? 'animate-spin' : undefined} /> {briefing ? 'Writing…' : report.briefing ? 'Update' : 'Write briefing'}
+                  </button>
+                </div>
+                {report.briefing ? (
+                  <>
+                    <div className="prose-term prose-read mt-1.5 text-xs">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{report.briefing.text}</ReactMarkdown>
+                    </div>
+                    {report.briefing.unverified && report.briefing.unverified.length > 0 && (
+                      <p className="mt-1.5 border border-danger/40 bg-danger/10 px-2 py-1 text-[11px] text-danger">
+                        Numbers in this briefing that do not match the pack (checked by code): {report.briefing.unverified.join('; ')}
+                      </p>
+                    )}
+                    <p className="mt-1.5 text-[10px] text-dim">
+                      Written by {report.briefing.by} from the agents' notes, todos and the verifier's verdict, {new Date(report.briefing.generatedAt).toLocaleString()}
+                      {report.briefing.usage ? ` · ${fmtTokens(report.briefing.usage.inputTokens)} in / ${fmtTokens(report.briefing.usage.outputTokens)} out tokens` : ''}. Checked against the pack by code for numbers only; read the notes below for the detail.
+                    </p>
+                  </>
+                ) : (
+                  <p className="mt-1 text-[11px] text-dim">
+                    {flow.status === 'running'
+                      ? 'Written automatically when the flow stops.'
+                      : 'Not written yet. It is written automatically when a flow stops (a flow this small does not get one); press Write briefing to have it now.'}
+                  </p>
+                )}
+              </div>
               <div>
                 <p className="label">Results</p>
                 <p className="mt-0.5 text-xs text-text/90">{report.outcome.headline}</p>
@@ -257,9 +294,16 @@ export function FlowTab({
                     {a.notes.length > 0 && (
                       <ul className="mt-0.5 text-[11px] text-text/80">
                         {a.notes.map((n) => (
-                          <li key={n.title} className="truncate">
-                            <span className="text-dim">{n.edited ? 'note (edited)' : 'note'}</span> {n.title}
-                            {n.folder ? <span className="text-dim"> · {n.folder}</span> : null}
+                          <li key={n.title}>
+                            <details>
+                              <summary className="cursor-pointer truncate hover:text-text">
+                                <span className="text-dim">{n.edited ? 'note (edited)' : 'note'}</span> {n.title}
+                                {n.folder ? <span className="text-dim"> · {n.folder}</span> : null}
+                              </summary>
+                              <div className="prose-term prose-read mt-1 max-h-80 overflow-y-auto border-l border-line pl-2 text-[11px]">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{n.body ?? ''}</ReactMarkdown>
+                              </div>
+                            </details>
                           </li>
                         ))}
                       </ul>
@@ -275,9 +319,12 @@ export function FlowTab({
                       </p>
                     ))}
                     {a.said && (
-                      <p className="mt-0.5 line-clamp-3 text-[11px] italic text-dim" title="In the agent's own words; not verified">
-                        “{a.said}”
-                      </p>
+                      <details className="mt-0.5">
+                        <summary className="cursor-pointer text-[11px] italic text-dim hover:text-text" title="In the agent's own words; not verified. Click for the full report.">
+                          <span className="line-clamp-2">“{a.said}”</span>
+                        </summary>
+                        <pre className="mt-1 max-h-72 overflow-y-auto whitespace-pre-wrap break-words border-l border-line pl-2 text-[11px] text-text/80">{a.fullReport ?? a.said}</pre>
+                      </details>
                     )}
                   </div>
                 ))}
@@ -291,7 +338,17 @@ export function FlowTab({
                     {report.outcome.toDo.map((t, i) => (
                       <li key={i}>
                         <span className="text-dim">{t.kind === 'todo' ? 'todo' : t.kind === 'review' ? 'check' : 'step'}</span> {t.text}
+                        {t.priority === 'high' && t.kind === 'todo' ? <span className="ml-1 text-[10px] uppercase text-danger">high</span> : null}
                         {t.detail ? <span className="text-dim"> — {t.detail}</span> : null}
+                        {t.info && <pre className="mt-1 whitespace-pre-wrap break-words border-l-2 border-accent/40 pl-2 text-[11px] text-text/80">{t.info}</pre>}
+                        {t.refs?.map((r) => (
+                          <details key={r.title} className="mt-1">
+                            <summary className="cursor-pointer text-[10px] uppercase tracking-wider text-dim hover:text-text">Read: {r.title}</summary>
+                            <div className="prose-term prose-read mt-1 max-h-72 overflow-y-auto border-l border-line pl-2 text-[11px]">
+                              <ReactMarkdown remarkPlugins={[remarkGfm]}>{r.body}</ReactMarkdown>
+                            </div>
+                          </details>
+                        ))}
                         {t.todoId && (
                           <span className="mt-1 flex items-center gap-1.5">
                             <input
