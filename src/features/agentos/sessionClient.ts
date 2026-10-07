@@ -323,10 +323,10 @@ export interface AgentOsFlowOutcome {
     agentId: string
     steps: { id: string; status: string }[]
     notes: { title: string; folder?: string; edited: boolean }[]
-    todos: { title: string; open: boolean }[]
+    todos: { id: string; title: string; open: boolean; answer?: string }[]
     said?: string
   }[]
-  toDo: { kind: 'step' | 'review' | 'todo'; text: string; detail?: string }[]
+  toDo: { kind: 'step' | 'review' | 'todo'; text: string; detail?: string; todoId?: string }[]
 }
 export interface AgentOsFlowReport {
   outcome?: AgentOsFlowOutcome

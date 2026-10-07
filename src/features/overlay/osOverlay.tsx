@@ -8,6 +8,7 @@ import type { Beat } from '@/data/beats'
 import type { LabModule } from '@/data/labs'
 import { fetchOverlay } from '@/features/agentos/client'
 import { subscribeToEvents } from '@/features/agentos/sessionClient'
+import { pushNotification } from '@/features/calendar/notifications'
 import { libraryFileUrl } from '@/features/library/libraryClient'
 
 /**
@@ -61,6 +62,7 @@ function withFileUrls(a: Asset): Asset {
 export function OsOverlayProvider({ children }: { children: ReactNode }) {
   const [overlay, setOverlay] = useState<OsOverlay>(EMPTY_OVERLAY)
   const [loaded, setLoaded] = useState(false)
+  const [toast, setToast] = useState<string | null>(null)
   const reload = useRef<() => Promise<void>>(async () => {})
 
   useEffect(() => {
@@ -94,16 +96,39 @@ export function OsOverlayProvider({ children }: { children: ReactNode }) {
       window.clearTimeout(pending)
       pending = window.setTimeout(() => void load(), 400)
     })
+    // A todo that completes by itself (its note was updated) is announced: an OS notification when allowed, and a note on screen.
+    let toastTimer: number | undefined
+    const disposeDone = subscribeToEvents(['basespace.todo.completed'], (e) => {
+      const p = e.payload as { title?: string; auto?: boolean; reason?: string }
+      void load()
+      if (!p.auto) return
+      const text = `Done: ${p.title ?? 'a todo'}${p.reason ? ` (${p.reason})` : ''}`
+      pushNotification('Todo completed', text, `todo-done-${p.title ?? ''}`)
+      setToast(text)
+      window.clearTimeout(toastTimer)
+      toastTimer = window.setTimeout(() => setToast(null), 9000)
+    })
     return () => {
       cancelled = true
       window.clearInterval(id)
       window.clearTimeout(pending)
+      window.clearTimeout(toastTimer)
       dispose()
+      disposeDone()
     }
   }, [])
 
   const refresh = useCallback(() => reload.current(), [])
-  return <OsOverlayContext.Provider value={{ overlay, loaded, refresh }}>{children}</OsOverlayContext.Provider>
+  return (
+    <OsOverlayContext.Provider value={{ overlay, loaded, refresh }}>
+      {children}
+      {toast && (
+        <div role="status" className="fixed bottom-4 right-4 z-[80] max-w-sm border border-accent/40 bg-panel px-3 py-2 text-xs text-text shadow-lg">
+          {toast}
+        </div>
+      )}
+    </OsOverlayContext.Provider>
+  )
 }
 
 export function useOsOverlay(): OsOverlay {

@@ -11,6 +11,7 @@ import {
   type AgentOsFlow,
   type FlowStepInput,
 } from './sessionClient'
+import { completeAgentTodo } from './client'
 
 /**
  * Live view of ONE Flow — fetches it, then refreshes on its own
@@ -95,7 +96,24 @@ export function useAgentOsFlow(flowId: string | null, steps: FlowStepInput[]) {
     [flowId, refresh, known],
   )
 
-  return { flow, report, error, busy, refresh, cancel, resume, markDone, steps: known }
+  /** Complete one of the flow's todos, with the answer when it was a question. */
+  const completeTodo = useCallback(
+    async (todoId: string, answer?: string) => {
+      setBusy(true)
+      try {
+        await completeAgentTodo(todoId, answer)
+        setError('')
+      } catch (err) {
+        setError((err as Error)?.message ?? 'Could not complete the todo')
+      } finally {
+        setBusy(false)
+      }
+      await refresh()
+    },
+    [refresh],
+  )
+
+  return { flow, report, error, busy, refresh, cancel, resume, markDone, completeTodo, steps: known }
 }
 
 /** All Flows, for a picker/list view — refetches on demand and whenever

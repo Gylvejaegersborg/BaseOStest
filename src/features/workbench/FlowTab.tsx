@@ -124,11 +124,12 @@ export function FlowTab({
   onSelectFlow: (id: string | null, steps: FlowStepInput[]) => void
   onNewFlow: () => void
 }) {
-  const { flow, report, error, busy, cancel, resume, markDone, steps: knownSteps } = useAgentOsFlow(flowId, steps)
+  const { flow, report, error, busy, cancel, resume, markDone, completeTodo, steps: knownSteps } = useAgentOsFlow(flowId, steps)
   const { flows, loading } = useAgentOsFlowList()
   const [openStep, setOpenStep] = useState<string | null>(null)
   // With a flow open the list of all flows sits folded at the bottom; with none open it is the whole panel.
   const [listOpen, setListOpen] = useState(false)
+  const [answers, setAnswers] = useState<Record<string, string>>({})
   const showingList = !flowId || listOpen
 
   const stepMeta = (stepId: string) => knownSteps.find((s) => s.id === stepId)
@@ -268,6 +269,11 @@ export function FlowTab({
                         <span className="text-dim">todos</span> {a.todos.length} created, {a.todos.filter((t) => t.open).length} still open
                       </p>
                     )}
+                    {a.todos.filter((t) => !t.open && t.answer).map((t) => (
+                      <p key={t.id} className="mt-0.5 text-[11px] text-text/80">
+                        <span className="text-dim">decided</span> {t.title} → <strong className="font-normal text-text">{t.answer}</strong>
+                      </p>
+                    ))}
                     {a.said && (
                       <p className="mt-0.5 line-clamp-3 text-[11px] italic text-dim" title="In the agent's own words; not verified">
                         “{a.said}”
@@ -286,6 +292,27 @@ export function FlowTab({
                       <li key={i}>
                         <span className="text-dim">{t.kind === 'todo' ? 'todo' : t.kind === 'review' ? 'check' : 'step'}</span> {t.text}
                         {t.detail ? <span className="text-dim"> — {t.detail}</span> : null}
+                        {t.todoId && (
+                          <span className="mt-1 flex items-center gap-1.5">
+                            <input
+                              value={answers[t.todoId] ?? ''}
+                              onChange={(e) => setAnswers((cur) => ({ ...cur, [t.todoId!]: e.target.value }))}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !busy) void completeTodo(t.todoId!, answers[t.todoId!]).then(() => setAnswers((cur) => ({ ...cur, [t.todoId!]: '' })))
+                              }}
+                              placeholder="Your answer or decision (optional)"
+                              className="min-w-0 flex-1 border border-line bg-bg/60 px-2 py-1 text-[11px] text-text placeholder:text-dim/60 focus:border-accent/50 focus:outline-none"
+                            />
+                            <button
+                              onClick={() => void completeTodo(t.todoId!, answers[t.todoId!]).then(() => setAnswers((cur) => ({ ...cur, [t.todoId!]: '' })))}
+                              disabled={busy}
+                              className="flex shrink-0 items-center gap-1 border border-accent/40 bg-accent/10 px-2 py-1 text-[10px] uppercase tracking-wider text-accent hover:bg-accent/20 disabled:opacity-40"
+                              title="Mark done. If you wrote an answer, the agents see it on the todo."
+                            >
+                              <CheckCircle2 size={11} /> {answers[t.todoId] ? 'Answer & done' : 'Done'}
+                            </button>
+                          </span>
+                        )}
                       </li>
                     ))}
                   </ul>

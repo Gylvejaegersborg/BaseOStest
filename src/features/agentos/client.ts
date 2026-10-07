@@ -82,6 +82,11 @@ export async function fetchAgents(): Promise<AgentOsAgent[]> {
 /** Board controls (agent-os's controls.ts) — operator-only levers. */
 export const pauseAgent = (id: string, reason?: string) =>
   writeJSON<AgentOsControl>('POST', `/agents/${encodeURIComponent(id)}/pause`, { reason })
+/** Complete an agent's todo (optionally with the answer, when the todo was a question). The gateway keeps the answer on the todo so the
+ *  agents that read it later know what was decided. */
+export const completeAgentTodo = (id: string, answer?: string) =>
+  writeJSON<{ id: string; status: string; answer?: string }>('POST', `/basespace/overlay/tasks/${encodeURIComponent(id)}/complete`, answer ? { answer } : {})
+export const reopenAgentTodo = (id: string) => writeJSON<{ ok: boolean }>('POST', `/basespace/overlay/tasks/${encodeURIComponent(id)}/reopen`, {})
 export const resumeAgent = (id: string) => writeJSON<AgentOsControl>('POST', `/agents/${encodeURIComponent(id)}/resume`, {})
 /** `limitTokens: null` removes the budget (unlimited). */
 export const setAgentBudget = (id: string, budget: { period: 'day' | 'week' | 'month'; limitTokens: number | null }) =>
