@@ -32,6 +32,10 @@ export default defineConfig({
     host: true,
     port: 5173,
     proxy: agentOs,
+    // Hot reload is for development (a Codespace). On the always-on machine nobody edits live, and it once got stuck in an
+    // endless update loop (~60 updates a second, a 500 MB log, the page unreachable from every device). So there it is off:
+    // after a change, reload the page. BASESPACE_HMR=1 turns it on anywhere.
+    hmr: process.env.CODESPACES === 'true' || process.env.BASESPACE_HMR === '1',
   },
   preview: {
     proxy: agentOs,
