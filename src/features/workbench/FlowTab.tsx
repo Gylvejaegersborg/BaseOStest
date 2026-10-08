@@ -33,6 +33,28 @@ const FLOW_COLOR: Record<AgentOsFlowStatus, string> = {
   cancelled: '#6b7785',
 }
 
+/** Agent text is markdown: render it (it used to show raw **stars** and # marks). */
+function Md({ children, className }: { children: string; className?: string }) {
+  return (
+    <div className={cn('prose-term prose-compact', className)}>
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>{children}</ReactMarkdown>
+    </div>
+  )
+}
+
+/** A one-line excerpt of markdown text, without the markup. */
+const plain = (t: string) => t.replace(/[*_`#>]+/g, '').replace(/\s+/g, ' ').trim()
+
+/** Options a todo lists ("1. First option"), so they can be chosen with one click. */
+function optionsOf(info: string | undefined): string[] {
+  if (!info) return []
+  const out = [...info.matchAll(/^\s*\d+[.)]\s+(.+?)\s*$/gm)].map((m) => m[1]!)
+  return out.length >= 2 ? out : []
+}
+
+/** Todos that ask for something to be written down (a choice, a value) get an answer box; actions (upload, record, review) just get Done. */
+const asksForAnswer = (title: string) => /choose|decide|confirm|set |pick|select|which|enter|fill|whether/i.test(title)
+
 const fmtSeconds = (n: number) => (n >= 60 ? `${Math.floor(n / 60)}m ${n % 60}s` : `${n}s`)
 const fmtTokens = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k` : String(n))
 
@@ -55,7 +77,7 @@ function Attempt({ a, label }: { a: AgentOsFlowReportAttempt; label?: string }) 
         </span>
       </div>
       {a.error && <p className="text-[11px] text-danger">{a.error}</p>}
-      {a.result && <pre className="max-h-64 overflow-y-auto whitespace-pre-wrap break-words text-[11px] text-text/80">{a.result}</pre>}
+      {a.result && <Md className="text-text/80">{a.result}</Md>}
       {!a.error && !a.result && <p className="text-[11px] text-dim">{a.status === 'running' ? 'Still running, nothing reported yet.' : 'No output recorded.'}</p>}
       {a.added.length > 0 && (
         <div className="border-l-2 border-accent/50 pl-2">
@@ -150,7 +172,7 @@ export function FlowTab({
             </p>
           )}
           <div className="mb-3 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs">
+            <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 text-xs">
               <button
                 onClick={() => {
                   setListOpen(false)
@@ -162,8 +184,9 @@ export function FlowTab({
                 <ArrowLeft size={12} /> All flows
               </button>
               <span className="text-dim">·</span>
-              {flow.title ? <strong className="text-sm font-normal text-text">{flow.title}</strong> : null}
-              <code className="text-text/60">{flow.id.slice(0, 8)}</code>
+              <strong className="text-sm font-normal text-text" title={`flow ${flow.id}`}>
+                {flow.title ?? flow.id.slice(0, 8)}
+              </strong>
               <span className="uppercase tracking-wider" style={{ color: FLOW_COLOR[flow.status] }}>
                 {flow.status}
               </span>
@@ -199,183 +222,205 @@ export function FlowTab({
               )}
             </div>
           </div>
-          {report && (
-            <div className="mb-3 space-y-1 border border-line bg-panel-2/40 px-2.5 py-2 text-[11px] text-text/80">
-              {report.summary && <p>{report.summary}</p>}
-              <p className="text-dim">
-                {report.proposedBy ? `Designed by ${report.proposedBy} · ` : ''}
-                {report.steps.filter((r) => r.status === 'succeeded').length}/{report.steps.length} steps done · {report.totals.toolCalls} tool calls ·{' '}
-                {report.totals.added} added to BaseSpace
-                {report.totals.tokens.input + report.totals.tokens.output > 0
-                  ? ` · ${fmtTokens(report.totals.tokens.input)} in${report.totals.tokens.cached ? ` (${fmtTokens(report.totals.tokens.cached)} cached)` : ''} / ${fmtTokens(report.totals.tokens.output)} out tokens`
-                  : ''}
-                {report.totals.seconds ? ` · ${fmtSeconds(report.totals.seconds)} of agent time` : ''}
-              </p>
-              <div className="mt-1 border-t border-line/40 pt-1.5">
-                <p className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-dim">
-                  <ShieldCheck size={12} /> {report.verdict.agentId}'s verdict
-                  {report.verdict.status === 'running' && <span className="text-[#f0a020]">checking now…</span>}
-                </p>
-                {report.verdict.status === 'done' && report.verdict.text ? (
-                  <pre className="mt-1 max-h-72 overflow-y-auto whitespace-pre-wrap break-words text-[11px] text-text/90">{report.verdict.text}</pre>
-                ) : report.verdict.status === 'done' ? (
-                  <p className="mt-1 text-dim">He finished the check but wrote nothing.</p>
-                ) : report.verdict.status === 'failed' ? (
-                  <p className="mt-1 text-danger">The check stopped before it finished{report.verdict.error ? `: ${report.verdict.error}` : '.'}</p>
-                ) : report.verdict.status === 'waiting' ? (
-                  <p className="mt-1 text-dim">Waiting for the steps before it to finish.</p>
-                ) : report.verdict.status === 'not-run' ? (
-                  <p className="mt-1 text-dim">This flow has no verification step, so nobody has checked it.</p>
-                ) : null}
-              </div>
-              {report.steps.some((r) => r.status === 'failed') && (
-                <p className="text-danger">
-                  {report.steps
-                    .filter((r) => r.status === 'failed')
-                    .map((r) => r.id)
-                    .join(', ')}{' '}
-                  failed. Resume runs only the steps that did not finish; the finished ones keep their results.
-                </p>
-              )}
-            </div>
-          )}
           {report?.outcome && (
-            <div className="mb-3 space-y-3 border border-line bg-bg/40 px-2.5 py-2.5">
-              <div className="border border-accent/30 bg-accent/5 px-2.5 py-2">
+            <>
+              {/* 1. The briefing: what to decide, what was done, what was found */}
+              <section className="mb-3 border border-accent/30 bg-accent/5 px-2.5 py-2">
                 <div className="flex items-center justify-between gap-2">
                   <p className="label">Briefing</p>
                   <button
                     onClick={() => void writeBriefing()}
                     disabled={briefing || flow.status === 'running'}
                     className="flex items-center gap-1 border border-line px-2 py-0.5 text-[10px] uppercase tracking-wider text-text/80 hover:bg-panel-2 disabled:opacity-40"
-                    title={flow.status === 'running' ? 'Available once the flow has stopped' : 'The flow\'s lead reads what the agents did and wrote, and writes this. One model call.'}
+                    title={flow.status === 'running' ? 'Available once the flow has stopped' : "The flow's lead reads what the agents did and wrote, and writes this. One model call."}
                   >
                     <RotateCcw size={10} className={briefing ? 'animate-spin' : undefined} /> {briefing ? 'Writing…' : report.briefing ? 'Update' : 'Write briefing'}
                   </button>
                 </div>
                 {report.briefing ? (
                   <>
-                    <div className="prose-term prose-read mt-1.5 text-xs">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{report.briefing.text}</ReactMarkdown>
-                    </div>
+                    <Md className="mt-1.5 text-xs">{report.briefing.text}</Md>
                     {report.briefing.unverified && report.briefing.unverified.length > 0 && (
                       <p className="mt-1.5 border border-danger/40 bg-danger/10 px-2 py-1 text-[11px] text-danger">
                         Numbers in this briefing that do not match the pack (checked by code): {report.briefing.unverified.join('; ')}
                       </p>
                     )}
                     <p className="mt-1.5 text-[10px] text-dim">
-                      Written by {report.briefing.by} from the agents' notes, todos and the verifier's verdict, {new Date(report.briefing.generatedAt).toLocaleString()}
-                      {report.briefing.usage ? ` · ${fmtTokens(report.briefing.usage.inputTokens)} in / ${fmtTokens(report.briefing.usage.outputTokens)} out tokens` : ''}. Checked against the pack by code for numbers only; read the notes below for the detail.
+                      Written by {report.briefing.by} from the agents' notes and todos, {new Date(report.briefing.generatedAt).toLocaleString()}. Numbers are checked by code; read the notes for the detail.
                     </p>
                   </>
                 ) : (
                   <p className="mt-1 text-[11px] text-dim">
-                    {flow.status === 'running'
-                      ? 'Written automatically when the flow stops.'
-                      : 'Not written yet. It is written automatically when a flow stops (a flow this small does not get one); press Write briefing to have it now.'}
+                    {flow.status === 'running' ? 'Written automatically when the flow stops.' : 'Not written yet. Press Write briefing to have the lead write one now.'}
                   </p>
                 )}
-              </div>
-              <div>
-                <p className="label">Results</p>
-                <p className="mt-0.5 text-xs text-text/90">{report.outcome.headline}</p>
-              </div>
-              <div className="space-y-2">
-                {report.outcome.byAgent.map((a) => (
-                  <div key={a.agentId} className="border-l-2 border-line pl-2.5">
-                    <p className="flex flex-wrap items-center gap-x-2 text-xs">
-                      <strong className="font-normal capitalize text-text">{a.agentId}</strong>
-                      {a.steps.map((st) => (
-                        <span key={st.id} className="text-[10px]" style={{ color: STEP_COLOR[st.status as AgentOsTaskStatus] ?? undefined }}>
-                          {st.id} · {st.status}
-                        </span>
-                      ))}
-                    </p>
-                    {a.notes.length > 0 && (
-                      <ul className="mt-0.5 text-[11px] text-text/80">
-                        {a.notes.map((n) => (
-                          <li key={n.title}>
-                            <details>
-                              <summary className="cursor-pointer truncate hover:text-text">
-                                <span className="text-dim">{n.edited ? 'note (edited)' : 'note'}</span> {n.title}
-                                {n.folder ? <span className="text-dim"> · {n.folder}</span> : null}
-                              </summary>
-                              <div className="prose-term prose-read mt-1 max-h-80 overflow-y-auto border-l border-line pl-2 text-[11px]">
-                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{n.body ?? ''}</ReactMarkdown>
-                              </div>
-                            </details>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                    {a.todos.length > 0 && (
-                      <p className="mt-0.5 text-[11px] text-text/80">
-                        <span className="text-dim">todos</span> {a.todos.length} created, {a.todos.filter((t) => t.open).length} still open
-                      </p>
-                    )}
-                    {a.todos.filter((t) => !t.open && t.answer).map((t) => (
-                      <p key={t.id} className="mt-0.5 text-[11px] text-text/80">
-                        <span className="text-dim">decided</span> {t.title} → <strong className="font-normal text-text">{t.answer}</strong>
-                      </p>
-                    ))}
-                    {a.said && (
-                      <details className="mt-0.5">
-                        <summary className="cursor-pointer text-[11px] italic text-dim hover:text-text" title="In the agent's own words; not verified. Click for the full report.">
-                          <span className="line-clamp-2">“{a.said}”</span>
-                        </summary>
-                        <pre className="mt-1 max-h-72 overflow-y-auto whitespace-pre-wrap break-words border-l border-line pl-2 text-[11px] text-text/80">{a.fullReport ?? a.said}</pre>
-                      </details>
-                    )}
-                  </div>
-                ))}
-              </div>
-              <div>
-                <p className="label">Still to do ({report.outcome.toDo.length})</p>
+              </section>
+
+              {/* 2. What needs you: decisions and actions first */}
+              <section className="mb-3">
+                <p className="label">Needs you ({report.outcome.toDo.length})</p>
                 {report.outcome.toDo.length === 0 ? (
-                  <p className="mt-0.5 text-[11px] text-dim">Nothing left from this flow.</p>
+                  <p className="mt-1 text-[11px] text-dim">Nothing is waiting on you from this flow.</p>
                 ) : (
-                  <ul className="mt-0.5 space-y-0.5 text-[11px] text-text/85">
-                    {report.outcome.toDo.map((t, i) => (
-                      <li key={i}>
-                        <span className="text-dim">{t.kind === 'todo' ? 'todo' : t.kind === 'review' ? 'check' : 'step'}</span> {t.text}
-                        {t.priority === 'high' && t.kind === 'todo' ? <span className="ml-1 text-[10px] uppercase text-danger">high</span> : null}
-                        {t.detail ? <span className="text-dim"> — {t.detail}</span> : null}
-                        {t.info && <pre className="mt-1 whitespace-pre-wrap break-words border-l-2 border-accent/40 pl-2 text-[11px] text-text/80">{t.info}</pre>}
-                        {t.refs?.map((r) => (
-                          <details key={r.title} className="mt-1">
-                            <summary className="cursor-pointer text-[10px] uppercase tracking-wider text-dim hover:text-text">Read: {r.title}</summary>
-                            <div className="prose-term prose-read mt-1 max-h-72 overflow-y-auto border-l border-line pl-2 text-[11px]">
-                              <ReactMarkdown remarkPlugins={[remarkGfm]}>{r.body}</ReactMarkdown>
-                            </div>
-                          </details>
-                        ))}
-                        {t.todoId && (
-                          <span className="mt-1 flex items-center gap-1.5">
-                            <input
-                              value={answers[t.todoId] ?? ''}
-                              onChange={(e) => setAnswers((cur) => ({ ...cur, [t.todoId!]: e.target.value }))}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter' && !busy) void completeTodo(t.todoId!, answers[t.todoId!]).then(() => setAnswers((cur) => ({ ...cur, [t.todoId!]: '' })))
-                              }}
-                              placeholder="Your answer or decision (optional)"
-                              className="min-w-0 flex-1 border border-line bg-bg/60 px-2 py-1 text-[11px] text-text placeholder:text-dim/60 focus:border-accent/50 focus:outline-none"
-                            />
-                            <button
-                              onClick={() => void completeTodo(t.todoId!, answers[t.todoId!]).then(() => setAnswers((cur) => ({ ...cur, [t.todoId!]: '' })))}
-                              disabled={busy}
-                              className="flex shrink-0 items-center gap-1 border border-accent/40 bg-accent/10 px-2 py-1 text-[10px] uppercase tracking-wider text-accent hover:bg-accent/20 disabled:opacity-40"
-                              title="Mark done. If you wrote an answer, the agents see it on the todo."
-                            >
-                              <CheckCircle2 size={11} /> {answers[t.todoId] ? 'Answer & done' : 'Done'}
-                            </button>
-                          </span>
-                        )}
-                      </li>
-                    ))}
+                  <ul className="mt-1 divide-y divide-line/50 border border-line">
+                    {[...report.outcome.toDo]
+                      .sort((x, y) => (x.kind === 'todo' ? 0 : 1) - (y.kind === 'todo' ? 0 : 1))
+                      .map((t, i) => {
+                        const options = t.kind === 'todo' ? optionsOf(t.info) : []
+                        const question = options.length > 0 || (t.kind === 'todo' && asksForAnswer(t.text))
+                        const id = t.todoId
+                        return (
+                          <li key={i} className="px-2.5 py-2">
+                            <p className="text-xs text-text">
+                              {t.priority === 'high' && t.kind === 'todo' ? <span className="mr-1 text-danger">●</span> : null}
+                              {t.kind !== 'todo' && <span className="mr-1 text-[10px] uppercase tracking-wider text-dim">{t.kind === 'review' ? 'check' : 'step'}</span>}
+                              {t.text}
+                            </p>
+                            {t.detail && t.kind !== 'todo' && <p className="mt-0.5 text-[11px] text-dim">{t.detail}</p>}
+                            {t.info && <Md className="mt-1 border-l-2 border-accent/40 pl-2 text-text/80">{t.info}</Md>}
+                            {t.refs?.map((r) => (
+                              <details key={r.title} className="mt-1">
+                                <summary className="cursor-pointer text-[10px] uppercase tracking-wider text-dim hover:text-text">Read: {r.title}</summary>
+                                <Md className="mt-1 border-l border-line pl-2">{r.body}</Md>
+                              </details>
+                            ))}
+                            {id && options.length > 0 && (
+                              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                                {options.map((o) => (
+                                  <button
+                                    key={o}
+                                    onClick={() => void completeTodo(id, o)}
+                                    disabled={busy}
+                                    className="border border-accent/40 bg-accent/10 px-2 py-1 text-left text-[11px] text-accent hover:bg-accent/20 disabled:opacity-40"
+                                    title="Choose this and mark the todo done; the agents see your choice on it."
+                                  >
+                                    {o}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                            {id && (
+                              <span className="mt-1.5 flex items-center gap-1.5">
+                                {question && (
+                                  <input
+                                    value={answers[id] ?? ''}
+                                    onChange={(e) => setAnswers((cur) => ({ ...cur, [id]: e.target.value }))}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter' && !busy && (answers[id] ?? '').trim()) void completeTodo(id, answers[id]).then(() => setAnswers((cur) => ({ ...cur, [id]: '' })))
+                                    }}
+                                    placeholder={options.length ? 'Or write your own answer' : 'Your answer or decision'}
+                                    className="min-w-0 flex-1 border border-line bg-bg/60 px-2 py-1 text-[11px] text-text placeholder:text-dim/60 focus:border-accent/50 focus:outline-none"
+                                  />
+                                )}
+                                <button
+                                  onClick={() => void completeTodo(id, answers[id]).then(() => setAnswers((cur) => ({ ...cur, [id]: '' })))}
+                                  disabled={busy || (question && !(answers[id] ?? '').trim())}
+                                  className="ml-auto flex shrink-0 items-center gap-1 border border-line px-2 py-1 text-[10px] uppercase tracking-wider text-text/80 hover:bg-panel-2 disabled:opacity-40"
+                                  title={question ? 'Write an answer, then mark it done. The agents see it on the todo.' : 'Mark it done.'}
+                                >
+                                  <CheckCircle2 size={11} /> {question ? 'Answer & done' : 'Done'}
+                                </button>
+                              </span>
+                            )}
+                          </li>
+                        )
+                      })}
                   </ul>
                 )}
-              </div>
-            </div>
+              </section>
+
+              {/* 3. What the agents did */}
+              <section className="mb-3">
+                <p className="label">What the agents did</p>
+                <p className="mt-0.5 text-xs text-text/90">{report.outcome.headline}</p>
+                <div className="mt-1.5 space-y-1.5">
+                  {report.outcome.byAgent.map((a) => (
+                    <details key={a.agentId} className="border border-line bg-bg/40">
+                      <summary className="cursor-pointer px-2.5 py-1.5 text-xs hover:bg-panel-2/30">
+                        <strong className="font-normal capitalize text-text">{a.agentId}</strong>
+                        <span className="ml-2 text-[10px] text-dim">
+                          {a.notes.length} note{a.notes.length === 1 ? '' : 's'}
+                          {a.todos.length ? ` · ${a.todos.length} todo${a.todos.length === 1 ? '' : 's'}` : ''}
+                        </span>
+                        {a.steps.map((st) => (
+                          <span key={st.id} className="ml-2 text-[10px]" style={{ color: STEP_COLOR[st.status as AgentOsTaskStatus] ?? undefined }}>
+                            {st.id} · {st.status}
+                          </span>
+                        ))}
+                        {a.said && <span className="mt-0.5 block truncate text-[11px] italic text-dim">“{plain(a.said)}”</span>}
+                      </summary>
+                      <div className="space-y-1.5 border-t border-line/40 px-2.5 py-2">
+                        {a.notes.map((n) => (
+                          <details key={n.title}>
+                            <summary className="cursor-pointer text-[11px] text-text/90 hover:text-text">
+                              <span className="text-dim">{n.edited ? 'note (edited)' : 'note'}</span> {n.title}
+                              {n.folder ? <span className="text-dim"> · {n.folder}</span> : null}
+                            </summary>
+                            <Md className="mt-1 border-l border-line pl-2">{n.body ?? ''}</Md>
+                          </details>
+                        ))}
+                        {a.todos.filter((t) => !t.open && t.answer).map((t) => (
+                          <p key={t.id} className="text-[11px] text-text/80">
+                            <span className="text-dim">decided</span> {t.title} → <strong className="font-normal text-text">{t.answer}</strong>
+                          </p>
+                        ))}
+                        {a.fullReport && (
+                          <details>
+                            <summary className="cursor-pointer text-[10px] uppercase tracking-wider text-dim hover:text-text">Its full report (its own words, not verified)</summary>
+                            <Md className="mt-1 border-l border-line pl-2 text-text/80">{a.fullReport}</Md>
+                          </details>
+                        )}
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              </section>
+
+              {/* 4. The verifier's check */}
+              <details className="mb-3 border border-line bg-bg/40">
+                <summary className="flex cursor-pointer items-center gap-1.5 px-2.5 py-1.5 text-[11px] hover:bg-panel-2/30">
+                  <ShieldCheck size={12} className="shrink-0 text-dim" />
+                  <span className="text-text/90">{report.verdict.agentId}'s check</span>
+                  <span className="text-dim">
+                    ·{' '}
+                    {report.verdict.status === 'done'
+                      ? 'done'
+                      : report.verdict.status === 'running'
+                        ? 'checking now…'
+                        : report.verdict.status === 'failed'
+                          ? 'stopped before it finished'
+                          : report.verdict.status === 'waiting'
+                            ? 'waiting for the steps before it'
+                            : 'this flow has no check step'}
+                  </span>
+                </summary>
+                <div className="border-t border-line/40 px-2.5 py-2">
+                  {report.verdict.text ? <Md className="text-text/90">{report.verdict.text}</Md> : <p className="text-[11px] text-dim">{report.verdict.error ?? 'Nothing written yet.'}</p>}
+                </div>
+              </details>
+
+              {/* 5. The details nobody needs first */}
+              <details className="mb-3 border border-line bg-bg/40">
+                <summary className="cursor-pointer px-2.5 py-1.5 text-[11px] text-dim hover:text-text">Details: purpose and effort</summary>
+                <div className="space-y-1 border-t border-line/40 px-2.5 py-2 text-[11px] text-text/80">
+                  {report.summary && <p>{report.summary}</p>}
+                  <p className="text-dim">
+                    {report.proposedBy ? `Designed by ${report.proposedBy} · ` : ''}
+                    {report.steps.filter((r) => r.status === 'succeeded').length}/{report.steps.length} steps done · {report.totals.toolCalls} tool calls
+                    {report.totals.tokens.input + report.totals.tokens.output > 0
+                      ? ` · ${fmtTokens(report.totals.tokens.input)} in${report.totals.tokens.cached ? ` (${fmtTokens(report.totals.tokens.cached)} cached)` : ''} / ${fmtTokens(report.totals.tokens.output)} out tokens`
+                      : ''}
+                    {report.totals.seconds ? ` · ${fmtSeconds(report.totals.seconds)} of agent time` : ''}
+                  </p>
+                  {report.steps.some((r) => r.status === 'failed') && (
+                    <p className="text-danger">
+                      {report.steps.filter((r) => r.status === 'failed').map((r) => r.id).join(', ')} failed. Resume runs only the steps that did not finish; the finished ones keep their results.
+                    </p>
+                  )}
+                </div>
+              </details>
+              <p className="label mb-1">Steps</p>
+            </>
           )}
           <div className="space-y-1.5">
             {flow.steps.map((s) => {

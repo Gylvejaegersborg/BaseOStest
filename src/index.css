@@ -98,6 +98,31 @@
 .prose-term.prose-read {
   @apply font-read text-base leading-loose;
 }
+/* Compact markdown for panels and chat (agent reports, briefings, notes shown inline): small, tight, headings kept modest. */
+.prose-term.prose-compact {
+  @apply text-[12px] leading-snug;
+}
+.prose-term.prose-compact.prose-chat {
+  @apply text-[13px] leading-normal;
+}
+.prose-term.prose-compact h1,
+.prose-term.prose-compact h2,
+.prose-term.prose-compact h3 {
+  @apply mt-3 mb-1 border-0 pb-0 text-[12px] uppercase tracking-wider;
+}
+.prose-term.prose-compact p {
+  @apply my-1.5;
+}
+.prose-term.prose-compact ul,
+.prose-term.prose-compact ol {
+  @apply my-1.5 space-y-0.5 pl-4;
+}
+.prose-term.prose-compact pre {
+  @apply my-2 p-2 text-[11px];
+}
+.prose-term.prose-compact > :first-child {
+  @apply mt-0;
+}
 .prose-term h1,
 .prose-term h2,
 .prose-term h3 {

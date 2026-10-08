@@ -68,6 +68,14 @@ export function fetchOverlay<T>(): Promise<T> {
   return getJSON<T>('/basespace/overlay')
 }
 
+/** Everything waiting on the operator (agent-os: GET /basespace/needs-you): pending approvals and the open todos agents created. */
+export interface AgentOsNeedsYou {
+  total: number
+  approvals: { id: string; agentId: string; toolName: string; requestedAt: string; summary: string }[]
+  todos: { id: string; title: string; priority: string; agent: string; flowId?: string; flowTitle?: string; createdAt?: string }[]
+}
+export const fetchNeedsYou = () => getJSON<AgentOsNeedsYou>('/basespace/needs-you')
+
 /** Push BaseSpace's current state for the agents to read. */
 export function pushSnapshot(snapshot: unknown): Promise<{ ok: true; savedAt: string; bytes: number }> {
   return writeJSON('POST', '/basespace/snapshot', snapshot, 15000)

@@ -74,7 +74,7 @@ export function RightPanel({
       <div className="flex h-full shrink-0 max-lg:!h-auto max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-40">
         <ResizeHandle onMouseDown={onMouseDown} className="max-lg:hidden" />
         <aside
-          className="flex h-full max-w-[calc(100vw-120px)] flex-col border-l border-line-2 bg-panel/40 max-lg:!h-auto max-lg:!w-full max-lg:max-h-[75vh] max-lg:max-w-none max-lg:animate-sheet-up max-lg:rounded-t-panel max-lg:border-l-0 max-lg:border-t"
+          className="flex h-full max-w-[calc(100vw-120px)] flex-col border-l border-line-2 bg-panel/40 max-lg:bg-bg max-lg:!h-auto max-lg:!w-full max-lg:max-h-[75vh] max-lg:max-w-none max-lg:animate-sheet-up max-lg:rounded-t-panel max-lg:border-l-0 max-lg:border-t"
           style={{ width }}
         >
           <div className="flex items-center justify-between border-b border-line px-3 py-2">

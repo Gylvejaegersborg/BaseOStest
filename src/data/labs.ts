@@ -99,16 +99,6 @@ export const LAB_MODULES: LabModule[] = [
     stack: ['React', 'TypeScript'],
   },
   {
-    id: 'pipeline-monitor',
-    name: 'Pipeline Monitor',
-    kind: 'Archive',
-    group: 'ops',
-    status: 'local',
-    description:
-      'Archived factory-style pipeline visualiser — live stage diagram, animated job queue, stats and an event log. Kept as a reusable design.',
-    stack: ['React', 'TypeScript'],
-  },
-  {
     id: 'n8n',
     name: 'n8n',
     kind: 'Automation hub',

@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { useAgentOsSessionUsage } from '@/features/agentos/useAgentOsSessionUsage'
 import { FocusPicker } from './FocusPicker'
 import { Mic, Paperclip, Send, Square, X, Bot, AlertTriangle, Eye, StickyNote, FileUp, FileText, ShieldCheck, CheckCircle2, OctagonAlert, ArrowRightLeft, Ban, ClipboardCheck } from 'lucide-react'
@@ -346,7 +348,15 @@ function MessageRow({
           className={cn('inline-block rounded-panel border px-3 py-2 text-sm', isUser ? 'border-line bg-panel-2 text-text' : 'border-line bg-panel/70 text-text/90')}
           style={!isUser ? { borderColor: `${agentColor}33` } : undefined}
         >
-          {msg.text && <p className="whitespace-pre-wrap text-left">{msg.text}</p>}
+          {msg.text &&
+            (isUser ? (
+              <p className="whitespace-pre-wrap text-left">{msg.text}</p>
+            ) : (
+              // An agent's reply is markdown: render it (it showed raw **stars** and *italics*).
+              <div className="prose-term prose-compact prose-chat text-left">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
+              </div>
+            ))}
         </div>
       </div>
     </div>

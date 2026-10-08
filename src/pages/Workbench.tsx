@@ -28,6 +28,12 @@ import { cn } from '@/lib/cn'
  * at all times") — the rail full-width until an agent or Team is picked,
  * then that surface takes over full-width with a back control to return.
  */
+const PANELS: StripTab[] = ['tasks', 'flow', 'artifacts', 'approvals', 'events', 'memory', 'files', 'notes', 'crons', 'teams', 'terminal']
+function panelFromParam(param: string | null): StripTab | null {
+  if (param === 'team') return 'teams'
+  return PANELS.includes(param as StripTab) ? (param as StripTab) : null
+}
+
 export function Workbench() {
   const [searchParams, setSearchParams] = useSearchParams()
   const { agents } = useAgentOsContext()
@@ -35,11 +41,8 @@ export function Workbench() {
     const param = searchParams.get('agent')
     return param && agents.some((a) => a.id === param) ? param : null
   })
-  const [activePanel, setActivePanel] = useState<StripTab | null>(() => {
-    const param = searchParams.get('panel')
-    return param === 'team' || param === 'teams' ? 'teams' : param === 'crons' ? 'crons' : param === 'terminal' ? 'terminal' : null
-  })
-  const [activeFlowId, setActiveFlowId] = useState<string | null>(null)
+  const [activePanel, setActivePanel] = useState<StripTab | null>(() => panelFromParam(searchParams.get('panel')))
+  const [activeFlowId, setActiveFlowId] = useState<string | null>(() => searchParams.get('flow'))
   const [activeFlowSteps, setActiveFlowSteps] = useState<FlowStepInput[]>([])
   const [newFlowOpen, setNewFlowOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -56,6 +59,21 @@ export function Workbench() {
     setDockedNoteId(id)
     if (id) setActivePanel('notes')
   }
+
+  // Links into the Workbench from elsewhere (the notification bell): ?panel=flow&flow=<id> opens that flow's results,
+  // ?panel=approvals&approval=<id> that approval. They also work while the Workbench is already open.
+  const panelParam = searchParams.get('panel')
+  const flowParam = searchParams.get('flow')
+  const approvalParam = searchParams.get('approval')
+  useEffect(() => {
+    const panel = panelFromParam(panelParam)
+    if (panel) setActivePanel(panel)
+    if (flowParam) {
+      setActiveFlowId(flowParam)
+      setActiveFlowSteps([])
+    }
+    if (approvalParam) setFocusApprovalId(approvalParam)
+  }, [panelParam, flowParam, approvalParam])
 
   // Links into the Workbench (?agent=…) while it's already open.
   const agentParam = searchParams.get('agent')

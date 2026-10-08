@@ -105,30 +105,8 @@ export const PRIORITY_LABEL: Record<TaskPriority, string> = {
   low: 'Low',
 }
 
-export const TASKS: Task[] = [
-  {
-    id: 't1',
-    title: 'Approve cover art for single',
-    status: 'todo',
-    priority: 'high',
-    kind: 'music',
-    dayOffset: 0,
-    dueTime: 12,
-    reminderMinutes: 20,
-    notes: 'Pick between the two Midjourney variants Hemera generated.',
-    subtasks: [
-      { id: 's1', title: 'Compare v3 vs v4', done: true },
-      { id: 's2', title: 'Check 1:1 + 16:9 crops', done: false },
-      { id: 's3', title: 'Send final to distributor', done: false },
-    ],
-  },
-  { id: 't2', title: 'Reply to sync licensing email', status: 'todo', priority: 'high', kind: 'meeting', dayOffset: 0, dueTime: 16, reminderMinutes: 30 },
-  { id: 't3', title: 'Pay homeserver electricity bill', status: 'doing', priority: 'med', kind: 'life', dayOffset: 0 },
-  { id: 't4', title: 'Backlog: rewrite upload queue retry logic', status: 'todo', priority: 'med', kind: 'tech', dayOffset: 2 },
-  { id: 't5', title: 'Draft newsletter #14', status: 'todo', priority: 'low', kind: 'music', dayOffset: 3, dueTime: 10 },
-  { id: 't6', title: 'Renew domain artist.app', status: 'todo', priority: 'high', kind: 'tech', dayOffset: -1, notes: 'Overdue — auto-renew failed, card expired.' },
-  { id: 't7', title: 'Stretch + foam roll', status: 'done', priority: 'low', kind: 'life', dayOffset: 0 },
-]
+// No sample todos: every todo in BaseSpace is a real one (the sample set was removed; see SEED_TODOS_PURGED_KEY in CalendarContext).
+export const TASKS: Task[] = []
 
 // ─── AI Cron jobs ─────────────────────────────────────────────────────────────
 
@@ -286,10 +264,7 @@ export interface Reminder {
   recurrence?: Recurrence
 }
 
-export const REMINDERS: Reminder[] = [
-  { id: 'r1', title: 'Stand up & stretch', dayOffset: 0, time: 15 },
-  { id: 'r2', title: 'Wind down — screens off', dayOffset: 0, time: 22 },
-]
+export const REMINDERS: Reminder[] = []
 
 /** Whether a cron's runs appear in the time grid (see showInCalendar). */
 export function cronVisible(c: CronJob): boolean {

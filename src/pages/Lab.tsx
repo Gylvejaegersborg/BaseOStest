@@ -1,5 +1,5 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
-import { CloudSun, X, ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe, Gauge, Music2, Download, Workflow, Grid3x3, Film, Anchor, ClipboardCheck, Scissors, Stethoscope, Signature, ChevronDown } from 'lucide-react'
+import { CloudSun, X, ExternalLink, Play, TerminalSquare, Hammer, Rocket, Activity, Store, Database, Bot, Smartphone, Globe, Music2, Download, Workflow, Grid3x3, Film, Anchor, ClipboardCheck, Scissors, Stethoscope, Signature, ChevronDown } from 'lucide-react'
 import { LAB_MODULES, LAB_GROUPS, type LabModule, type LabGroup } from '@/data/labs'
 import { useSearchParams } from 'react-router-dom'
 import { useOsOverlay, mergeById } from '@/features/overlay/osOverlay'
@@ -30,9 +30,6 @@ const ShortcutsLabPage = lazy(() =>
 )
 const SongTrackerPage = lazy(() =>
   import('@/features/songtracker/SongTrackerPage').then((m) => ({ default: m.SongTrackerPage })),
-)
-const PipelineMonitorPage = lazy(() =>
-  import('@/features/pipelinemonitor/PipelineMonitorPage').then((m) => ({ default: m.PipelineMonitorPage })),
 )
 const YtDlpPage = lazy(() =>
   import('@/features/ytdlp/YtDlpPage').then((m) => ({ default: m.YtDlpPage })),
@@ -76,7 +73,6 @@ export function Lab() {
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
   const [artistOpen, setArtistOpen] = useState(false)
   const [trackerOpen, setTrackerOpen] = useState(false)
-  const [pipelineOpen, setPipelineOpen] = useState(false)
   const [ytdlpOpen, setYtdlpOpen] = useState(false)
   const [n8nOpen, setN8nOpen] = useState(false)
   const [sudokuOpen, setSudokuOpen] = useState(false)
@@ -149,7 +145,6 @@ export function Lab() {
           onOpenShortcuts={() => setShortcutsOpen(true)}
           onOpenArtist={() => setArtistOpen(true)}
           onOpenTracker={() => setTrackerOpen(true)}
-          onOpenPipeline={() => setPipelineOpen(true)}
           onOpenYtDlp={() => setYtdlpOpen(true)}
           onOpenN8n={() => setN8nOpen(true)}
           onOpenSudoku={() => setSudokuOpen(true)}
@@ -181,7 +176,6 @@ export function Lab() {
             onOpenShortcuts={() => setShortcutsOpen(true)}
             onOpenArtist={() => setArtistOpen(true)}
             onOpenTracker={() => setTrackerOpen(true)}
-            onOpenPipeline={() => setPipelineOpen(true)}
             onOpenYtDlp={() => setYtdlpOpen(true)}
             onOpenN8n={() => setN8nOpen(true)}
             onOpenSudoku={() => setSudokuOpen(true)}
@@ -236,12 +230,6 @@ export function Lab() {
       {trackerOpen && (
         <Suspense fallback={null}>
           <SongTrackerPage open onClose={() => setTrackerOpen(false)} />
-        </Suspense>
-      )}
-
-      {pipelineOpen && (
-        <Suspense fallback={null}>
-          <PipelineMonitorPage open onClose={() => setPipelineOpen(false)} />
         </Suspense>
       )}
 
@@ -329,7 +317,6 @@ function ModuleDetail({
   onOpenShortcuts,
   onOpenArtist,
   onOpenTracker,
-  onOpenPipeline,
   onOpenYtDlp,
   onOpenN8n,
   onOpenSudoku,
@@ -349,7 +336,6 @@ function ModuleDetail({
   onOpenShortcuts?: () => void
   onOpenArtist?: () => void
   onOpenTracker?: () => void
-  onOpenPipeline?: () => void
   onOpenYtDlp?: () => void
   onOpenN8n?: () => void
   onOpenSudoku?: () => void
@@ -419,14 +405,6 @@ function ModuleDetail({
             className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
           >
             Open Song Tracker <Music2 size={13} />
-          </button>
-        )}
-        {mod.id === 'pipeline-monitor' && onOpenPipeline && (
-          <button
-            onClick={onOpenPipeline}
-            className="mt-3 flex w-full items-center justify-center gap-2 border border-accent/50 bg-accent/10 py-2 text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
-          >
-            Open Pipeline Monitor <Gauge size={13} />
           </button>
         )}
         {mod.id === 'yt-dlp' && onOpenYtDlp && (

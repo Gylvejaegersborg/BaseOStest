@@ -34,7 +34,9 @@ Services (homeserver, copyparty, artist-web, vault-api, beat-db, discord-bridge)
 
 | ID | Sev | Cert. | Status |
 |---|---|---|---|
-| T2 | High | Confirmed (statuses) / Uncertain (which apps exist) | open |
+| T2 | High | Confirmed | partly done (Pipeline Monitor removed; the rest is real, see note) |
+
+> **Your answer:** everything in the Lab is real except the Pipeline Monitor (the old ops from before the runner). **Done:** the Pipeline Monitor is removed (its code is in git history). **Still open, uncertain:** the empty preview boxes and the fake "Test console" in the Lab's side panel; do you want those removed, or are they placeholders for something coming?
 
 **T2. Lab shows hard-coded "LIVE / STAGING / LOCAL" badges, empty preview boxes and a fake console.** *Screen: `/lab` ([lab.webp](shots/lab.webp)).*
 Statuses are typed into `src/data/labs.ts`. The previews are grey placeholders ("PREVIEW · STOREFRONT"). The Test console says "connected to beat-store" and offers Ping / Build / Deploy. I could not tell which of these apps exist.
@@ -42,7 +44,9 @@ Statuses are typed into `src/data/labs.ts`. The previews are grey placeholders (
 
 | ID | Sev | Cert. | Status |
 |---|---|---|---|
-| T3 | Med | Likely | open |
+| T3 | Med | Confirmed | partly done (sample todos removed; projects and events still open) |
+
+> **Your answer:** all the old todos were fake; the projects are real but contained mock data. **Done:** the sample todos and the two sample reminders are removed from the code, and from any browser that stored them (one-time, only those ids). **Still open:** the projects' mock details. Each project still has progress bars, "last move" / "next move" and timeline entries that were typed in as samples, and the Calendar's todo list also fills with items derived from them. I did not guess which text is real (the "AI Artist Management" timeline, for example, looks genuine). Tell me which fields to clear. The Calendar's events (Gym, Long walk, Master new single…) are also unanswered.
 
 **T3. Sample items are mixed into your real lists.** *Screens: Calendar ([calendar.webp](shots/calendar.webp)), Projects, Notes.*
 Calendar has "Gym", "Renew domain artist.app", "Reply to sync licensing email", "Master new single". Projects has "Copyparty Server", "Homeserver Setup", "iOS Shortcuts Bridge". The vault notes ("Welcome", "Formatting"…) show invented "5m ago / 40m ago" times. They sit in the same lists as the real Salient todos, so "2/33 done · 6%" means nothing. These come from `src/data/calendar.ts`, `projects.ts` and `notes.ts`.
@@ -56,7 +60,9 @@ Calendar has "Gym", "Renew domain artist.app", "Reply to sync licensing email", 
 
 | ID | Sev | Cert. | Status |
 |---|---|---|---|
-| T5 | Med | Uncertain | open |
+| T5 | Med | Answered | dropped (the crons are real, just not built out yet) |
+
+> **Your answer:** the crons are real, not built out yet. Nothing to fix now.
 
 **T5. The Crons tab lists six jobs with recent "last run" times.** *Screen: Workbench → Crons.* Three of them (every 2h / 6h / 15m: upload queue flush, beat import scan, sub-agent health check) sound like sample data, yet they show "14m ago" and "6m ago". If they are real they should have left traces; if not, they mislead. *Fix:* check which crons are real, and only show real ones.
 
@@ -66,19 +72,25 @@ Calendar has "Gym", "Renew domain artist.app", "Reply to sync licensing email", 
 
 | ID | Sev | Cert. | Status |
 |---|---|---|---|
-| C1 | High | Confirmed | open |
+| C1 | High | Confirmed | done (live after the next gateway restart) |
+
+> **Done:** the notification bell is the home for this. It shows a count and glows when anything waits, and its panel opens with "Needs you now": pending approvals first, then the open todos agents made, grouped by the flow they came from; each line opens the right place (the approval, or that flow's results). Todos and notes now record which flow made them.
 
 **C1. Nothing says "something needs you".** No count or dot on the Flow, Approvals or Tasks tabs, none in the top bar, none on the home screen. Today the nine open Salient decisions are only found by opening Workbench → Flow → a specific flow → scrolling about 1,500 px ([flow-todos.webp](shots/flow-todos.webp)). *Fix:* one "Needs you" place with a badge in the top bar and a card on the home screen: pending approvals, open decisions from flows (with their options), failures, flows that finished with a briefing.
 
 | ID | Sev | Cert. | Status |
 |---|---|---|---|
-| C2 | High | Confirmed | open |
+| C2 | High | Confirmed | done |
+
+> **Done:** Briefing → Needs you (decisions, options as buttons, answer box only on questions) → What the agents did (collapsed per agent) → the check (collapsed, with its state in one line) → Details (purpose, effort) → Steps. Nested scroll boxes are gone.
 
 **C2. The order of a flow's page is backwards.** *Screen: Flow tab ([flow-top.webp](shots/flow-top.webp), [flow-todos.webp](shots/flow-todos.webp)).* From the top: the flow description, developer stats, Argus' old verdict (clipped in its own scroll box), then Briefing, Results, the agent cards, and only then "Still to do". It should be: Briefing → what you need to decide → what agents did → details. Also, the verdict at the top is the old first check, while newer reviews live in other flows. *Fix:* reorder, and show the latest verdict with its date.
 
 | ID | Sev | Cert. | Status |
 |---|---|---|---|
-| C3 | High | Confirmed | open |
+| C3 | High | Confirmed | done |
+
+> **Done:** the verdict, agent reports, note previews, todo details and agent chat replies are rendered as markdown, in a compact style so headings do not take over a narrow panel.
 
 **C3. Markdown is not rendered in three places.** Argus' verdict shows literal `**Result: 12 problems found.**` ([flow-top.webp](shots/flow-top.webp)); each agent's quoted report shows `**What went in:**`; Hemera's chat shows `*Last updated: 2026-10-06*` ([chat-with-flow.webp](shots/chat-with-flow.webp)). *Fix:* render markdown there (the app already ships `react-markdown`).
 
@@ -102,7 +114,9 @@ Calendar has "Gym", "Renew domain artist.app", "Reply to sync licensing email", 
 
 | ID | Sev | Cert. | Status |
 |---|---|---|---|
-| C6 | Med | Confirmed | open |
+| C6 | Low | Confirmed | open (smaller than first reported) |
+
+> **Correction after a closer look:** work notes in a thread are already collapsed to two lines until clicked. What remains is the thread's title, which is the work brief ("Work: Fix FAQ…"). Lower priority than I first wrote.
 
 **C6. An agent's thread opens on harness text, not a conversation.** *Screen: [chat-with-flow.webp](shots/chat-with-flow.webp).* Hemera's thread is titled with a work brief ("Work: Fix FAQ…") and contains the full instruction text written for the model ("Work · Hemera handed you this (work item …)", hand-back notes, "Do it now…"). *Fix:* collapse harness and work briefs into one line ("Work item: Fix FAQ 'register' ambiguity · done") with "show full".
 
@@ -187,7 +201,9 @@ Calendar has "Gym", "Renew domain artist.app", "Reply to sync licensing email", 
 
 | ID | Sev | Cert. | Status |
 |---|---|---|---|
-| P1 | High | Confirmed | open |
+| P1 | High | Confirmed | done |
+
+> **Done:** every Workbench panel shares that sheet, so all of them are now opaque on the phone.
 
 **P1. Panels are see-through on the phone.** *Screen: [phone-flow.webp](shots/phone-flow.webp).* The Flow panel opens as a bottom sheet with a transparent background, so the conversation text shows through behind it and both become hard to read. *Fix:* an opaque sheet with a dimmed backdrop.
 

@@ -39,6 +39,9 @@ const MERGED_KEY = 'os:calendar:reminders-merged'
 // "team-t-…"). That team turned out to be test data, so a one-time cleanup
 // removes them. Only those ids: anything made here is untouched.
 const TEAM_TODOS_PURGED_KEY = 'os:calendar:team-todos-purged'
+// The bundled sample todos and reminders (t1-t7, r1, r2) were not real. Removed from the code, and from browsers that had stored them.
+const SEED_TODOS_PURGED_KEY = 'os:calendar:seed-todos-purged:v1'
+const SEED_TODO_IDS = new Set(['t1', 't2', 't3', 't4', 't5', 't6', 't7', 'r1', 'r2'])
 const TEAM_TODO_PREFIX = 'team-t-'
 
 /** A reminder is a timed todo that notifies at its time. */
@@ -215,6 +218,16 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
       return kept.length === list.length ? list : persistTasks(kept)
     })
     localStorage.setItem(TEAM_TODOS_PURGED_KEY, '1')
+  }, [persistTasks])
+
+  // One-time: remove the stored copies of the sample todos (only those ids; anything made here is untouched).
+  useEffect(() => {
+    if (localStorage.getItem(SEED_TODOS_PURGED_KEY)) return
+    setTasks((list) => {
+      const kept = list.filter((t) => !SEED_TODO_IDS.has(t.id))
+      return kept.length === list.length ? list : persistTasks(kept)
+    })
+    localStorage.setItem(SEED_TODOS_PURGED_KEY, '1')
   }, [persistTasks])
 
   const deleteTask = useCallback((id: string) => setTasks((list) => persistTasks(list.filter((t) => t.id !== id))), [persistTasks])
