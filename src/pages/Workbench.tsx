@@ -143,11 +143,14 @@ export function Workbench() {
               activePanel={activePanel}
               onSelectTab={selectTab}
               onOpenSettings={() => setSettingsOpen(true)}
+              agentSelected={false}
             />
             <div className="flex min-h-0 flex-1">
-              <div className="flex flex-1 items-center justify-center text-xs text-dim">Pick an agent on the left to open a conversation.</div>
+              {/* With no agent picked there is no conversation: an open panel fills the space, otherwise the hint shows. */}
+              {!activePanel && <div className="flex flex-1 items-center justify-center text-xs text-dim">Pick an agent on the left to open a conversation.</div>}
               {activePanel && (
                 <RightPanel
+                  fill
                   key={activePanel === 'terminal' ? 'terminal' : 'panel'}
                   tab={activePanel}
                   agentId={null}

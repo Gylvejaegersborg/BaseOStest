@@ -125,7 +125,7 @@ export function NotificationBell({ className }: { className?: string }) {
           <>
             <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
             <div
-              className="fixed z-50 max-h-[75dvh] animate-fade-in overflow-y-auto shadow-glow"
+              className="fixed z-50 max-h-[75dvh] animate-fade-in overflow-y-auto bg-bg shadow-glow"
               style={{ top: rect.bottom + 6, left, width }}
             >
               <NeedsYouSection

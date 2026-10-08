@@ -4,22 +4,25 @@ import { Tabs, type TabItem } from '@/components/ui/Tabs'
 import { cn } from '@/lib/cn'
 import { Glow } from '@/components/ui/Glow'
 import { useAgentOsApprovals } from '@/features/agentos/useAgentOsApprovals'
+import { useNeedsYou } from '@/features/agentos/useNeedsYou'
 
 export type StripTab = 'tasks' | 'flow' | 'artifacts' | 'approvals' | 'events' | 'memory' | 'files' | 'notes' | 'teams' | 'crons' | 'terminal'
 
+// Three groups, divided: what is being worked on, what came out of it, and the system behind it.
 export const STRIP_TABS: TabItem<StripTab>[] = [
   { id: 'tasks', label: 'Tasks', icon: ListChecks },
   { id: 'flow', label: 'Flow', icon: Workflow },
-  { id: 'artifacts', label: 'Artifacts', icon: FileStack },
   { id: 'approvals', label: 'Approvals', icon: ShieldCheck },
-  { id: 'events', label: 'Events', icon: ActivityIcon },
-  { id: 'memory', label: 'Memory', icon: Brain },
+  { id: 'artifacts', label: 'Artifacts', icon: FileStack },
   { id: 'files', label: 'Files', icon: History },
   { id: 'notes', label: 'Notes', icon: StickyNote },
+  { id: 'events', label: 'Events', icon: ActivityIcon },
+  { id: 'memory', label: 'Memory', icon: Brain },
   { id: 'crons', label: 'Crons', icon: Timer },
   { id: 'teams', label: 'Teams', icon: Users },
   { id: 'terminal', label: 'Terminal', icon: SquareTerminal },
 ]
+const GROUP_ENDS: StripTab[] = ['approvals', 'notes']
 
 const ALL_TABS = STRIP_TABS
 
@@ -46,17 +49,24 @@ export function WorkbenchTopStrip({
   activePanel,
   onSelectTab,
   onOpenSettings,
+  agentSelected = true,
 }: {
   left: ReactNode
   activePanel: StripTab | null
   onSelectTab: (tab: StripTab) => void
   onOpenSettings: () => void
+  /** Memory is about one agent: with none picked its tab is dimmed. */
+  agentSelected?: boolean
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
   // Something is waiting on the operator — flag Approvals (and, on phones,
   // the Panels button that hides it) with the nav rail's glow.
   const { approvals } = useAgentOsApprovals()
   const pending = approvals.length
+  // Decisions waiting in flows (what the bell lists), shown on the Flow tab.
+  const waitingInFlows = useNeedsYou().todos.length
+  const badge = { approvals: pending, flow: waitingInFlows }
+  const dim = agentSelected ? undefined : { memory: 'Pick an agent to see what it has learned' }
   const APPROVAL_GLOW = '#f0a020'
 
   return (
@@ -64,7 +74,7 @@ export function WorkbenchTopStrip({
       <div className="min-w-0 flex-1">{left}</div>
       <div className="flex shrink-0 items-center gap-1">
         <div className="hidden items-center gap-1 min-[1400px]:flex">
-          <Tabs tabs={STRIP_TABS} active={activePanel} onChange={onSelectTab} glow={pending ? { approvals: APPROVAL_GLOW } : undefined} />
+          <Tabs tabs={STRIP_TABS} active={activePanel} onChange={onSelectTab} glow={pending ? { approvals: APPROVAL_GLOW } : undefined} badge={badge} dividerAfter={GROUP_ENDS} dim={dim} />
         </div>
 
         <div className="relative min-[1400px]:hidden">
@@ -91,12 +101,14 @@ export function WorkbenchTopStrip({
                   className={cn(
                     'relative flex w-full items-center gap-2 px-3 py-2 text-left text-xs hover:bg-panel-2',
                     activePanel === t.id ? 'text-accent' : 'text-text',
+                    GROUP_ENDS.includes(ALL_TABS[ALL_TABS.findIndex((x) => x.id === t.id) - 1]?.id as StripTab) && 'border-t border-line',
+                    dim?.[t.id as 'memory'] && 'opacity-40',
                   )}
                 >
                   {t.id === 'approvals' && pending > 0 && <Glow color={APPROVAL_GLOW} className="rounded-none" />}
                   {t.icon && <t.icon size={13} />}
                   {t.label}
-                  {t.id === 'approvals' && pending > 0 && <span className="ml-auto tabular-nums text-amber">{pending}</span>}
+                  {(badge[t.id as 'approvals' | 'flow'] ?? 0) > 0 && <span className="ml-auto tabular-nums text-amber">{badge[t.id as 'approvals' | 'flow']}</span>}
                 </button>
               ))}
             </div>

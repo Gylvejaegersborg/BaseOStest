@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { CheckCircle2, XCircle, Clock, Loader2, Ban, ArrowRight, ArrowLeft, RotateCcw, Square, ChevronDown, ChevronRight, Plus, ShieldCheck } from 'lucide-react'
 import { useAgentOsFlow, useAgentOsFlowList } from '@/features/agentos/useAgentOsFlow'
-import type { AgentOsFlowReportAttempt, AgentOsFlowStatus, AgentOsTaskStatus, FlowStepInput } from '@/features/agentos/sessionClient'
+import type { AgentOsFlowReport, AgentOsFlowReportAttempt, AgentOsFlowStatus, AgentOsTaskStatus, FlowStepInput } from '@/features/agentos/sessionClient'
 import { cn } from '@/lib/cn'
 
 const STEP_ICON: Record<AgentOsTaskStatus, typeof CheckCircle2> = {
@@ -124,6 +124,118 @@ function Attempt({ a, label }: { a: AgentOsFlowReportAttempt; label?: string }) 
   )
 }
 
+type ToDo = NonNullable<AgentOsFlowReport['outcome']>['toDo'][number]
+
+/** What needs the operator, in three groups: things to decide, things to do, and what is wrong with the flow itself. */
+function NeedsYou({
+  items,
+  answers,
+  setAnswers,
+  busy,
+  completeTodo,
+}: {
+  items: ToDo[]
+  answers: Record<string, string>
+  setAnswers: (f: (cur: Record<string, string>) => Record<string, string>) => void
+  busy: boolean
+  completeTodo: (id: string, answer?: string) => Promise<void>
+}) {
+  const todos = items.filter((t) => t.kind === 'todo')
+  const isQuestion = (t: ToDo) => optionsOf(t.info).length > 0 || asksForAnswer(t.text)
+  const decide = todos.filter(isQuestion)
+  const doThese = todos.filter((t) => !isQuestion(t))
+  const flowIssues = items.filter((t) => t.kind !== 'todo')
+  // A priority mark only means something when the priorities differ.
+  const mixed = new Set(todos.map((t) => t.priority ?? 'med')).size > 1
+
+  const row = (t: ToDo, i: number) => {
+    const options = optionsOf(t.info)
+    const question = isQuestion(t)
+    const id = t.todoId
+    const done = (a?: string) => id && void completeTodo(id, a).then(() => setAnswers((cur) => ({ ...cur, [id]: '' })))
+    return (
+      <li key={`${t.text}-${i}`} className="px-2.5 py-2">
+        <p className="text-xs text-text">
+          {mixed && t.priority === 'high' ? <span className="mr-1 text-danger">●</span> : null}
+          {t.kind !== 'todo' && <span className="mr-1 text-[11px] uppercase tracking-wider text-dim">{t.kind === 'review' ? 'check' : 'step'}</span>}
+          {t.text}
+        </p>
+        {t.detail && t.kind !== 'todo' && <p className="mt-0.5 text-[11px] text-dim">{t.detail}</p>}
+        {t.info && <Md className="mt-1 border-l-2 border-line pl-2 text-text/80">{t.info}</Md>}
+        {t.refs?.map((r) => (
+          <details key={r.title} className="mt-1">
+            <summary className="cursor-pointer text-[11px] uppercase tracking-wider text-dim hover:text-text">Read: {r.title}</summary>
+            <Md className="mt-1 border-l border-line pl-2">{r.body}</Md>
+          </details>
+        ))}
+        {id && options.length > 0 && (
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {options.map((o) => (
+              <button
+                key={o}
+                onClick={() => done(o)}
+                disabled={busy}
+                className="border border-accent/40 bg-accent/10 px-2 py-1 text-left text-[11px] text-accent hover:bg-accent/20 disabled:opacity-40"
+                title="Choose this and mark the todo done; the agents see your choice on it."
+              >
+                {o}
+              </button>
+            ))}
+          </div>
+        )}
+        {id && (
+          <span className="mt-1.5 flex items-center gap-1.5">
+            {question && (
+              <input
+                value={answers[id] ?? ''}
+                onChange={(e) => setAnswers((cur) => ({ ...cur, [id]: e.target.value }))}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !busy && (answers[id] ?? '').trim()) done(answers[id])
+                }}
+                placeholder={options.length ? 'Or write your own answer' : 'Your answer or decision'}
+                className="min-w-0 flex-1 border border-line bg-bg/60 px-2 py-1 text-[11px] text-text placeholder:text-dim/60 focus:border-accent/50 focus:outline-none"
+              />
+            )}
+            <button
+              onClick={() => done(answers[id])}
+              disabled={busy || (question && !(answers[id] ?? '').trim())}
+              className="ml-auto flex shrink-0 items-center gap-1 border border-line px-2 py-1 text-[11px] uppercase tracking-wider text-text/80 hover:bg-panel-2 disabled:opacity-40"
+              title={question ? 'Write an answer, then mark it done. The agents see it on the todo.' : 'Mark it done.'}
+            >
+              <CheckCircle2 size={11} /> {question ? 'Answer & done' : 'Done'}
+            </button>
+          </span>
+        )}
+      </li>
+    )
+  }
+
+  const group = (label: string, list: ToDo[]) =>
+    list.length > 0 && (
+      <div key={label} className="mt-1.5">
+        <p className="mb-1 text-[11px] text-dim">
+          {label} ({list.length})
+        </p>
+        <ul className="divide-y divide-line/50 border border-line">{list.map(row)}</ul>
+      </div>
+    )
+
+  return (
+    <section className="mb-3">
+      <p className="label">Needs you ({items.length})</p>
+      {items.length === 0 ? (
+        <p className="mt-1 text-[11px] text-dim">Nothing is waiting on you from this flow.</p>
+      ) : (
+        <>
+          {group('To decide', decide)}
+          {group('To do', doThese)}
+          {group('About the flow', flowIssues)}
+        </>
+      )}
+    </section>
+  )
+}
+
 /**
  * The workbench's Flow tab — live DAG view of the currently active Flow
  * (if any), with cancel/resume, plus a picker to switch to any other
@@ -225,7 +337,7 @@ export function FlowTab({
           {report?.outcome && (
             <>
               {/* 1. The briefing: what to decide, what was done, what was found */}
-              <section className="mb-3 border border-accent/30 bg-accent/5 px-2.5 py-2">
+              <section className="mb-3 border border-line bg-panel-2/30 px-2.5 py-2">
                 <div className="flex items-center justify-between gap-2">
                   <p className="label">Briefing</p>
                   <button
@@ -257,77 +369,7 @@ export function FlowTab({
               </section>
 
               {/* 2. What needs you: decisions and actions first */}
-              <section className="mb-3">
-                <p className="label">Needs you ({report.outcome.toDo.length})</p>
-                {report.outcome.toDo.length === 0 ? (
-                  <p className="mt-1 text-[11px] text-dim">Nothing is waiting on you from this flow.</p>
-                ) : (
-                  <ul className="mt-1 divide-y divide-line/50 border border-line">
-                    {[...report.outcome.toDo]
-                      .sort((x, y) => (x.kind === 'todo' ? 0 : 1) - (y.kind === 'todo' ? 0 : 1))
-                      .map((t, i) => {
-                        const options = t.kind === 'todo' ? optionsOf(t.info) : []
-                        const question = options.length > 0 || (t.kind === 'todo' && asksForAnswer(t.text))
-                        const id = t.todoId
-                        return (
-                          <li key={i} className="px-2.5 py-2">
-                            <p className="text-xs text-text">
-                              {t.priority === 'high' && t.kind === 'todo' ? <span className="mr-1 text-danger">●</span> : null}
-                              {t.kind !== 'todo' && <span className="mr-1 text-[10px] uppercase tracking-wider text-dim">{t.kind === 'review' ? 'check' : 'step'}</span>}
-                              {t.text}
-                            </p>
-                            {t.detail && t.kind !== 'todo' && <p className="mt-0.5 text-[11px] text-dim">{t.detail}</p>}
-                            {t.info && <Md className="mt-1 border-l-2 border-accent/40 pl-2 text-text/80">{t.info}</Md>}
-                            {t.refs?.map((r) => (
-                              <details key={r.title} className="mt-1">
-                                <summary className="cursor-pointer text-[10px] uppercase tracking-wider text-dim hover:text-text">Read: {r.title}</summary>
-                                <Md className="mt-1 border-l border-line pl-2">{r.body}</Md>
-                              </details>
-                            ))}
-                            {id && options.length > 0 && (
-                              <div className="mt-1.5 flex flex-wrap gap-1.5">
-                                {options.map((o) => (
-                                  <button
-                                    key={o}
-                                    onClick={() => void completeTodo(id, o)}
-                                    disabled={busy}
-                                    className="border border-accent/40 bg-accent/10 px-2 py-1 text-left text-[11px] text-accent hover:bg-accent/20 disabled:opacity-40"
-                                    title="Choose this and mark the todo done; the agents see your choice on it."
-                                  >
-                                    {o}
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-                            {id && (
-                              <span className="mt-1.5 flex items-center gap-1.5">
-                                {question && (
-                                  <input
-                                    value={answers[id] ?? ''}
-                                    onChange={(e) => setAnswers((cur) => ({ ...cur, [id]: e.target.value }))}
-                                    onKeyDown={(e) => {
-                                      if (e.key === 'Enter' && !busy && (answers[id] ?? '').trim()) void completeTodo(id, answers[id]).then(() => setAnswers((cur) => ({ ...cur, [id]: '' })))
-                                    }}
-                                    placeholder={options.length ? 'Or write your own answer' : 'Your answer or decision'}
-                                    className="min-w-0 flex-1 border border-line bg-bg/60 px-2 py-1 text-[11px] text-text placeholder:text-dim/60 focus:border-accent/50 focus:outline-none"
-                                  />
-                                )}
-                                <button
-                                  onClick={() => void completeTodo(id, answers[id]).then(() => setAnswers((cur) => ({ ...cur, [id]: '' })))}
-                                  disabled={busy || (question && !(answers[id] ?? '').trim())}
-                                  className="ml-auto flex shrink-0 items-center gap-1 border border-line px-2 py-1 text-[10px] uppercase tracking-wider text-text/80 hover:bg-panel-2 disabled:opacity-40"
-                                  title={question ? 'Write an answer, then mark it done. The agents see it on the todo.' : 'Mark it done.'}
-                                >
-                                  <CheckCircle2 size={11} /> {question ? 'Answer & done' : 'Done'}
-                                </button>
-                              </span>
-                            )}
-                          </li>
-                        )
-                      })}
-                  </ul>
-                )}
-              </section>
+              <NeedsYou items={report.outcome.toDo} answers={answers} setAnswers={setAnswers} busy={busy} completeTodo={completeTodo} />
 
               {/* 3. What the agents did */}
               <section className="mb-3">
@@ -440,9 +482,6 @@ export function FlowTab({
                     <strong className="shrink-0 font-normal text-text">{s.id}</strong>
                     <span className="shrink-0 text-dim">· {rep?.agentId ?? meta?.agentId ?? '?'}</span>
                     {rep && rep.attempts.length > 1 && <span className="shrink-0 text-[10px] text-dim">{rep.attempts.length} attempts</span>}
-                    {rep && rep.attempts.some((a) => a.added.length) ? (
-                      <span className="shrink-0 text-[10px] text-accent">+{rep.attempts.reduce((n, a) => n + a.added.length, 0)} added</span>
-                    ) : null}
                     {s.dependsOn.length > 0 && (
                       <span className="flex items-center gap-1 text-[10px] text-dim">
                         <ArrowRight size={10} /> {s.dependsOn.join(', ')}

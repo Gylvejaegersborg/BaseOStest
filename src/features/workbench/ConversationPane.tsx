@@ -330,7 +330,7 @@ function MessageRow({
       >
         {isUser ? 'YOU' : <Bot size={14} />}
       </div>
-      <div className={cn('max-w-[72%]', isUser && 'text-right')}>
+      <div className={cn('max-w-[92%]', isUser && 'text-right')}>
         <div className="mb-1 flex items-center gap-2 text-[10px] text-dim" style={isUser ? { justifyContent: 'flex-end' } : undefined}>
           <span>{isUser ? 'You' : agentName}</span>
           {msg.time && <span>{msg.time}</span>}
