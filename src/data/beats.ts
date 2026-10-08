@@ -16,13 +16,16 @@ export interface Beat {
   id: string
   title: string
   artist: string
-  bpm: number
-  musicalKey: string
+  /** Only what is known: the sample BPM, key, mood, play counts and license prices were invented and are gone. */
+  bpm?: number
+  musicalKey?: string
   mood: string[]
-  durationSec: number
+  /** Measured from the real audio file. */
+  durationSec?: number
   /** Two-stop gradient used as fallback cover art when no image is provided. */
   gradient: [string, string]
-  plays: number
+  plays?: number
+  /** Empty until real licensing is set up. */
   licenses: License[]
   /** Same-origin audio file under /public/beats/audio/. Falls back to a synth preview if missing. */
   audioFile?: string
@@ -39,59 +42,6 @@ export interface CartItem {
   price: number
 }
 
-function licenses(): License[] {
-  return [
-    {
-      tier: 'MP3',
-      price: 24.99,
-      note: 'Tagless MP3 · 5k streams',
-      details:
-        'Tagless 320 kbps MP3 master. Stream up to 5,000 plays across all platforms, monetise on YouTube and TikTok. Credit "Prod. ISARK" in the title or description.',
-      highlights: [
-        'Tagless 320 kbps MP3',
-        'Up to 5,000 streams',
-        'Music videos + social posts OK',
-        'Credit Prod. ISARK',
-      ],
-    },
-    {
-      tier: 'WAV',
-      price: 49.99,
-      note: 'MP3 + WAV · 10k streams',
-      details:
-        'Includes everything in the MP3 license plus the uncompressed WAV master. Stream cap is raised to 10,000.',
-      highlights: ['Everything in MP3', 'Uncompressed WAV master', 'Up to 10,000 streams', 'Mixing-ready file'],
-    },
-    {
-      tier: 'Stems',
-      price: 99,
-      note: 'WAV + trackouts · 25k streams',
-      details:
-        'Adds the individual trackout stems (drums, bass, melodies, FX) for full mixing flexibility. Stream cap raised to 25,000. Ideal for serious productions and releases.',
-      highlights: [
-        'Everything in WAV',
-        'Individual trackout stems',
-        'Drums · bass · melodies · FX',
-        'Up to 25,000 streams',
-      ],
-    },
-    {
-      tier: 'Exclusive',
-      price: 'negotiable',
-      note: 'Full rights · contact ISARK',
-      details:
-        'Full transfer of rights — the beat is permanently retired from the store after purchase. Includes the stems, WAV, signed exclusive contract and no streaming caps. Pricing depends on the beat; reach out to negotiate.',
-      highlights: [
-        'Full rights transfer',
-        'Beat retired from the store',
-        'Stems + WAV + MP3 included',
-        'No streaming caps',
-        'Signed exclusive contract',
-      ],
-    },
-  ]
-}
-
 const ARTIST = 'ISΛRK'
 
 export const BEATS: Beat[] = [
@@ -100,39 +50,30 @@ export const BEATS: Beat[] = [
     id: 'homerun',
     title: 'Homerun',
     artist: ARTIST,
-    bpm: 140,
-    musicalKey: 'A min',
-    mood: ['Hard', 'Trap'],
+    mood: [],
     durationSec: 113,
     gradient: ['#FF7A55', '#3A0F18'],
-    plays: 412,
-    licenses: licenses(),
+    licenses: [],
     audioFile: '/beats/audio/homerun.mp3',
   },
   {
     id: 'virtual-love',
     title: 'Virtual Love',
     artist: ARTIST,
-    bpm: 110,
-    musicalKey: 'C maj',
-    mood: ['Lo-fi', 'Warm', 'Smooth'],
+    mood: [],
     durationSec: 55,
     gradient: ['#F4A8E8', '#3A1B33'],
-    plays: 287,
-    licenses: licenses(),
+    licenses: [],
     audioFile: '/beats/audio/virtual-love.mp3',
   },
   {
     id: 'switch',
     title: 'Switch',
     artist: 'ISΛRK × 10k.emraan',
-    bpm: 186,
-    musicalKey: 'C min',
-    mood: ['Drill', 'Hard'],
+    mood: [],
     durationSec: 100,
     gradient: ['#A78BFA', '#150A33'],
-    plays: 1024,
-    licenses: licenses(),
+    licenses: [],
     audioFile: '/beats/audio/switch.mp3',
   },
   // ─── Placeholders (synth preview until real audio lands) ────────────────
@@ -140,8 +81,19 @@ export const BEATS: Beat[] = [
 
 export const MOODS: string[] = [...new Set(BEATS.flatMap((b) => b.mood))].sort()
 
-/** Where exclusive-license enquiries are sent. Update to your real address. */
-export const CONTACT_EMAIL = 'hello@isark.beats'
+/** The main contact for beats, bookings and licensing enquiries. */
+export const CONTACT_EMAIL = 'isarkbeats@gmail.com'
+/** Loops, instrumentals and similar. */
+export const LOOPS_EMAIL = 'Loopsforisark@gmail.com'
+
+/** Only the details that are known, e.g. "140 BPM · A min" (none are known for the sample tracks). */
+export function beatSpecs(b: { bpm?: number; musicalKey?: string; durationSec?: number }): string[] {
+  const out: string[] = []
+  if (b.bpm) out.push(`${b.bpm} BPM`)
+  if (b.musicalKey) out.push(b.musicalKey)
+  if (b.durationSec) out.push(formatDuration(b.durationSec))
+  return out
+}
 
 export function formatDuration(sec: number): string {
   const m = Math.floor(sec / 60)

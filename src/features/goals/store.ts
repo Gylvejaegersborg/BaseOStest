@@ -109,6 +109,33 @@ export function createGoal(input: Partial<Omit<Goal, 'id' | 'createdAt' | 'updat
   return id
 }
 
+// The release-schedule goal was asked for by name ("schedule posts: keep track of when to release songs and content"), so it is created
+// once. If it is deleted later it does not come back (the flag stays set).
+const SEED_RELEASE_GOAL = 'os:goals:seeded:release-schedule:v1'
+function seedReleaseGoal() {
+  try {
+    if (localStorage.getItem(SEED_RELEASE_GOAL)) return
+    localStorage.setItem(SEED_RELEASE_GOAL, '1')
+  } catch {
+    return
+  }
+  if (goals.some((g) => g.id === 'goal-release-schedule')) return
+  const t = new Date().toISOString()
+  commit([
+    ...goals,
+    {
+      id: 'goal-release-schedule',
+      title: 'Keep track of when songs and content are released',
+      why: 'Schedule posts: know what releases when, across songs and content, so nothing is missed.',
+      status: 'active',
+      projectIds: ['artist-mgmt', 'song-routines'],
+      createdAt: t,
+      updatedAt: t,
+    },
+  ])
+}
+if (typeof window !== 'undefined') seedReleaseGoal()
+
 export function updateGoal(id: string, patch: Partial<Omit<Goal, 'id' | 'createdAt'>>) {
   commit(goals.map((g) => (g.id === id ? { ...g, ...patch, updatedAt: now() } : g)))
 }

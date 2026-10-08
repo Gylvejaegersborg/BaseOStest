@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ExternalLink } from 'lucide-react'
-import { type Beat, type License, type LicenseTier, formatDuration } from '@/data/beats'
+import { type Beat, type License, type LicenseTier, beatSpecs } from '@/data/beats'
 import { LicenseDetailModal } from './LicenseDetailModal'
 import { Transport } from './Transport'
 import { generateLabelDataURL } from './textures'
@@ -87,11 +87,12 @@ function TitleOverlay({ beat }: { beat: Beat }) {
         </p>
         {/* BPM · key · duration on one row */}
         <p className="mt-1.5 truncate font-mono text-[10px] uppercase tracking-[0.18em] text-white/65 sm:text-[11px]">
-          <span>{beat.bpm} BPM</span>
-          <span className="mx-2">·</span>
-          <span>{beat.musicalKey}</span>
-          <span className="mx-2">·</span>
-          <span>{formatDuration(beat.durationSec)}</span>
+          {beatSpecs(beat).map((spec, i) => (
+            <span key={spec}>
+              {i > 0 && <span className="mx-2">·</span>}
+              {spec}
+            </span>
+          ))}
         </p>
         {/* Mood / genre on its own row so it doesn't reflow into the metadata */}
         {beat.mood.length > 0 && (

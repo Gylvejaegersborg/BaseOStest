@@ -82,7 +82,6 @@ export interface Asset {
   relatedId?: string
 }
 
-const ARTIST = 'ISΛRK'
 const SOURCE = 'SoundCloud · @itsisark'
 
 /** Map an asset to its preview bucket. */
@@ -116,12 +115,12 @@ export function toBeat(a: Asset): Beat {
     id: a.id,
     title: a.title,
     artist: a.artist,
-    bpm: a.bpm ?? 120,
-    musicalKey: a.musicalKey ?? '—',
+    bpm: a.bpm,
+    musicalKey: a.musicalKey,
     mood: a.tags,
-    durationSec: a.durationSec ?? 30,
+    durationSec: a.durationSec,
     gradient: a.gradient,
-    plays: a.plays ?? 0,
+    plays: a.plays,
     licenses: FREE_LICENSE,
     audioFile: a.audioFile,
     coverImage: a.coverImage,
@@ -130,193 +129,30 @@ export function toBeat(a: Asset): Beat {
 }
 
 // ── Beats, derived from the shared store catalog ────────────────────────────
+// Sizes of the real audio files (measured).
+const REAL_SIZES: Record<string, string> = { homerun: '4.3 MB', 'virtual-love': '2.1 MB', switch: '3.8 MB' }
 const BEAT_ASSETS: Asset[] = BEATS.map((b) => ({
   id: b.id,
   title: b.title,
   category: 'beat',
   artist: b.artist,
-  date: '2025-0' + ((b.bpm % 8) + 1) + '-14',
+  // When the audio was added to the repo (git: 62ca251), not an invented date.
+  date: '2026-05-28',
   tags: b.mood,
   fileType: b.audioFile ? (b.audioFile.endsWith('.wav') ? 'wav' : 'mp3') : 'wav',
-  fileSize: b.audioFile ? `${(b.durationSec * 0.34).toFixed(1)} MB` : `${(b.durationSec * 1.7).toFixed(1)} MB`,
+  fileSize: REAL_SIZES[b.id],
   source: SOURCE,
   gradient: b.gradient,
   bpm: b.bpm,
   musicalKey: b.musicalKey,
   durationSec: b.durationSec,
-  plays: b.plays,
   audioFile: b.audioFile,
   soundcloudUrl: b.audioFile ? 'https://soundcloud.com/itsisark' : undefined,
-  note: `${b.bpm} BPM · ${b.musicalKey} instrumental. ${b.audioFile ? 'Mastered preview.' : 'Rough bounce — synth preview until the real file lands.'}`,
 }))
 
-// ── Everything else, authored here ──────────────────────────────────────────
-const EXTRA_ASSETS: Asset[] = [
-  // ── Songs (vocal takes over instrumentals) ──────────────────────────────
-  {
-    id: 'homerun-vox',
-    title: 'Homerun (Vocal)',
-    category: 'song',
-    artist: ARTIST,
-    date: '2025-03-02',
-    tags: ['Hard', 'Trap', 'Vocal'],
-    fileType: 'wav',
-    fileSize: '41.8 MB',
-    source: SOURCE,
-    gradient: ['#FF7A55', '#3A0F18'],
-    bpm: 140,
-    musicalKey: 'A min',
-    durationSec: 118,
-    plays: 388,
-    relatedId: 'homerun',
-    audioFile: '/beats/audio/homerun.mp3',
-    note: 'Full vocal take over the Homerun instrumental. Comp v3.',
-  },
-  {
-    id: 'virtual-love-demo',
-    title: 'Virtual Love (Demo)',
-    category: 'song',
-    artist: ARTIST,
-    date: '2025-02-19',
-    tags: ['Lo-fi', 'Vocal', 'Demo'],
-    fileType: 'mp3',
-    fileSize: '5.2 MB',
-    source: SOURCE,
-    gradient: ['#F4A8E8', '#3A1B33'],
-    bpm: 110,
-    musicalKey: 'C maj',
-    durationSec: 58,
-    plays: 144,
-    relatedId: 'virtual-love',
-    audioFile: '/beats/audio/virtual-love.mp3',
-    note: 'Scratch vocal demo. Needs a real chorus.',
-  },
-
-  // ── Lyrics ──────────────────────────────────────────────────────────────
-
-  // ── Artwork ─────────────────────────────────────────────────────────────
-  {
-    id: 'isark-logo',
-    title: 'ISΛRK — Logo Mark',
-    category: 'artwork',
-    artist: ARTIST,
-    date: '2024-11-30',
-    tags: ['Brand', 'Logo'],
-    fileType: 'svg',
-    fileSize: '14 KB',
-    source: SOURCE,
-    gradient: ['#36e0c8', '#0A2540'],
-    note: 'Primary wordmark — the lambda-A logo. Vector master.',
-  },
-  {
-    id: 'homerun-art',
-    title: 'Homerun — Single Art',
-    category: 'artwork',
-    artist: ARTIST,
-    date: '2025-03-01',
-    tags: ['Cover', 'Single'],
-    fileType: 'png',
-    fileSize: '4.1 MB',
-    source: SOURCE,
-    gradient: ['#FF7A55', '#3A0F18'],
-    relatedId: 'homerun',
-    note: '3000×3000 single artwork for streaming + SoundCloud.',
-  },
-  {
-    id: 'virtual-love-art',
-    title: 'Virtual Love — Cover',
-    category: 'artwork',
-    artist: ARTIST,
-    date: '2025-02-15',
-    tags: ['Cover', 'Lo-fi'],
-    fileType: 'png',
-    fileSize: '2.8 MB',
-    source: SOURCE,
-    gradient: ['#F4A8E8', '#3A1B33'],
-    relatedId: 'virtual-love',
-    note: 'CRT-glow cover for the lo-fi cut.',
-  },
-
-  // ── Music video ─────────────────────────────────────────────────────────
-  {
-    id: 'switch-video',
-    title: 'Switch (Official Video)',
-    category: 'music-video',
-    artist: 'ISΛRK × 10k.emraan',
-    date: '2025-02-04',
-    tags: ['Drill', 'Official'],
-    fileType: 'mp4',
-    fileSize: '212 MB',
-    source: SOURCE,
-    gradient: ['#A78BFA', '#150A33'],
-    relatedId: 'switch',
-    videoUrl: 'https://soundcloud.com/itsisark',
-    note: '1080p official video. Master export, color graded.',
-  },
-
-  // ── Social video ────────────────────────────────────────────────────────
-  {
-    id: 'homerun-reel',
-    title: 'Homerun — IG Reel',
-    category: 'social-video',
-    artist: ARTIST,
-    date: '2025-03-03',
-    tags: ['Reel', 'Promo'],
-    fileType: 'mp4',
-    fileSize: '28 MB',
-    source: SOURCE,
-    gradient: ['#FF7A55', '#3A0F18'],
-    relatedId: 'homerun',
-    videoUrl: 'https://soundcloud.com/itsisark',
-    note: '9:16 vertical snippet for Reels / TikTok. 22s hook loop.',
-  },
-  {
-    id: 'studio-reel',
-    title: 'Studio Reel — TikTok',
-    category: 'social-video',
-    artist: ARTIST,
-    date: '2025-02-27',
-    tags: ['BTS', 'Promo'],
-    fileType: 'mov',
-    fileSize: '46 MB',
-    source: SOURCE,
-    gradient: ['#36e0c8', '#0A2540'],
-    videoUrl: 'https://soundcloud.com/itsisark',
-    note: 'Behind-the-scenes cooking up Switch. Vertical.',
-  },
-
-  // ── Stems / trackouts ───────────────────────────────────────────────────
-  {
-    id: 'switch-stems',
-    title: 'Switch — Trackouts',
-    category: 'stem',
-    artist: 'ISΛRK × 10k.emraan',
-    date: '2025-01-20',
-    tags: ['Stems', 'Drill'],
-    fileType: 'zip',
-    fileSize: '486 MB',
-    source: SOURCE,
-    gradient: ['#A78BFA', '#150A33'],
-    relatedId: 'switch',
-    note: '24 labeled WAV stems @ 24-bit/44.1k for the Exclusive license.',
-  },
-  {
-    id: 'homerun-stems',
-    title: 'Homerun — Stems',
-    category: 'stem',
-    artist: ARTIST,
-    date: '2025-03-01',
-    tags: ['Stems', 'Trap'],
-    fileType: 'zip',
-    fileSize: '512 MB',
-    source: SOURCE,
-    gradient: ['#FF7A55', '#3A0F18'],
-    relatedId: 'homerun',
-    note: 'Trackout pack — drums, 808, melody, FX busses.',
-  },
-
-  // ── Notes ───────────────────────────────────────────────────────────────
-]
+// Nothing else is authored here: the sample songs, artwork, videos and stems that used to sit in this list were invented and are gone.
+// Everything else in the library comes from real uploads (the gateway) and agent entries (the overlay).
+const EXTRA_ASSETS: Asset[] = []
 
 export const LIBRARY: Asset[] = [...BEAT_ASSETS, ...EXTRA_ASSETS]
 

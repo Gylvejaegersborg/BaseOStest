@@ -19,10 +19,13 @@ gateway through the dev server's `/agent-os` proxy (see `vite.config.ts`).
 - The old GitHub team's archive (`team-archive.json`) was test data that ran on without the
   operator knowing; it is removed (recoverable from git history) and its imported todos are purged
   on load. Do not bring it back.
-- **Only three songs are real: Homerun, Virtual Love and Switch** (audio in `public/beats/audio`).
-  Every other song, beat, release, plan or tracker entry that ever appeared in this repo was
-  invented test data. Even for the three, the *details* in code (BPM, key, mood, license prices,
-  lyrics, asset notes in `src/data/beats.ts` / `library.ts`) were generated and are unverified.
+- **Real music: Homerun, Virtual Love and Switch** (audio in `public/beats/audio`), plus what the
+  operator has added since: the beat "Love on the beach" (made with Gswish: a credit, not a tag) and
+  the song Sinnsyk (not in the library yet: it needs its audio file). Every other song, beat,
+  release, plan or tracker entry that ever appeared in this repo was invented test data. The
+  sample details (BPM, key, mood, play counts, license prices, extra assets, bio) have been removed
+  from `src/data/beats.ts` / `library.ts`; do not put them back. Real contact addresses and channels
+  are in the memory file `artist-contact-and-release-plan`.
   Never invent song facts or metrics: ask the operator, or leave the field empty.
 - An agent's model (`defaultModel`, set in the agent editor) can name its provider:
   `claude-cli:sonnet` (your Claude subscription via the Claude Code CLI), `ollama:<model>`,

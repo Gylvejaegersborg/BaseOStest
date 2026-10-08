@@ -45,6 +45,9 @@ const SEED_TODO_IDS = new Set(['t1', 't2', 't3', 't4', 't5', 't6', 't7', 'r1', '
 // Likewise the sample events (a1-a14).
 const SEED_APPTS_PURGED_KEY = 'os:calendar:seed-appts-purged:v1'
 const SEED_APPT_IDS = new Set(Array.from({ length: 14 }, (_, i) => `a${i + 1}`))
+// The sample run history on the cron jobs (c1-c6) was invented: stored copies lose it too, once.
+const SEED_CRON_RUNS_KEY = 'os:calendar:cron-sample-runs-cleared:v1'
+const SEED_CRON_IDS = new Set(['c1', 'c2', 'c3', 'c4', 'c5', 'c6'])
 const TEAM_TODO_PREFIX = 'team-t-'
 
 /** A reminder is a timed todo that notifies at its time. */
@@ -242,6 +245,23 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
     })
     localStorage.setItem(SEED_APPTS_PURGED_KEY, '1')
   }, [persistAppts])
+
+  // One-time: stored copies of the sample cron jobs lose their invented run history (the jobs themselves stay).
+  useEffect(() => {
+    if (localStorage.getItem(SEED_CRON_RUNS_KEY)) return
+    setCrons((list) => {
+      let changed = false
+      const next = list.map((c) => {
+        if (!SEED_CRON_IDS.has(c.id)) return c
+        changed = true
+        const { avgRuntime: _a, successRate: _s, recentRuns: _r, outputs: _o, ...rest } = c
+        void _a, _s, _r, _o
+        return { ...rest, lastRun: 'never', status: 'ok' as const }
+      })
+      return changed ? persistCrons(next) : list
+    })
+    localStorage.setItem(SEED_CRON_RUNS_KEY, '1')
+  }, [persistCrons])
 
   const deleteTask = useCallback((id: string) => setTasks((list) => persistTasks(list.filter((t) => t.id !== id))), [persistTasks])
 
