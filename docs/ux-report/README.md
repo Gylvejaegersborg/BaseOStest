@@ -26,7 +26,9 @@ A working list of things to fix, with evidence, so we can go through it over tim
 
 | ID | Sev | Cert. | Status |
 |---|---|---|---|
-| T1 | High | Confirmed | open |
+| T1 | High | Confirmed | done |
+
+> **Done:** rebuilt on real data (agent-os `GET /ops`). Services: the gateway (uptime, memory), Hindsight (a real HTTP check) and your connectors. Devices: your real Tailscale devices (this server, the phone, MSI with when it was last seen). This machine: CPU, memory, disk, data size. Problems: failed tasks, blocked work, stopped flows, supervisor restarts (shown as info), the gateway's error log. Logs: the real gateway, supervisor and error log files. Agents: real token use and success rate. Anything it cannot read says so; nothing is a placeholder. All the old invented services, devices and log lines are gone.
 
 **T1. The Ops page is made-up data presented as live.** *Screen: `/ops` ([ops.webp](shots/ops.webp)).*
 Services (homeserver, copyparty, artist-web, vault-api, beat-db, discord-bridge) with latency and uptime charts, devices (iPhone, Studio Mac, NAS, Pi-monitor with 192.168.1.x addresses), a "live log" (`tail -f /var/log/basespace` with every line stamped the same second), and errors such as "Import failed: unsupported sample rate 96kHz" and "Master complete: track_0427". It all comes from `src/data/ops.ts`, and the log label is hard-coded in `src/pages/Ops.tsx`. The project's own rule is to never invent facts or metrics.
@@ -34,9 +36,9 @@ Services (homeserver, copyparty, artist-web, vault-api, beat-db, discord-bridge)
 
 | ID | Sev | Cert. | Status |
 |---|---|---|---|
-| T2 | High | Confirmed | partly done (Pipeline Monitor removed; the rest is real, see note) |
+| T2 | High | Confirmed | done |
 
-> **Your answer:** everything in the Lab is real except the Pipeline Monitor (the old ops from before the runner). **Done:** the Pipeline Monitor is removed (its code is in git history). **Still open, uncertain:** the empty preview boxes and the fake "Test console" in the Lab's side panel; do you want those removed, or are they placeholders for something coming?
+> **Your answer:** everything in the Lab is real except the Pipeline Monitor (the old ops from before the runner). **Done:** the Pipeline Monitor is removed (its code is in git history). **Also done:** the empty preview boxes and the fake "Test console" are removed; the cards now show the name, kind and status.
 
 **T2. Lab shows hard-coded "LIVE / STAGING / LOCAL" badges, empty preview boxes and a fake console.** *Screen: `/lab` ([lab.webp](shots/lab.webp)).*
 Statuses are typed into `src/data/labs.ts`. The previews are grey placeholders ("PREVIEW · STOREFRONT"). The Test console says "connected to beat-store" and offers Ping / Build / Deploy. I could not tell which of these apps exist.
@@ -44,9 +46,9 @@ Statuses are typed into `src/data/labs.ts`. The previews are grey placeholders (
 
 | ID | Sev | Cert. | Status |
 |---|---|---|---|
-| T3 | Med | Confirmed | partly done (sample todos removed; projects and events still open) |
+| T3 | Med | Confirmed | done |
 
-> **Your answer:** all the old todos were fake; the projects are real but contained mock data. **Done:** the sample todos and the two sample reminders are removed from the code, and from any browser that stored them (one-time, only those ids). **Still open:** the projects' mock details. Each project still has progress bars, "last move" / "next move" and timeline entries that were typed in as samples, and the Calendar's todo list also fills with items derived from them. I did not guess which text is real (the "AI Artist Management" timeline, for example, looks genuine). Tell me which fields to clear. The Calendar's events (Gym, Long walk, Master new single…) are also unanswered.
+> **Your answer:** all the old todos were fake; the projects are real but contained mock data. **Done:** the sample todos and the two sample reminders are removed from the code, and from any browser that stored them (one-time, only those ids). **Also done (your answers):** the sample Calendar events are removed (code and any stored copies; crons untouched). Every project except AI Artist Management lost its sample last/next moves, plans and timeline; its own timeline stays. Progress bars are gone from Goals and no longer reach the agents. The Calendar todo list no longer fills with items derived from the sample moves.
 
 **T3. Sample items are mixed into your real lists.** *Screens: Calendar ([calendar.webp](shots/calendar.webp)), Projects, Notes.*
 Calendar has "Gym", "Renew domain artist.app", "Reply to sync licensing email", "Master new single". Projects has "Copyparty Server", "Homeserver Setup", "iOS Shortcuts Bridge". The vault notes ("Welcome", "Formatting"…) show invented "5m ago / 40m ago" times. They sit in the same lists as the real Salient todos, so "2/33 done · 6%" means nothing. These come from `src/data/calendar.ts`, `projects.ts` and `notes.ts`.
