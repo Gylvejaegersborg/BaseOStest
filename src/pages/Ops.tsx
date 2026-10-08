@@ -188,9 +188,9 @@ export function Ops() {
         </Stat>
       </div>
 
-      <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 lg:min-h-0 lg:flex-1 lg:grid-cols-3">
         {/* Services, devices, this machine */}
-        <div className="flex min-h-0 flex-col gap-3">
+        <div className="flex flex-col gap-3 lg:min-h-0">
           <Panel title="Services" code="HEALTH" accent="#e05c67" className="rounded-none" bodyClassName="space-y-1 p-1.5">
             {services.length === 0 && <p className="p-1 text-xs text-dim">{error ? 'Not reachable.' : 'Loading…'}</p>}
             {services.map((s) => (
@@ -310,7 +310,7 @@ export function Ops() {
         </Panel>
 
         {/* Problems and agents */}
-        <div className="flex min-h-0 flex-col gap-3">
+        <div className="flex flex-col gap-3 lg:min-h-0">
           <Panel
             title="Problems"
             code="REAL"
