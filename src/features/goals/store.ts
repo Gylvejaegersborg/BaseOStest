@@ -168,8 +168,6 @@ export interface GoalView extends Goal {
   /** Its own projects plus every sub-goal's, deduplicated — what the goal
    *  actually rests on, for progress and next-move counts. */
   allProjects: ProjectView[]
-  /** Average progress over allProjects (shipped counts as 100); null with none. */
-  progress: number | null
 }
 
 /** Everything connected to each goal, for the Goals view and the snapshot. */
@@ -189,7 +187,6 @@ export function useGoalViews(): GoalView[] {
         if (!list) byProjectNotes.set(p.id, (list = graph.notesLinkingToProject(p.id)))
         return list.map((note) => ({ note, via: p }))
       })
-      const progressOf = (p: ProjectView) => (p.status === 'shipped' ? 100 : p.progress)
       // Roll up through sub-goals (cycle-safe).
       const seen = new Set<string>([g.id])
       const ids = new Set(g.projectIds)
@@ -210,7 +207,6 @@ export function useGoalViews(): GoalView[] {
         notes: notes.filter((n) => noteLinksGoal(n, g)),
         projectNotes,
         allProjects,
-        progress: allProjects.length ? Math.round(allProjects.reduce((s, p) => s + progressOf(p), 0) / allProjects.length) : null,
       }
     })
   }, [all, projects, notes, graph])

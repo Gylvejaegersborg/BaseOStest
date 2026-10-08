@@ -1,77 +1,25 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import {
-  AlertTriangle,
-  Bug,
-  Copy,
-  Cpu,
-  HardDrive,
-  Maximize2,
-  Pause,
-  Play,
-  Radio,
-  Server,
-  Smartphone,
-  Terminal,
-  Trash2,
-  Wifi,
-  WifiOff,
-} from 'lucide-react'
-import { DEVICES, OPS_ERRORS, SERVICES, makeLogLine, type DeviceConn, type ServiceStatus } from '@/data/ops'
+import { Link } from 'react-router-dom'
+import { Copy, Cpu, HardDrive, Monitor, Server, Smartphone, Terminal, Trash2, Wifi, WifiOff } from 'lucide-react'
 import { isRealAgent, type Agent } from '@/data/agents'
 import { useAgentOsContext } from '@/features/agentos/AgentOsProvider'
+import { useOps, type OpsProblem, type OpsReport, type TailDevice } from '@/features/agentos/useOps'
 import { clearErrors, dismissError, useAppErrors, type Severity } from '@/lib/errorBus'
 import { Panel } from '@/components/ui/Panel'
-import { Modal } from '@/components/ui/Modal'
 import { StatusDot } from '@/components/ui/StatusDot'
 import { relTime } from '@/lib/time'
 import { cn } from '@/lib/cn'
 
 /**
- * Ops is the deliberate Command Deck exception (design territories,
- * page-specific patterns): flat, sharp, dense. Everything is layered —
- * a summary strip, panels, a full-table pop-up per panel, and a detail
- * pop-up per row with related errors, log lines and raw data — because
- * this page is for debugging.
+ * Ops is the deliberate Command Deck exception (flat, sharp, dense) and it shows only what is real: this server and the
+ * gateway on it (agent-os's /ops), the Tailscale devices that can reach it, the problems that actually happened (failed
+ * tasks, blocked work, stopped flows, supervisor restarts, the gateway's error log), the real log files, the agents'
+ * real usage, and BaseSpace's own errors. Anything that cannot be read says so instead of showing a placeholder.
  */
 
-const STATE_COLOR = { up: '#46d369', degraded: '#f0a020', down: '#ff5566' } as const
+const STATE_COLOR = { up: '#46d369', down: '#ff5566', unconfigured: '#6b7785' } as const
 const SEV_COLOR: Record<Severity, string> = { error: '#ff5566', warn: '#f0a020', info: '#6b7785' }
-const DEVICE_ICON: Record<string, typeof Cpu> = {
-  mobile: Smartphone,
-  server: Server,
-  workstation: Cpu,
-  storage: HardDrive,
-  sensor: Radio,
-}
-
-interface LogLine {
-  time: string
-  source: string
-  text: string
-}
-
-/** One error shape for both the monitored-services feed and failures
- *  captured inside BaseSpace itself. */
-interface Issue {
-  id: string
-  severity: Severity
-  source: string
-  message: string
-  context?: string
-  stack?: string
-  when: string
-  count: number
-  firstSeen?: string
-  origin: 'services' | 'basespace'
-}
-
-type Detail =
-  | { kind: 'service'; item: ServiceStatus }
-  | { kind: 'device'; item: DeviceConn }
-  | { kind: 'issue'; item: Issue }
-  | { kind: 'agent'; item: Agent }
-  | { kind: 'log'; line: LogLine }
-  | { kind: 'table'; panel: 'services' | 'devices' | 'issues' | 'agents' }
+const DEVICE_ICON: Record<string, typeof Cpu> = { windows: Monitor, linux: Server, macOS: Monitor, iOS: Smartphone, android: Smartphone }
 
 async function ping(url: string): Promise<number> {
   const t0 = performance.now()
@@ -83,71 +31,71 @@ async function ping(url: string): Promise<number> {
   }
 }
 
-/** "12.4M" → 12_400_000 (for comparing agents' token usage). */
-function tokenCount(s: string): number {
-  const m = /([\d.]+)\s*([KMB])?/i.exec(s)
-  if (!m) return 0
-  const mult = { K: 1e3, M: 1e6, B: 1e9 }[(m[2] ?? '').toUpperCase() as 'K' | 'M' | 'B'] ?? 1
-  return Number(m[1]) * mult
+const fmtUptime = (sec: number) => {
+  const d = Math.floor(sec / 86400)
+  const h = Math.floor((sec % 86400) / 3600)
+  const m = Math.floor((sec % 3600) / 60)
+  return d ? `${d}d ${h}h` : h ? `${h}h ${m}m` : `${m}m`
+}
+const fmtTokens = (n: number | null | undefined) => (n == null ? '—' : n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}k` : String(n))
+const gb = (mb: number) => (mb >= 1024 ? `${(mb / 1024).toFixed(1)} GB` : `${mb} MB`)
+const pctColor = (p: number) => (p >= 90 ? '#ff5566' : p >= 75 ? '#f0a020' : '#46d369')
+
+function Bar({ value, label }: { value: number; label: string }) {
+  const v = Math.max(0, Math.min(100, value))
+  return (
+    <div>
+      <div className="mb-0.5 flex justify-between text-[10px] text-dim">
+        <span>{label}</span>
+        <span className="tabular-nums">{Math.round(v)}%</span>
+      </div>
+      <div className="h-1 w-full bg-line">
+        <div className="h-1" style={{ width: `${v}%`, background: pctColor(v) }} />
+      </div>
+    </div>
+  )
 }
 
-const pct = (v: number | null | undefined) => (v == null ? '—' : `${Math.round(v * 100)}%`)
+function Stat({ label, children, hint }: { label: string; children: ReactNode; hint?: string }) {
+  return (
+    <div className="border border-line bg-panel/70 px-3 py-2">
+      <p className="text-[9px] uppercase tracking-widest text-dim">{label}</p>
+      <div className="mt-1 flex items-baseline gap-2 font-display text-lg">{children}</div>
+      {hint && <p className="mt-0.5 truncate text-[10px] text-dim">{hint}</p>}
+    </div>
+  )
+}
+const Num = ({ v, c }: { v: number | string; c: string }) => (
+  <span className="tabular-nums" style={{ color: c }}>
+    {v}
+  </span>
+)
 
-/** Tokens an agent has used: real (Agent-OS) when connected — null if its
- *  model doesn't report usage — otherwise the bundled roster's demo figure. */
-function agentTokens(a: Agent): number | null {
-  if (a.live) return a.live.tokens ?? null
-  return tokenCount(a.stats.tokens)
+function Row({ dot, name, detail, right }: { dot: string; name: string; detail?: string; right?: ReactNode }) {
+  return (
+    <div className="flex items-center gap-2 border border-line bg-bg/30 px-2 py-1">
+      <StatusDot color={dot} size={6} />
+      <span className="w-36 shrink-0 truncate text-xs text-text">{name}</span>
+      <span className="min-w-0 flex-1 truncate text-[10px] text-dim">{detail}</span>
+      {right && <span className="shrink-0 text-[10px] tabular-nums text-dim">{right}</span>}
+    </div>
+  )
 }
 
-/** What the usage bar compares: tokens, or model turns when no model reports tokens. */
-function usageOf(a: Agent, byTurns: boolean): number {
-  return byTurns ? (a.live?.turns ?? 0) : (agentTokens(a) ?? 0)
-}
-
-function fmtTokens(n: number | null): string {
-  if (n == null) return '—'
-  if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`
-  if (n >= 1e3) return `${(n / 1e3).toFixed(1)}k`
-  return String(n)
-}
-
-function lastTurn(a: Agent): string {
-  const t = a.live?.lastTurnAt
-  if (!t) return a.live ? 'no turns yet' : a.stats.uptime
-  const min = Math.round((Date.now() - new Date(t).getTime()) / 60_000)
-  return min < 1 ? 'just now' : min < 60 ? `${min}m ago` : min < 1440 ? `${Math.round(min / 60)}h ago` : `${Math.round(min / 1440)}d ago`
-}
+type LogTab = 'gateway' | 'supervisor' | 'errors'
 
 export function Ops() {
-  const { agents: allAgents, connection, events } = useAgentOsContext()
-  // Nyx's simulated sub-agents have no Agent-OS identity; hide them once real data is in.
-  const agents = connection === 'live' ? allAgents.filter(isRealAgent) : allAgents
+  const { agents: allAgents, connection } = useAgentOsContext()
+  const agents = connection === 'live' ? allAgents.filter(isRealAgent) : []
   const appErrors = useAppErrors()
-  const [logs, setLogs] = useState<LogLine[]>(() => Array.from({ length: 16 }, (_, i) => makeLogLine(i)))
-  const [paused, setPaused] = useState(false)
-  const [logFilter, setLogFilter] = useState('')
+  const { data, error, updatedAt } = useOps()
   const [online, setOnline] = useState(navigator.onLine)
   const [selfLatency, setSelfLatency] = useState<number | null>(null)
-  const [sevFilter, setSevFilter] = useState<Severity | 'all'>('all')
-  // Pop-ups stack: opening one from inside another pushes it, and closing
-  // it returns to the parent instead of closing everything.
-  const [stack, setStack] = useState<Detail[]>([])
-  const detail = stack[stack.length - 1] ?? null
-  const setDetail = (d: Detail | null) => setStack(d ? [d] : [])
-  const pushDetail = (d: Detail) => setStack((st) => [...st, d])
-  const popDetail = () => setStack((st) => st.slice(0, -1))
-  const seed = useRef(16)
-  const logScrollRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (paused) return
-    const id = window.setInterval(() => {
-      seed.current += 1
-      setLogs((l) => [...l.slice(-300), makeLogLine(seed.current)])
-    }, 1400)
-    return () => window.clearInterval(id)
-  }, [paused])
+  const [logTab, setLogTab] = useState<LogTab>('gateway')
+  const [logFilter, setLogFilter] = useState('')
+  const [sev, setSev] = useState<Severity | 'all'>('all')
+  const logRef = useRef<HTMLDivElement>(null)
+  const stick = useRef(true)
 
   useEffect(() => {
     const on = () => setOnline(true)
@@ -159,7 +107,6 @@ export function Ops() {
       window.removeEventListener('offline', off)
     }
   }, [])
-
   useEffect(() => {
     const measure = async () => setSelfLatency(await ping(window.location.origin + '/'))
     void measure()
@@ -167,754 +114,282 @@ export function Ops() {
     return () => window.clearInterval(id)
   }, [])
 
-  // Real Agent-OS events join the stream when a gateway is connected.
-  const allLogs = useMemo<LogLine[]>(() => {
-    const evs = events.map((e) => ({
-      time: new Date(e.time).toTimeString().slice(0, 8),
-      source: String(e.payload.agentId ?? 'agent-os'),
-      text: e.type,
-    }))
-    return [...logs, ...evs].sort((a, b) => a.time.localeCompare(b.time))
-  }, [logs, events])
-  const shownLogs = logFilter ? allLogs.filter((l) => l.source === logFilter) : allLogs
-  const logSources = useMemo(() => [...new Set(allLogs.map((l) => l.source))].sort(), [allLogs])
-
-  // Stick to the bottom while the reader is at the bottom; leave their
-  // scroll position alone once they've scrolled up. Keyed on the last line
-  // (the length stops changing once the buffer is full).
-  const stick = useRef(true)
-  const lastLine = shownLogs[shownLogs.length - 1]
+  const logLines = data ? (logTab === 'gateway' ? data.logs.gateway : logTab === 'supervisor' ? data.logs.supervisor : data.logs.gatewayErrors) : []
+  const shownLines = logFilter ? logLines.filter((l) => l.toLowerCase().includes(logFilter.toLowerCase())) : logLines
   useEffect(() => {
-    const el = logScrollRef.current
+    const el = logRef.current
     if (el && stick.current) el.scrollTop = el.scrollHeight
-  }, [lastLine])
+  }, [shownLines.length, logTab, updatedAt])
 
-  const issues = useMemo<Issue[]>(
-    () => [
-      ...appErrors.map((e) => ({
-        id: e.id,
-        severity: e.severity,
-        source: e.source,
-        message: e.message,
-        context: e.context,
-        stack: e.stack,
-        when: relTime(new Date(e.lastSeen)),
-        count: e.count,
-        firstSeen: e.firstSeen,
-        origin: 'basespace' as const,
-      })),
-      ...OPS_ERRORS.map((e) => ({ ...e, when: e.ago, count: 1, origin: 'services' as const })),
-    ],
-    [appErrors],
-  )
-  const shownIssues = sevFilter === 'all' ? issues : issues.filter((i) => i.severity === sevFilter)
+  // Problems: the machine's real ones, then BaseSpace's own errors.
+  const problems = useMemo(() => {
+    const own: OpsProblem[] = appErrors.map((e) => ({
+      id: `bs:${e.id}`,
+      kind: 'log',
+      severity: e.severity,
+      when: e.lastSeen,
+      source: `BaseSpace · ${e.source}`,
+      text: e.count > 1 ? `${e.message} (×${e.count})` : e.message,
+    }))
+    return [...(data?.problems ?? []), ...own]
+      .filter((p) => sev === 'all' || p.severity === sev)
+      .sort((a, b) => Date.parse(b.when) - Date.parse(a.when))
+  }, [data?.problems, appErrors, sev])
+  const counts = (s: Severity) => (data?.problems ?? []).filter((p) => p.severity === s).length + appErrors.filter((e) => e.severity === s).length
 
-  const count = <T,>(xs: T[], f: (x: T) => boolean) => xs.filter(f).length
-  // Real usage once Agent-OS is connected; bars fall back to turn counts
-  // when the model in use doesn't report tokens (e.g. the stub).
-  const byTurns = connection === 'live' && agents.every((a) => a.live?.tokens == null)
-  const maxTokens = Math.max(1, ...agents.map((a) => usageOf(a, byTurns)))
-
-  const related = (source: string) => ({
-    issues: issues.filter((i) => i.source.toLowerCase().includes(source.toLowerCase()) || source.toLowerCase().includes(i.source.toLowerCase())),
-    logs: allLogs.filter((l) => l.source.toLowerCase() === source.toLowerCase()).slice(-12),
-  })
+  const services = data?.services ?? []
+  const connectors = data?.connectors ?? []
+  const svcUp = services.filter((s) => s.state === 'up').length + connectors.filter((c) => c.enabled && c.status === 'connected').length
+  const svcTotal = services.filter((s) => s.state !== 'unconfigured').length + connectors.filter((c) => c.enabled).length
+  const ts = data?.tailscale
+  const devices: TailDevice[] = ts && !('error' in ts) ? [ts.self, ...ts.peers] : []
+  const maxUse = Math.max(1, ...agents.map((a) => a.live?.tokens ?? a.live?.turns ?? 0))
 
   return (
     <div className="flex h-full flex-col gap-3 overflow-y-auto p-3 sm:p-4">
-      {/* Header */}
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="font-display text-lg tracking-wider text-crimson-3">OPS CONSOLE</h1>
         <span className={cn('flex items-center gap-1 text-[10px] uppercase tracking-wider', online ? 'text-neon-green' : 'text-danger')}>
           {online ? <Wifi size={12} /> : <WifiOff size={12} />}
           {online ? 'online' : 'offline'}
         </span>
-        {selfLatency !== null && online && (
-          <span className="text-[10px] tabular-nums text-dim">self {selfLatency >= 0 ? `${selfLatency}ms` : '—'}</span>
-        )}
+        {selfLatency !== null && online && <span className="text-[10px] tabular-nums text-dim">this page {selfLatency >= 0 ? `${selfLatency}ms` : '—'}</span>}
         <span className="text-[10px] uppercase tracking-wider text-dim">
-          agent-os:{' '}
-          <span className={connection === 'live' ? 'text-neon-green' : connection === 'error' ? 'text-danger' : 'text-amber'}>{connection}</span>
+          agent-os: <span className={connection === 'live' ? 'text-neon-green' : connection === 'error' ? 'text-danger' : 'text-amber'}>{connection}</span>
         </span>
+        {updatedAt && <span className="text-[10px] text-dim">updated {relTime(new Date(updatedAt))}</span>}
       </div>
 
-      {/* Summary strip — every tile opens its panel as a full table */}
+      {error && !data && <p className="border border-danger/40 bg-danger/10 px-3 py-2 text-xs text-danger">The gateway's Ops report could not be read: {error}</p>}
+
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
-        <Stat label="Services" onClick={() => setDetail({ kind: 'table', panel: 'services' })}>
-          <Num v={count(SERVICES, (s) => s.state === 'up')} c={STATE_COLOR.up} />
-          <Num v={count(SERVICES, (s) => s.state === 'degraded')} c={STATE_COLOR.degraded} />
-          <Num v={count(SERVICES, (s) => s.state === 'down')} c={STATE_COLOR.down} />
+        <Stat label="Services" hint={data ? 'gateway, memory, connectors' : undefined}>
+          <Num v={svcUp} c="#46d369" />
+          <span className="text-sm text-dim">/ {svcTotal}</span>
         </Stat>
-        <Stat label="Devices" onClick={() => setDetail({ kind: 'table', panel: 'devices' })}>
-          <Num v={count(DEVICES, (d) => d.online)} c="#46d369" />
-          <Num v={count(DEVICES, (d) => !d.online)} c="#ff5566" />
+        <Stat label="Devices" hint={ts && 'error' in ts ? 'Tailscale unavailable' : 'on your tailnet'}>
+          <Num v={devices.filter((d) => d.online).length} c="#46d369" />
+          <span className="text-sm text-dim">/ {devices.length}</span>
         </Stat>
-        <Stat label="Issues" onClick={() => setDetail({ kind: 'table', panel: 'issues' })}>
-          <Num v={count(issues, (i) => i.severity === 'error')} c={SEV_COLOR.error} />
-          <Num v={count(issues, (i) => i.severity === 'warn')} c={SEV_COLOR.warn} />
-          <Num v={count(issues, (i) => i.severity === 'info')} c={SEV_COLOR.info} />
+        <Stat label="Problems" hint="last 48 hours">
+          <Num v={counts('error')} c={SEV_COLOR.error} />
+          <Num v={counts('warn')} c={SEV_COLOR.warn} />
+          <Num v={counts('info')} c={SEV_COLOR.info} />
         </Stat>
-        <Stat label="BaseSpace failures" onClick={() => setDetail({ kind: 'table', panel: 'issues' })}>
+        <Stat label="BaseSpace errors" hint={`${appErrors.reduce((n, e) => n + e.count, 0)} in total`}>
           <Num v={appErrors.length} c={appErrors.length ? '#ff5566' : '#46d369'} />
-          <span className="text-[10px] text-dim">{appErrors.reduce((n, e) => n + e.count, 0)} total</span>
         </Stat>
-        <Stat label="Agents" onClick={() => setDetail({ kind: 'table', panel: 'agents' })}>
-          <Num v={count(agents, (a) => a.status === 'working' || a.status === 'thinking')} c="#46d369" />
-          <Num v={count(agents, (a) => a.status === 'idle')} c="#6b7785" />
-          <Num v={count(agents, (a) => a.status === 'offline')} c="#ff5566" />
+        <Stat label="Agents" hint={agents.filter((a) => a.control?.paused).length ? `${agents.filter((a) => a.control?.paused).length} paused` : undefined}>
+          <Num v={agents.filter((a) => a.status === 'working' || a.status === 'thinking').length} c="#46d369" />
+          <Num v={agents.filter((a) => a.status === 'idle').length} c="#6b7785" />
         </Stat>
-        <Stat label="Log lines">
-          <Num v={allLogs.length} c="#f0a020" />
-          <span className="text-[10px] text-dim">{logSources.length} sources</span>
+        <Stat label="Data" hint={data?.gateway.dataDir}>
+          <Num v={data ? gb(data.host.dataMB ?? 0) : '—'} c="#f0a020" />
         </Stat>
       </div>
 
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-3">
-        {/* Services + devices */}
+        {/* Services, devices, this machine */}
         <div className="flex min-h-0 flex-col gap-3">
-          <Panel title="Services" code="HEALTH" accent="#e05c67" className="rounded-none" bodyClassName="p-1.5" right={<Expand onClick={() => setDetail({ kind: 'table', panel: 'services' })} />}>
-            <div className="space-y-1">
-              {SERVICES.map((s) => (
-                <ServiceRow key={s.id} svc={s} issues={related(s.name).issues.length} onClick={() => setDetail({ kind: 'service', item: s })} />
-              ))}
-            </div>
+          <Panel title="Services" code="HEALTH" accent="#e05c67" className="rounded-none" bodyClassName="space-y-1 p-1.5">
+            {services.length === 0 && <p className="p-1 text-xs text-dim">{error ? 'Not reachable.' : 'Loading…'}</p>}
+            {services.map((s) => (
+              <Row
+                key={s.id}
+                dot={STATE_COLOR[s.state]}
+                name={s.name}
+                detail={s.state === 'unconfigured' ? s.detail : s.id === 'gateway' && data ? `up ${fmtUptime(data.gateway.uptimeSec)} · ${data.gateway.memoryMB} MB · ${data.gateway.node}` : s.detail}
+                right={s.ms != null ? `${s.ms}ms` : undefined}
+              />
+            ))}
+            {connectors.map((c) => (
+              <Row
+                key={c.name}
+                dot={!c.enabled ? '#6b7785' : c.status === 'connected' ? '#46d369' : '#ff5566'}
+                name={c.name.replace(/^claude\.ai\s+/i, '')}
+                detail={`${c.kind === 'account' ? 'account connector' : 'local server'} · ${c.enabled ? 'on' : 'off'} · ${c.status}`}
+              />
+            ))}
           </Panel>
-          <Panel title="Devices" code="CONN" accent="#46d369" className="rounded-none" bodyClassName="p-1.5" right={<Expand onClick={() => setDetail({ kind: 'table', panel: 'devices' })} />}>
-            <div className="space-y-1">
-              {DEVICES.map((d) => {
-                const Icon = DEVICE_ICON[d.kind] ?? Cpu
-                return (
-                  <button
-                    key={d.id}
-                    onClick={() => setDetail({ kind: 'device', item: d })}
-                    className="flex w-full items-center gap-2 border border-line bg-bg/30 px-2 py-1 text-left transition-colors hover:border-line-2"
-                  >
-                    <Icon size={13} className={d.online ? 'text-neon-green' : 'text-danger'} />
-                    <span className="w-24 truncate text-xs text-text">{d.name}</span>
-                    <span className="min-w-0 flex-1 truncate text-[10px] text-dim">{d.detail}</span>
-                    <span className="text-[10px] tabular-nums text-dim">{d.ip}</span>
-                  </button>
-                )
-              })}
-            </div>
+
+          <Panel title="Devices" code="TAILSCALE" accent="#46d369" className="rounded-none" bodyClassName="space-y-1 p-1.5">
+            {ts && 'error' in ts && <p className="p-1 text-xs text-dim">{ts.error}</p>}
+            {!ts && <p className="p-1 text-xs text-dim">{error ? 'Not reachable.' : 'Loading…'}</p>}
+            {devices.map((d) => {
+              const Icon = DEVICE_ICON[d.os] ?? Cpu
+              return (
+                <div key={`${d.name}-${d.ip}`} className="flex items-center gap-2 border border-line bg-bg/30 px-2 py-1">
+                  <Icon size={13} className={d.online ? 'text-neon-green' : 'text-dim'} />
+                  <span className="w-28 shrink-0 truncate text-xs text-text">
+                    {d.name}
+                    {d.self && <span className="ml-1 text-[9px] text-accent">this server</span>}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-[10px] text-dim">
+                    {d.os}
+                    {!d.online && d.lastSeen ? ` · last seen ${relTime(new Date(d.lastSeen))}` : d.online ? ' · online' : ' · offline'}
+                  </span>
+                  <span className="text-[10px] tabular-nums text-dim">{d.ip}</span>
+                </div>
+              )
+            })}
+          </Panel>
+
+          <Panel title="This machine" code="HOST" accent="#9b7bff" className="rounded-none" bodyClassName="space-y-2.5 p-3">
+            {!data ? (
+              <p className="text-xs text-dim">{error ? 'Not reachable.' : 'Loading…'}</p>
+            ) : (
+              <>
+                <p className="flex items-center gap-1.5 text-xs text-text">
+                  <HardDrive size={12} className="text-dim" /> {data.host.name} <span className="text-dim">· up {fmtUptime(data.host.uptimeSec)}</span>
+                </p>
+                {data.host.cpuPercent != null && <Bar value={data.host.cpuPercent} label={`CPU · ${data.host.cpus} cores`} />}
+                <Bar value={((data.host.memTotalMB - data.host.memFreeMB) / data.host.memTotalMB) * 100} label={`Memory · ${gb(data.host.memTotalMB - data.host.memFreeMB)} of ${gb(data.host.memTotalMB)}`} />
+                {data.host.disk && <Bar value={((data.host.disk.totalGB - data.host.disk.freeGB) / data.host.disk.totalGB) * 100} label={`Disk (data drive) · ${data.host.disk.freeGB} GB free of ${data.host.disk.totalGB} GB`} />}
+                <p className="truncate text-[10px] text-dim" title={data.host.cpuModel}>
+                  {data.host.cpuModel} · {data.gateway.platform} · terminal {data.gateway.terminal ? 'on' : 'off'}
+                </p>
+              </>
+            )}
           </Panel>
         </div>
 
-        {/* Log stream */}
+        {/* Logs */}
         <Panel
-          title="Live Log"
-          code="STREAM"
+          title="Logs"
+          code="FILES"
           accent="#f0a020"
           className="min-h-[360px] rounded-none lg:min-h-0"
           bodyClassName="flex min-h-0 flex-col p-0"
           right={
-            <button onClick={() => setPaused((p) => !p)} title={paused ? 'Resume' : 'Pause'} className="text-dim hover:text-text">
-              {paused ? <Play size={13} /> : <Pause size={13} />}
+            <button
+              onClick={() => void navigator.clipboard?.writeText(shownLines.join('\n'))}
+              title="Copy what is shown"
+              className="text-dim hover:text-text"
+            >
+              <Copy size={13} />
             </button>
           }
         >
           <div className="flex items-center gap-1.5 border-b border-line px-2 py-1 text-[10px] text-dim">
-            <Terminal size={11} /> tail -f /var/log/basespace
-            <select
-              value={logFilter}
-              onChange={(e) => setLogFilter(e.target.value)}
-              className="ml-auto border border-line bg-bg px-1 py-0.5 text-[10px] text-text focus:outline-none"
-            >
-              <option value="">all sources</option>
-              {logSources.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div
-            ref={logScrollRef}
-            onScroll={(e) => {
-              const el = e.currentTarget
-              stick.current = el.scrollHeight - el.scrollTop - el.clientHeight < 40
-            }}
-            className="min-h-0 flex-1 overflow-y-auto p-1.5 text-[11px] leading-relaxed"
-          >
-            {shownLogs.map((l, i) => (
-              <button
-                key={i}
-                onClick={() => setDetail({ kind: 'log', line: l })}
-                className="flex w-full gap-2 whitespace-nowrap px-1 text-left hover:bg-panel-2/60"
-              >
-                <span className="tabular-nums text-dim">{l.time}</span>
-                <span className="text-accent">[{l.source}]</span>
-                <span className="truncate text-text/80">{l.text}</span>
+            <Terminal size={11} />
+            {(['gateway', 'supervisor', 'errors'] as LogTab[]).map((t) => (
+              <button key={t} onClick={() => setLogTab(t)} className={cn('px-1.5 py-0.5 uppercase tracking-wider', logTab === t ? 'bg-panel-2 text-text' : 'hover:text-text')}>
+                {t}
               </button>
             ))}
+            <input
+              value={logFilter}
+              onChange={(e) => setLogFilter(e.target.value)}
+              placeholder="filter"
+              className="ml-auto w-24 border border-line bg-bg px-1 py-0.5 text-[10px] text-text placeholder:text-dim focus:outline-none"
+            />
           </div>
+          <div
+            ref={logRef}
+            onScroll={(e) => {
+              const el = e.currentTarget
+              stick.current = el.scrollHeight - el.scrollTop - el.clientHeight < 24
+            }}
+            className="min-h-0 flex-1 overflow-y-auto p-2 font-mono text-[11px] leading-relaxed"
+          >
+            {!data ? (
+              <p className="text-dim">{error ? 'Not reachable.' : 'Loading…'}</p>
+            ) : !data.logs.dir ? (
+              <p className="text-dim">The gateway cannot find its log directory (set AGENT_OS_LOG_DIR), so there is nothing to show.</p>
+            ) : shownLines.length === 0 ? (
+              <p className="text-dim">{logTab === 'errors' ? 'The error log is empty. Good.' : 'Nothing in this log.'}</p>
+            ) : (
+              shownLines.map((l, i) => (
+                <div key={i} className={cn('whitespace-pre-wrap break-words', /error|fail|exited|refused|ECONN/i.test(l) ? 'text-danger/90' : 'text-text/80')}>
+                  {l}
+                </div>
+              ))
+            )}
+          </div>
+          {data?.logs.dir && <p className="border-t border-line px-2 py-1 text-[10px] text-dim">last lines of the real files in {data.logs.dir}, refreshed every 10 s</p>}
         </Panel>
 
-        {/* Issues + agents */}
+        {/* Problems and agents */}
         <div className="flex min-h-0 flex-col gap-3">
           <Panel
-            title="Errors & Warnings"
-            code="ALERT"
+            title="Problems"
+            code="REAL"
             accent="#ff5566"
             className="rounded-none"
-            bodyClassName="p-1.5"
-            right={<Expand onClick={() => setDetail({ kind: 'table', panel: 'issues' })} />}
+            bodyClassName="p-0"
+            right={
+              appErrors.length > 0 ? (
+                <button onClick={() => clearErrors()} title="Clear BaseSpace's own errors" className="text-dim hover:text-text">
+                  <Trash2 size={13} />
+                </button>
+              ) : undefined
+            }
           >
-            <div className="mb-1.5 flex flex-wrap gap-1 text-[10px]">
+            <div className="flex gap-1 border-b border-line px-2 py-1 text-[10px]">
               {(['all', 'error', 'warn', 'info'] as const).map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setSevFilter(s)}
-                  className={cn('border px-1.5 py-0.5 uppercase tracking-wider', sevFilter === s ? 'border-line-2 text-text' : 'border-line text-dim hover:text-text')}
-                  style={s !== 'all' && sevFilter === s ? { color: SEV_COLOR[s], borderColor: `${SEV_COLOR[s]}88` } : undefined}
-                >
-                  {s} {s === 'all' ? issues.length : count(issues, (i) => i.severity === s)}
+                <button key={s} onClick={() => setSev(s)} className={cn('px-1.5 py-0.5 uppercase tracking-wider', sev === s ? 'bg-panel-2 text-text' : 'text-dim hover:text-text')}>
+                  {s}
                 </button>
               ))}
             </div>
-            <div className="max-h-[340px] space-y-1 overflow-y-auto">
-              {shownIssues.map((e) => (
-                <IssueRow key={e.id} issue={e} onClick={() => setDetail({ kind: 'issue', item: e })} />
+            <div className="max-h-[340px] divide-y divide-line/60 overflow-y-auto">
+              {problems.length === 0 && <p className="p-3 text-xs text-dim">Nothing has gone wrong in the last 48 hours.</p>}
+              {problems.map((p) => (
+                <div key={p.id} className="px-3 py-2" style={{ borderLeft: `2px solid ${SEV_COLOR[p.severity]}` }}>
+                  <p className="flex items-center gap-2 text-[10px] uppercase tracking-wider" style={{ color: SEV_COLOR[p.severity] }}>
+                    {p.severity} <span className="text-dim normal-case tracking-normal">· {p.source} · {relTime(new Date(p.when))}</span>
+                    {p.id.startsWith('bs:') && (
+                      <button onClick={() => dismissError(p.id.slice(3))} className="ml-auto text-dim hover:text-text normal-case tracking-normal">
+                        dismiss
+                      </button>
+                    )}
+                  </p>
+                  <p className="mt-0.5 break-words text-xs text-text/90">{p.text}</p>
+                  {p.flowId && (
+                    <Link to={`/workbench?panel=flow&flow=${encodeURIComponent(p.flowId)}`} className="text-[10px] text-accent hover:underline">
+                      open the flow →
+                    </Link>
+                  )}
+                </div>
               ))}
-              {!shownIssues.length && <div className="p-2 text-[11px] text-dim">Nothing here.</div>}
             </div>
           </Panel>
 
-          <Panel title="Agent Health" code="AGT" accent="#e0408a" className="rounded-none" bodyClassName="p-1.5" right={<Expand onClick={() => setDetail({ kind: 'table', panel: 'agents' })} />}>
-            <div className="mb-1 flex gap-2 px-2 text-[9px] uppercase tracking-wider text-dim">
-              <span className="w-20">agent</span>
-              <span className="flex-1">{byTurns ? 'turns (share)' : 'token usage (share)'}</span>
-              <span className="w-12 text-right">{byTurns ? 'turns' : 'tokens'}</span>
-              <span className="w-12 text-right" title="Task success rate — live from Agent-OS">success</span>
-            </div>
+          <Panel title="Agents" code="USAGE" accent="#9b7bff" className="rounded-none" bodyClassName="p-1.5">
+            {agents.length === 0 && <p className="p-1 text-xs text-dim">{connection === 'live' ? 'No agents.' : 'The gateway is not connected, so there is nothing real to show.'}</p>}
             <div className="space-y-1">
               {agents.map((a) => (
-                <button
-                  key={a.id}
-                  onClick={() => setDetail({ kind: 'agent', item: a })}
-                  className="flex w-full items-center gap-2 border border-line bg-bg/30 px-2 py-1 text-left transition-colors hover:border-line-2"
-                >
-                  <StatusDot color={a.status === 'offline' ? '#ff5566' : a.color} pulse={a.status === 'working'} size={6} />
-                  <span className="w-[68px] truncate text-xs text-text">{a.name}</span>
-                  <div className="h-1.5 flex-1 bg-bg">
-                    <div className="h-full" style={{ width: `${(usageOf(a, byTurns) / maxTokens) * 100}%`, backgroundColor: a.color }} />
-                  </div>
-                  <span className="w-12 text-right text-[10px] tabular-nums text-dim">{byTurns ? (a.live?.turns ?? 0) : fmtTokens(agentTokens(a))}</span>
-                  <span className="w-12 text-right text-[10px] tabular-nums text-dim">{pct(a.live?.successRate)}</span>
-                </button>
+                <AgentRow key={a.id} a={a} max={maxUse} />
               ))}
             </div>
+            <p className="px-1 pt-1.5 text-[10px] text-dim">Tokens (or model turns when a model does not report tokens) used so far, and the share of tasks that succeeded.</p>
           </Panel>
         </div>
       </div>
-
-      {detail && (
-        <DetailModal
-          key={stack.length}
-          detail={detail}
-          onClose={popDetail}
-          open={pushDetail}
-          issues={issues}
-          agents={agents}
-          logs={allLogs}
-          related={related}
-        />
-      )}
     </div>
   )
 }
 
-// ---- small pieces -----------------------------------------------------------
-
-/** Clickable log lines. Follows new lines only while scrolled to the bottom. */
-function LogList({
-  lines,
-  onOpen,
-  current,
-  className,
-  follow = true,
-}: {
-  lines: LogLine[]
-  onOpen: (l: LogLine) => void
-  current?: LogLine
-  className?: string
-  follow?: boolean
-}) {
-  const ref = useRef<HTMLDivElement>(null)
-  const stick = useRef(true)
-  const last = lines[lines.length - 1]
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    if (!follow) {
-      const cur = el.querySelector<HTMLElement>('[data-current]')
-      if (cur) el.scrollTop = cur.offsetTop - el.clientHeight / 2
-      return
-    }
-    if (stick.current) el.scrollTop = el.scrollHeight
-  }, [last, follow])
+function AgentRow({ a, max }: { a: Agent; max: number }) {
+  const use = a.live?.tokens ?? a.live?.turns ?? 0
+  const last = a.live?.lastTurnAt ? relTime(new Date(a.live.lastTurnAt)) : 'no turns yet'
   return (
-    <div
-      ref={ref}
-      onScroll={(e) => {
-        const el = e.currentTarget
-        stick.current = el.scrollHeight - el.scrollTop - el.clientHeight < 30
-      }}
-      className={cn('relative overflow-y-auto border border-line bg-bg/40 p-1.5 text-[11px]', className)}
-    >
-      {lines.map((l, j) => (
-        <button
-          key={`${l.time}-${l.source}-${j}`}
-          data-current={l === current || undefined}
-          onClick={() => onOpen(l)}
-          className={cn('flex w-full gap-2 whitespace-nowrap px-1 text-left hover:bg-panel-2/60', l === current && 'bg-amber/15')}
-        >
-          <span className="tabular-nums text-dim">{l.time}</span>
-          <span className="text-accent">[{l.source}]</span>
-          <span className="truncate text-text/80">{l.text}</span>
-        </button>
-      ))}
-      {!lines.length && <div className="text-dim">No lines from this source yet.</div>}
+    <div className="border border-line bg-bg/30 px-2 py-1.5">
+      <div className="flex items-center gap-2 text-xs">
+        <StatusDot color={a.control?.paused ? '#f0a020' : a.status === 'offline' ? '#ff5566' : a.status === 'idle' ? '#6b7785' : '#46d369'} size={6} />
+        <span className="w-20 shrink-0 truncate text-text">{a.name}</span>
+        <div className="h-1 min-w-0 flex-1 bg-line">
+          <div className="h-1" style={{ width: `${Math.max(2, (use / max) * 100)}%`, background: a.color }} />
+        </div>
+        <span className="w-14 shrink-0 text-right text-[10px] tabular-nums text-dim">{fmtTokens(a.live?.tokens ?? null)}</span>
+        <span className="w-10 shrink-0 text-right text-[10px] tabular-nums text-dim">{a.live?.successRate == null ? '—' : `${Math.round(a.live.successRate * 100)}%`}</span>
+      </div>
+      <p className="mt-0.5 pl-4 text-[10px] text-dim">
+        {a.control?.paused ? 'paused · ' : ''}
+        {a.model} · last turn {last}
+      </p>
     </div>
   )
 }
 
-function Stat({ label, children, onClick }: { label: string; children: ReactNode; onClick?: () => void }) {
-  return (
-    <button onClick={onClick} disabled={!onClick} className="border border-line bg-panel/50 px-2.5 py-1.5 text-left transition-colors hover:border-line-2 disabled:hover:border-line">
-      <div className="text-[9px] uppercase tracking-wider text-dim">{label}</div>
-      <div className="flex items-baseline gap-2">{children}</div>
-    </button>
-  )
-}
-
-function Num({ v, c }: { v: number; c: string }) {
-  return (
-    <span className="font-display text-lg tabular-nums" style={{ color: v ? c : '#3a4048' }}>
-      {v}
-    </span>
-  )
-}
-
-function Expand({ onClick }: { onClick: () => void }) {
-  return (
-    <button onClick={onClick} title="Open full view" className="text-dim hover:text-text">
-      <Maximize2 size={12} />
-    </button>
-  )
-}
-
-function Spark({ svc, h = 16 }: { svc: ServiceStatus; h?: number }) {
-  const color = STATE_COLOR[svc.state]
-  const max = Math.max(...svc.spark)
-  return (
-    <svg viewBox={`0 0 64 ${h + 2}`} className="w-full" style={{ height: h }} preserveAspectRatio="none">
-      <polyline
-        fill="none"
-        stroke={color}
-        strokeWidth={1}
-        vectorEffect="non-scaling-stroke"
-        points={svc.spark.map((v, i) => `${(i / (svc.spark.length - 1)) * 64},${h + 1 - (v / max) * h}`).join(' ')}
-      />
-    </svg>
-  )
-}
-
-function ServiceRow({ svc, issues, onClick }: { svc: ServiceStatus; issues: number; onClick: () => void }) {
-  const color = STATE_COLOR[svc.state]
-  return (
-    <button onClick={onClick} className="flex w-full items-center gap-2 border border-line bg-bg/30 px-2 py-1 text-left transition-colors hover:border-line-2">
-      <StatusDot color={color} pulse={svc.state !== 'down'} size={6} />
-      <span className="w-24 truncate text-xs text-text">{svc.name}</span>
-      <div className="min-w-0 flex-1">
-        <Spark svc={svc} h={14} />
-      </div>
-      <span className="w-10 text-right text-[10px] tabular-nums text-dim">{svc.errorRate}</span>
-      <span className="w-12 text-right text-[10px] tabular-nums" style={{ color }}>
-        {svc.state === 'down' ? '—' : `${svc.latency}ms`}
-      </span>
-      {issues > 0 && <span className="text-[10px] text-danger">⚠{issues}</span>}
-    </button>
-  )
-}
-
-function IssueRow({ issue: e, onClick }: { issue: Issue; onClick: () => void }) {
-  return (
-    <button onClick={onClick} className="w-full border-l-2 bg-bg/30 px-2 py-1 text-left transition-colors hover:bg-bg/50" style={{ borderColor: SEV_COLOR[e.severity] }}>
-      <div className="flex items-center gap-1.5 text-[10px]">
-        <span className="flex items-center gap-1 uppercase tracking-wider" style={{ color: SEV_COLOR[e.severity] }}>
-          {e.origin === 'basespace' ? <Bug size={10} /> : <AlertTriangle size={10} />} {e.severity} · {e.source}
-        </span>
-        {e.count > 1 && <span className="bg-panel-2 px-1 text-text/80">×{e.count}</span>}
-        <span className="ml-auto text-dim">{e.when}</span>
-      </div>
-      <div className="truncate text-xs text-text/85">{e.message}</div>
-    </button>
-  )
-}
-
-function KV({ k, v, c }: { k: string; v: ReactNode; c?: string }) {
-  return (
-    <div className="border border-line bg-bg/30 px-2 py-1">
-      <div className="text-[9px] uppercase tracking-wider text-dim">{k}</div>
-      <div className="truncate text-xs tabular-nums text-text" style={c ? { color: c } : undefined}>
-        {v}
-      </div>
-    </div>
-  )
-}
-
-function Section({ title, children, right }: { title: string; children: ReactNode; right?: ReactNode }) {
-  return (
-    <div className="mt-3">
-      <div className="mb-1 flex items-center text-[10px] uppercase tracking-wider text-dim">
-        {title}
-        <span className="ml-auto">{right}</span>
-      </div>
-      {children}
-    </div>
-  )
-}
-
-function Raw({ value }: { value: unknown }) {
-  const text = JSON.stringify(value, null, 2)
-  return (
-    <details className="mt-3 border border-line bg-bg/40">
-      <summary className="cursor-pointer px-2 py-1 text-[10px] uppercase tracking-wider text-dim">Raw data</summary>
-      <div className="relative">
-        <button onClick={() => void navigator.clipboard?.writeText(text)} className="absolute right-2 top-1 text-dim hover:text-text" title="Copy">
-          <Copy size={12} />
-        </button>
-        <pre className="max-h-64 overflow-auto p-2 text-[10px] leading-relaxed text-text/80">{text}</pre>
-      </div>
-    </details>
-  )
-}
-
-// ---- detail pop-ups -----------------------------------------------------------
-
-function DetailModal({
-  detail,
-  onClose,
-  open,
-  issues,
-  agents,
-  logs,
-  related,
-}: {
-  detail: Detail
-  onClose: () => void
-  open: (d: Detail) => void
-  issues: Issue[]
-  agents: Agent[]
-  logs: LogLine[]
-  related: (source: string) => { issues: Issue[]; logs: LogLine[] }
-}) {
-  const [pingResult, setPingResult] = useState<string | null>(null)
-
-  // A plain function, not a component defined in render — a component
-  // defined here remounts on every log tick, which reset its scroll.
-  const relatedBlock = (source: string) => {
-    const r = related(source)
-    return (
-      <>
-        <Section title={`Related issues (${r.issues.length})`}>
-          <div className="space-y-1">
-            {r.issues.map((i) => (
-              <IssueRow key={i.id} issue={i} onClick={() => open({ kind: 'issue', item: i })} />
-            ))}
-            {!r.issues.length && <div className="text-[11px] text-dim">None.</div>}
-          </div>
-        </Section>
-        <Section title={`Recent log lines (${r.logs.length})`}>
-          <LogList lines={r.logs} onOpen={(l) => open({ kind: 'log', line: l })} className="max-h-40" />
-        </Section>
-      </>
-    )
-  }
-
-  let title = ''
-  let accent = '#e05c67'
-  let body: ReactNode = null
-
-  switch (detail.kind) {
-    case 'service': {
-      const s = detail.item
-      title = s.name
-      accent = STATE_COLOR[s.state]
-      body = (
-        <>
-          <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
-            <KV k="state" v={s.state} c={STATE_COLOR[s.state]} />
-            <KV k="latency" v={s.state === 'down' ? '—' : `${s.latency}ms`} />
-            <KV k="uptime" v={s.uptime} />
-            <KV k="error rate" v={s.errorRate} />
-          </div>
-          <Section title="Latency trend">
-            <div className="border border-line bg-bg/40 p-2">
-              <Spark svc={s} h={60} />
-            </div>
-          </Section>
-          <Section
-            title="Endpoint"
-            right={
-              <span className="flex gap-2">
-                <button
-                  onClick={async () => {
-                    setPingResult('pinging…')
-                    const ms = await ping(`http://${s.endpoint}`)
-                    setPingResult(ms >= 0 ? `reachable in ${ms}ms` : 'unreachable from this browser')
-                  }}
-                  className="text-accent hover:underline"
-                >
-                  ping now
-                </button>
-                <button onClick={() => void navigator.clipboard?.writeText(s.endpoint)} className="hover:text-text">
-                  copy
-                </button>
-              </span>
-            }
-          >
-            <div className="border border-line bg-bg/40 px-2 py-1 text-xs text-text">
-              {s.endpoint}
-              {pingResult && <span className="ml-2 text-dim">· {pingResult}</span>}
-            </div>
-          </Section>
-          {relatedBlock(s.name)}
-          <Raw value={s} />
-        </>
-      )
-      break
-    }
-    case 'device': {
-      const d = detail.item
-      title = d.name
-      accent = d.online ? '#46d369' : '#ff5566'
-      body = (
-        <>
-          <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
-            <KV k="status" v={d.online ? 'online' : 'offline'} c={accent} />
-            <KV k="kind" v={d.kind} />
-            <KV k="ip" v={d.ip} />
-            <KV k="last seen" v={d.lastSeen} />
-          </div>
-          <Section title="Detail">
-            <div className="border border-line bg-bg/40 px-2 py-1 text-xs text-text/85">{d.detail}</div>
-          </Section>
-          {relatedBlock(d.name)}
-          <Raw value={d} />
-        </>
-      )
-      break
-    }
-    case 'issue': {
-      const e = detail.item
-      title = `${e.severity} · ${e.source}`
-      accent = SEV_COLOR[e.severity]
-      body = (
-        <>
-          <div className="border-l-2 bg-bg/40 px-2 py-1.5 text-sm text-text" style={{ borderColor: accent }}>
-            {e.message}
-          </div>
-          <div className="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
-            <KV k="origin" v={e.origin === 'basespace' ? 'inside BaseSpace' : 'monitored service'} />
-            <KV k="occurrences" v={e.count} />
-            <KV k="last seen" v={e.when} />
-            <KV k="first seen" v={e.firstSeen ? relTime(new Date(e.firstSeen)) : '—'} />
-          </div>
-          {e.context && (
-            <Section title="Context">
-              <pre className="max-h-40 overflow-auto whitespace-pre-wrap border border-line bg-bg/40 p-2 text-[11px] text-text/80">{e.context}</pre>
-            </Section>
-          )}
-          {e.stack && (
-            <Section title="Stack trace">
-              <pre className="max-h-56 overflow-auto border border-line bg-bg/40 p-2 text-[10px] leading-relaxed text-text/70">{e.stack}</pre>
-            </Section>
-          )}
-          <div className="mt-3 flex gap-3 text-[11px]">
-            <button
-              onClick={() => void navigator.clipboard?.writeText(JSON.stringify(e, null, 2))}
-              className="flex items-center gap-1 text-dim hover:text-text"
-            >
-              <Copy size={12} /> Copy details
-            </button>
-            {e.origin === 'basespace' && (
-              <button
-                onClick={() => {
-                  dismissError(e.id)
-                  onClose()
-                }}
-                className="flex items-center gap-1 text-dim hover:text-danger"
-              >
-                <Trash2 size={12} /> Dismiss
-              </button>
-            )}
-          </div>
-          {relatedBlock(e.source)}
-        </>
-      )
-      break
-    }
-    case 'agent': {
-      const a = detail.item
-      title = a.name
-      accent = a.color
-      body = (
-        <>
-          <div className="text-xs text-dim">
-            {a.role} · {a.model}
-          </div>
-          <div className="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
-            <KV k="status" v={a.status} c={a.status === 'offline' ? '#ff5566' : a.color} />
-            <KV k="tokens used" v={fmtTokens(agentTokens(a))} />
-            <KV k="model turns" v={a.live?.turns ?? '—'} />
-            <KV k={a.live ? 'last turn' : 'uptime'} v={lastTurn(a)} />
-            <KV k="tasks done" v={a.live?.tasks ?? a.stats.tasksDone} />
-            <KV k="success rate" v={pct(a.live?.successRate)} c="#46d369" />
-            <KV k="failure rate" v={pct(a.live?.failureRate)} c="#ff5566" />
-            <KV k="avg turn" v={a.live?.avgTurnMs != null ? `${Math.round(a.live.avgTurnMs)}ms` : '—'} />
-          </div>
-          {!a.live && <p className="mt-1.5 text-[10px] text-dim">Agent-OS isn't connected — these are the local roster's demo figures.</p>}
-          <Section title="Current task">
-            <div className="border border-line bg-bg/40 px-2 py-1 text-xs text-text/85">{a.task || '—'}</div>
-          </Section>
-          {relatedBlock(a.id)}
-          <Raw value={a} />
-        </>
-      )
-      break
-    }
-    case 'log': {
-      const target = detail.line
-      const i = logs.findIndex((l) => l === target || (l.time === target.time && l.source === target.source && l.text === target.text))
-      const line = logs[i] ?? target
-      title = `[${line.source}] ${line.time}`
-      accent = '#f0a020'
-      body = (
-        <>
-          <div className="border border-line bg-bg/40 px-2 py-1.5 text-sm text-text">{line.text}</div>
-          <Section title="Surrounding lines">
-            <LogList
-              lines={i >= 0 ? logs.slice(Math.max(0, i - 8), i + 9) : [line]}
-              current={line}
-              onOpen={(l) => l !== line && open({ kind: 'log', line: l })}
-              className="max-h-64"
-              follow={false}
-            />
-          </Section>
-          {relatedBlock(line.source)}
-        </>
-      )
-      break
-    }
-    case 'table': {
-      accent = '#e05c67'
-      const th = 'border-b border-line px-2 py-1 text-left text-[9px] font-normal uppercase tracking-wider text-dim'
-      const td = 'border-b border-line/60 px-2 py-1 text-[11px] tabular-nums text-text/85'
-      if (detail.panel === 'services') {
-        title = 'All services'
-        body = (
-          <table className="w-full">
-            <thead>
-              <tr>{['service', 'state', 'latency', 'uptime', 'errors', 'endpoint', 'issues'].map((h) => <th key={h} className={th}>{h}</th>)}</tr>
-            </thead>
-            <tbody>
-              {SERVICES.map((s) => (
-                <tr key={s.id} onClick={() => open({ kind: 'service', item: s })} className="cursor-pointer hover:bg-panel-2/60">
-                  <td className={td}>{s.name}</td>
-                  <td className={td} style={{ color: STATE_COLOR[s.state] }}>{s.state}</td>
-                  <td className={td}>{s.state === 'down' ? '—' : `${s.latency}ms`}</td>
-                  <td className={td}>{s.uptime}</td>
-                  <td className={td}>{s.errorRate}</td>
-                  <td className={td}>{s.endpoint}</td>
-                  <td className={td}>{related(s.name).issues.length}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )
-      } else if (detail.panel === 'devices') {
-        title = 'All devices'
-        body = (
-          <table className="w-full">
-            <thead>
-              <tr>{['device', 'kind', 'status', 'ip', 'last seen', 'detail'].map((h) => <th key={h} className={th}>{h}</th>)}</tr>
-            </thead>
-            <tbody>
-              {DEVICES.map((d) => (
-                <tr key={d.id} onClick={() => open({ kind: 'device', item: d })} className="cursor-pointer hover:bg-panel-2/60">
-                  <td className={td}>{d.name}</td>
-                  <td className={td}>{d.kind}</td>
-                  <td className={td} style={{ color: d.online ? '#46d369' : '#ff5566' }}>{d.online ? 'online' : 'offline'}</td>
-                  <td className={td}>{d.ip}</td>
-                  <td className={td}>{d.lastSeen}</td>
-                  <td className={td}>{d.detail}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )
-      } else if (detail.panel === 'issues') {
-        title = 'All issues'
-        body = (
-          <>
-            <div className="mb-2 flex justify-end">
-              <button onClick={clearErrors} className="flex items-center gap-1 text-[11px] text-dim hover:text-danger">
-                <Trash2 size={12} /> Clear BaseSpace failures
-              </button>
-            </div>
-            <table className="w-full">
-              <thead>
-                <tr>{['severity', 'origin', 'source', 'message', 'count', 'last seen'].map((h) => <th key={h} className={th}>{h}</th>)}</tr>
-              </thead>
-              <tbody>
-                {issues.map((e) => (
-                  <tr key={e.id} onClick={() => open({ kind: 'issue', item: e })} className="cursor-pointer hover:bg-panel-2/60">
-                    <td className={td} style={{ color: SEV_COLOR[e.severity] }}>{e.severity}</td>
-                    <td className={td}>{e.origin === 'basespace' ? 'BaseSpace' : 'service'}</td>
-                    <td className={td}>{e.source}</td>
-                    <td className={cn(td, 'max-w-[320px] truncate')}>{e.message}</td>
-                    <td className={td}>{e.count}</td>
-                    <td className={td}>{e.when}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </>
-        )
-      } else {
-        title = 'All agents'
-        body = (
-          <table className="w-full">
-            <thead>
-              <tr>{['agent', 'status', 'model', 'tokens', 'turns', 'tasks', 'success', 'avg turn', 'last turn'].map((h) => <th key={h} className={th}>{h}</th>)}</tr>
-            </thead>
-            <tbody>
-              {agents.map((a) => (
-                <tr key={a.id} onClick={() => open({ kind: 'agent', item: a })} className="cursor-pointer hover:bg-panel-2/60">
-                  <td className={td} style={{ color: a.color }}>{a.name}</td>
-                  <td className={td}>{a.status}</td>
-                  <td className={td}>{a.model}</td>
-                  <td className={td}>{fmtTokens(agentTokens(a))}</td>
-                  <td className={td}>{a.live?.turns ?? '—'}</td>
-                  <td className={td}>{a.live?.tasks ?? a.stats.tasksDone}</td>
-                  <td className={td}>{pct(a.live?.successRate)}</td>
-                  <td className={td}>{a.live?.avgTurnMs != null ? `${Math.round(a.live.avgTurnMs)}ms` : '—'}</td>
-                  <td className={td}>{lastTurn(a)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )
-      }
-      break
-    }
-  }
-
-  return (
-    <Modal open onClose={onClose} title={title} code="OPS" accent={accent} width={detail.kind === 'table' ? 900 : 680}>
-      {body}
-    </Modal>
-  )
-}
+export type { OpsReport }

@@ -76,6 +76,36 @@ export interface AgentOsNeedsYou {
 }
 export const fetchNeedsYou = () => getJSON<AgentOsNeedsYou>('/basespace/needs-you')
 
+/** The gateway's real Ops report (agent-os: GET /ops). */
+export interface OpsProblem {
+  id: string
+  kind: 'task' | 'work' | 'flow' | 'approval' | 'supervisor' | 'log'
+  severity: 'error' | 'warn' | 'info'
+  when: string
+  source: string
+  text: string
+  flowId?: string
+}
+export interface TailDevice {
+  name: string
+  ip: string
+  os: string
+  online: boolean
+  lastSeen?: string
+  self?: boolean
+}
+export interface OpsReport {
+  at: string
+  gateway: { pid: number; startedAt: string; uptimeSec: number; memoryMB: number; node: string; platform: string; dataDir: string; terminal: boolean }
+  host: { name: string; uptimeSec: number; memTotalMB: number; memFreeMB: number; cpus: number; cpuModel: string; cpuPercent: number | null; disk?: { path: string; totalGB: number; freeGB: number }; dataMB: number | null }
+  services: { id: string; name: string; state: 'up' | 'down' | 'unconfigured'; detail?: string; ms?: number }[]
+  connectors: { name: string; kind: string; status: string; enabled: boolean }[]
+  tailscale: { error: string } | { backend: string; self: TailDevice; peers: TailDevice[] }
+  problems: OpsProblem[]
+  logs: { dir?: string; gateway: string[]; supervisor: string[]; gatewayErrors: string[] }
+}
+export const fetchOps = () => getJSON<OpsReport>('/ops', 12000)
+
 /** Push BaseSpace's current state for the agents to read. */
 export function pushSnapshot(snapshot: unknown): Promise<{ ok: true; savedAt: string; bytes: number }> {
   return writeJSON('POST', '/basespace/snapshot', snapshot, 15000)

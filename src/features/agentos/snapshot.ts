@@ -30,7 +30,6 @@ export interface BaseSpaceSnapshot {
     name: string
     status: string
     tagline: string
-    progress: number
     tags: string[]
     props: Record<string, unknown>
     nextMoves: string[]
@@ -52,7 +51,6 @@ export interface BaseSpaceSnapshot {
     projectIds: string[]
     /** Notes linking the goal, then notes linking its projects. */
     noteIds: string[]
-    progress: number | null
   }[]
   events: { id: string; title: string; kind: string; date: string; start: number; end: number; location?: string; recurring: boolean }[]
   crons: { id: string; name: string; owner: string; team?: string; focus?: { kind: 'goal' | 'project'; id: string }; schedule: unknown; nextRun: string; status: string }[]
@@ -95,7 +93,6 @@ export function useSnapshot(): BaseSpaceSnapshot {
       name: p.name,
       status: p.status,
       tagline: p.tagline,
-      progress: p.progress,
       tags: p.tags,
       props: p.props,
       nextMoves: p.plans.map((e) => e.text),
@@ -146,7 +143,6 @@ export function useSnapshot(): BaseSpaceSnapshot {
       parentId: g.parentId,
       projectIds: g.projectIds,
       noteIds: [...new Set([...g.notes.map((n) => n.id), ...g.projectNotes.map((x) => x.note.id)])],
-      progress: g.progress,
     })),
   }
 }

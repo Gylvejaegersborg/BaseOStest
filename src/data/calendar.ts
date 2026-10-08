@@ -38,22 +38,8 @@ export const KIND_COLOR: Record<Appt['kind'], string> = {
   meeting: '#9b7bff',
 }
 
-export const APPOINTMENTS: Appt[] = [
-  { id: 'a1', title: 'Master new single', dayOffset: 0, start: 9, end: 10.5, kind: 'music', location: 'Studio', notes: 'Final loudness pass before upload routine picks it up.', reminderMinutes: 15 },
-  { id: 'a2', title: 'Agent standup', dayOffset: 0, start: 11, end: 11.5, kind: 'agent', location: 'Meeting Room', notes: 'Claude / Hemera / Nyx sync.', reminderMinutes: 5 },
-  { id: 'a3', title: 'Homeserver maintenance', dayOffset: 0, start: 14, end: 15, kind: 'tech', notes: 'Apply container updates, check disks.' },
-  { id: 'a4', title: 'Gym', dayOffset: 0, start: 18, end: 19, kind: 'life', reminderMinutes: 30 },
-  { id: 'a5', title: 'Beat DB review', dayOffset: 1, start: 10, end: 11, kind: 'tech', notes: 'Triage smart-playlist ideas.' },
-  { id: 'a6', title: 'Release planning w/ Hemera', dayOffset: 1, start: 13, end: 14, kind: 'meeting', location: 'Chat' },
-  { id: 'a7', title: 'Write lyrics', dayOffset: 1, start: 16, end: 17.5, kind: 'music' },
-  { id: 'a8', title: 'Discord bot deploy', dayOffset: 2, start: 9.5, end: 10.5, kind: 'tech' },
-  { id: 'a9', title: 'Cook + reset', dayOffset: 2, start: 19, end: 20, kind: 'life' },
-  { id: 'a10', title: 'Artist site A/B test', dayOffset: 3, start: 11, end: 12, kind: 'tech', location: 'Lab' },
-  { id: 'a11', title: 'Mix session', dayOffset: 3, start: 15, end: 17, kind: 'music', location: 'Studio' },
-  { id: 'a12', title: 'Weekly review', dayOffset: 4, start: 16, end: 17, kind: 'meeting', notes: 'Look back at all project moves.' },
-  { id: 'a13', title: 'Long walk', dayOffset: -1, start: 8, end: 9, kind: 'life' },
-  { id: 'a14', title: 'Vault cleanup', dayOffset: 5, start: 10, end: 11, kind: 'tech' },
-]
+// No sample events: every event in BaseSpace is a real one (the sample set was removed; see SEED_APPTS_PURGED_KEY in CalendarContext).
+export const APPOINTMENTS: Appt[] = []
 
 // ─── Tasks ──────────────────────────────────────────────────────────────────
 

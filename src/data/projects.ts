@@ -18,7 +18,6 @@ export interface Project {
   nextMove: string
   /** Further open plans beyond nextMove. */
   extraPlans?: string[]
-  progress: number // 0-100
   tags: string[]
   links?: { label: string; href: string }[]
   timeline: Move[]
@@ -41,7 +40,6 @@ export const PROJECTS: Project[] = [
     what: 'A crew of AI agents that plan releases, schedule posts, draft copy and keep the artist brand moving without me babysitting every step.',
     lastMove: 'Moved the team from GitHub Actions into BaseSpace + Agent-OS: teams, standups as cron jobs, snapshot for the agents.',
     nextMove: 'Run the first standup from Agent-OS and check the brief lands in Notes → Team.',
-    progress: 80,
     tags: ['agents', 'music', 'ops'],
     links: [{ label: 'SoundCloud', href: 'https://soundcloud.com/itsisark' }],
     timeline: [
@@ -59,14 +57,10 @@ export const PROJECTS: Project[] = [
     status: 'active',
     tagline: 'Cron-driven create → master → upload pipeline.',
     what: 'Scheduled routines that take a finished track, run loudness mastering, generate metadata + art prompts, and push to the distribution queue.',
-    lastMove: 'Added automatic ISRC tagging before upload.',
-    nextMove: 'Hook the mastering step into the beat database UI.',
-    progress: 48,
+    lastMove: '',
+    nextMove: '',
     tags: ['music', 'automation', 'cron'],
-    timeline: [
-      { date: '2026-05-18', text: 'ISRC + metadata auto-tagging live.' },
-      { date: '2026-05-02', text: 'Loudness target locked to -10 LUFS.' },
-    ],
+    timeline: [],
   },
   {
     id: 'obsidian-vault',
@@ -75,14 +69,10 @@ export const PROJECTS: Project[] = [
     status: 'active',
     tagline: 'The long-term memory for every project.',
     what: 'A structured Obsidian vault holding project notes, lyrics, research and decisions. This OS will read and write into it directly.',
-    lastMove: 'Restructured folders by life-area (music / tech / skills).',
-    nextMove: 'Expose the vault over a local API for the Notes section.',
-    progress: 70,
+    lastMove: '',
+    nextMove: '',
     tags: ['notes', 'knowledge'],
-    timeline: [
-      { date: '2026-05-22', text: 'Folder taxonomy reorganised around the OS sections.' },
-      { date: '2026-05-05', text: 'Daily-note template standardised.' },
-    ],
+    timeline: [],
   },
   {
     id: 'copyparty',
@@ -91,14 +81,10 @@ export const PROJECTS: Project[] = [
     status: 'active',
     tagline: 'Self-hosted file sharing + ingest.',
     what: 'A copyparty instance on the homeserver that handles uploads, stems and shared drops between devices and agents.',
-    lastMove: 'Locked down with per-folder tokens.',
-    nextMove: 'Mount as the storage backend for song routines.',
-    progress: 55,
+    lastMove: '',
+    nextMove: '',
     tags: ['server', 'storage'],
-    timeline: [
-      { date: '2026-05-15', text: 'Token-scoped folders enabled.' },
-      { date: '2026-04-28', text: 'Reverse proxy + TLS configured.' },
-    ],
+    timeline: [],
   },
   {
     id: 'homeserver',
@@ -107,17 +93,10 @@ export const PROJECTS: Project[] = [
     status: 'active',
     tagline: 'The machine this OS will live on.',
     what: 'A home server that hosts the agents, the vault API, copyparty and eventually this dashboard — reachable from anywhere.',
-    lastMove: 'Containerised the agent runtimes.',
-    nextMove: 'Add remote tunnel + watchtower auto-updates.',
-    extraPlans: [
-      'Move BaseSpace + Agent-OS here from the Codespace, then set up Hindsight agent memory: run ghcr.io/vectorize-io/hindsight (needs an LLM key), set HINDSIGHT_URL=http://127.0.0.1:8888 for the gateway. Steps in agent-os README → "Hindsight". Left out of the Codespace (docker-in-docker broke its build).',
-    ],
-    progress: 58,
+    lastMove: '',
+    nextMove: '',
     tags: ['infra', 'server'],
-    timeline: [
-      { date: '2026-05-19', text: 'Agents moved into isolated containers.' },
-      { date: '2026-05-01', text: 'Base OS + monitoring stack installed.' },
-    ],
+    timeline: [],
   },
   {
     id: 'artist-web',
@@ -126,15 +105,11 @@ export const PROJECTS: Project[] = [
     status: 'shipped',
     tagline: 'Public face of ISΛRK.',
     what: 'The public artist site linking music, releases and socials. Lives as a lab module so I can test changes safely.',
-    lastMove: 'Shipped the releases grid + link hub.',
-    nextMove: 'A/B test a darker landing hero.',
-    progress: 90,
+    lastMove: '',
+    nextMove: '',
     tags: ['web', 'music', 'public'],
     links: [{ label: '@ISΛRK', href: 'https://soundcloud.com/itsisark' }],
-    timeline: [
-      { date: '2026-05-10', text: 'Releases grid shipped to production.' },
-      { date: '2026-04-20', text: 'Link hub consolidated all socials.' },
-    ],
+    timeline: [],
   },
   {
     id: 'beat-db',
@@ -143,14 +118,10 @@ export const PROJECTS: Project[] = [
     status: 'active',
     tagline: 'Private, searchable beat library.',
     what: 'A private database + UI for cataloguing beats with tags, BPM, key and preview playback. Feeds the song routines.',
-    lastMove: 'Added waveform previews to the grid.',
-    nextMove: 'Bulk-tagging and smart playlists.',
-    progress: 44,
+    lastMove: '',
+    nextMove: '',
     tags: ['music', 'web', 'data'],
-    timeline: [
-      { date: '2026-05-17', text: 'Inline waveform preview added.' },
-      { date: '2026-05-03', text: 'Key + BPM detection on import.' },
-    ],
+    timeline: [],
   },
   {
     id: 'discord-bots',
@@ -159,14 +130,10 @@ export const PROJECTS: Project[] = [
     status: 'active',
     tagline: 'Agents reach me through Discord.',
     what: 'Bots that bridge the agents to Discord — status pings, approvals, and a channel where the crew posts what it is doing.',
-    lastMove: 'Added an approval flow for risky actions.',
-    nextMove: 'Per-agent identities with unique voices.',
-    progress: 50,
+    lastMove: '',
+    nextMove: '',
     tags: ['agents', 'discord', 'ops'],
-    timeline: [
-      { date: '2026-05-21', text: 'Risky-action approvals routed to DM.' },
-      { date: '2026-05-08', text: 'Status ping bot online.' },
-    ],
+    timeline: [],
   },
   {
     id: 'ios-shortcuts',
@@ -175,13 +142,10 @@ export const PROJECTS: Project[] = [
     status: 'paused',
     tagline: 'Trigger the OS from my phone.',
     what: 'Shortcuts that fire OS actions — log a note, queue a track, ask an agent — from anywhere on iOS.',
-    lastMove: 'Built a "quick note to vault" shortcut.',
-    nextMove: 'Resume once the local API is stable.',
-    progress: 30,
+    lastMove: '',
+    nextMove: '',
     tags: ['mobile', 'automation'],
-    timeline: [
-      { date: '2026-04-25', text: 'Quick-note shortcut working end to end.' },
-    ],
+    timeline: [],
   },
   {
     id: 'ai-businesses',
@@ -190,13 +154,10 @@ export const PROJECTS: Project[] = [
     status: 'idea',
     tagline: 'Tiny ventures the agents operate.',
     what: 'Experiment: small, mostly-autonomous businesses where agents handle ops and I set direction. Early scoping only.',
-    lastMove: 'Sketched the first candidate (digital goods).',
-    nextMove: 'Pick one and define guardrails.',
-    progress: 12,
+    lastMove: '',
+    nextMove: '',
     tags: ['agents', 'business', 'experiment'],
-    timeline: [
-      { date: '2026-05-11', text: 'Shortlisted three low-risk business ideas.' },
-    ],
+    timeline: [],
   },
 ]
 
