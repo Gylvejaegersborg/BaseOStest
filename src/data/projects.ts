@@ -63,14 +63,15 @@ export const PROJECTS: Project[] = [
     sectionId: 'calendar',
     status: 'active',
     tagline: 'Cron-driven create → master → upload pipeline.',
-    what: 'Scheduled routines that take a finished track, check it against a LUFS loudness target, prepare its release details and send it to DistroKid. The routines are real ideas that are not built out yet.',
+    what: 'Scheduled routines that take a finished track, check it against a LUFS loudness target, prepare its release details and send it to DistroKid. The ISΛRK Song Tracker (a Lab tool) belongs here: each song’s stage from record to distribute, with its own checklist. The routines are real ideas that are not built out yet.',
     lastMove: 'Built the pieces underneath: the music library, loudness measurement and rough audio editing for the agents, and Sound Lab. No routine runs yet.',
     nextMove: 'LUFS-target normalization: the audio tool only measures loudness and edits roughly.',
-    extraPlans: ['Measure loudness on the real songs and record it on each', 'A per-song release checklist; unknown fields stay empty until I fill them', 'The DistroKid upload is an Approvals item, never automatic'],
+    extraPlans: ['Put the real songs in the Song Tracker (it is empty today)', 'Measure loudness on the real songs and record it on each', 'A per-song release checklist; unknown fields stay empty until I fill them', 'The DistroKid upload is an Approvals item, never automatic'],
     tags: ['music', 'automation', 'cron'],
     timeline: [
       { date: '2026-10-06', text: 'Sound Lab and sound-pack export: drum and melodic one-shots you judge by ear.' },
-      { date: '2026-09-29', text: 'Music library with real uploads, plus agent tools for the library and for audio (loudness measurement, rough edits).' },
+      { date: '2026-09-29', text: 'Music library with real uploads, plus agent tools for the library and for audio (loudness measurement, rough edits). The Song Tracker’s sample songs were removed.' },
+      { date: '2026-06-01', text: 'The Song Tracker created in the Lab (refocused from an older render-queue design).' },
     ],
   },
   {
