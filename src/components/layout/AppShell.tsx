@@ -12,6 +12,7 @@ import { SnapshotSync } from '@/features/agentos/snapshot'
 import { OsOverlayProvider } from '@/features/overlay/osOverlay'
 import { AgentOsProvider } from '@/features/agentos/AgentOsProvider'
 import { sectionForPath } from '@/data/sections'
+import { Launcher } from '@/features/launcher/Launcher'
 
 /** One context menu for the whole app: anything (editor widgets, canvas,
  *  property panels, long-press on touch) can open it via menuBus. */
@@ -75,6 +76,7 @@ export function AppShell() {
       <GlobalNudges />
       <GlobalContextMenu />
       <SnapshotSync />
+      <Launcher />
       </AgentOsProvider>
       </CalendarProvider>
     </OsOverlayProvider>
