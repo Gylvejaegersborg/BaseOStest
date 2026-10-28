@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
+import { format } from 'date-fns'
 import { useNotesList } from '@/features/notes/notesStore'
 import { useProjects } from '@/features/projects/store'
 import { useCalendar } from '@/features/calendar/CalendarContext'
@@ -57,7 +58,8 @@ export interface BaseSpaceSnapshot {
   teams: { id: string; name: string; members: string[]; description?: string }[]
 }
 
-const iso = (d: Date) => d.toISOString().slice(0, 10)
+// Local calendar day. toISOString() is UTC, so local midnight read as the day before east of UTC.
+const iso = (d: Date) => format(d, 'yyyy-MM-dd')
 
 export function useSnapshot(): BaseSpaceSnapshot {
   const notes = useNotesList()
