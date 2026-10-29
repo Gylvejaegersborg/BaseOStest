@@ -28,7 +28,9 @@ const GROUP_LABEL: Record<RendererKind, string> = {
 const GROUP_ORDER: RendererKind[] = ['answer', 'swatch', 'timer-ring', 'form', 'row', 'reply']
 
 /** Alt+B is the HUD key (Alt+Space and Ctrl+Alt+Space are taken on the
- *  operator's machine). Matched by physical key, so it works on any layout. */
+ *  operator's machine). Matched by physical key, so it works on any layout.
+ *  Ctrl+Alt+B is kept free for voice (hud/core): the strict modifier check
+ *  below is what keeps it from opening the launcher too. */
 function isToggleKey(e: KeyboardEvent): boolean {
   return e.code === 'KeyB' && e.altKey && !e.ctrlKey && !e.shiftKey && !e.metaKey
 }
