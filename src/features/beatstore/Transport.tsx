@@ -67,12 +67,13 @@ export function Transport({
           </span>
           <SeekBar progress={progress} onSeek={onSeek} />
           <span className="w-10 font-mono text-[11px] text-isark-text/70">
-            {formatDuration(duration || beat.durationSec)}
+            {formatDuration(duration || beat.durationSec || 0)}
           </span>
         </div>
       </div>
 
       {/* Licenses — click opens the detail modal for that tier */}
+      {beat.licenses.length === 0 && <p className="text-[11px] text-isark-text/60">Licensing is not set up yet.</p>}
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {beat.licenses.map((lic) => {
           const inCart = cartTiers.has(lic.tier)

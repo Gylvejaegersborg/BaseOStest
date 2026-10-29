@@ -41,7 +41,6 @@ interface PanelProps {
 
 export function Panel({
   title,
-  code,
   right,
   children,
   className,
@@ -79,9 +78,6 @@ export function Panel({
       {(title || right || dismissible) && (
         <div className="flex items-center justify-between border-b border-line px-3 py-2">
           <div className="flex items-baseline gap-2 min-w-0">
-            {code && (
-              <span className="text-[10px] tracking-widest text-dim shrink-0">{code}</span>
-            )}
             {title && (
               <h2
                 className="font-display text-sm uppercase tracking-wider truncate"

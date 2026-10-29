@@ -306,49 +306,6 @@ Properties power [[Song catalog]], a **base** that lists notes as a table or as 
 `,
   },
   {
-    id: 'vault-song-neon',
-    title: 'Neon Rain',
-    folder: 'Music/Songs',
-    tags: ['single'],
-    ago: 90,
-    props: { status: 'mixing', bpm: 128, key: 'F minor', release: '2026-10-24', rating: 4, featured: true, cover: '/notes/waveform.svg' },
-    body: `Lead single. The vocal chain is in [[Vocal chain]].
-
-- [ ] Recall the mix after the car test
-- [ ] Print stems for the remix pack
-`,
-  },
-  {
-    id: 'vault-song-glass',
-    title: 'Glass Hearts',
-    folder: 'Music/Songs',
-    tags: ['single'],
-    ago: 400,
-    props: { status: 'recording', bpm: 140, key: 'A minor', release: '2026-12-05', rating: 3, featured: false },
-    body: `Needs a second verse. The hook is in the voice memo from Tuesday.
-`,
-  },
-  {
-    id: 'vault-song-tide',
-    title: 'Low Tide',
-    folder: 'Music/Songs',
-    tags: ['album'],
-    ago: 3000,
-    props: { status: 'released', bpm: 92, key: 'D major', release: '2026-06-14', rating: 5, featured: true },
-    body: `Out now. Released following the [[Release checklist]].
-`,
-  },
-  {
-    id: 'vault-song-static',
-    title: 'Static Bloom',
-    folder: 'Music/Songs',
-    tags: ['idea'],
-    ago: 1500,
-    props: { status: 'idea', bpm: 170, key: 'C# minor', rating: 2, featured: false },
-    body: `Half-time drum and bass sketch. Might become a B-side.
-`,
-  },
-  {
     id: 'vault-songs-base',
     title: 'Song catalog',
     folder: 'Music',
@@ -451,7 +408,7 @@ Properties power [[Song catalog]], a **base** that lists notes as a table or as 
     body: JSON.stringify(
       {
         nodes: [
-          { id: 'g1', type: 'group', x: -40, y: -60, width: 860, height: 380, label: 'Neon Rain rollout', color: '6' },
+          { id: 'g1', type: 'group', x: -40, y: -60, width: 860, height: 380, label: 'Release rollout (template)', color: '6' },
           { id: 'n1', type: 'text', x: 0, y: 0, width: 240, height: 130, text: '## Week 1\nTeaser clips and a pre-save link', color: '5' },
           { id: 'n2', type: 'text', x: 300, y: 0, width: 240, height: 160, text: '## Week 2\n**Release day**\n- Canvas loop live\n- Update the artist page' },
           { id: 'n3', type: 'file', x: 580, y: 0, width: 220, height: 260, noteId: 'vault-release-checklist' },

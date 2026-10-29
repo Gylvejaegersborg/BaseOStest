@@ -43,7 +43,6 @@ interface ProjectPatch {
   // legacy fields from the old overrides store (still honoured)
   lastMove?: string
   nextMove?: string
-  progress?: number
 }
 
 interface State {
@@ -218,7 +217,6 @@ export function createProject(opts: Partial<Project> = {}): string {
     what: opts.what ?? '',
     lastMove: '',
     nextMove: '',
-    progress: 0,
     tags: opts.tags ?? [],
     timeline: [],
   }

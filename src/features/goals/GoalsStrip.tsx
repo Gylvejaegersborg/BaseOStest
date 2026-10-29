@@ -81,9 +81,6 @@ export function GoalsStrip({ onOpenGoal }: { onOpenGoal: (id: string) => void })
                       <Flag size={9} /> {g.chain[1]!.title}
                     </p>
                   )}
-                  <div className="mt-2 h-1 w-full bg-line">
-                    <div className="h-1 bg-[#f0a020]" style={{ width: `${g.progress ?? 0}%` }} />
-                  </div>
                   <p className="mt-1.5 truncate text-[10px] text-dim">
                     {g.allProjects.length} project{g.allProjects.length === 1 ? '' : 's'}
                     {viaSubGoals > 0 && ` (${viaSubGoals} via sub-goals)`} · {g.notes.length + g.projectNotes.length} notes · {open} next moves

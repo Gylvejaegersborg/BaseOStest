@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Check, Mail, ShoppingBag, X } from 'lucide-react'
-import { CONTACT_EMAIL, formatPrice, type Beat, type License } from '@/data/beats'
+import { CONTACT_EMAIL, beatSpecs, formatPrice, type Beat, type License } from '@/data/beats'
 
 interface LicenseDetailModalProps {
   beat: Beat
@@ -60,7 +60,7 @@ export function LicenseDetailModal({ beat, license, inCart, onAddToCart, onClose
               {beat.title}
             </h2>
             <p className="mt-1 font-mono text-[11px] uppercase tracking-wider text-white/85">
-              {beat.bpm} BPM · {beat.musicalKey} · {beat.artist}
+              {[...beatSpecs(beat), beat.artist].join(' · ')}
             </p>
           </div>
         </div>

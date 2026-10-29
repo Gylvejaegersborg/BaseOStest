@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Search, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
-import { BEATS, MOODS, type Beat, formatDuration, formatPlays } from '@/data/beats'
+import { BEATS, MOODS, type Beat, beatSpecs, formatPlays } from '@/data/beats'
 import { useOsOverlay, mergeById } from '@/features/overlay/osOverlay'
 
 interface BeatMenuProps {
@@ -115,7 +115,7 @@ function BeatLine({
           {beat.title}
         </div>
         <div className="font-mono text-[10px] uppercase tracking-wider text-isark-dim">
-          {beat.bpm} BPM · {beat.musicalKey} · {formatDuration(beat.durationSec)} · {formatPlays(beat.plays)} plays
+          {[...beatSpecs(beat), beat.plays ? `${formatPlays(beat.plays)} plays` : ''].filter(Boolean).join(' · ')}
         </div>
       </div>
     </button>

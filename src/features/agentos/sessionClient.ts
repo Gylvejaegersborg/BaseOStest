@@ -253,6 +253,10 @@ export interface AgentOsFlowStep {
 
 export interface AgentOsFlow {
   id: string
+  /** What whoever made it called it (older flows have none). */
+  title?: string
+  /** What it was made of, when the gateway knows (flows made by an agent or through the gateway). */
+  definition?: { title?: string; summary?: string; proposedBy?: string; steps: FlowStepInput[] } | null
   kind: 'managed' | 'mirrored'
   status: AgentOsFlowStatus
   steps: AgentOsFlowStep[]
@@ -273,12 +277,95 @@ export interface FlowStepInput {
  *  via subscribeToEvents(['flow.step.started','flow.step.completed',
  *  'flow.completed']) or by polling fetchFlow(). */
 /** `focus`: what the flow serves — every step runs focused on it. */
-export function createFlow(steps: FlowStepInput[], focus?: AgentOsSessionFocus): Promise<AgentOsFlow> {
-  return request<AgentOsFlow>('/flows', { method: 'POST', body: JSON.stringify({ steps, ...(focus ? { focus } : {}) }) })
+export function createFlow(steps: FlowStepInput[], focus?: AgentOsSessionFocus, title?: string): Promise<AgentOsFlow> {
+  return request<AgentOsFlow>('/flows', { method: 'POST', body: JSON.stringify({ steps, ...(focus ? { focus } : {}), ...(title ? { title } : {}) }) })
 }
 
 export function fetchFlow(flowId: string): Promise<AgentOsFlow> {
   return request<AgentOsFlow>(`/flows/${flowId}`)
+}
+
+/** Everything about one flow in one answer (agent-os's flow-report.ts): per step the goal, agent, every attempt, what it
+ *  said, its tool calls, what it added to BaseSpace and its tokens. */
+export interface AgentOsFlowReportAttempt {
+  taskId: string
+  status: string
+  startedAt?: string
+  completedAt?: string
+  seconds?: number
+  sessionId?: string
+  result?: string
+  error?: string
+  tokens?: { input: number; output: number; cached?: number }
+  toolCalls: { name: string; summary: string; ok: boolean }[]
+  added: { kind: string; title: string; folder?: string }[]
+  edited?: { note: string; changes: number }[]
+}
+export interface AgentOsFlowReportStep {
+  id: string
+  agentId?: string
+  goal?: string
+  dependsOn: string[]
+  status: AgentOsTaskStatus
+  attempts: AgentOsFlowReportAttempt[]
+}
+export interface AgentOsFlowVerdict {
+  agentId: string
+  stepId?: string
+  status: 'not-run' | 'waiting' | 'running' | 'done' | 'failed'
+  text?: string
+  error?: string
+}
+/** The direct summary of a flow (agent-os's flow-report.ts): built by code from the records, checked against live BaseSpace. */
+export interface AgentOsFlowOutcome {
+  headline: string
+  byAgent: {
+    agentId: string
+    steps: { id: string; status: string }[]
+    notes: { title: string; folder?: string; edited: boolean; body?: string }[]
+    todos: { id: string; title: string; open: boolean; answer?: string }[]
+    said?: string
+    fullReport?: string
+  }[]
+  toDo: {
+    kind: 'step' | 'review' | 'todo'
+    text: string
+    detail?: string
+    todoId?: string
+    info?: string
+    priority?: string
+    refs?: { title: string; body: string }[]
+  }[]
+}
+
+/** What the flow's lead wrote for the operator from the real records (agent-os's flow-briefing.ts). */
+export interface AgentOsFlowBriefing {
+  text: string
+  by: string
+  generatedAt: string
+  usage?: { inputTokens: number; outputTokens: number; cachedInputTokens?: number }
+  /** Numbers in the text that did not match the pack. */
+  unverified?: string[]
+}
+
+export function writeFlowBriefing(flowId: string): Promise<AgentOsFlowBriefing> {
+  return request<AgentOsFlowBriefing>(`/flows/${flowId}/briefing`, { method: 'POST', body: '{}' }, 240000)
+}
+export interface AgentOsFlowReport {
+  briefing?: AgentOsFlowBriefing | null
+  outcome?: AgentOsFlowOutcome
+  verdict: AgentOsFlowVerdict
+  flowId: string
+  title?: string
+  status: AgentOsFlowStatus
+  summary?: string
+  proposedBy?: string
+  steps: AgentOsFlowReportStep[]
+  totals: { tokens: { input: number; output: number; cached?: number }; toolCalls: number; added: number; seconds: number }
+}
+
+export function fetchFlowReport(flowId: string): Promise<AgentOsFlowReport> {
+  return request<AgentOsFlowReport>(`/flows/${flowId}/report`)
 }
 
 export async function fetchFlows(): Promise<AgentOsFlow[]> {
@@ -294,6 +381,13 @@ export async function fetchFlows(): Promise<AgentOsFlow[]> {
  *  agent-os's flow-engine.ts). */
 export function resumeFlow(flowId: string, steps: FlowStepInput[]): Promise<AgentOsFlow> {
   return request<AgentOsFlow>(`/flows/${flowId}/resume`, { method: 'POST', body: JSON.stringify({ steps }) })
+}
+
+/** Accept a stopped step as done (it finished its work but ran out of steps saying so): the flow carries on after it
+ *  without running that step again. */
+export function markFlowStepDone(flowId: string, stepIds: string[], steps: FlowStepInput[]): Promise<AgentOsFlow> {
+  // One call for all of them: accepting steps one by one would re-queue (and re-run) the stopped steps not yet accepted.
+  return request<AgentOsFlow>(`/flows/${flowId}/steps/done`, { method: 'POST', body: JSON.stringify({ steps, stepIds }) })
 }
 
 export function cancelFlow(flowId: string, reason?: string): Promise<AgentOsFlow> {

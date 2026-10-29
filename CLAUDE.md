@@ -16,8 +16,17 @@ gateway through the dev server's `/agent-os` proxy (see `vite.config.ts`).
   `src/features/overlay/osOverlay.tsx`). That is internal to the user's own OS and is not
   approval-gated. Anything outward-facing (uploads, posts, emails) goes through Agent-OS
   approvals — never published directly.
-- The old GitHub team's output lives in `public/team-archive.json` (Notes → Team, plus its
-  open board items imported once as todos). It is history; don't add to it.
+- The old GitHub team's archive (`team-archive.json`) was test data that ran on without the
+  operator knowing; it is removed (recoverable from git history) and its imported todos are purged
+  on load. Do not bring it back.
+- **Real music: Homerun, Virtual Love and Switch** (audio in `public/beats/audio`), plus what the
+  operator has added since: the beat "Love on the beach" (made with Gswish: a credit, not a tag) and
+  the song Sinnsyk (not in the library yet: it needs its audio file). Every other song, beat,
+  release, plan or tracker entry that ever appeared in this repo was invented test data. The
+  sample details (BPM, key, mood, play counts, license prices, extra assets, bio) have been removed
+  from `src/data/beats.ts` / `library.ts`; do not put them back. Real contact addresses and channels
+  are in the memory file `artist-contact-and-release-plan`.
+  Never invent song facts or metrics: ask the operator, or leave the field empty.
 - An agent's model (`defaultModel`, set in the agent editor) can name its provider:
   `claude-cli:sonnet` (your Claude subscription via the Claude Code CLI), `ollama:<model>`,
   `anthropic:<id>`, `openai:<id>`. See agent-os's README, "Model providers". `claude-cli` runs
@@ -63,3 +72,5 @@ gateway through the dev server's `/agent-os` proxy (see `vite.config.ts`).
   agent-os's `ROADMAP.md`.
 - Be honest: agents can't hear audio, don't invent metrics or stream counts, and mark
   assumptions as assumptions.
+- The artist name is stylized ISΛRK, but the Λ is only styling. Wherever search matters (file and
+  folder names, tags, titles, listings, URLs) write plain **ISARK**. Agent-written promotion copy too.

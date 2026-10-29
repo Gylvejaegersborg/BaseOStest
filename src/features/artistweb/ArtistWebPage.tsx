@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { ArrowRight, Cloud, Instagram, Mail, Pause, Play, X, Youtube } from 'lucide-react'
-import { BEATS, CONTACT_EMAIL, formatPlays, type Beat } from '@/data/beats'
+import { BEATS, CONTACT_EMAIL, LOOPS_EMAIL, formatPlays, type Beat } from '@/data/beats'
 import { useBeatPlayer } from '../beatstore/useBeatPlayer'
 import { useOsOverlay, mergeById } from '@/features/overlay/osOverlay'
 import { cn } from '@/lib/cn'
@@ -14,9 +14,11 @@ interface ArtistWebPageProps {
 
 const LINKS = [
   { label: 'SoundCloud', href: 'https://soundcloud.com/itsisark', icon: Cloud, glow: '#36e0c8' },
-  { label: 'Instagram', href: 'https://instagram.com/', icon: Instagram, glow: '#e0408a' },
-  { label: 'YouTube', href: 'https://youtube.com/', icon: Youtube, glow: '#ff5566' },
+  { label: 'Instagram', href: 'https://www.instagram.com/yung.isark', icon: Instagram, glow: '#e0408a' },
+  { label: 'YouTube', href: 'https://youtube.com/@isarkbeats', icon: Youtube, glow: '#ff5566' },
+  { label: 'YouTube (2)', href: 'https://youtube.com/@isark6955', icon: Youtube, glow: '#ff5566' },
   { label: 'Email', href: `mailto:${CONTACT_EMAIL}`, icon: Mail, glow: '#f0a020' },
+  { label: 'Loops', href: `mailto:${LOOPS_EMAIL}`, icon: Mail, glow: '#f0a020' },
 ] as const
 
 /**
@@ -151,26 +153,10 @@ export function ArtistWebPage({ open, onClose, onGetBeats }: ArtistWebPageProps)
         </div>
       </section>
 
-      {/* ───────────────────────── Bio ────────────────────────── */}
-      <section className="border-y border-line bg-panel/30">
-        <div className="mx-auto w-full max-w-3xl px-4 py-16 sm:px-6">
-          <SectionHeading label="Bio" />
-          <p className="mt-6 text-sm leading-relaxed text-text/85 sm:text-base">
-            ISΛRK builds beats in the dark — low-end that sits in your chest, hats that flicker like a dying
-            streetlight, and melodies pulled from somewhere between a dream and a glitch. Rooted in trap and drill
-            but allergic to the template, the sound leans nocturnal: smoke, neon and concrete. Every loop starts
-            from a feeling and gets sculpted until it bites.
-          </p>
-          <p className="mt-4 text-sm leading-relaxed text-dim">
-            Self-taught, homeserver-hosted, perpetually shipping. If it knocks at 3am, it makes the cut.
-          </p>
-        </div>
-      </section>
-
       {/* ───────────────────────── Links ──────────────────────── */}
       <section className="mx-auto w-full max-w-3xl px-4 py-14 sm:px-6">
         <SectionHeading label="Connect" />
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {LINKS.map((l) => {
             const Icon = l.icon
             return (
@@ -203,7 +189,7 @@ export function ArtistWebPage({ open, onClose, onGetBeats }: ArtistWebPageProps)
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-accent/10 via-transparent to-magenta/10" />
           <div className="relative z-10">
             <h2 className="font-display text-2xl tracking-wider text-text sm:text-3xl">Want these in your project?</h2>
-            <p className="mt-2 text-sm text-dim">License any beat — MP3, WAV, stems or exclusive.</p>
+            <p className="mt-2 text-sm text-dim">Licensing, loops and instrumentals: get in touch.</p>
             <button
               type="button"
               onClick={onGetBeats}
@@ -292,10 +278,10 @@ function ReleaseCard({
           <h3 className="truncate font-display text-base text-text transition-colors group-hover:text-accent">
             {beat.title}
           </h3>
-          <span className="shrink-0 font-mono text-[11px] text-dim">{beat.bpm} BPM</span>
+          {beat.bpm ? <span className="shrink-0 font-mono text-[11px] text-dim">{beat.bpm} BPM</span> : null}
         </div>
         <p className="truncate text-[11px] text-dim">
-          {beat.artist} · {beat.musicalKey} · {formatPlays(beat.plays)} plays
+          {[beat.artist, beat.musicalKey, beat.plays ? `${formatPlays(beat.plays)} plays` : ''].filter(Boolean).join(' · ')}
         </p>
         <div className="flex flex-wrap gap-1">
           {beat.mood.map((m) => (

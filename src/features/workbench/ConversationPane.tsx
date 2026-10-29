@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { useAgentOsSessionUsage } from '@/features/agentos/useAgentOsSessionUsage'
 import { FocusPicker } from './FocusPicker'
 import { Mic, Paperclip, Send, Square, X, Bot, AlertTriangle, Eye, StickyNote, FileUp, FileText, ShieldCheck, CheckCircle2, OctagonAlert, ArrowRightLeft, Ban, ClipboardCheck } from 'lucide-react'
@@ -42,6 +44,7 @@ export function ConversationPane({
 }) {
   const [draft, setDraft] = useState('')
   const [pending, setPending] = useState<Attachment[]>([])
+  const [referencedNoteIds, setReferencedNoteIds] = useState<string[]>([])
   const [dragging, setDragging] = useState(false)
   const [planMode, setPlanMode] = useState(false)
   const currentSession = chat.sessions.find((x) => x.id === chat.sessionId)
@@ -50,6 +53,7 @@ export function ConversationPane({
   const [notePickerOpen, setNotePickerOpen] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const notes = useNotesList()
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
@@ -68,12 +72,26 @@ export function ConversationPane({
       return
     }
     if (!draft.trim() && !pending.length) return
-    const withAttachments = pending.length
+    let withAttachments = pending.length
       ? `${draft.trim()}\n\n[attached: ${pending.map((a) => a.name).join(', ')}]`
       : draft.trim()
+    // A "[[Title]]" reference in the draft is just text to a small local
+    // model — it has no built-in wikilink convention and would need to
+    // guess it should call the basespace tool and match the title, which
+    // is exactly what was going wrong (agent "gets confused" instead of
+    // reading the note). Inlining the note's actual body here means the
+    // agent already has it, no tool round-trip or guessing required.
+    if (referencedNoteIds.length) {
+      const blocks = referencedNoteIds
+        .map((id) => notes.find((n) => n.id === id))
+        .filter((n): n is NonNullable<typeof n> => Boolean(n))
+        .map((n) => `--- Referenced note: "${n.title}" ---\n${n.body}\n--- end note ---`)
+      withAttachments = `${blocks.join('\n\n')}\n\n${withAttachments}`
+    }
     chat.send(withAttachments, planMode)
     setDraft('')
     setPending([])
+    setReferencedNoteIds([])
   }
 
   const notReady = chat.connection === 'unconfigured' || chat.connection === 'error'
@@ -85,6 +103,7 @@ export function ConversationPane({
 
   const referenceNote = (id: string, title: string) => {
     setDraft((d) => (d ? `${d} [[${title}]]` : `[[${title}]]`))
+    setReferencedNoteIds((ids) => (ids.includes(id) ? ids : [...ids, id]))
     setNotePickerOpen(false)
     setAttachMenuOpen(false)
     onDockNote(id)
@@ -311,7 +330,7 @@ function MessageRow({
       >
         {isUser ? 'YOU' : <Bot size={14} />}
       </div>
-      <div className={cn('max-w-[72%]', isUser && 'text-right')}>
+      <div className={cn('max-w-[92%]', isUser && 'text-right')}>
         <div className="mb-1 flex items-center gap-2 text-[10px] text-dim" style={isUser ? { justifyContent: 'flex-end' } : undefined}>
           <span>{isUser ? 'You' : agentName}</span>
           {msg.time && <span>{msg.time}</span>}
@@ -329,7 +348,15 @@ function MessageRow({
           className={cn('inline-block rounded-panel border px-3 py-2 text-sm', isUser ? 'border-line bg-panel-2 text-text' : 'border-line bg-panel/70 text-text/90')}
           style={!isUser ? { borderColor: `${agentColor}33` } : undefined}
         >
-          {msg.text && <p className="whitespace-pre-wrap text-left">{msg.text}</p>}
+          {msg.text &&
+            (isUser ? (
+              <p className="whitespace-pre-wrap text-left">{msg.text}</p>
+            ) : (
+              // An agent's reply is markdown: render it (it showed raw **stars** and *italics*).
+              <div className="prose-term prose-compact prose-chat text-left">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
+              </div>
+            ))}
         </div>
       </div>
     </div>

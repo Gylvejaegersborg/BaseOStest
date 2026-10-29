@@ -104,7 +104,6 @@ export function GoalModal({ goalId, onClose, onOpenGoal, onOpenProject }: {
                       <StatusDot color={STATUS_META[p.status].color} size={5} />
                       <span className="truncate">{p.name}</span>
                     </button>
-                    {on && <span className="shrink-0 text-[11px] text-dim">{p.status === 'shipped' ? 100 : p.progress}%</span>}
                   </div>
                 )
               })}
@@ -165,21 +164,6 @@ export function GoalModal({ goalId, onClose, onOpenGoal, onOpenProject }: {
                 </option>
               ))}
             </select>
-          </Section>
-          <Section label="Progress">
-            {goal.progress == null ? (
-              <p className="text-dim">Link projects to track it.</p>
-            ) : (
-              <div className="space-y-1">
-                <div className="h-1 w-full bg-line">
-                  <div className="h-1 bg-[#f0a020]" style={{ width: `${goal.progress}%` }} />
-                </div>
-                <p className="text-dim">
-                  {goal.progress}% — average of {goal.allProjects.length} project{goal.allProjects.length === 1 ? '' : 's'}
-                  {goal.allProjects.length > goal.projects.length && ', including its sub-goals’'}
-                </p>
-              </div>
-            )}
           </Section>
           <Section label={`Sub-goals · ${goal.children.length}`}>
             <div className="space-y-0.5">

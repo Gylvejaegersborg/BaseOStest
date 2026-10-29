@@ -35,16 +35,20 @@ interface CalendarContextValue {
 const CalendarContext = createContext<CalendarContextValue | null>(null)
 
 const MERGED_KEY = 'os:calendar:reminders-merged'
-const TEAM_TODOS_KEY = 'os:calendar:team-todos-imported'
-
-interface TeamBoardItem {
-  id: string
-  title: string
-  owner: string
-  status: string
-  due?: string | null
-  notes?: string
-}
+// The retired GitHub team's open board items were once imported as todos (ids
+// "team-t-…"). That team turned out to be test data, so a one-time cleanup
+// removes them. Only those ids: anything made here is untouched.
+const TEAM_TODOS_PURGED_KEY = 'os:calendar:team-todos-purged'
+// The bundled sample todos and reminders (t1-t7, r1, r2) were not real. Removed from the code, and from browsers that had stored them.
+const SEED_TODOS_PURGED_KEY = 'os:calendar:seed-todos-purged:v1'
+const SEED_TODO_IDS = new Set(['t1', 't2', 't3', 't4', 't5', 't6', 't7', 'r1', 'r2'])
+// Likewise the sample events (a1-a14).
+const SEED_APPTS_PURGED_KEY = 'os:calendar:seed-appts-purged:v1'
+const SEED_APPT_IDS = new Set(Array.from({ length: 14 }, (_, i) => `a${i + 1}`))
+// The sample run history on the cron jobs (c1-c6) was invented: stored copies lose it too, once.
+const SEED_CRON_RUNS_KEY = 'os:calendar:cron-sample-runs-cleared:v1'
+const SEED_CRON_IDS = new Set(['c1', 'c2', 'c3', 'c4', 'c5', 'c6'])
+const TEAM_TODO_PREFIX = 'team-t-'
 
 /** A reminder is a timed todo that notifies at its time. */
 export function reminderToTask(r: Reminder): Task {
@@ -211,31 +215,53 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
     [persistTasks],
   )
 
-  // One-time: the retired GitHub team's open board items become todos.
+  // One-time cleanup of the todos the retired GitHub team's board was imported
+  // as (see TEAM_TODO_PREFIX). The old team was test data.
   useEffect(() => {
-    if (localStorage.getItem(TEAM_TODOS_KEY)) return
-    fetch(`${import.meta.env.BASE_URL}team-archive.json`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((a: { todos?: TeamBoardItem[] } | null) => {
-        if (!a?.todos) return
-        const imported: Task[] = a.todos.map((t) => ({
-          id: t.id,
-          title: t.title,
-          status: t.status === 'doing' ? 'doing' : 'todo',
-          priority: t.owner === 'user' ? 'high' : 'med',
-          dayOffset: t.due ? dayOffsetOf(new Date(`${t.due}T12:00:00`)) : undefined,
-          notify: false,
-          notes: `From the GitHub team board (owner: ${t.owner}).${t.notes ? ` ${t.notes}` : ''}`,
-          source: 'manual',
-        }))
-        setTasks((list) => {
-          const ids = new Set(list.map((x) => x.id))
-          return persistTasks([...list, ...imported.filter((x) => !ids.has(x.id))])
-        })
-        localStorage.setItem(TEAM_TODOS_KEY, '1')
-      })
-      .catch(() => {})
+    if (localStorage.getItem(TEAM_TODOS_PURGED_KEY)) return
+    setTasks((list) => {
+      const kept = list.filter((t) => !t.id.startsWith(TEAM_TODO_PREFIX))
+      return kept.length === list.length ? list : persistTasks(kept)
+    })
+    localStorage.setItem(TEAM_TODOS_PURGED_KEY, '1')
   }, [persistTasks])
+
+  // One-time: remove the stored copies of the sample todos (only those ids; anything made here is untouched).
+  useEffect(() => {
+    if (localStorage.getItem(SEED_TODOS_PURGED_KEY)) return
+    setTasks((list) => {
+      const kept = list.filter((t) => !SEED_TODO_IDS.has(t.id))
+      return kept.length === list.length ? list : persistTasks(kept)
+    })
+    localStorage.setItem(SEED_TODOS_PURGED_KEY, '1')
+  }, [persistTasks])
+
+  // One-time: remove the stored copies of the sample events (only those ids).
+  useEffect(() => {
+    if (localStorage.getItem(SEED_APPTS_PURGED_KEY)) return
+    setAppts((list) => {
+      const kept = list.filter((a) => !SEED_APPT_IDS.has(a.id))
+      return kept.length === list.length ? list : persistAppts(kept)
+    })
+    localStorage.setItem(SEED_APPTS_PURGED_KEY, '1')
+  }, [persistAppts])
+
+  // One-time: stored copies of the sample cron jobs lose their invented run history (the jobs themselves stay).
+  useEffect(() => {
+    if (localStorage.getItem(SEED_CRON_RUNS_KEY)) return
+    setCrons((list) => {
+      let changed = false
+      const next = list.map((c) => {
+        if (!SEED_CRON_IDS.has(c.id)) return c
+        changed = true
+        const { avgRuntime: _a, successRate: _s, recentRuns: _r, outputs: _o, ...rest } = c
+        void _a, _s, _r, _o
+        return { ...rest, lastRun: 'never', status: 'ok' as const }
+      })
+      return changed ? persistCrons(next) : list
+    })
+    localStorage.setItem(SEED_CRON_RUNS_KEY, '1')
+  }, [persistCrons])
 
   const deleteTask = useCallback((id: string) => setTasks((list) => persistTasks(list.filter((t) => t.id !== id))), [persistTasks])
 

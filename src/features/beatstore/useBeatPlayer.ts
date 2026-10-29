@@ -189,7 +189,7 @@ export function useBeatPlayer(queue: Beat[]): BeatPlayer {
       // Stop real audio cleanly.
       if (audioRef.current && !audioRef.current.paused) audioRef.current.pause()
       if (ctx.state === 'suspended') void ctx.resume()
-      bpmRef.current = beat.bpm
+      bpmRef.current = beat.bpm ?? 120
       synthStepRef.current = 0
       synthNextRef.current = ctx.currentTime + 0.06
       synthStartedAtRef.current = ctx.currentTime
@@ -243,7 +243,7 @@ export function useBeatPlayer(queue: Beat[]): BeatPlayer {
         setCurrent(beat)
         setProgress(0)
         setCurrentTime(0)
-        setDuration(beat.durationSec)
+        setDuration(beat.durationSec ?? 0)
         setSwapToken((n) => n + 1)
       }
       if (beat.audioFile && !failedRef.current.has(beat.id)) {
@@ -320,7 +320,7 @@ export function useBeatPlayer(queue: Beat[]): BeatPlayer {
   useEffect(() => {
     if (!current && queue.length > 0) {
       setCurrent(queue[0])
-      setDuration(queue[0].durationSec)
+      setDuration(queue[0].durationSec ?? 0)
     }
   }, [current, queue])
 

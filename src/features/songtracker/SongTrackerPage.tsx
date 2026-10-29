@@ -114,6 +114,14 @@ export function SongTrackerPage({ open, onClose }: SongTrackerPageProps) {
             <span className="font-display tracking-wider text-text">Song projects</span>
             <span className="text-dim">· {projects.length} active</span>
           </div>
+          {projects.length === 0 && (
+            <div className="border border-dashed border-line p-6 text-center text-xs text-dim">
+              <p className="text-text/80">No songs are being tracked yet.</p>
+              <p className="mt-1">
+                The earlier entries here were test data and have been removed. Real songs will appear once they&apos;re added.
+              </p>
+            </div>
+          )}
           <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
             {projects.map((p) => (
               <SongCard
@@ -323,6 +331,7 @@ function Checkbox({ done, accent }: { done: boolean; accent: string }) {
 /* ── Recently released ──────────────────────────────────────────────── */
 
 function Released() {
+  if (RECENT_RELEASES.length === 0) return null
   return (
     <section className="border border-line bg-panel/40">
       <div className="border-b border-line px-3 py-2">

@@ -68,19 +68,63 @@ export function fetchOverlay<T>(): Promise<T> {
   return getJSON<T>('/basespace/overlay')
 }
 
+/** Everything waiting on the operator (agent-os: GET /basespace/needs-you): pending approvals and the open todos agents created. */
+export interface AgentOsNeedsYou {
+  total: number
+  approvals: { id: string; agentId: string; toolName: string; requestedAt: string; summary: string }[]
+  todos: { id: string; title: string; priority: string; agent: string; flowId?: string; flowTitle?: string; createdAt?: string }[]
+}
+export const fetchNeedsYou = () => getJSON<AgentOsNeedsYou>('/basespace/needs-you')
+
+/** The gateway's real Ops report (agent-os: GET /ops). */
+export interface OpsProblem {
+  id: string
+  kind: 'task' | 'work' | 'flow' | 'approval' | 'supervisor' | 'log'
+  severity: 'error' | 'warn' | 'info'
+  when: string
+  source: string
+  text: string
+  flowId?: string
+}
+export interface TailDevice {
+  name: string
+  ip: string
+  os: string
+  online: boolean
+  lastSeen?: string
+  self?: boolean
+}
+export interface OpsReport {
+  at: string
+  gateway: { pid: number; startedAt: string; uptimeSec: number; memoryMB: number; node: string; platform: string; dataDir: string; terminal: boolean }
+  host: { name: string; uptimeSec: number; memTotalMB: number; memFreeMB: number; cpus: number; cpuModel: string; cpuPercent: number | null; disk?: { path: string; totalGB: number; freeGB: number }; dataMB: number | null }
+  services: { id: string; name: string; state: 'up' | 'down' | 'unconfigured'; detail?: string; ms?: number }[]
+  connectors: { name: string; kind: string; status: string; enabled: boolean }[]
+  tailscale: { error: string } | { backend: string; self: TailDevice; peers: TailDevice[] }
+  problems: OpsProblem[]
+  logs: { dir?: string; gateway: string[]; supervisor: string[]; gatewayErrors: string[] }
+}
+export const fetchOps = () => getJSON<OpsReport>('/ops', 12000)
+
 /** Push BaseSpace's current state for the agents to read. */
 export function pushSnapshot(snapshot: unknown): Promise<{ ok: true; savedAt: string; bytes: number }> {
   return writeJSON('POST', '/basespace/snapshot', snapshot, 15000)
 }
 
 export async function fetchAgents(): Promise<AgentOsAgent[]> {
-  const { agents } = await getJSON<{ agents: AgentOsAgent[] }>('/agents')
+  // Generous: this is the call that decides whether BaseSpace says Agent-OS is connected, and a busy gateway can take a few seconds.
+  const { agents } = await getJSON<{ agents: AgentOsAgent[] }>('/agents', 12_000)
   return agents
 }
 
 /** Board controls (agent-os's controls.ts) — operator-only levers. */
 export const pauseAgent = (id: string, reason?: string) =>
   writeJSON<AgentOsControl>('POST', `/agents/${encodeURIComponent(id)}/pause`, { reason })
+/** Complete an agent's todo (optionally with the answer, when the todo was a question). The gateway keeps the answer on the todo so the
+ *  agents that read it later know what was decided. */
+export const completeAgentTodo = (id: string, answer?: string) =>
+  writeJSON<{ id: string; status: string; answer?: string }>('POST', `/basespace/overlay/tasks/${encodeURIComponent(id)}/complete`, answer ? { answer } : {})
+export const reopenAgentTodo = (id: string) => writeJSON<{ ok: boolean }>('POST', `/basespace/overlay/tasks/${encodeURIComponent(id)}/reopen`, {})
 export const resumeAgent = (id: string) => writeJSON<AgentOsControl>('POST', `/agents/${encodeURIComponent(id)}/resume`, {})
 /** `limitTokens: null` removes the budget (unlimited). */
 export const setAgentBudget = (id: string, budget: { period: 'day' | 'week' | 'month'; limitTokens: number | null }) =>
@@ -261,6 +305,27 @@ export interface ConfiguredHook {
   command: string
   matchTool?: string
   label?: string
+}
+
+export interface Connector {
+  name: string
+  kind: 'account' | 'local'
+  target: string
+  status: 'connected' | 'needs-auth' | 'failed'
+  enabled: boolean
+  toolPrefix: string
+}
+
+/** The MCP connectors the agents can reach through the Claude CLI (agent-os's connectors.ts). `refresh` re-reads the account first (slow: ~10 s). */
+export async function fetchConnectors(refresh = false): Promise<{ connectors: Connector[]; refreshedAt?: string }> {
+  if (!BASE) throw new Error('agent-os gateway not configured')
+  const res = await fetch(`${BASE}/connectors${refresh ? '?refresh=1' : ''}`, { headers: { accept: 'application/json' }, signal: AbortSignal.timeout(refresh ? 90_000 : 5000) })
+  if (!res.ok) throw new Error(`agent-os gateway ${res.status} on /connectors`)
+  return res.json()
+}
+
+export function setConnectorEnabled(name: string, enabled: boolean): Promise<Connector> {
+  return writeJSON<Connector>('PUT', `/connectors/${encodeURIComponent(name)}`, { enabled })
 }
 
 export async function fetchConfiguredHooks(): Promise<ConfiguredHook[]> {

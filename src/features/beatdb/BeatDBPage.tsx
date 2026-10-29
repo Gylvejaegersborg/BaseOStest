@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Database, X } from 'lucide-react'
+import { Database, Plus, X } from 'lucide-react'
+import { SongModal } from '@/features/library/SongModal'
 import { LIBRARY, PLAYABLE_BEATS, isAudio, toBeat, type Asset, type AssetCategory } from '@/data/library'
 import { useBeatPlayer } from '@/features/beatstore/useBeatPlayer'
 import { useOsOverlay, mergeById } from '@/features/overlay/osOverlay'
@@ -35,6 +36,7 @@ export function BeatDBPage({ open, onClose }: BeatDBPageProps) {
   const [category, setCategory] = useState<AssetCategory | 'all'>('all')
   const [selectedId, setSelectedId] = useState<string>(LIBRARY[0].id)
   const [mobileDetail, setMobileDetail] = useState(false)
+  const [songModal, setSongModal] = useState<{ editing?: Asset } | null>(null)
   const isDesktop = useIsDesktop()
   // Agent-cataloged assets (OS overlay) join the static library.
   const overlay = useOsOverlay()
@@ -97,8 +99,14 @@ export function BeatDBPage({ open, onClose }: BeatDBPageProps) {
           />
         </div>
         <span className="ml-auto shrink-0 text-[10px] tabular-nums text-dim sm:ml-0">
-          {filtered.length} / {LIBRARY.length}
+          {filtered.length} / {library.length}
         </span>
+        <button
+          onClick={() => setSongModal({})}
+          className="flex shrink-0 items-center gap-1 border border-accent/60 px-2 py-1 text-[11px] text-accent transition-colors hover:bg-accent/10"
+        >
+          <Plus size={13} /> Add song
+        </button>
         <button onClick={onClose} aria-label="Close Beat DB" className="shrink-0 text-dim transition-colors hover:text-text">
           <X size={18} />
         </button>
@@ -148,7 +156,7 @@ export function BeatDBPage({ open, onClose }: BeatDBPageProps) {
 
         {/* Desktop detail panel */}
         <aside className="hidden w-[400px] shrink-0 overflow-y-auto border-l border-line bg-panel/30 p-4 xl:w-[440px] lg:block">
-          <DetailPanel asset={selected} player={player} onSelectRelated={(a) => setSelectedId(a.id)} />
+          <DetailPanel asset={selected} player={player} onSelectRelated={(a) => setSelectedId(a.id)} onEdit={(a) => setSongModal({ editing: a })} />
         </aside>
       </div>
 
@@ -162,13 +170,22 @@ export function BeatDBPage({ open, onClose }: BeatDBPageProps) {
         code={categoryMeta(selected.category).label}
         accent={categoryMeta(selected.category).accent}
         width={560}
+        zIndex={70}
       >
         <DetailPanel
           asset={selected}
           player={player}
           onSelectRelated={(a) => setSelectedId(a.id)}
+          onEdit={(a) => setSongModal({ editing: a })}
         />
       </Modal>
+
+      <SongModal
+        open={songModal !== null}
+        editing={songModal?.editing}
+        onClose={() => setSongModal(null)}
+        onSaved={(id) => setSelectedId(id)}
+      />
     </div>
   )
 }

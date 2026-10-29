@@ -192,8 +192,7 @@ export function TeamsTab() {
             </div>
             <p className="mt-1 text-[10px] leading-snug text-dim">
               Agents read notes, projects, todos, events, crons and teams from this snapshot; it re-syncs a few seconds after you change
-              anything. Briefs, meeting minutes, reports and drafts from the old GitHub team live in Notes under the Team folder. Their open board
-              items are in the Calendar's Todo list.
+              anything.
             </p>
           </section>
 
