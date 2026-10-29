@@ -27,12 +27,12 @@ const GROUP_LABEL: Record<RendererKind, string> = {
 }
 const GROUP_ORDER: RendererKind[] = ['answer', 'swatch', 'timer-ring', 'form', 'row', 'reply']
 
-/** Alt+Space is the HUD key. In a browser tab Windows may take it for the
- *  window menu first, so Ctrl+Shift+Space opens it too until the Tauri
- *  shell registers Alt+Space globally. */
+/** Alt+B is the HUD key (Alt+Space and Ctrl+Alt+Space are taken on the
+ *  operator's machine). Matched by physical key, so it works on any layout.
+ *  Ctrl+Alt+B is kept free for voice (hud/core): the strict modifier check
+ *  below is what keeps it from opening the launcher too. */
 function isToggleKey(e: KeyboardEvent): boolean {
-  if (e.code !== 'Space') return false
-  return (e.altKey && !e.ctrlKey && !e.shiftKey && !e.metaKey) || (e.ctrlKey && e.shiftKey && !e.altKey)
+  return e.code === 'KeyB' && e.altKey && !e.ctrlKey && !e.shiftKey && !e.metaKey
 }
 
 interface Menu {
