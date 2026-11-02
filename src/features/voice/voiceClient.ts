@@ -111,7 +111,7 @@ export const setPushToTalk = (down: boolean) => control({ ptt: down })
 export const setVoiceMode = (mode: VoiceMode) => control({ mode })
 
 /** Speaks text on the voice service's machine (the one with the mic and speakers), sentence by sentence, each in
- *  its language's voice (Kokoro English, Piper Norwegian) — if speech back is on there (tts.enabled; off by default).
+ *  its language's voice (Phonon 31M English, Piper Norwegian) — if speech back is on there (tts.enabled; off by default).
  *  Resolves false when it's off, so callers can just call it. Played there rather than in this tab so that pressing
  *  push-to-talk cuts it off (barge-in); speak_start / sentence / speak_end arrive on subscribeToVoice. `language`
  *  forces a voice; by default each sentence is detected. A new speak() replaces what's being said. */
