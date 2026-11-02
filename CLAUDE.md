@@ -70,6 +70,10 @@ gateway through the dev server's `/agent-os` proxy (see `vite.config.ts`).
   later request.
 - The integrations plan (providers, Hindsight, knowledge graph, voice, CLI-Anything) lives in
   agent-os's `ROADMAP.md`.
+- Voice: agent-os's `voice/` service (127.0.0.1:8765, on the machine with the mic) is reached through the
+  dev server's `/voice` proxy, which adds the gateway token (`vite.config.ts`). `src/features/voice/voiceClient.ts`
+  keeps ONE WebSocket for the app — same rule as the EventSource. Ctrl+Alt+B push-to-talk is the service's
+  global hotkey; dictation lands in the launcher's input with its language tag, and is never run on its own.
 - Be honest: agents can't hear audio, don't invent metrics or stream counts, and mark
   assumptions as assumptions.
 - The artist name is stylized ISΛRK, but the Λ is only styling. Wherever search matters (file and

@@ -50,6 +50,27 @@ const agentOs: Record<string, ProxyOptions> = {
       })
     },
   },
+  // The local voice service (agent-os's voice/, src/features/voice/voiceClient.ts). Same token as the gateway, on
+  // plain requests and on the /v1/listen WebSocket upgrade (proxyReqWs) alike.
+  '/voice': {
+    target: process.env.AGENT_OS_VOICE_TARGET ?? 'http://127.0.0.1:8765',
+    changeOrigin: true,
+    ws: true,
+    rewrite: (p) => p.replace(/^\/voice/, ''),
+    configure: (proxy) => {
+      const auth = (req: { setHeader(name: string, value: string): void }) => {
+        const token = gatewayToken()
+        if (token) req.setHeader('authorization', `Bearer ${token}`)
+      }
+      proxy.on('proxyReq', auth)
+      proxy.on('proxyReqWs', auth)
+      // The service isn't running: answer 502 quietly instead of logging a stack trace per retry.
+      proxy.on('error', (_err, _req, res) => {
+        if ('writeHead' in res && !res.headersSent) res.writeHead(502).end()
+        else res.destroy()
+      })
+    },
+  },
 }
 
 export default defineConfig({

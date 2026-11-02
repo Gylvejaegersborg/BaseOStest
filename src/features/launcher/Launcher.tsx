@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion, type Transition } from 'motion/react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Search, Sparkles } from 'lucide-react'
+import { ArrowLeft, Mic, Search, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/cn'
+import { subscribeToVoice } from '@/features/voice/voiceClient'
 import { runningTimerResults } from './commands'
 import { allEntries, askResult, search } from './rank'
 import { AnswerTitle, FormBody, ReplyBody, ResultAside, ResultIcon, TimerRing } from './renderers'
@@ -60,6 +61,10 @@ export function Launcher() {
   const [aiQuery, setAiQuery] = useState<string | null>(null)
   const [menu, setMenu] = useState<Menu | null>(null)
   const [toast, setToast] = useState<string | null>(null)
+  /** Push-to-talk (Ctrl+Alt+B, owned by the voice service) is held. */
+  const [listening, setListening] = useState(false)
+  /** Language tag of the dictated query ('no' / 'en'), until it's edited. */
+  const [heard, setHeard] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const spring: Transition = reduce ? { duration: 0.08 } : { type: 'spring', stiffness: 400, damping: 40, mass: 0.8 }
@@ -90,6 +95,7 @@ export function Launcher() {
   const close = useCallback(() => {
     setOpen(false)
     setQuery('')
+    setHeard(null)
     setExpanded(false)
     setStrip(null)
     setFormFor(null)
@@ -145,6 +151,30 @@ export function Launcher() {
       window.removeEventListener(LAUNCHER_TOGGLE_EVENT, onToggle)
     }
   }, [open, show, close])
+
+  // ── voice: push-to-talk dictation lands in the input ─────────────────
+  // Only push-to-talk finals: with the service's open mic (mic.trigger: always) everything said in the room would
+  // end up here. The text is put in the input, not run; Enter runs it like anything typed.
+  useEffect(
+    () =>
+      subscribeToVoice((e) => {
+        if (e.type === 'ptt_start') {
+          setListening(true)
+          show()
+        } else if (e.type === 'ptt_end') {
+          setListening(false)
+          if (!e.kept) flash("Didn't catch that")
+        } else if (e.type === 'final' && e.trigger === 'push_to_talk') {
+          show()
+          setAiQuery(null)
+          setFormFor(null)
+          // Without the sentence's closing punctuation: "open my calendar." should match commands as typed text does.
+          setQuery(e.text.trim().replace(/[.!?…]+$/, ''))
+          setHeard(e.language)
+        }
+      }),
+    [show, flash],
+  )
 
   useEffect(() => {
     if (!liveTimers.some((t) => t.endsAt !== null)) return
@@ -269,6 +299,8 @@ export function Launcher() {
                   <button type="button" aria-label="Back to results" onClick={() => setAiQuery(null)} className="text-dim hover:text-text">
                     <ArrowLeft size={18} />
                   </button>
+                ) : listening ? (
+                  <Mic size={18} className="animate-pulse text-accent" aria-label="Listening" />
                 ) : (
                   <Search size={18} className="text-dim" />
                 )}
@@ -278,14 +310,23 @@ export function Launcher() {
                   onChange={(e) => {
                     setQuery(e.target.value)
                     setFormFor(null)
+                    setHeard(null)
                   }}
                   onKeyDown={onInputKey}
-                  placeholder={aiQuery !== null ? 'Ask a follow-up…' : 'Type a command, a sum, a colour — or ? to ask'}
+                  placeholder={
+                    listening
+                      ? 'Listening… let go of Ctrl+Alt+B when you’re done'
+                      : aiQuery !== null
+                        ? 'Ask a follow-up…'
+                        : 'Type a command, a sum, a colour — or ? to ask'
+                  }
                   aria-label="Launcher search"
                   spellCheck={false}
                   className="h-full min-w-0 flex-1 bg-transparent text-[16px] outline-none placeholder:text-dim"
                 />
-                <span className="label hidden sm:inline">{aiQuery !== null ? 'AI mode' : size}</span>
+                <span className="label hidden sm:inline">
+                  {listening ? 'listening' : heard ? `dictated · ${heard.toUpperCase()}` : aiQuery !== null ? 'AI mode' : size}
+                </span>
               </motion.div>
 
               <AnimatePresence mode="popLayout" initial={false}>
