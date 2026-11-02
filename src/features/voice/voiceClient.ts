@@ -17,6 +17,10 @@ export type VoiceEvent =
   | { type: 'speech_start'; t: number }
   | { type: 'speech_end'; t: number; kept: boolean }
   | { type: 'mode'; mode: VoiceMode }
+  | { type: 'speak_start'; t: number }
+  | { type: 'sentence'; text: string; language: string; engine: string; synth_ms: number }
+  | { type: 'speak_end'; t: number; reason: 'done' | 'stop' | 'barge_in' | 'replaced' | 'cancel' }
+  | { type: 'barge_in'; t: number }
   | { type: 'error'; error: string }
   | {
       type: 'final'
@@ -106,18 +110,21 @@ async function control(body: Record<string, unknown>): Promise<{ muted: boolean;
 export const setPushToTalk = (down: boolean) => control({ ptt: down })
 export const setVoiceMode = (mode: VoiceMode) => control({ mode })
 
-/** Speaks text through the voice service, if speech back is on there (tts.enabled; off by default). Resolves false
- *  when it's off or the language has no voice yet (English only until Piper, phase 3), so callers can just call it. */
-export async function speak(text: string, language: string = 'en'): Promise<boolean> {
-  const res = await fetch(`${BASE}/v1/audio/speech`, {
+/** Speaks text on the voice service's machine (the one with the mic and speakers), sentence by sentence, each in
+ *  its language's voice (Phonon 31M English, Piper Norwegian) — if speech back is on there (tts.enabled; off by default).
+ *  Resolves false when it's off, so callers can just call it. Played there rather than in this tab so that pressing
+ *  push-to-talk cuts it off (barge-in); speak_start / sentence / speak_end arrive on subscribeToVoice. `language`
+ *  forces a voice; by default each sentence is detected. A new speak() replaces what's being said. */
+export async function speak(text: string, language?: 'no' | 'en'): Promise<boolean> {
+  const res = await fetch(`${BASE}/v1/speak`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ input: text, language }),
+    body: JSON.stringify({ input: text, ...(language ? { language } : {}) }),
   })
-  if (!res.ok) return false
-  const url = URL.createObjectURL(await res.blob())
-  const audio = new Audio(url)
-  audio.onended = () => URL.revokeObjectURL(url)
-  await audio.play()
-  return true
+  return res.ok
+}
+
+/** Stops speaking now and drops the rest. */
+export async function stopSpeaking(): Promise<void> {
+  await fetch(`${BASE}/v1/speak/stop`, { method: 'POST' })
 }
