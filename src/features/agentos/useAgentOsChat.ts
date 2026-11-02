@@ -7,6 +7,7 @@ import {
   listChatSessions,
   renameChatSession,
   setSessionFocus,
+  type AgentOsImage,
   type AgentOsSessionFocus,
   sendTurn,
   subscribeToSessionEvents,
@@ -66,7 +67,7 @@ function toChatMessages(history: { role: string; content: string }[]): ChatMessa
  * when no gateway is set or it's unreachable, same posture as
  * useAgentOsAgents/useTeamState/useDiscordBridge elsewhere in this repo.
  */
-export function useAgentOsChat(agentId: string, preferredSessionId?: string | null) {
+export function useAgentOsChat(agentId: string, preferredSessionId?: string | null, opts?: { sessionTitle?: string }) {
   const [connection, setConnection] = useState<ChatConnection>('connecting')
   const [errorText, setErrorText] = useState('')
   const [sessions, setSessions] = useState<AgentOsSession[]>([])
@@ -124,9 +125,11 @@ export function useAgentOsChat(agentId: string, preferredSessionId?: string | nu
         // guard was moved up.
         if (cancelled) return
         const mostRecent = [...list].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0]
-        let session = list.find((x) => x.id === preferredRef.current) ?? mostRecent
+        // A named thread (the HUD's "HUD") is found by its title, or made once — never "most recent".
+        const titled = opts?.sessionTitle
+        let session = titled ? list.find((x) => x.title === titled) : (list.find((x) => x.id === preferredRef.current) ?? mostRecent)
         if (!session) {
-          session = await createChatSession(agentId)
+          session = await createChatSession(agentId, titled)
           if (cancelled) return
           await refreshSessions() // so the sidebar shows the new thread immediately, not just after the first send
         }
@@ -188,16 +191,16 @@ export function useAgentOsChat(agentId: string, preferredSessionId?: string | nu
   }, [sessionId, connection, refreshHistory])
 
   const send = useCallback(
-    async (text: string, planMode?: boolean) => {
+    async (text: string, planMode?: boolean, images?: AgentOsImage[]) => {
       const id = sessionIdRef.current
       if (!id || connection !== 'ready' || !text.trim()) return
 
-      const optimistic: ChatMessage = { id: `local-${Date.now()}`, role: 'user', text, time: fmtTime() }
+      const optimistic: ChatMessage = { id: `local-${Date.now()}`, role: 'user', text: images?.length ? `${text} [screenshot]` : text, time: fmtTime() }
       setMessages((m) => [...m, optimistic])
       setStreaming(true)
 
       try {
-        await sendTurn(id, text, planMode)
+        await sendTurn(id, text, planMode, images)
       } catch (err) {
         setMessages((m) => [
           ...m,

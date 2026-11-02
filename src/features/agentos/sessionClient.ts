@@ -91,8 +91,35 @@ export async function getSessionHistory(sessionId: string): Promise<AgentOsHisto
  *  calls, cancellation) is instead observed via subscribeToSessionEvents
  *  below, concurrently with this call. A generous 120s timeout since a
  *  real model call plus tool hops can genuinely take a while. */
-export function sendTurn(sessionId: string, userMessage: string, planMode?: boolean): Promise<AgentOsTurnResult> {
-  return request<AgentOsTurnResult>(`/sessions/${sessionId}/turns`, { method: 'POST', body: JSON.stringify({ userMessage, planMode }) }, 120000)
+export function sendTurn(sessionId: string, userMessage: string, planMode?: boolean, images?: AgentOsImage[]): Promise<AgentOsTurnResult> {
+  return request<AgentOsTurnResult>(
+    `/sessions/${sessionId}/turns`,
+    { method: 'POST', body: JSON.stringify({ userMessage, planMode, ...(images?.length ? { images } : {}) }) },
+    120000,
+  )
+}
+
+/** A screenshot for one turn (the HUD's dot mode). The gateway passes it to the model for that turn only and
+ *  never stores it: history keeps a `[screenshot]` marker instead. */
+export interface AgentOsImage {
+  mediaType: 'image/png' | 'image/jpeg'
+  /** base64, no data: prefix */
+  data: string
+}
+
+/** What the operator is looking at, from the desktop sensor (agent-os's desktop.ts), and the BaseSpace project
+ *  or goal its title matches, if any. */
+export interface AgentOsDesktopFocus {
+  app: string
+  title: string
+  since: string
+  serves?: { kind: 'goal' | 'project'; id: string; title: string }
+}
+
+export async function getDesktopFocus(): Promise<AgentOsDesktopFocus | null> {
+  const r = await request<{ focus?: AgentOsDesktopFocus | null } | AgentOsDesktopFocus | null>('/desktop/now')
+  if (!r) return null
+  return 'focus' in r ? (r.focus ?? null) : (r as AgentOsDesktopFocus)
 }
 
 export function cancelChatSession(sessionId: string, reason?: string): Promise<AgentOsSession> {

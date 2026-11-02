@@ -15,6 +15,9 @@ export type VoiceEvent =
   | { type: 'ptt_start'; t: number }
   | { type: 'ptt_end'; t: number; kept: boolean }
   | { type: 'speech_start'; t: number }
+  /** Live English text while push-to-talk is held (the hold so far, re-read about twice a second); the final
+   *  replaces it. Never for Norwegian. */
+  | { type: 'partial'; text: string; n: number; language: 'en'; audio_s: number; transcribe_ms: number }
   | { type: 'speech_end'; t: number; kept: boolean }
   | { type: 'mode'; mode: VoiceMode }
   | { type: 'speak_start'; t: number }
