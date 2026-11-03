@@ -1,0 +1,13 @@
+{
+  "name": "basespace-hud-shell",
+  "private": true,
+  "version": "0.1.0",
+  "description": "BaseSpace's desktop shell (Tauri): the launcher/HUD over every app and the dot beside the cursor. Loads /hud from the BaseSpace dev server.",
+  "scripts": {
+    "dev": "tauri dev --no-watch",
+    "icon": "tauri icon icon-source.png"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

@@ -38,6 +38,40 @@ export async function captureScreen(): Promise<AgentOsImage[] | null> {
   }
 }
 
+const DOT_ON_KEY = 'hud.dotOn'
+
+/** Whether the shell's dot window is showing (it says so itself, through localStorage, which both windows share):
+ *  then the dot answers push-to-talk and the launcher stays out of it. */
+export function dotWindowOn(): boolean {
+  try {
+    return inShell() && localStorage.getItem(DOT_ON_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+export function setDotWindowOn(on: boolean) {
+  try {
+    localStorage.setItem(DOT_ON_KEY, on ? '1' : '0')
+  } catch {
+    /* ignore */
+  }
+}
+
+/** Whether this page is where the operator is: a shell window that's showing, or the focused browser tab. The
+ *  page in front claims a push-to-talk final at once; others wait a moment, so they only answer when nothing in
+ *  front does. */
+export async function inFront(): Promise<boolean> {
+  const invoke = tauriInvoke()
+  if (invoke) {
+    try {
+      return Boolean(await invoke('window_visible'))
+    } catch {
+      return !document.hidden
+    }
+  }
+  return !document.hidden && document.hasFocus()
+}
+
 /** Ask the shell to show a mode's window (the launcher, or the dot); no-op in a browser. */
 export async function showShellMode(mode: 'search' | 'chat' | 'dot'): Promise<void> {
   await tauriInvoke()?.('show_mode', { mode })

@@ -6,7 +6,7 @@ import { cn } from '@/lib/cn'
 import { subscribeToVoice } from '@/features/voice/voiceClient'
 import { HudChat } from '@/features/hud/HudChat'
 import { HudDot } from '@/features/hud/HudDot'
-import { hideShellWindow, inShell, showShellMode } from '@/features/hud/shell'
+import { dotWindowOn, hideShellWindow, inShell, showShellMode } from '@/features/hud/shell'
 import { useHud } from '@/features/hud/useHud'
 import { runningTimerResults } from './commands'
 import { allEntries, askResult, search } from './rank'
@@ -79,12 +79,14 @@ export function Launcher({ shell = false }: { shell?: boolean } = {}) {
   const liveTimers = useTimers()
 
   const [open, setOpen] = useState(shell)
-  const [mode, setModeState] = useState<LauncherMode>(loadMode)
+  // In the shell the launcher window is never the dot (the dot has its own window), so it starts in Search or Chat.
+  const [mode, setModeState] = useState<LauncherMode>(() => (shell && loadMode() === 'dot' ? 'chat' : loadMode()))
   const modeRef = useRef(mode)
   modeRef.current = mode
   // The HUD listens whenever a HUD mode is the current one, open or not: push-to-talk opens the launcher, and
-  // the dot's screenshot has to be taken the moment the key goes down.
-  const hud = useHud({ active: mode !== 'search', screenshots: mode === 'dot' && inShell() })
+  // the dot's screenshot has to be taken the moment the key goes down. In the shell, only while this window is
+  // open: the dot window answers on its own when it's showing.
+  const hud = useHud({ active: mode !== 'search' && (!shell || open), screenshots: mode === 'dot' && inShell() })
   const [query, setQuery] = useState('')
   const [expanded, setExpanded] = useState(false)
   const [hl, setHl] = useState(0)
@@ -173,8 +175,11 @@ export function Launcher({ shell = false }: { shell?: boolean } = {}) {
 
   const setMode = useCallback(
     (m: LauncherMode) => {
-      // In the shell the dot has its own window: hand over to it (and back).
-      if (shell && (m === 'dot') !== (modeRef.current === 'dot')) void showShellMode(m)
+      // In the shell the dot has its own window: "Dot" turns it on or off, and this window stays as it was.
+      if (shell && m === 'dot') {
+        void showShellMode('dot')
+        return
+      }
       setModeState(m)
       try {
         localStorage.setItem(MODE_KEY, m)
@@ -228,8 +233,12 @@ export function Launcher({ shell = false }: { shell?: boolean } = {}) {
     () =>
       subscribeToVoice((e) => {
         if (e.type === 'ptt_start') {
+          if (shell && dotWindowOn()) return // the dot answers this one
           setListening(true)
           show()
+          if (shell) void showShellMode(modeRef.current) // bring the window up over whatever is in front
+        } else if (shell && dotWindowOn()) {
+          return
         } else if (modeRef.current !== 'search') {
           if (e.type === 'ptt_end') setListening(false)
           return // a HUD mode: useHud sends it to the agent
@@ -342,7 +351,8 @@ export function Launcher({ shell = false }: { shell?: boolean } = {}) {
         {open && mode !== 'dot' && (
           <motion.div
             key="scrim"
-            className="fixed inset-0 z-[90] bg-black/45"
+            // In the shell the window is the launcher's own, over other apps: no dimming, just "click outside closes".
+            className={cn('fixed inset-0 z-[90]', !shell && 'bg-black/45')}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.1 } }}
@@ -393,7 +403,11 @@ export function Launcher({ shell = false }: { shell?: boolean } = {}) {
             <motion.div
               layout
               transition={spring}
-              className="hud-corners relative overflow-hidden rounded-xl border border-line-2 bg-panel/95 text-accent-3 shadow-[0_24px_64px_rgba(0,0,0,0.6)] backdrop-blur-md"
+              // In the shell the window's edge would cut the big shadow off into a grey box: a small one fits inside.
+              className={cn(
+                'hud-corners relative overflow-hidden rounded-xl border border-line-2 bg-panel/95 text-accent-3 backdrop-blur-md',
+                shell ? 'shadow-[0_6px_18px_rgba(0,0,0,0.45)]' : 'shadow-[0_24px_64px_rgba(0,0,0,0.6)]',
+              )}
               style={{ borderRadius: 12 }}
             >
               {mode === 'chat' ? (

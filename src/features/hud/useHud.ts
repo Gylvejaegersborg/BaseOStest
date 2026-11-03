@@ -11,8 +11,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAgentOsChat } from '@/features/agentos/useAgentOsChat'
 import type { AgentOsImage, AgentOsSessionFocus } from '@/features/agentos/sessionClient'
-import { speak, subscribeToVoice, subscribeToVoiceStatus, type VoiceStatus } from '@/features/voice/voiceClient'
-import { captureScreen } from './shell'
+import { claimFinal, speak, subscribeToVoice, subscribeToVoiceStatus, type VoiceStatus } from '@/features/voice/voiceClient'
+import { captureScreen, inFront, inShell } from './shell'
 import { useDesktopFocus } from './useDesktopFocus'
 
 export const HUD_SESSION_TITLE = 'HUD'
@@ -84,8 +84,10 @@ export function useHud(opts: { active: boolean; screenshots: boolean }) {
         setListening(true)
         setPartial('')
         // The screen as it is when the key goes down: that's what "this" refers to.
-        shot.current = optsRef.current.screenshots ? captureScreen() : null
+        // Only the window in front takes it (a hidden dot window doesn't look at your screen).
+        shot.current = optsRef.current.screenshots ? inFront().then((front) => (front ? captureScreen() : null)) : null
       } else if (e.type === 'partial') {
+        setListening(true) // also when this mode came up after the key went down (the shell's launcher)
         setPartial(e.text)
       } else if (e.type === 'ptt_end') {
         setListening(false)
@@ -98,7 +100,17 @@ export function useHud(opts: { active: boolean; screenshots: boolean }) {
         setLastHeard({ text: e.text, language: e.language })
         const images = shot.current
         shot.current = null
-        void (async () => askRef.current(`[voice, ${e.language}] ${e.text}`, images ? await images : null))()
+        void (async () => {
+          // Exactly one page sends it: the one in front claims at once; a hidden shell window never does; a tab in
+          // the background only if nothing in front claimed it within 400 ms.
+          const front = await inFront()
+          if (!front) {
+            if (inShell()) return
+            await new Promise((r) => setTimeout(r, 400))
+          }
+          if (!(await claimFinal(e.id))) return
+          await askRef.current(`[voice, ${e.language}] ${e.text}`, images ? await images : null)
+        })()
       }
     })
   }, [opts.active])

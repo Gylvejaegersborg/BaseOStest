@@ -1,10 +1,10 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { CalendarProvider } from '@/features/calendar/CalendarContext'
 import { OsOverlayProvider } from '@/features/overlay/osOverlay'
 import { AgentOsProvider } from '@/features/agentos/AgentOsProvider'
 import { Launcher } from '@/features/launcher/Launcher'
 import { HudDot } from './HudDot'
-import { shellWindow } from './shell'
+import { inFront, setDotWindowOn, shellWindow } from './shell'
 import { useHud } from './useHud'
 
 /** /hud — what the desktop shell's windows load: `?window=launcher` (the launcher alone, shown by Alt+B) or
@@ -31,8 +31,18 @@ export function HudPage() {
   )
 }
 
-/** The dot window: always listening for push-to-talk, always taking the screenshot (it only exists in the shell). */
+/** The dot window: while it's showing it answers push-to-talk, with a screenshot each time (it only exists in the
+ *  shell). Hidden, it stays out of the way so the launcher answers instead. */
 function DotWindow() {
-  const hud = useHud({ active: true, screenshots: true })
+  // Asked of the shell (a hidden Tauri window doesn't reliably mark its page hidden), once a second.
+  const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    const check = () => void inFront().then(setVisible)
+    check()
+    const t = window.setInterval(check, 1000)
+    return () => window.clearInterval(t)
+  }, [])
+  useEffect(() => setDotWindowOn(visible), [visible])
+  const hud = useHud({ active: visible, screenshots: true })
   return <HudDot hud={hud} fixed />
 }

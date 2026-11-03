@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-window-visible"
+description = "Enables the window_visible command without any pre-configured scope."
+commands.allow = ["window_visible"]
+
+[[permission]]
+identifier = "deny-window-visible"
+description = "Denies the window_visible command without any pre-configured scope."
+commands.deny = ["window_visible"]

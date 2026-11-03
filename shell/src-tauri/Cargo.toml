@@ -1,0 +1,17 @@
+[package]
+name = "basespace-hud"
+version = "0.1.0"
+description = "BaseSpace's desktop shell: the launcher/HUD over every app, and the dot beside the cursor"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon"] }
+tauri-plugin-global-shortcut = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+xcap = "0"
+image = { version = "0.25", default-features = false, features = ["jpeg"] }
+base64 = "0.22"
