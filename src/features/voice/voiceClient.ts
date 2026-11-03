@@ -15,6 +15,9 @@ export type VoiceEvent =
   | { type: 'ptt_start'; t: number }
   | { type: 'ptt_end'; t: number; kept: boolean }
   | { type: 'speech_start'; t: number }
+  /** Live English text while push-to-talk is held (the hold so far, re-read about twice a second); the final
+   *  replaces it. Never for Norwegian. */
+  | { type: 'partial'; text: string; n: number; language: 'en'; audio_s: number; transcribe_ms: number }
   | { type: 'speech_end'; t: number; kept: boolean }
   | { type: 'mode'; mode: VoiceMode }
   | { type: 'speak_start'; t: number }
@@ -24,6 +27,8 @@ export type VoiceEvent =
   | { type: 'error'; error: string }
   | {
       type: 'final'
+      /** Claim it (claimFinal) before acting on it: every listening page gets the same final. */
+      id: string
       text: string
       /** 'no' or 'en': the language tag that goes with the text. */
       language: string
@@ -104,6 +109,17 @@ async function control(body: Record<string, unknown>): Promise<{ muted: boolean;
   const res = await fetch(`${BASE}/v1/control`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
   if (!res.ok) throw new Error(`voice service: ${res.status} ${await res.text()}`)
   return res.json()
+}
+
+/** True for the first page to claim a final, false for every other: BaseSpace can be open in several browser
+ *  tabs and in the shell's windows at once, and each hears the same push-to-talk. */
+export async function claimFinal(id: string): Promise<boolean> {
+  try {
+    const res = await fetch(`${BASE}/v1/claim`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id }) })
+    return res.ok && Boolean(((await res.json()) as { claimed?: boolean }).claimed)
+  } catch {
+    return false
+  }
 }
 
 /** Push-to-talk from a button instead of the key (hold: true on press, false on release). */

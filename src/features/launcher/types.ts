@@ -4,6 +4,10 @@ import type { LucideIcon } from 'lucide-react'
  *  AI mode), Expanded (everything, grouped by renderer). */
 export type LauncherSize = 'peek' | 'focus' | 'expanded'
 
+/** What the launcher is for right now. Search grows through the three sizes above (modes 1–3); chat is a
+ *  conversation with the agents (mode 5) and dot the cursor-side HUD dot (mode 4), both in src/features/hud/. */
+export type LauncherMode = 'search' | 'chat' | 'dot'
+
 /** Where a command can run. `shell` commands need the Tauri shell (apps,
  *  files, PowerToys…) and stay hidden in the browser until it exists. */
 export type Runtime = 'browser' | 'shell'

@@ -1,0 +1,10 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "hud",
+  "description": "The launcher and dot windows load BaseSpace from its dev server; only that origin may call the shell's commands.",
+  "windows": ["launcher", "dot"],
+  "remote": {
+    "urls": ["http://localhost:5173/*", "http://127.0.0.1:5173/*"]
+  },
+  "permissions": ["core:default", "allow-capture-screen", "allow-show-mode", "allow-hide-window", "allow-window-visible"]
+}

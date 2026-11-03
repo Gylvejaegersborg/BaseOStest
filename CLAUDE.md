@@ -74,6 +74,10 @@ gateway through the dev server's `/agent-os` proxy (see `vite.config.ts`).
   dev server's `/voice` proxy, which adds the gateway token (`vite.config.ts`). `src/features/voice/voiceClient.ts`
   keeps ONE WebSocket for the app — same rule as the EventSource. Ctrl+Alt+B push-to-talk is the service's
   global hotkey; dictation lands in the launcher's input with its language tag, and is never run on its own.
+- The HUD is the launcher (`src/features/hud/`): Search (modes 1–3), Chat (mode 5: a thread titled "HUD" with
+  Hemera by default, following `desktop.focus` → "Serves") and Dot (mode 4: beside the cursor; in the desktop
+  shell each push-to-talk takes a screenshot for that one turn, never stored). Ctrl+Alt+M cycles modes. The
+  shell's windows load `/hud?window=launcher|dot`. In chat and dot modes push-to-talk is sent to the agent.
 - Be honest: agents can't hear audio, don't invent metrics or stream counts, and mark
   assumptions as assumptions.
 - The artist name is stylized ISΛRK, but the Λ is only styling. Wherever search matters (file and

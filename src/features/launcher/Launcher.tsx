@@ -1,19 +1,27 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion, type Transition } from 'motion/react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Mic, Search, Sparkles } from 'lucide-react'
+import { ArrowLeft, Bot, Circle, Mic, Search, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { subscribeToVoice } from '@/features/voice/voiceClient'
+import { HudChat } from '@/features/hud/HudChat'
+import { HudDot } from '@/features/hud/HudDot'
+import { dotWindowOn, hideShellWindow, inShell, showShellMode } from '@/features/hud/shell'
+import { useHud } from '@/features/hud/useHud'
 import { runningTimerResults } from './commands'
 import { allEntries, askResult, search } from './rank'
 import { AnswerTitle, FormBody, ReplyBody, ResultAside, ResultIcon, TimerRing } from './renderers'
 import { addAlias, cancelTimer, hideResult, recordPick, remainingOf, renameResult, timers, togglePin, usePrefs, useTimers } from './store'
-import type { LauncherContext, LauncherSize, RendererKind, Result } from './types'
+import type { LauncherContext, LauncherMode, LauncherSize, RendererKind, Result } from './types'
 
 // The launcher: one window that grows on intent. Peek (bar + pinned chips)
 // → Focus (6 results + the Ask row; also the AI mode) → Expanded (all,
 // grouped by renderer). The search bar never moves; only the panel under it
 // does, on interruptible springs.
+//
+// It is also the HUD (src/features/hud/): mode 4 is the dot beside the cursor, mode 5 a chat/voice thread with the
+// agents. Ctrl+Alt+M cycles Search → Chat → Dot while it's open; the last mode is where Alt+B and push-to-talk open
+// it next time. In the desktop shell (shell/, Tauri) the launcher and the dot get their own always-on-top windows.
 
 const FOCUS_ROWS = 6
 export const LAUNCHER_TOGGLE_EVENT = 'launcher:toggle'
@@ -27,6 +35,26 @@ const GROUP_LABEL: Record<RendererKind, string> = {
   reply: 'Ask',
 }
 const GROUP_ORDER: RendererKind[] = ['answer', 'swatch', 'timer-ring', 'form', 'row', 'reply']
+const MODES: { id: LauncherMode; label: string; icon: typeof Search }[] = [
+  { id: 'search', label: 'Search', icon: Search },
+  { id: 'chat', label: 'Chat', icon: Bot },
+  { id: 'dot', label: 'Dot', icon: Circle },
+]
+const MODE_KEY = 'launcher.mode'
+
+function loadMode(): LauncherMode {
+  try {
+    const m = localStorage.getItem(MODE_KEY)
+    return m === 'chat' || m === 'dot' ? m : 'search'
+  } catch {
+    return 'search'
+  }
+}
+
+/** Ctrl+Alt+M: the next mode, while the launcher is open. */
+function isModeKey(e: KeyboardEvent): boolean {
+  return e.code === 'KeyM' && e.altKey && e.ctrlKey && !e.shiftKey && !e.metaKey
+}
 
 /** Alt+B is the HUD key (Alt+Space and Ctrl+Alt+Space are taken on the
  *  operator's machine). Matched by physical key, so it works on any layout.
@@ -43,13 +71,22 @@ interface Menu {
   mode: 'menu' | 'rename' | 'alias'
 }
 
-export function Launcher() {
+/** `shell`: rendered by the desktop shell's launcher window (/hud), which shows and hides the window itself. */
+export function Launcher({ shell = false }: { shell?: boolean } = {}) {
   const navigate = useNavigate()
   const reduce = useReducedMotion()
   const prefs = usePrefs()
   const liveTimers = useTimers()
 
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(shell)
+  // In the shell the launcher window is never the dot (the dot has its own window), so it starts in Search or Chat.
+  const [mode, setModeState] = useState<LauncherMode>(() => (shell && loadMode() === 'dot' ? 'chat' : loadMode()))
+  const modeRef = useRef(mode)
+  modeRef.current = mode
+  // The HUD listens whenever a HUD mode is the current one, open or not: push-to-talk opens the launcher, and
+  // the dot's screenshot has to be taken the moment the key goes down. In the shell, only while this window is
+  // open: the dot window answers on its own when it's showing.
+  const hud = useHud({ active: mode !== 'search' && (!shell || open), screenshots: mode === 'dot' && inShell() })
   const [query, setQuery] = useState('')
   const [expanded, setExpanded] = useState(false)
   const [hl, setHl] = useState(0)
@@ -94,6 +131,7 @@ export function Launcher() {
   }, [])
   const close = useCallback(() => {
     setOpen(false)
+    if (shell) void hideShellWindow()
     setQuery('')
     setHeard(null)
     setExpanded(false)
@@ -101,7 +139,7 @@ export function Launcher() {
     setFormFor(null)
     setAiQuery(null)
     setMenu(null)
-  }, [])
+  }, [shell])
 
   const flash = useCallback((text: string) => {
     setToast(text)
@@ -135,9 +173,45 @@ export function Launcher() {
     [close, navigate, flash],
   )
 
+  const setMode = useCallback(
+    (m: LauncherMode) => {
+      // In the shell the dot has its own window: "Dot" turns it on or off, and this window stays as it was.
+      if (shell && m === 'dot') {
+        void showShellMode('dot')
+        return
+      }
+      setModeState(m)
+      try {
+        localStorage.setItem(MODE_KEY, m)
+      } catch {
+        /* not remembered in a private window */
+      }
+      if (m === 'search') requestAnimationFrame(() => inputRef.current?.focus())
+    },
+    [shell],
+  )
+
+  // The shell shows this window on Alt+B: open the launcher whenever it comes to the front.
+  useEffect(() => {
+    if (!shell) return
+    const onFocus = () => setOpen(true)
+    window.addEventListener('focus', onFocus)
+    return () => window.removeEventListener('focus', onFocus)
+  }, [shell])
+
   // ── global hotkey + timer completion ─────────────────────────────────
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (open && isModeKey(e)) {
+        e.preventDefault()
+        setMode(MODES[(MODES.findIndex((m) => m.id === mode) + 1) % MODES.length].id)
+        return
+      }
+      if (open && mode === 'dot' && e.key === 'Escape') {
+        e.preventDefault()
+        close()
+        return
+      }
       if (!isToggleKey(e)) return
       e.preventDefault()
       if (open) close()
@@ -150,7 +224,7 @@ export function Launcher() {
       window.removeEventListener('keydown', onKey)
       window.removeEventListener(LAUNCHER_TOGGLE_EVENT, onToggle)
     }
-  }, [open, show, close])
+  }, [open, show, close, mode, setMode])
 
   // ── voice: push-to-talk dictation lands in the input ─────────────────
   // Only push-to-talk finals: with the service's open mic (mic.trigger: always) everything said in the room would
@@ -159,8 +233,15 @@ export function Launcher() {
     () =>
       subscribeToVoice((e) => {
         if (e.type === 'ptt_start') {
+          if (shell && dotWindowOn()) return // the dot answers this one
           setListening(true)
           show()
+          if (shell) void showShellMode(modeRef.current) // bring the window up over whatever is in front
+        } else if (shell && dotWindowOn()) {
+          return
+        } else if (modeRef.current !== 'search') {
+          if (e.type === 'ptt_end') setListening(false)
+          return // a HUD mode: useHud sends it to the agent
         } else if (e.type === 'ptt_end') {
           setListening(false)
           if (!e.kept) flash("Didn't catch that")
@@ -267,17 +348,31 @@ export function Launcher() {
   return (
     <>
       <AnimatePresence>
-        {open && (
+        {open && mode !== 'dot' && (
           <motion.div
             key="scrim"
-            className="fixed inset-0 z-[90] bg-black/45"
+            // In the shell the window is the launcher's own, over other apps: no dimming, just "click outside closes".
+            className={cn('fixed inset-0 z-[90]', !shell && 'bg-black/45')}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.1 } }}
             onMouseDown={close}
           />
         )}
-        {open && (
+        {open && mode === 'dot' && <HudDot key="dot" hud={hud} />}
+        {open && mode === 'dot' && !shell && (
+          <motion.div
+            key="dot-hint"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-x-0 bottom-6 z-[95] mx-auto w-fit rounded-full border border-line-2 bg-panel/90 px-4 py-1.5 text-[12px] text-dim"
+          >
+            Dot mode · hold Ctrl+Alt+B to ask · Ctrl+Alt+M switches mode · Esc closes
+            {!inShell() && ' · screenshots need the desktop shell'}
+          </motion.div>
+        )}
+        {open && mode !== 'dot' && (
           <motion.div
             key="launcher"
             role="dialog"
@@ -287,12 +382,38 @@ export function Launcher() {
             animate={{ opacity: 1, scale: 1, transition: spring }}
             exit={{ opacity: 0, scale: 0.98, transition: { duration: 0.1 } }}
           >
+            <div className="mb-2 flex justify-center gap-1" role="tablist" aria-label="Launcher mode">
+              {MODES.map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={mode === m.id}
+                  onClick={() => setMode(m.id)}
+                  title={`${m.label} (Ctrl+Alt+M cycles)`}
+                  className={cn(
+                    'flex items-center gap-1.5 rounded-full border px-3 py-0.5 text-[11px]',
+                    mode === m.id ? 'border-accent-4 bg-accent-5/30 text-accent-1' : 'border-line-2 bg-panel/80 text-dim hover:text-text',
+                  )}
+                >
+                  <m.icon size={11} /> {m.label}
+                </button>
+              ))}
+            </div>
             <motion.div
               layout
               transition={spring}
-              className="hud-corners relative overflow-hidden rounded-xl border border-line-2 bg-panel/95 text-accent-3 shadow-[0_24px_64px_rgba(0,0,0,0.6)] backdrop-blur-md"
+              // In the shell the window's edge would cut the big shadow off into a grey box: a small one fits inside.
+              className={cn(
+                'hud-corners relative overflow-hidden rounded-xl border border-line-2 bg-panel/95 text-accent-3 backdrop-blur-md',
+                shell ? 'shadow-[0_6px_18px_rgba(0,0,0,0.45)]' : 'shadow-[0_24px_64px_rgba(0,0,0,0.6)]',
+              )}
               style={{ borderRadius: 12 }}
             >
+              {mode === 'chat' ? (
+                <HudChat hud={hud} onClose={close} />
+              ) : (
+              <>
               {/* Search bar: anchored; only what's below it moves. */}
               <motion.div layout="position" className="flex h-14 items-center gap-3 border-b border-line px-4 text-text">
                 {aiQuery !== null ? (
@@ -499,6 +620,8 @@ export function Launcher() {
                   <Sparkles size={11} /> ? asks
                 </span>
               </motion.div>
+              </>
+              )}
             </motion.div>
           </motion.div>
         )}
