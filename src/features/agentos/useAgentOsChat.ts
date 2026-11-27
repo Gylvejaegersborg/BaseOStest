@@ -13,6 +13,7 @@ import {
   subscribeToSessionEvents,
   type AgentOsSession,
 } from './sessionClient'
+import { startUiBridge } from './uiBridge'
 
 export interface ChatMessage {
   id: string
@@ -190,8 +191,13 @@ export function useAgentOsChat(agentId: string, preferredSessionId?: string | nu
     return dispose
   }, [sessionId, connection, refreshHistory])
 
+  useEffect(() => {
+    if (!sessionId || connection !== 'ready') return
+    return startUiBridge(sessionId)
+  }, [sessionId, connection])
+
   const send = useCallback(
-    async (text: string, planMode?: boolean, images?: AgentOsImage[]) => {
+    async (text: string, planMode?: boolean, images?: AgentOsImage[], options?: { openui?: boolean; openuiPrompt?: string; enableUi?: boolean }) => {
       const id = sessionIdRef.current
       if (!id || connection !== 'ready' || !text.trim()) return
 
@@ -200,7 +206,7 @@ export function useAgentOsChat(agentId: string, preferredSessionId?: string | nu
       setStreaming(true)
 
       try {
-        await sendTurn(id, text, planMode, images)
+        await sendTurn(id, text, planMode, images, options)
       } catch (err) {
         setMessages((m) => [
           ...m,
