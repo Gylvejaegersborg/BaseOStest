@@ -91,10 +91,28 @@ export async function getSessionHistory(sessionId: string): Promise<AgentOsHisto
  *  calls, cancellation) is instead observed via subscribeToSessionEvents
  *  below, concurrently with this call. A generous 120s timeout since a
  *  real model call plus tool hops can genuinely take a while. */
-export function sendTurn(sessionId: string, userMessage: string, planMode?: boolean, images?: AgentOsImage[]): Promise<AgentOsTurnResult> {
+export interface AgentOsTurnOptions {
+  openui?: boolean
+  openuiPrompt?: string
+  enableUi?: boolean
+}
+
+export function sendTurn(
+  sessionId: string,
+  userMessage: string,
+  planMode?: boolean,
+  images?: AgentOsImage[],
+  options?: AgentOsTurnOptions,
+): Promise<AgentOsTurnResult> {
   return request<AgentOsTurnResult>(
     `/sessions/${sessionId}/turns`,
-    { method: 'POST', body: JSON.stringify({ userMessage, planMode, ...(images?.length ? { images } : {}) }) },
+    { method: 'POST', body: JSON.stringify({
+      userMessage,
+      planMode,
+      ...(images?.length ? { images } : {}),
+      ...(options?.enableUi ? { enableUi: true } : {}),
+      ...(options?.openui ? { openui: true, ...(options.openuiPrompt ? { openuiPrompt: options.openuiPrompt } : {}) } : {}),
+    }) },
     120000,
   )
 }
@@ -188,6 +206,16 @@ export async function fetchRecentDecisions(limit = 30): Promise<AgentOsApproval[
 
 export async function fetchApproval(id: string): Promise<AgentOsApproval> {
   return request<AgentOsApproval>(`/approvals/${encodeURIComponent(id)}`)
+}
+
+export async function respondUiRequest(requestId: string, outcome:
+  | { ok: true; result: unknown }
+  | { ok: false; outcome: 'rejected' | 'cancelled' | 'timeout' | 'error'; error?: string },
+): Promise<{ ok: true; requestId: string }> {
+  return request<{ ok: true; requestId: string }>(`/ui/responses/${encodeURIComponent(requestId)}`, {
+    method: 'POST',
+    body: JSON.stringify(outcome),
+  })
 }
 
 // ---- Allowlist ("always allow" per agent — agent-os's allowlist.ts) ----
@@ -524,6 +552,7 @@ export function subscribeToEvents(types: string[], onEvent: (e: SessionEvent) =>
 
 const SESSION_EVENT_TYPES = [
   'agent.turn.start',
+  'ui.request',
   'session.note',
   'agent.turn.delta',
   'tool.call.start',

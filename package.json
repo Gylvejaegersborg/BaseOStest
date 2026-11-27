@@ -22,9 +22,14 @@
     "@lezer/common": "^1.5.3",
     "@lezer/highlight": "^1.2.4",
     "@lezer/markdown": "^1.7.2",
+    "@openuidev/lang-core": "^1.2.0",
+    "@openuidev/react-headless": "^0.20.1",
+    "@openuidev/react-lang": "^1.2.0",
     "@react-three/drei": "^9.122.0",
     "@react-three/fiber": "^8.18.0",
     "@react-three/postprocessing": "^2.19.1",
+    "@ui-sdk/core": "^0.1.0-beta.17",
+    "@ui-sdk/react": "^0.1.0-beta.17",
     "@xterm/addon-fit": "^0.10.0",
     "@xterm/xterm": "^5.5.0",
     "clsx": "^2.1.1",
@@ -38,7 +43,8 @@
     "react-router-dom": "^6.26.2",
     "remark-gfm": "^4.0.0",
     "tailwind-merge": "^3.7.0",
-    "three": "^0.169.0"
+    "three": "^0.169.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/node": "^25.9.1",

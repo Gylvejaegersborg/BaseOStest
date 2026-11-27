@@ -9,6 +9,7 @@ import { cn } from '@/lib/cn'
 import type { Agent } from '@/data/agents'
 import type { useAgentOsChat, ChatMessage } from '@/features/agentos/useAgentOsChat'
 import { useNotesList, createNoteFromText } from '@/features/notes/notesStore'
+import { OpenUiMessage, isValidOpenUiResponse, openUiPrompt } from '@/features/agentos/openuiLibrary'
 
 interface Attachment {
   id: string
@@ -47,6 +48,7 @@ export function ConversationPane({
   const [referencedNoteIds, setReferencedNoteIds] = useState<string[]>([])
   const [dragging, setDragging] = useState(false)
   const [planMode, setPlanMode] = useState(false)
+  const [openUiMode, setOpenUiMode] = useState(false)
   const currentSession = chat.sessions.find((x) => x.id === chat.sessionId)
   const usage = useAgentOsSessionUsage(chat.sessionId, chat.streaming)
   const [attachMenuOpen, setAttachMenuOpen] = useState(false)
@@ -88,7 +90,11 @@ export function ConversationPane({
         .map((n) => `--- Referenced note: "${n.title}" ---\n${n.body}\n--- end note ---`)
       withAttachments = `${blocks.join('\n\n')}\n\n${withAttachments}`
     }
-    chat.send(withAttachments, planMode)
+    chat.send(withAttachments, planMode, undefined, {
+      enableUi: true,
+      openui: openUiMode,
+      openuiPrompt: openUiMode ? openUiPrompt() : undefined,
+    })
     setDraft('')
     setPending([])
     setReferencedNoteIds([])
@@ -138,12 +144,23 @@ export function ConversationPane({
           <MessageRow key={m.id} msg={m} agentColor={agent.color} agentName={agent.name} onSendToNotes={sendToNotes} onShowApproval={onShowApproval} />
         ))}
         {chat.streaming && chat.streamingText && (
-          <MessageRow
-            msg={{ id: '__streaming', role: 'assistant', text: chat.streamingText, time: '' }}
-            agentColor={agent.color}
-            agentName={agent.name}
-            onSendToNotes={sendToNotes}
-          />
+          openUiMode && isValidOpenUiResponse(chat.streamingText)
+            ? (
+              <div className="flex gap-3">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center border text-[10px]" style={{ borderColor: `${agent.color}66`, color: agent.color }}>
+                  <Bot size={14} />
+                </div>
+                <div className="max-w-[92%] text-left"><OpenUiMessage text={chat.streamingText} streaming /></div>
+              </div>
+            )
+            : (
+              <MessageRow
+                msg={{ id: '__streaming', role: 'assistant', text: chat.streamingText, time: '' }}
+                agentColor={agent.color}
+                agentName={agent.name}
+                onSendToNotes={sendToNotes}
+              />
+            )
         )}
         {chat.streaming && !chat.streamingText && (
           <div className="flex gap-3">
@@ -184,6 +201,16 @@ export function ConversationPane({
           </p>
         )}
         <div className="flex items-end gap-2">
+          <button
+            onClick={() => setOpenUiMode((enabled) => !enabled)}
+            title={openUiMode ? 'OpenUI generation on — click for plain chat' : 'Plain chat — click to enable OpenUI generation'}
+            className={cn(
+              'rounded-control border px-2 py-2 text-[10px] transition-colors',
+              openUiMode ? 'border-accent/50 bg-accent/10 text-accent' : 'border-line text-dim hover:border-accent/60 hover:text-accent',
+            )}
+          >
+            UI
+          </button>
           <button
             onClick={() => setPlanMode((p) => !p)}
             title={planMode ? 'Plan mode on — click to allow real changes again' : 'Plan mode off — click to inspect only, no real changes'}
@@ -352,10 +379,14 @@ function MessageRow({
             (isUser ? (
               <p className="whitespace-pre-wrap text-left">{msg.text}</p>
             ) : (
-              // An agent's reply is markdown: render it (it showed raw **stars** and *italics*).
-              <div className="prose-term prose-compact prose-chat text-left">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
-              </div>
+              isValidOpenUiResponse(msg.text)
+                ? <OpenUiMessage text={msg.text} streaming={false} />
+                : (
+                  // Plain text and Markdown remain the fallback for invalid OpenUI.
+                  <div className="prose-term prose-compact prose-chat text-left">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
+                  </div>
+                )
             ))}
         </div>
       </div>
